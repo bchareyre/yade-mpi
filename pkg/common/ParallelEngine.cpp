@@ -1,4 +1,4 @@
-#include <yade/pkg/common/ParallelEngine.hpp>
+#include <pkg/common/ParallelEngine.hpp>
 YADE_PLUGIN((ParallelEngine));
 
 #ifdef YADE_OPENMP

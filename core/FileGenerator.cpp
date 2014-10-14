@@ -3,10 +3,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/core/Omega.hpp>
+#include<core/Omega.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
-#include<yade/lib/pyutil/gil.hpp>
-#include<yade/lib/serialization/ObjectIO.hpp>
+#include<lib/pyutil/gil.hpp>
+#include<lib/serialization/ObjectIO.hpp>
 
 #include"FileGenerator.hpp"
 

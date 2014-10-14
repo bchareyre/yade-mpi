@@ -166,12 +166,12 @@ class FlowBoundingSphere : public Network<_Tesselation>
 };
 
 } //namespace CGT
-#include <yade/lib/triangulation/FlowBoundingSphere.ipp>
+#include <lib/triangulation/FlowBoundingSphere.ipp>
 #ifdef LINSOLV
-#include "yade/lib/triangulation/FlowBoundingSphereLinSolv.hpp"
+#include "lib/triangulation/FlowBoundingSphereLinSolv.hpp"
 #endif
 
 /// _____ Template Implementation ____
-// #include "yade/lib/triangulation/FlowBoundingSphereLinSolv.ipp"
+// #include "lib/triangulation/FlowBoundingSphereLinSolv.ipp"
 
 #endif //FLOW_ENGINE

@@ -7,35 +7,35 @@
 *************************************************************************/
 
 
-#include<yade/pkg/dem/ElasticContactLaw.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/dem/TriaxialStressController.hpp>
-#include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
-#include <yade/pkg/dem/TriaxialStateRecorder.hpp>
-#include<yade/pkg/common/Aabb.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/InsertionSortCollider.hpp>
-#include<yade/pkg/common/InsertionSortCollider.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/GravityEngines.hpp>
-#include<yade/pkg/dem/NewtonIntegrator.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/common/Wall.hpp>
-#include<yade/pkg/common/ForceResetter.hpp>
-#include<yade/pkg/common/InteractionLoop.hpp>
-#include<yade/pkg/dem/Shop.hpp>
+#include<pkg/dem/ElasticContactLaw.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/dem/GlobalStiffnessTimeStepper.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/dem/TriaxialStressController.hpp>
+#include<pkg/dem/TriaxialCompressionEngine.hpp>
+#include <pkg/dem/TriaxialStateRecorder.hpp>
+#include<pkg/common/Aabb.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/InsertionSortCollider.hpp>
+#include<pkg/common/InsertionSortCollider.hpp>
+#include<core/Interaction.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/GravityEngines.hpp>
+#include<pkg/dem/NewtonIntegrator.hpp>
+#include<core/Body.hpp>
+#include<pkg/common/Box.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/common/Wall.hpp>
+#include<pkg/common/ForceResetter.hpp>
+#include<pkg/common/InteractionLoop.hpp>
+#include<pkg/dem/Shop.hpp>
 
-#include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
-#include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
-#include<yade/pkg/dem/Ig2_Facet_Sphere_ScGeom.hpp>
-#include<yade/pkg/common/Bo1_Aabb.hpp>
-#include<yade/pkg/common/Wall.hpp>
+#include<pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
+#include<pkg/dem/Ig2_Facet_Sphere_ScGeom.hpp>
+#include<pkg/common/Bo1_Aabb.hpp>
+#include<pkg/common/Wall.hpp>
 
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
@@ -44,8 +44,8 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
-#include<yade/pkg/dem/SpherePack.hpp>
-//#include<yade/pkg/dem/MicroMacroAnalyser.hpp>
+#include<pkg/dem/SpherePack.hpp>
+//#include<pkg/dem/MicroMacroAnalyser.hpp>
 
 #include "TriaxialTest.hpp"
 CREATE_LOGGER(TriaxialTest);

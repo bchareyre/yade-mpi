@@ -2,11 +2,11 @@
 // 2012 © Kneib Francois <francois.kneib@irstea.fr>
 
 #include "Cylinder.hpp"
-#include<yade/pkg/common/Sphere.hpp>
+#include<pkg/common/Sphere.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
 #endif
-#include<yade/pkg/common/Aabb.hpp>
+#include<pkg/common/Aabb.hpp>
 
 Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}

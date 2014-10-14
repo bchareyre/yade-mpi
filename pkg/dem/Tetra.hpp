@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include<yade/core/Shape.hpp>
-#include<yade/core/IGeom.hpp>
-#include<yade/core/GlobalEngine.hpp>
+#include<core/Shape.hpp>
+#include<core/IGeom.hpp>
+#include<core/GlobalEngine.hpp>
 
-#include<yade/pkg/common/Aabb.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
+#include<pkg/common/Aabb.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/NormShearPhys.hpp>
 
 #ifdef YADE_CGAL
 	#include <CGAL/Cartesian.h>
@@ -84,7 +84,7 @@ class Bo1_Tetra_Aabb: public BoundFunctor{
 REGISTER_SERIALIZABLE(Bo1_Tetra_Aabb);
 
 #ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
+	#include<pkg/common/GLDrawFunctors.hpp>
 	/*! Draw Tetra using OpenGL */
 	class Gl1_Tetra: public GlShapeFunctor{	
 		public:

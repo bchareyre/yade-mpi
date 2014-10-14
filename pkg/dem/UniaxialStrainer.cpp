@@ -1,9 +1,9 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"UniaxialStrainer.hpp"
 
-#include<yade/core/Scene.hpp>
-#include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg/common/Aabb.hpp>
+#include<core/Scene.hpp>
+#include<core/InteractionContainer.hpp>
+#include<pkg/common/Aabb.hpp>
 
 YADE_PLUGIN((UniaxialStrainer));
 /************************ UniaxialStrainer **********************/

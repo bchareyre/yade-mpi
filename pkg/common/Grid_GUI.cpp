@@ -7,7 +7,7 @@
 
 #include "Grid.hpp"
 #ifdef YADE_OPENGL
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
 
 //!##################	Rendering   #####################
 

@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/pkg/common/MatchMaker.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<pkg/common/MatchMaker.hpp>
 
 #ifdef YADE_SPH
-#include<yade/pkg/common/SPHEngine.hpp>
+#include<pkg/common/SPHEngine.hpp>
 #endif
 
 

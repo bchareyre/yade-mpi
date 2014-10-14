@@ -8,32 +8,32 @@
 
 #include "CohesiveTriaxialTest.hpp"
 
-#include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
+#include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
+#include<pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
-#include<yade/pkg/dem/TriaxialStressController.hpp>
-#include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
-#include <yade/pkg/dem/TriaxialStateRecorder.hpp>
+#include<pkg/dem/TriaxialStressController.hpp>
+#include<pkg/dem/TriaxialCompressionEngine.hpp>
+#include <pkg/dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg/common/Aabb.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/InsertionSortCollider.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
+#include<pkg/common/Aabb.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/InsertionSortCollider.hpp>
+#include<core/Interaction.hpp>
+#include<pkg/common/Dispatching.hpp>
 
-#include<yade/pkg/common/GravityEngines.hpp>
-#include<yade/pkg/dem/NewtonIntegrator.hpp>
-#include<yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
-#include<yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
+#include<pkg/common/GravityEngines.hpp>
+#include<pkg/dem/NewtonIntegrator.hpp>
+#include<pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<pkg/dem/Ig2_Box_Sphere_ScGeom.hpp>
 
-#include<yade/core/Body.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Bo1_Aabb.hpp>
+#include<core/Body.hpp>
+#include<pkg/common/Box.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Bo1_Aabb.hpp>
 
-#include<yade/pkg/common/ForceResetter.hpp>
+#include<pkg/common/ForceResetter.hpp>
 
-#include<yade/pkg/dem/Shop.hpp>
+#include<pkg/dem/Shop.hpp>
 
 #include <boost/limits.hpp>
 

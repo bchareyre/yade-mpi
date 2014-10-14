@@ -1,9 +1,9 @@
 #pragma once
 
-#include<yade/core/Material.hpp>
-#include<yade/core/IPhys.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
+#include<core/Material.hpp>
+#include<core/IPhys.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/common/Dispatching.hpp>
 
 namespace py=boost::python;
 

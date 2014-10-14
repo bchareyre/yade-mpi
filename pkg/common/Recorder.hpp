@@ -1,6 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
-#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
 class Recorder: public PeriodicEngine{
 	void openAndCheck() {
 		assert(!out.is_open());

@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include "CohesiveFrictionalContactLaw.hpp"
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
 
 YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom6D_CohFrictPhys_CohesionMoment)(CohFrictMat)(CohFrictPhys)(Ip2_CohFrictMat_CohFrictMat_CohFrictPhys));
 CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);

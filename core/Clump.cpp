@@ -1,10 +1,10 @@
 // (c) 2007-2010 Vaclav Smilauer <eudoxos@arcig.cz> 
 
 #include"Clump.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/core/BodyContainer.hpp>
-#include<yade/core/State.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<core/Scene.hpp>
+#include<core/BodyContainer.hpp>
+#include<core/State.hpp>
+#include<pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);

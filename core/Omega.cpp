@@ -12,13 +12,13 @@
 #include"Scene.hpp"
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/multimethods/FunctorWrapper.hpp>
-#include<yade/lib/multimethods/Indexable.hpp>
+#include<lib/base/Math.hpp>
+#include<lib/multimethods/FunctorWrapper.hpp>
+#include<lib/multimethods/Indexable.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
 
-#include<yade/lib/serialization/ObjectIO.hpp>
+#include<lib/serialization/ObjectIO.hpp>
 
 
 #include<cxxabi.h>

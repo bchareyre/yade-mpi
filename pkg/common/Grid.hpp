@@ -22,15 +22,15 @@
 
 #pragma once
 #include "Sphere.hpp"
-#include <yade/pkg/dem/FrictPhys.hpp>
-#include <yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
-#include <yade/pkg/dem/ScGeom.hpp>
-#include <yade/core/Body.hpp>
-#include <yade/pkg/common/Dispatching.hpp>
-#include <yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
-#include <yade/pkg/dem/ElasticContactLaw.hpp>
+#include <pkg/dem/FrictPhys.hpp>
+#include <pkg/dem/CohesiveFrictionalContactLaw.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <core/Body.hpp>
+#include <pkg/common/Dispatching.hpp>
+#include <pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include <pkg/dem/ElasticContactLaw.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
+	#include<pkg/common/GLDrawFunctors.hpp>
 #endif
 
 

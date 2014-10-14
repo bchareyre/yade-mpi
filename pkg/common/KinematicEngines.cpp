@@ -1,8 +1,8 @@
 
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/KinematicEngines.hpp>
-#include<yade/pkg/dem/Shop.hpp>
-#include<yade/lib/smoothing/LinearInterpolate.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/KinematicEngines.hpp>
+#include<pkg/dem/Shop.hpp>
+#include<lib/smoothing/LinearInterpolate.hpp>
 
 YADE_PLUGIN((KinematicEngine)(CombinedKinematicEngine)(TranslationEngine)(HarmonicMotionEngine)(RotationEngine)(HelixEngine)(InterpolatingHelixEngine)(HarmonicRotationEngine)(ServoPIDController)(BicyclePedalEngine));
 

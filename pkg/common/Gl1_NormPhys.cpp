@@ -1,11 +1,11 @@
 #ifdef YADE_OPENGL
 
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Gl1_NormPhys.hpp>
-#include<yade/pkg/common/OpenGLRenderer.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/pkg/dem/Shop.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Gl1_NormPhys.hpp>
+#include<pkg/common/OpenGLRenderer.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<pkg/dem/Shop.hpp>
 
 
 	YADE_PLUGIN((Gl1_NormPhys));

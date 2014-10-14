@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include "NormalInelasticPM.hpp"
-#include <yade/pkg/dem/ScGeom.hpp>
-#include <yade/core/Omega.hpp>
-#include <yade/core/Scene.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <core/Omega.hpp>
+#include <core/Scene.hpp>
 
 YADE_PLUGIN((NormalInelasticMat)(NormalInelasticityPhys)(Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity)(Ip2_2xNormalInelasticMat_NormalInelasticityPhys));
 

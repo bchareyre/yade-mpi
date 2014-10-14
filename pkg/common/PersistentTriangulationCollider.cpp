@@ -7,11 +7,11 @@
 #ifdef YADE_CGAL
 
 #include"PersistentTriangulationCollider.hpp"
-#include<yade/core/Body.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/BodyContainer.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
+#include<core/Body.hpp>
+#include<core/Scene.hpp>
+#include<core/BodyContainer.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/ElastMat.hpp>
 
 // PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 // {

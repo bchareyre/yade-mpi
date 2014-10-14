@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/pkg/dem/TriaxialStressController.hpp>
+#include<core/PartialEngine.hpp>
+#include<lib/base/Math.hpp>
+#include<pkg/dem/TriaxialStressController.hpp>
 
 /** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial test with constant lateral stress and constant axial strain rate. The algorithms used have been developed initialy for simulations reported in [Chareyre2002a] and [Chareyre2005]. They have been ported to Yade in a second step and used in e.g. [Kozicki2008],[Scholtes2009b],[Jerier2010b].
  *

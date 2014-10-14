@@ -1,7 +1,7 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
 
-#include<yade/lib/serialization/Serializable.hpp>
+#include<lib/serialization/Serializable.hpp>
 
 class Interaction;
 class Body;

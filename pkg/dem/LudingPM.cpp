@@ -1,9 +1,9 @@
 #include"LudingPM.hpp"
-#include<yade/core/State.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<core/State.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((LudingMat)(LudingPhys)(Ip2_LudingMat_LudingMat_LudingPhys)(Law2_ScGeom_LudingPhys_Basic));
 

@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include<yade/pkg/common/BoundaryController.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/lib/base/Math.hpp>
-#include <yade/core/Scene.hpp>
+#include<pkg/common/BoundaryController.hpp>
+#include<core/Body.hpp>
+#include<lib/base/Math.hpp>
+#include <core/Scene.hpp>
 
 
 

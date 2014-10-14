@@ -1,6 +1,6 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 
-#include<yade/lib/base/Math.hpp>
+#include<lib/base/Math.hpp>
 #include<unistd.h>
 #include<list>
 #include<signal.h>
@@ -12,28 +12,28 @@
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/algorithm/string.hpp>
 
-#include<yade/lib/base/Logging.hpp>
-#include<yade/lib/pyutil/gil.hpp>
-#include<yade/lib/pyutil/raw_constructor.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/ThreadRunner.hpp>
-#include<yade/core/FileGenerator.hpp>
-#include<yade/core/EnergyTracker.hpp>
+#include<lib/base/Logging.hpp>
+#include<lib/pyutil/gil.hpp>
+#include<lib/pyutil/raw_constructor.hpp>
+#include<lib/pyutil/doc_opts.hpp>
+#include<core/Omega.hpp>
+#include<core/ThreadRunner.hpp>
+#include<core/FileGenerator.hpp>
+#include<core/EnergyTracker.hpp>
 
-#include<yade/pkg/dem/STLImporter.hpp>
+#include<pkg/dem/STLImporter.hpp>
 
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/core/PartialEngine.hpp>
-#include<yade/core/Functor.hpp>
-#include<yade/pkg/common/ParallelEngine.hpp>
-#include<yade/pkg/common/Collider.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<core/GlobalEngine.hpp>
+#include<core/PartialEngine.hpp>
+#include<core/Functor.hpp>
+#include<pkg/common/ParallelEngine.hpp>
+#include<pkg/common/Collider.hpp>
 
-#include<yade/pkg/common/InteractionLoop.hpp>
+#include<pkg/common/InteractionLoop.hpp>
 
-#include <yade/core/Clump.hpp>
-#include <yade/pkg/common/Sphere.hpp>
+#include <core/Clump.hpp>
+#include <pkg/common/Sphere.hpp>
 
 #if BOOST_VERSION>=104700
 	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
@@ -47,8 +47,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/archive/codecvt_null.hpp>
 
-#include <yade/core/Timing.hpp>
-#include <yade/lib/serialization/ObjectIO.hpp>
+#include <core/Timing.hpp>
+#include <lib/serialization/ObjectIO.hpp>
 
 namespace py = boost::python;
 

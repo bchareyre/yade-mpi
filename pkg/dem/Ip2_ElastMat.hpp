@@ -1,7 +1,7 @@
 
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/MatchMaker.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/MatchMaker.hpp>
+#include<pkg/common/ElastMat.hpp>
 
 class Ip2_ElastMat_ElastMat_NormPhys: public IPhysFunctor{
 	public:

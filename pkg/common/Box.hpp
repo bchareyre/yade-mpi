@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/Shape.hpp>
+#include<core/Shape.hpp>
 
 
 class Box: public Shape{

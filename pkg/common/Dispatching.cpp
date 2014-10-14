@@ -1,4 +1,4 @@
-#include<yade/pkg/common/Dispatching.hpp>
+#include<pkg/common/Dispatching.hpp>
 
 YADE_PLUGIN((BoundFunctor)(IGeomFunctor)(IPhysFunctor)(LawFunctor)(BoundDispatcher)(IGeomDispatcher)(IPhysDispatcher)(LawDispatcher));
 BoundFunctor::~BoundFunctor(){};

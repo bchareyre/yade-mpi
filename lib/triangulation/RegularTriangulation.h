@@ -20,7 +20,7 @@
 #include <boost/static_assert.hpp>
 
 //This include from yade let us use Eigen types
-#include <yade/lib/base/Math.hpp>
+#include <lib/base/Math.hpp>
 
 const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 

@@ -3,11 +3,11 @@
 // © 2006 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 
 #pragma once
-#include<yade/core/Interaction.hpp>
-#include<yade/core/IGeom.hpp>
-#include<yade/core/State.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
+#include<core/Interaction.hpp>
+#include<core/IGeom.hpp>
+#include<core/State.hpp>
+#include<lib/base/Math.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
 /*! Class representing geometry of two bodies in contact.
  *
  * The code under SCG_SHEAR is experimental and is used only if ElasticContactLaw::useShear is explicitly true

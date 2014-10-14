@@ -3,13 +3,13 @@
 // 2014 © Raphael Maurin <raphael.maurin@irstea.fr> 
 
 #include"ForceEngine.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/lib/smoothing/LinearInterpolate.hpp>
-#include<yade/pkg/dem/Shop.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<lib/smoothing/LinearInterpolate.hpp>
+#include<pkg/dem/Shop.hpp>
 
-#include<yade/core/IGeom.hpp>
-#include<yade/core/IPhys.hpp>
+#include<core/IGeom.hpp>
+#include<core/IPhys.hpp>
 
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/normal_distribution.hpp>

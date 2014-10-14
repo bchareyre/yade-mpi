@@ -4,9 +4,9 @@
 
 #include<boost/lambda/lambda.hpp>
 
-#include "yade/lib/base/Math.hpp"
-#include "yade/lib/base/Logging.hpp"
-#include "yade/core/Body.hpp"
+#include "lib/base/Math.hpp"
+#include "lib/base/Logging.hpp"
+#include "core/Body.hpp"
 
 #include<boost/function.hpp>
 

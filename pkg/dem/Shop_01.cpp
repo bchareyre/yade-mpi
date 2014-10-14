@@ -2,47 +2,47 @@
 #include"Shop.hpp"
 #include<boost/tokenizer.hpp>
 
-#include"yade/core/Scene.hpp"
-#include"yade/core/Body.hpp"
-#include"yade/core/Interaction.hpp"
+#include"core/Scene.hpp"
+#include"core/Body.hpp"
+#include"core/Interaction.hpp"
 
-#include"yade/pkg/common/Aabb.hpp"
-#include"yade/core/Clump.hpp"
-#include"yade/pkg/common/InsertionSortCollider.hpp"
+#include"pkg/common/Aabb.hpp"
+#include"core/Clump.hpp"
+#include"pkg/common/InsertionSortCollider.hpp"
 
-#include"yade/pkg/common/Box.hpp"
-#include"yade/pkg/common/Sphere.hpp"
-#include"yade/pkg/common/ElastMat.hpp"
-#include"yade/pkg/dem/ViscoelasticPM.hpp"
-#include"yade/pkg/dem/CapillaryPhys.hpp"
+#include"pkg/common/Box.hpp"
+#include"pkg/common/Sphere.hpp"
+#include"pkg/common/ElastMat.hpp"
+#include"pkg/dem/ViscoelasticPM.hpp"
+#include"pkg/dem/CapillaryPhys.hpp"
 
-#include"yade/pkg/common/Bo1_Aabb.hpp"
-#include"yade/pkg/dem/NewtonIntegrator.hpp"
-#include"yade/pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp"
-#include"yade/pkg/dem/Ig2_Box_Sphere_ScGeom.hpp"
-#include"yade/pkg/dem/FrictPhys.hpp"
+#include"pkg/common/Bo1_Aabb.hpp"
+#include"pkg/dem/NewtonIntegrator.hpp"
+#include"pkg/dem/Ig2_Sphere_Sphere_ScGeom.hpp"
+#include"pkg/dem/Ig2_Box_Sphere_ScGeom.hpp"
+#include"pkg/dem/FrictPhys.hpp"
 
-#include"yade/pkg/common/ForceResetter.hpp"
+#include"pkg/common/ForceResetter.hpp"
 
-#include"yade/pkg/common/Dispatching.hpp"
-#include"yade/pkg/common/InteractionLoop.hpp"
-#include"yade/pkg/common/GravityEngines.hpp"
+#include"pkg/common/Dispatching.hpp"
+#include"pkg/common/InteractionLoop.hpp"
+#include"pkg/common/GravityEngines.hpp"
 
-#include"yade/pkg/dem/GlobalStiffnessTimeStepper.hpp"
-#include"yade/pkg/dem/ElasticContactLaw.hpp"
+#include"pkg/dem/GlobalStiffnessTimeStepper.hpp"
+#include"pkg/dem/ElasticContactLaw.hpp"
 
-#include"yade/pkg/dem/ScGeom.hpp"
-#include"yade/pkg/dem/FrictPhys.hpp"
+#include"pkg/dem/ScGeom.hpp"
+#include"pkg/dem/FrictPhys.hpp"
 
-#include"yade/pkg/common/Grid.hpp"
+#include"pkg/common/Grid.hpp"
 
-#include"yade/pkg/dem/Tetra.hpp"
+#include"pkg/dem/Tetra.hpp"
 
 #ifdef YADE_OPENGL
-	#include"yade/pkg/common/Gl1_NormPhys.hpp"
+	#include"pkg/common/Gl1_NormPhys.hpp"
 #endif
 
-#include "yade/py/_utils.hpp"
+#include "py/_utils.hpp"
 
 
 CREATE_LOGGER(Shop);

@@ -4,7 +4,7 @@
 #ifdef YADE_CGAL
 
 #include"Polyhedra.hpp"
-#include<yade/pkg/common/Sphere.hpp>
+#include<pkg/common/Sphere.hpp>
 
 //***************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedras. */

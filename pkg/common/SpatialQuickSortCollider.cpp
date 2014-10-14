@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #include "SpatialQuickSortCollider.hpp"
-#include <yade/core/Scene.hpp>
-#include <yade/core/BodyContainer.hpp>
+#include <core/Scene.hpp>
+#include <core/BodyContainer.hpp>
 #include <cmath>
 #include <algorithm>
 

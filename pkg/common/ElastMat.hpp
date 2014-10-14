@@ -1,6 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/Material.hpp>
+#include<core/Material.hpp>
 
 /*! Elastic material */
 class ElastMat: public Material{

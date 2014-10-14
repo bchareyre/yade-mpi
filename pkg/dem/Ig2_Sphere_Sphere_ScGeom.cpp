@@ -3,12 +3,12 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"Ig2_Sphere_Sphere_ScGeom.hpp"
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/pkg/common/InteractionLoop.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<core/Scene.hpp>
+#include<lib/base/Math.hpp>
+#include<core/Omega.hpp>
+#include<pkg/common/InteractionLoop.hpp>
 
 bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
 {

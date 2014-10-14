@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Timing.hpp>
-#include<yade/lib/base/Logging.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<core/Omega.hpp>
+#include<core/Timing.hpp>
+#include<lib/base/Logging.hpp>
 
 class Body;
 class Scene;

@@ -7,18 +7,18 @@
 *************************************************************************/
 
 #include"TriaxialStressController.hpp"
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/core/State.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Box.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<core/State.hpp>
 #include<assert.h>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/Shop.hpp>
-#include<yade/core/Clump.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/Shop.hpp>
+#include<core/Clump.hpp>
 
 #ifdef FLOW_ENGINE
-//#include<yade/pkg/pfv/FlowEngine.hpp>
+//#include<pkg/pfv/FlowEngine.hpp>
 #include "FlowEngine_FlowEngineT.hpp"
 #endif
 

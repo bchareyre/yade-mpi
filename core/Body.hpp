@@ -14,9 +14,9 @@
 #include"State.hpp"
 #include"Material.hpp"
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/lib/multimethods/Indexable.hpp>
+#include<lib/base/Math.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<lib/multimethods/Indexable.hpp>
 
 
 

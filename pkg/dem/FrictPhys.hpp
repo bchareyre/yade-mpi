@@ -7,10 +7,10 @@
 *************************************************************************/
 #pragma once
 
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/pkg/common/MatchMaker.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<pkg/common/MatchMaker.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/common/Dispatching.hpp>
 
 class FrictPhys: public NormShearPhys
 {

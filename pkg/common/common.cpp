@@ -1,22 +1,22 @@
 // =======================================================
 // Some plugins from removed CPP-fiels
 
-#include <yade/pkg/dem/DemXDofGeom.hpp>
-#include <yade/pkg/common/TorqueEngine.hpp>
-#include <yade/pkg/common/ForceResetter.hpp>
-#include <yade/pkg/common/FieldApplier.hpp>
-#include <yade/pkg/common/Callbacks.hpp>
-#include <yade/pkg/common/BoundaryController.hpp>
-#include <yade/pkg/common/NormShearPhys.hpp>
-#include <yade/pkg/common/Recorder.hpp>
-#include <yade/pkg/common/CylScGeom6D.hpp>
-#include <yade/pkg/common/Box.hpp>
-#include <yade/pkg/common/StepDisplacer.hpp>
-#include <yade/pkg/common/PeriodicEngines.hpp>
-#include <yade/pkg/common/ElastMat.hpp>
-#include <yade/pkg/common/PyRunner.hpp>
-#include <yade/pkg/common/Sphere.hpp>
-#include <yade/pkg/common/Aabb.hpp>
+#include <pkg/dem/DemXDofGeom.hpp>
+#include <pkg/common/TorqueEngine.hpp>
+#include <pkg/common/ForceResetter.hpp>
+#include <pkg/common/FieldApplier.hpp>
+#include <pkg/common/Callbacks.hpp>
+#include <pkg/common/BoundaryController.hpp>
+#include <pkg/common/NormShearPhys.hpp>
+#include <pkg/common/Recorder.hpp>
+#include <pkg/common/CylScGeom6D.hpp>
+#include <pkg/common/Box.hpp>
+#include <pkg/common/StepDisplacer.hpp>
+#include <pkg/common/PeriodicEngines.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/common/PyRunner.hpp>
+#include <pkg/common/Sphere.hpp>
+#include <pkg/common/Aabb.hpp>
 
 YADE_PLUGIN((IntrCallback)
 	#ifdef YADE_BODY_CALLBACK

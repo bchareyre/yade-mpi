@@ -12,8 +12,8 @@
 #include "Indexable.hpp"
 
 
-#include<yade/lib/factory/ClassFactory.hpp>
-#include<yade/lib/serialization/Serializable.hpp>
+#include<lib/factory/ClassFactory.hpp>
+#include<lib/serialization/Serializable.hpp>
 
 #include<loki/Functor.h>
 #include<loki/Typelist.h>

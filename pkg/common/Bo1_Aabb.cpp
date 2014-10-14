@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#include <yade/pkg/common/Bo1_Aabb.hpp>
+#include <pkg/common/Bo1_Aabb.hpp>
 
 YADE_PLUGIN((Bo1_Sphere_Aabb)(Bo1_Facet_Aabb)(Bo1_Box_Aabb));
 

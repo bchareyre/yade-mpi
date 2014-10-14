@@ -2,9 +2,9 @@
 #pragma once
 
 #include<time.h>
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
+#include<core/GlobalEngine.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
 
 class PeriodicEngine:  public GlobalEngine {
 	public:

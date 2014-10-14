@@ -9,8 +9,8 @@
 #ifdef LBM_ENGINE
 
 #pragma once
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/lib/multimethods/Indexable.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<lib/multimethods/Indexable.hpp>
 
 class LBMlink: public Serializable{
     public:

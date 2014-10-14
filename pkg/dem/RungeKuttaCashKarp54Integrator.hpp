@@ -1,7 +1,7 @@
 #ifdef YADE_ODEINT
 #pragma once
-#include <yade/core/Scene.hpp>
-#include<yade/pkg/dem/Integrator.hpp>
+#include <core/Scene.hpp>
+#include<pkg/dem/Integrator.hpp>
 #include<boost/numeric/odeint.hpp>
 
 

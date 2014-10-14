@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <yade/pkg/common/ElastMat.hpp>
-#include <yade/pkg/dem/ScGeom.hpp>
-#include <yade/pkg/dem/FrictPhys.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <pkg/dem/FrictPhys.hpp>
 #include "CohesiveFrictionalContactLaw.hpp"
 
 class InelastCohFrictMat : public FrictMat

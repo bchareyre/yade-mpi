@@ -1,7 +1,7 @@
 #include"GLViewer.hpp"
 #include"OpenGLManager.hpp"
-#include<yade/pkg/common/OpenGLRenderer.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
+#include<pkg/common/OpenGLRenderer.hpp>
+#include<lib/pyutil/doc_opts.hpp>
 
 #include<QApplication>
 #include<QCloseEvent>

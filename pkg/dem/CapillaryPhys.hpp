@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #pragma once
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/common/Dispatching.hpp>
 
 class CapillaryPhys : public FrictPhys
 {

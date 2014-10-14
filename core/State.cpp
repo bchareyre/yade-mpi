@@ -1,5 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
-#include<yade/core/State.hpp>
+#include<core/State.hpp>
 
 CREATE_LOGGER(State);
 

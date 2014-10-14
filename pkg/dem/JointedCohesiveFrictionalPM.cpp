@@ -1,9 +1,9 @@
 /* LucScholtes2010  */
 
 #include"JointedCohesiveFrictionalPM.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
 
 YADE_PLUGIN((JCFpmMat)(JCFpmState)(JCFpmPhys)(Ip2_JCFpmMat_JCFpmMat_JCFpmPhys)(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM));
 

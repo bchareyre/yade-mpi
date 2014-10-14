@@ -2,10 +2,10 @@
  
 #pragma once
 
-#include<yade/core/Body.hpp>
-#include<yade/lib/base/Logging.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/core/PartialEngine.hpp>
+#include<core/Body.hpp>
+#include<lib/base/Logging.hpp>
+#include<lib/base/Math.hpp>
+#include<core/PartialEngine.hpp>
 
 
 /*! Body representing clump (rigid aggregate) composed by other existing bodies.

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/lib/base/openmp-accu.hpp>
+#include<core/GlobalEngine.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<lib/base/openmp-accu.hpp>
 
 class Law2_ScGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:

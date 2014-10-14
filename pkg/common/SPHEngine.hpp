@@ -1,8 +1,8 @@
 #ifdef YADE_SPH
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
+#include<core/PartialEngine.hpp>
+#include<pkg/dem/ScGeom.hpp>
 
 typedef Real (* KernelFunction)(const double & r, const double & h);
 

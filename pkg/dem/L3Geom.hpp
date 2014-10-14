@@ -1,17 +1,17 @@
 
 #pragma once
-#include<yade/core/IGeom.hpp>
-#include<yade/core/IPhys.hpp>
-#include<yade/core/Shape.hpp>
-#include<yade/core/State.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/common/Wall.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
+#include<core/IGeom.hpp>
+#include<core/IPhys.hpp>
+#include<core/Shape.hpp>
+#include<core/State.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/common/Wall.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<pkg/dem/FrictPhys.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
+	#include<pkg/common/GLDrawFunctors.hpp>
 #endif
 
 /*

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/TimeStepper.hpp>
+#include<core/TimeStepper.hpp>
 
 
 /*! \brief Compute the critical timestep of the leap-frog scheme based on global stiffness of bodies

@@ -1,9 +1,9 @@
 #pragma once
 
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
-#include<yade/lib/opengl/GLUtils.hpp>
-#include<yade/pkg/common/GLDrawFunctors.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
+#include<lib/opengl/OpenGLWrapper.hpp>
+#include<lib/opengl/GLUtils.hpp>
+#include<pkg/common/GLDrawFunctors.hpp>
+#include<pkg/common/NormShearPhys.hpp>
 #include<GL/glu.h>
 
 

@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Wall.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Wall.hpp>
 
 class Ig2_Facet_Sphere_ScGeom : public IGeomFunctor
 {

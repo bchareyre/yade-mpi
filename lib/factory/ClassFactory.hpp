@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <yade/lib/base/Math.hpp>
-#include <yade/lib/base/Singleton.hpp>
+#include <lib/base/Math.hpp>
+#include <lib/base/Singleton.hpp>
 #include "DynLibManager.hpp"
 
 /*! define the following macro to enable experimenta boost::serialization support

@@ -24,10 +24,10 @@
 #ifdef LBM_ENGINE
 
 #pragma once
-#include<yade/pkg/lbm/LBMnode.hpp>
-#include<yade/pkg/lbm/LBMlink.hpp>
-#include<yade/pkg/lbm/LBMbody.hpp>
-#include<yade/core/GlobalEngine.hpp>
+#include<pkg/lbm/LBMnode.hpp>
+#include<pkg/lbm/LBMlink.hpp>
+#include<pkg/lbm/LBMbody.hpp>
+#include<core/GlobalEngine.hpp>
 
 
 class HydrodynamicsLawLBM : public GlobalEngine

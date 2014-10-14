@@ -1,9 +1,9 @@
 // 2010 © Chiara Modenese <c.modenese@gmail.com> 
 
 #include"HertzMindlin.hpp"
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
 
 YADE_PLUGIN(
 	(MindlinPhys)

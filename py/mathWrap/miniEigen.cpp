@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #include<boost/algorithm/string/trim.hpp>
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
+#include<lib/base/Math.hpp>
+#include<lib/pyutil/doc_opts.hpp>
 
 
 namespace bp=boost::python;

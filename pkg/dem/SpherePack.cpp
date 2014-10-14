@@ -1,17 +1,17 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/pkg/dem/SpherePack.hpp>
+#include<pkg/dem/SpherePack.hpp>
 
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/dem/Shop.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/dem/Shop.hpp>
 
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include<yade/core/Timing.hpp>
+#include<core/Timing.hpp>
 
 // not a serializable in the sense of YADE_PLUGIN
 

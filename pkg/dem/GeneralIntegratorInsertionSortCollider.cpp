@@ -1,12 +1,12 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
 #include"GeneralIntegratorInsertionSortCollider.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/Integrator.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<core/Scene.hpp>
+#include<core/Interaction.hpp>
+#include<core/InteractionContainer.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/Integrator.hpp>
+#include<pkg/common/Sphere.hpp>
 
 #include<algorithm>
 #include<vector>

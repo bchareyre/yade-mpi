@@ -1,5 +1,5 @@
 #pragma once
-#include<yade/core/Shape.hpp>
+#include<core/Shape.hpp>
 
 // HACK to work around https://bugs.launchpad.net/yade/+bug/528509
 // see comments there for explanation

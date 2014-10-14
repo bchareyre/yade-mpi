@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include<lib/opengl/OpenGLWrapper.hpp>
 #include<sstream>
 #include<iomanip>
 #include<string>

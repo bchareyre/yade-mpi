@@ -42,14 +42,14 @@ directory are joind by dash, deeper levels are discarded (in case of ``core`` an
 ============================================================= =========================
 Original header location											     Included as     
 ============================================================= =========================
-``core/Scene.hpp``														  ``<yade/core/Scene.hpp>``
-``lib/base/Logging.hpp``												  ``<yade/lib-base/Logging.hpp>``
-``lib/serialization/Serializable.hpp``								  ``<yade/lib-serialization/Serializable.hpp>``
-``pkg/dem/DataClass/SpherePack.hpp``                          ``<yade/pkg-dem/SpherePack.hpp>``
-``gui/qt3/QtGUI.hpp``                                         ``<yade/gui-qt3/QtGUI.hpp>``
+``core/Scene.hpp``														  ``<core/Scene.hpp>``
+``lib/base/Logging.hpp``												  ``<lib-base/Logging.hpp>``
+``lib/serialization/Serializable.hpp``								  ``<lib-serialization/Serializable.hpp>``
+``pkg/dem/DataClass/SpherePack.hpp``                          ``<pkg-dem/SpherePack.hpp>``
+``gui/qt3/QtGUI.hpp``                                         ``<gui-qt3/QtGUI.hpp>``
 ============================================================= =========================
 
-It is advised to use ``#include<yade/module/Class.hpp>`` style of inclusion rather than ``#include"Class.hpp`` even if you are in the same directory.
+It is advised to use ``#include<module/Class.hpp>`` style of inclusion rather than ``#include"Class.hpp`` even if you are in the same directory.
 
 
 Automatic compilation
@@ -541,8 +541,8 @@ and this is the implementation:
 
 .. code-block:: c++
 
-	#include<yade/pkg-common/GravityEngine.hpp>
-	#include<yade/core/Scene.hpp>
+	#include<pkg-common/GravityEngine.hpp>
+	#include<core/Scene.hpp>
 
 	// registering the plugin
 	YADE_PLUGIN((GravityEngine));
@@ -756,7 +756,7 @@ additionally, you *have* to allocate memory for static data members in the ``.cp
 .. code-block: c++
 
 	/* in the .cpp file */
-	#include<yade/pkg-something/HeaderFile.hpp>
+	#include<pkg-something/HeaderFile.hpp>
 	/* allocate memory for static attrs;
 	   no need to assign initial value, that is done from
 	   (hidden) initialization function at class registration

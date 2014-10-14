@@ -15,11 +15,11 @@
 
 #pragma once
 
-#include<yade/pkg/common/GLDrawFunctors.hpp>
-#include<yade/pkg/common/Aabb.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<pkg/common/GLDrawFunctors.hpp>
+#include<pkg/common/Aabb.hpp>
+#include<pkg/common/Box.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/common/Sphere.hpp>
 
 class Gl1_Aabb: public GlBoundFunctor{
 	public:

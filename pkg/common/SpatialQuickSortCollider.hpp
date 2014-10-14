@@ -7,8 +7,8 @@
 *************************************************************************/
 #pragma once
 
-#include <yade/pkg/common/Collider.hpp>
-#include <yade/core/InteractionContainer.hpp>
+#include <pkg/common/Collider.hpp>
+#include <core/InteractionContainer.hpp>
 #include <vector>
 
 class SpatialQuickSortCollider : public Collider {

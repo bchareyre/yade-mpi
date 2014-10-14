@@ -1,8 +1,8 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #pragma once
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/Shop.hpp>
-#include<yade/pkg/common/BoundaryController.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/Shop.hpp>
+#include<pkg/common/BoundaryController.hpp>
 
 /*! Axial displacing two groups of bodies in the opposite direction with given strain rate.
  *

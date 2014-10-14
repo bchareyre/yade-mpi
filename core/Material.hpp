@@ -1,9 +1,9 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/lib/multimethods/Indexable.hpp>
-#include<yade/core/State.hpp>
-#include<yade/core/Dispatcher.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<lib/multimethods/Indexable.hpp>
+#include<core/State.hpp>
+#include<core/Dispatcher.hpp>
 
 
 class Scene;

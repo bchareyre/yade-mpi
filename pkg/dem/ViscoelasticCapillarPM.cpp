@@ -1,9 +1,9 @@
 #include"ViscoelasticCapillarPM.hpp"
-#include<yade/core/State.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<core/State.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((ViscElCapMat)(ViscElCapPhys)(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys)(Law2_ScGeom_ViscElCapPhys_Basic));
 

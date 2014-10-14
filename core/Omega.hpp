@@ -17,10 +17,10 @@
 #include <boost/thread/thread.hpp>
 #include <iostream>
 
-#include <yade/lib/base/Math.hpp>
-#include <yade/lib/factory/ClassFactory.hpp>
+#include <lib/base/Math.hpp>
+#include <lib/factory/ClassFactory.hpp>
 
-#include <yade/lib/base/Singleton.hpp>
+#include <lib/base/Singleton.hpp>
 
 #include "SimulationFlow.hpp"
 

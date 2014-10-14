@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg/common/Callbacks.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
+#include<core/GlobalEngine.hpp>
+#include<pkg/common/Callbacks.hpp>
+#include<pkg/common/Dispatching.hpp>
 
 #ifdef USE_TIMING_DELTAS
 	#define TIMING_DELTAS_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)

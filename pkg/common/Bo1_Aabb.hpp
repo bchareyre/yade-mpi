@@ -8,11 +8,11 @@
  
 #pragma once
 
-#include <yade/pkg/common/Dispatching.hpp>
-#include <yade/pkg/common/Aabb.hpp>
-#include <yade/pkg/common/Sphere.hpp>
-#include <yade/pkg/common/Facet.hpp>
-#include <yade/pkg/common/Box.hpp>
+#include <pkg/common/Dispatching.hpp>
+#include <pkg/common/Aabb.hpp>
+#include <pkg/common/Sphere.hpp>
+#include <pkg/common/Facet.hpp>
+#include <pkg/common/Box.hpp>
 
 class Bo1_Sphere_Aabb : public BoundFunctor
 {

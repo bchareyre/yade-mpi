@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg/dem/KinemC__Engine.hpp>
+#include<pkg/dem/KinemC__Engine.hpp>
 
 YADE_PLUGIN((KinemCTDEngine)(KinemCNDEngine)(KinemCNLEngine)(KinemCNSEngine));
 

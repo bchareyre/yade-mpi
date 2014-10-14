@@ -1,11 +1,11 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"ConcretePM.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/pkg/dem/Shop.hpp>
-#include<yade/pkg/common/InteractionLoop.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/common/Wall.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<pkg/dem/Shop.hpp>
+#include<pkg/common/InteractionLoop.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/common/Wall.hpp>
 
 
 YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_ScGeom_CpmPhys_Cpm)
@@ -449,8 +449,8 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 #ifdef YADE_OPENGL
 	/********************** Gl1_CpmPhys ****************************/
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
-	#include<yade/lib/opengl/GLUtils.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/GLUtils.hpp>
 
 	CREATE_LOGGER(Gl1_CpmPhys);
 

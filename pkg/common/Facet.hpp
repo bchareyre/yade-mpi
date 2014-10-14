@@ -8,8 +8,8 @@
 #pragma once
 
 
-#include<yade/core/Shape.hpp>
-#include<yade/core/Body.hpp>
+#include<core/Shape.hpp>
+#include<core/Body.hpp>
 
 // define this to have topology information about facets enabled;
 // it is necessary for FacetTopologyAnalyzer

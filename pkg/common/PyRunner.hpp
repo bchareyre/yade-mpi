@@ -1,9 +1,9 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/PeriodicEngines.hpp>
-#include<yade/lib/pyutil/gil.hpp>
+#include<core/GlobalEngine.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
+#include<lib/pyutil/gil.hpp>
 
 class PyRunner: public PeriodicEngine {
 	public :

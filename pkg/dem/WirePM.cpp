@@ -7,16 +7,16 @@
 *************************************************************************/
 
 #include"WirePM.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
 #include "../../lib/base/Math.hpp"
 
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/triangle_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include<yade/core/Timing.hpp>
+#include<core/Timing.hpp>
 
 YADE_PLUGIN((WireMat)(WireState)(WirePhys)(Ip2_WireMat_WireMat_WirePhys)(Law2_ScGeom_WirePhys_WirePM));
 

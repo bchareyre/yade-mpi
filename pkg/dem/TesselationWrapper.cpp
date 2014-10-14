@@ -8,11 +8,11 @@
 
 #ifdef YADE_CGAL
 
-#include<yade/pkg/dem/Shop.hpp>
+#include<pkg/dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
-#include<yade/lib/triangulation/Timer.h>
-#include<yade/pkg/dem/SpherePack.hpp>
-#include<yade/lib/pyutil/numpy.hpp>
+#include<lib/triangulation/Timer.h>
+#include<pkg/dem/SpherePack.hpp>
+#include<lib/pyutil/numpy.hpp>
 
 YADE_PLUGIN((TesselationWrapper));
 CREATE_LOGGER(TesselationWrapper);

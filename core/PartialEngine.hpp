@@ -8,8 +8,8 @@
 
 #pragma once
 #include <vector>
-#include<yade/core/Engine.hpp>
-#include<yade/core/Body.hpp>
+#include<core/Engine.hpp>
+#include<core/Body.hpp>
 
 class PartialEngine: public Engine{
 	public:

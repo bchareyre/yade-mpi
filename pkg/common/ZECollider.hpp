@@ -1,8 +1,8 @@
 // 2011 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 
 #pragma once
-#include<yade/pkg/common/Collider.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/common/Collider.hpp>
+#include<core/Scene.hpp>
 class InteractionContainer;
 
 // #define this macro to enable timing within this engine

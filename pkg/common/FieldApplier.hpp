@@ -1,5 +1,5 @@
 #pragma once
-#include <yade/core/GlobalEngine.hpp>
+#include <core/GlobalEngine.hpp>
 #include <stdexcept>
 
 class FieldApplier: public GlobalEngine{

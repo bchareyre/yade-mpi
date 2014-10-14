@@ -1,7 +1,7 @@
 #include"FacetTopologyAnalyzer.hpp"
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/Body.hpp>
+#include<pkg/common/Facet.hpp>
+#include<core/Scene.hpp>
+#include<core/Body.hpp>
 
 CREATE_LOGGER(FacetTopologyAnalyzer);
 YADE_PLUGIN((FacetTopologyAnalyzer));

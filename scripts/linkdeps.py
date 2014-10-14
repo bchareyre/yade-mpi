@@ -39,7 +39,7 @@ def grepCpp(path,f,level=0):
 	if level==maxIncludeLevel: return set(),set()
 	#print path,f
 	for l in open(fullF):
-		m=re.match('^#include<yade/([^/]*)/(.*)>.*$',l)
+		m=re.match('^#include<([^/]*)/(.*)>.*$',l)
 		if m:
 			incMod=m.group(1); incHead=m.group(2); baseName=incHead.split('.')[0]; assert(len(incHead.split('.'))==2)
 			if incMod=='core': continue

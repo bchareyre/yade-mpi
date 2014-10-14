@@ -3,13 +3,13 @@
 
 #include"Tetra.hpp"
 
-#include<yade/core/Interaction.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/State.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
+#include<core/Interaction.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<core/State.hpp>
+#include<pkg/common/ElastMat.hpp>
 
-#include<yade/pkg/common/Aabb.hpp>
+#include<pkg/common/Aabb.hpp>
 
 #ifdef YADE_CGAL
 	#include <CGAL/intersections.h>
@@ -990,7 +990,7 @@ void TetraVolumetricLaw::action()
 }
 
 #ifdef YADE_OPENGL
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
 	bool Gl1_Tetra::wire;
 	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
 	{

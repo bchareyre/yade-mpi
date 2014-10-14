@@ -2,12 +2,12 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#include<yade/lib/multimethods/DynLibDispatcher.hpp>
-#include<yade/core/Dispatcher.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
+#include<lib/multimethods/DynLibDispatcher.hpp>
+#include<core/Dispatcher.hpp>
+#include<core/Body.hpp>
+#include<lib/opengl/OpenGLWrapper.hpp>
 
-#include<yade/pkg/common/GLDrawFunctors.hpp>
+#include<pkg/common/GLDrawFunctors.hpp>
 
 struct GlExtraDrawer: public Serializable{
 	Scene* scene;

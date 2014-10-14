@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/pkg/dem/TriaxialStressController.hpp>
+#include<core/PartialEngine.hpp>
+#include<lib/base/Math.hpp>
+#include<pkg/dem/TriaxialStressController.hpp>
 
 /** \brief Class for controlling in stress or in strain with respect to each spatial direction a cubical assembly of particles.
  *

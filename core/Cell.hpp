@@ -13,10 +13,10 @@ The transformation is split between "normal" part and "rotation/shear" part for 
 
 #pragma once
 
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<lib/base/Math.hpp>
 
-//#include<yade/pkg/dem/Shop.hpp>
+//#include<pkg/dem/Shop.hpp>
 
 class Cell: public Serializable{
 	public:

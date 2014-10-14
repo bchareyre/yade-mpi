@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include<yade/lib/serialization/Serializable.hpp>
+#include<lib/serialization/Serializable.hpp>
 #include<boost/tuple/tuple.hpp>
 
 class Body;

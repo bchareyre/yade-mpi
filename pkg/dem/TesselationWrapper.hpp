@@ -6,12 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #pragma once
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/lib/triangulation/Tesselation.h>
-#include<yade/pkg/dem/MicroMacroAnalyser.hpp>
+#include<core/GlobalEngine.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<lib/triangulation/Tesselation.h>
+#include<pkg/dem/MicroMacroAnalyser.hpp>
 
 /*! \class TesselationWrapper
  * \brief Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.

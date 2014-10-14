@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<core/PartialEngine.hpp>
+#include<lib/base/Math.hpp>
 
 struct KinematicEngine;
 

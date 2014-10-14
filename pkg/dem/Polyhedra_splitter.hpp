@@ -6,8 +6,8 @@
 
 #ifdef YADE_CGAL
 
-#include<yade/pkg/common/PeriodicEngines.hpp>
-#include<yade/core/Interaction.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
+#include<core/Interaction.hpp>
 
 #include"Polyhedra.hpp"
 

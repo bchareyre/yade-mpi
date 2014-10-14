@@ -1,9 +1,9 @@
 #pragma once
 
-#include<yade/core/Material.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
+#include<core/Material.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/ScGeom.hpp>
 
 
 class LudingMat : public Material {

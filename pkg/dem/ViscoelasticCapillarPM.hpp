@@ -1,7 +1,7 @@
 #pragma once
 #include "ViscoelasticPM.hpp"
 #include <boost/unordered_map.hpp>
-#include <yade/core/PartialEngine.hpp>
+#include <core/PartialEngine.hpp>
 
 class ViscElCapMat : public ViscElMat {
 	public:

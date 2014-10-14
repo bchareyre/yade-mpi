@@ -11,17 +11,17 @@
 #include"GLViewer.hpp"
 #include"OpenGLManager.hpp"
 
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/DisplayParameters.hpp>
+#include<lib/opengl/OpenGLWrapper.hpp>
+#include<core/Body.hpp>
+#include<core/Scene.hpp>
+#include<core/Interaction.hpp>
+#include<core/DisplayParameters.hpp>
 #include<boost/algorithm/string.hpp>
 #include<sstream>
 #include<iomanip>
 #include<boost/algorithm/string/case_conv.hpp>
-#include<yade/lib/serialization/ObjectIO.hpp>
-#include<yade/lib/pyutil/gil.hpp>
+#include<lib/serialization/ObjectIO.hpp>
+#include<lib/pyutil/gil.hpp>
 #include<QtGui/qevent.h>
 
 #ifdef YADE_GL2PS

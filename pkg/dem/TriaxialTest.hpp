@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/FileGenerator.hpp>
+#include<core/FileGenerator.hpp>
 
 class ForceRecorder;
 class AveragePositionRecorder;

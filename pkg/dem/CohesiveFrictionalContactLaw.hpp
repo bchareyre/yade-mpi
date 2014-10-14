@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
+#include<core/GlobalEngine.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/dem/ScGeom.hpp>
 #include<boost/tuple/tuple.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<pkg/dem/FrictPhys.hpp>
 
 
 // The following code was moved from CohFrictMat.hpp

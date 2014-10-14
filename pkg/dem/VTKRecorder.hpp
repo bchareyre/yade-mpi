@@ -1,5 +1,5 @@
 #pragma once
-#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
 #include<vtkQuad.h>
 #include<vtkSmartPointer.h>
 

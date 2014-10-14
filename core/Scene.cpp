@@ -9,16 +9,16 @@
 *************************************************************************/
 
 #include"Scene.hpp"
-#include<yade/core/Engine.hpp>
-#include<yade/core/Timing.hpp>
-#include<yade/core/TimeStepper.hpp>
+#include<core/Engine.hpp>
+#include<core/Timing.hpp>
+#include<core/TimeStepper.hpp>
 
-#include<yade/lib/base/Math.hpp>
+#include<lib/base/Math.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/algorithm/string.hpp>
 
-#include<yade/core/BodyContainer.hpp>
-#include<yade/core/InteractionContainer.hpp>
+#include<core/BodyContainer.hpp>
+#include<core/InteractionContainer.hpp>
 
 
 // POSIX-only

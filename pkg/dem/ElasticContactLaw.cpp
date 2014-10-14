@@ -6,11 +6,11 @@
 *************************************************************************/
 
 #include"ElasticContactLaw.hpp"
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
 
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_ScGeom_ViscoFrictPhys_CundallStrack)(ElasticContactLaw));
 

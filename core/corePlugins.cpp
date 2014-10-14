@@ -1,24 +1,24 @@
-#include<yade/lib/factory/ClassFactory.hpp>
+#include<lib/factory/ClassFactory.hpp>
 // make core classes known to the class factory
-#include<yade/core/Body.hpp>
-#include<yade/core/BodyContainer.hpp>
-#include<yade/core/Bound.hpp>
-#include<yade/core/Cell.hpp>
-#include<yade/core/Dispatcher.hpp>
-#include<yade/core/EnergyTracker.hpp>
-#include<yade/core/Engine.hpp>
-#include<yade/core/FileGenerator.hpp>
-#include<yade/core/Functor.hpp>
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/InteractionContainer.hpp>
-#include<yade/core/IGeom.hpp>
-#include<yade/core/IPhys.hpp>
-#include<yade/core/Material.hpp>
-#include<yade/core/PartialEngine.hpp>
-#include<yade/core/Shape.hpp>
-#include<yade/core/State.hpp>
-#include<yade/core/TimeStepper.hpp>
+#include<core/Body.hpp>
+#include<core/BodyContainer.hpp>
+#include<core/Bound.hpp>
+#include<core/Cell.hpp>
+#include<core/Dispatcher.hpp>
+#include<core/EnergyTracker.hpp>
+#include<core/Engine.hpp>
+#include<core/FileGenerator.hpp>
+#include<core/Functor.hpp>
+#include<core/GlobalEngine.hpp>
+#include<core/Interaction.hpp>
+#include<core/InteractionContainer.hpp>
+#include<core/IGeom.hpp>
+#include<core/IPhys.hpp>
+#include<core/Material.hpp>
+#include<core/PartialEngine.hpp>
+#include<core/Shape.hpp>
+#include<core/State.hpp>
+#include<core/TimeStepper.hpp>
 
 
 // these two are not accessible from python directly (though they should be in the future, perhaps)

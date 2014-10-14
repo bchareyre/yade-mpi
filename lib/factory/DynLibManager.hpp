@@ -11,8 +11,8 @@
 
 #include <dlfcn.h>
 
-#include<yade/lib/base/Logging.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<lib/base/Logging.hpp>
+#include<lib/base/Math.hpp>
 
 class DynLibManager 
 {

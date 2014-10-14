@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/pkg/common/BoundaryController.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<pkg/common/BoundaryController.hpp>
+#include<core/Scene.hpp>
+#include<lib/base/Math.hpp>
 
 #include<boost/array.hpp>
 

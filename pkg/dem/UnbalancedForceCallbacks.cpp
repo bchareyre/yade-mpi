@@ -1,8 +1,8 @@
-#include<yade/pkg/dem/UnbalancedForceCallbacks.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/dem/UnbalancedForceCallbacks.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<core/Interaction.hpp>
+#include<core/Body.hpp>
+#include<core/Scene.hpp>
 
 YADE_PLUGIN((SumIntrForcesCb)
 #ifdef YADE_BODY_CALLBACK

@@ -1,9 +1,9 @@
 #pragma once
-#include<yade/lib/serialization/Serializable.hpp>
+#include<lib/serialization/Serializable.hpp>
 // keep those two here, template instantiation & boost::python gets broken otherwise, e.g. https://bugs.launchpad.net/bugs/618766
-#include<yade/core/IGeom.hpp> 
-#include<yade/core/IPhys.hpp>
-#include<yade/core/Body.hpp>
+#include<core/IGeom.hpp> 
+#include<core/IPhys.hpp>
+#include<core/Body.hpp>
 
 
 class IGeomFunctor;

@@ -1,5 +1,5 @@
 #include "FrictPhys.hpp"
-#include <yade/pkg/dem/ScGeom.hpp>
+#include <pkg/dem/ScGeom.hpp>
 YADE_PLUGIN((FrictPhys)(ViscoFrictPhys)(Ip2_FrictMat_FrictMat_ViscoFrictPhys)(Ip2_FrictMat_FrictMat_FrictPhys));
 
 // The following code was moved from Ip2_FrictMat_FrictMat_FrictPhys.hpp

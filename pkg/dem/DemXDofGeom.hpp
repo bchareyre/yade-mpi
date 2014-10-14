@@ -1,6 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/IGeom.hpp>
+#include<core/IGeom.hpp>
 
 /*! Abstract class that unites ScGeom and L3Geom,
 	created for the purposes of GlobalStiffnessTimeStepper.

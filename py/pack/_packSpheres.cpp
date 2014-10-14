@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include<yade/pkg/dem/SpherePack.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<pkg/dem/SpherePack.hpp>
+#include<lib/pyutil/doc_opts.hpp>
+#include<lib/base/Math.hpp>
 
 BOOST_PYTHON_MODULE(_packSpheres){
   boost::python::scope().attr("__doc__")="Creation, manipulation, IO for generic sphere packings.";

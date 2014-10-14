@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg/dem/NewtonIntegrator.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/Clump.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<pkg/dem/NewtonIntegrator.hpp>
+#include<core/Scene.hpp>
+#include<core/Clump.hpp>
+#include<lib/base/Math.hpp>
 
 
 YADE_PLUGIN((NewtonIntegrator));

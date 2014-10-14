@@ -1,9 +1,9 @@
 #pragma once
 
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/PeriodicEngines.hpp>
-#include<yade/gui/qt4/OpenGLManager.hpp>
+#include<lib/opengl/OpenGLWrapper.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
+#include<gui/qt4/OpenGLManager.hpp>
 
 
 class SnapshotEngine: public PeriodicEngine {

@@ -2,9 +2,9 @@
 // the code written after http://www.amillionpixels.us/bestfitobb.cpp
 // which is MIT-licensed
 
-#include<yade/lib/base/Logging.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
+#include<lib/base/Logging.hpp>
+#include<lib/base/Math.hpp>
+#include<lib/pyutil/doc_opts.hpp>
 
 // compute minimum bounding for a cloud of points
 

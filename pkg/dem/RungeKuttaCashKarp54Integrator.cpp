@@ -1,6 +1,6 @@
 #ifdef YADE_ODEINT
-#include<yade/pkg/dem/RungeKuttaCashKarp54Integrator.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/dem/RungeKuttaCashKarp54Integrator.hpp>
+#include<core/Scene.hpp>
 
 YADE_PLUGIN((RungeKuttaCashKarp54Integrator));
 

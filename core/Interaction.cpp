@@ -10,7 +10,7 @@
 
 #include"Interaction.hpp"
 
-#include<yade/core/Scene.hpp>
+#include<core/Scene.hpp>
 
 Interaction::Interaction(Body::id_t newId1,Body::id_t newId2): id1(newId1), id2(newId2), cellDist(Vector3i(0,0,0)){ reset(); }
 

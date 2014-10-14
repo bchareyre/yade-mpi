@@ -2,7 +2,7 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#include<yade/core/IPhys.hpp>
+#include<core/IPhys.hpp>
 
 class NormPhys:public IPhys {
 	public:

@@ -34,13 +34,13 @@ Variants for periodic boundary conditions are also present.
 */
 
 #pragma once
-#include<yade/core/PartialEngine.hpp>
-#include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
-#include<yade/pkg/dem/TesselationWrapper.hpp>
-#include<yade/lib/triangulation/FlowBoundingSphere.hpp>
-#include<yade/lib/triangulation/PeriodicFlow.hpp>
-#include<yade/pkg/pfv/FlowEngine.hpp>
-#include<yade/core/Clump.hpp>
+#include<core/PartialEngine.hpp>
+#include<pkg/dem/TriaxialCompressionEngine.hpp>
+#include<pkg/dem/TesselationWrapper.hpp>
+#include<lib/triangulation/FlowBoundingSphere.hpp>
+#include<lib/triangulation/PeriodicFlow.hpp>
+#include<pkg/pfv/FlowEngine.hpp>
+#include<core/Clump.hpp>
 
 template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=DEFAULTSOLVER >
 class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine

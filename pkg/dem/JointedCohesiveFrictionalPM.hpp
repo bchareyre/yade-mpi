@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<pkg/dem/ScGeom.hpp>
 
 /** This class holds information associated with each body state*/
 class JCFpmState: public State {

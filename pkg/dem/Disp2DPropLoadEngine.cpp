@@ -8,10 +8,10 @@
 
 
 #include "Disp2DPropLoadEngine.hpp"
-#include<yade/core/State.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/lib/base/Math.hpp>
+#include<core/State.hpp>
+#include<pkg/common/Box.hpp>
+#include<core/Scene.hpp>
+#include<lib/base/Math.hpp>
 
 
 YADE_PLUGIN((Disp2DPropLoadEngine));

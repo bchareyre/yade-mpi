@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include<yade/lib/base/Math.hpp>
+#include<lib/base/Math.hpp>
 
 #include<boost/math/distributions/normal.hpp>
 

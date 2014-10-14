@@ -10,16 +10,16 @@ The DMT formulation is also considered (for adhesive particles, rigid and small 
 
 #pragma once
 
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/common/PeriodicEngines.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/pkg/common/MatchMaker.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<pkg/common/MatchMaker.hpp>
 
 #include <boost/tuple/tuple.hpp>
-#include<yade/lib/base/openmp-accu.hpp>
+#include<lib/base/openmp-accu.hpp>
 
 
 /******************** MindlinPhys *********************************/

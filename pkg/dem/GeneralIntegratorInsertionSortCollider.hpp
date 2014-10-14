@@ -1,7 +1,7 @@
 // 2014 Burak ER <burak.er@btu.edu.tr> 
 
 #pragma once
-#include<yade/pkg/common/InsertionSortCollider.hpp>
+#include<pkg/common/InsertionSortCollider.hpp>
 
 
 /*!

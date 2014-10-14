@@ -3,7 +3,7 @@
 
 #ifdef YADE_CGAL
 
-#include<yade/pkg/dem/Polyhedra_splitter.hpp>
+#include<pkg/dem/Polyhedra_splitter.hpp>
 
 
 YADE_PLUGIN((PolyhedraSplitter));

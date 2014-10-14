@@ -3,13 +3,13 @@
 
 #ifdef YADE_CGAL
 
-#include"yade/pkg/dem/Polyhedra.hpp"
+#include"pkg/dem/Polyhedra.hpp"
 
-#include<yade/core/Scene.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
+#include<core/Scene.hpp>
+#include<core/Omega.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/ElastMat.hpp>
+#include<lib/pyutil/doc_opts.hpp>
 #include<cmath>
 
 #include<numpy/ndarrayobject.h>

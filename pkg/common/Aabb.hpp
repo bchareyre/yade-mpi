@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/Bound.hpp>
+#include<core/Bound.hpp>
 
 /*! Representation of bound by min and max points.
 

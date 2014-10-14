@@ -1,20 +1,20 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/base/openmp-accu.hpp>
+#include<lib/base/Math.hpp>
+#include<lib/base/openmp-accu.hpp>
 
-#include<yade/core/Engine.hpp>
+#include<core/Engine.hpp>
 
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/common/Callbacks.hpp>
-#include<yade/pkg/dem/SpherePack.hpp>
-#include<yade/pkg/common/KinematicEngines.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/common/Callbacks.hpp>
+#include<pkg/dem/SpherePack.hpp>
+#include<pkg/common/KinematicEngines.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
-	#include<yade/pkg/common/OpenGLRenderer.hpp>
+	#include<pkg/common/GLDrawFunctors.hpp>
+	#include<pkg/common/OpenGLRenderer.hpp>
 #endif
-#include<yade/pkg/common/MatchMaker.hpp>
+#include<pkg/common/MatchMaker.hpp>
 
 // move this to the miniEigen wrapper later
 

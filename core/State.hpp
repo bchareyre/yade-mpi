@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/lib/multimethods/Indexable.hpp>
-#include<yade/core/Dispatcher.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<lib/multimethods/Indexable.hpp>
+#include<core/Dispatcher.hpp>
 
 // delete later and remove relevant code, to not support old State.blockedDOFs=['x','y','rz'] syntax anymore
 //#define YADE_DEPREC_DOF_LIST

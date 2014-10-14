@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg/common/GravityEngines.hpp>
-#include<yade/pkg/common/PeriodicEngines.hpp>
-#include<yade/core/BodyContainer.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/common/GravityEngines.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
+#include<core/BodyContainer.hpp>
+#include<core/Scene.hpp>
 #include<boost/regex.hpp>
 
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravityEngine));

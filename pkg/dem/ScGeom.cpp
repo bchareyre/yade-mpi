@@ -3,9 +3,9 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 // © 2006 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
 
 YADE_PLUGIN((ScGeom)(ScGeom6D)(ChCylGeom6D));
 ScGeom::~ScGeom(){};

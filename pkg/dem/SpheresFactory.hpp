@@ -1,7 +1,7 @@
 // Kovthanan …
-#include<yade/lib/base/Math.hpp>
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/pkg/common/Collider.hpp>
+#include<lib/base/Math.hpp>
+#include<core/GlobalEngine.hpp>
+#include<pkg/common/Collider.hpp>
 
 
 class SpheresFactory: public GlobalEngine {

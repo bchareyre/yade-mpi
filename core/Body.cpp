@@ -1,8 +1,8 @@
 
-#include<yade/core/Body.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/InteractionContainer.hpp>
+#include<core/Body.hpp>
+#include<core/Scene.hpp>
+#include<core/Omega.hpp>
+#include<core/InteractionContainer.hpp>
 
 //! This could be -1 if id_t is re-typedef'ed as `int'
 const Body::id_t Body::ID_NONE=Body::id_t(-1);

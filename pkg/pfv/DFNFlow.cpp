@@ -7,8 +7,8 @@
 *************************************************************************/
 #ifdef FLOW_ENGINE
 
-#include<yade/pkg/dem/JointedCohesiveFrictionalPM.hpp>
-// #include<yade/pkg/dem/ScGeom.hpp>
+#include<pkg/dem/JointedCohesiveFrictionalPM.hpp>
+// #include<pkg/dem/ScGeom.hpp>
 
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else

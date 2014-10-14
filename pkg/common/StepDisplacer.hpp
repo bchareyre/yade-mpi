@@ -1,8 +1,8 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #pragma once
-#include<yade/core/PartialEngine.hpp>
-#include<yade/core/State.hpp>
-#include<yade/core/Scene.hpp>
+#include<core/PartialEngine.hpp>
+#include<core/State.hpp>
+#include<core/Scene.hpp>
 
 class StepDisplacer: public PartialEngine {
 	public:

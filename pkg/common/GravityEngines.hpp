@@ -1,9 +1,9 @@
 // 2004 © Janek Kozicki <cosurgi@berlios.de>
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #pragma once
-#include<yade/pkg/common/FieldApplier.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/Body.hpp>
+#include<pkg/common/FieldApplier.hpp>
+#include<core/Interaction.hpp>
+#include<core/Body.hpp>
 
 /*! Homogeneous gravity field; applies gravity×mass force on all bodies. */
 class GravityEngine: public FieldApplier{

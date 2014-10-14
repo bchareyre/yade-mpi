@@ -12,14 +12,14 @@
 //FIXME : needs "requestErase" somewhere
 
 #include "Law2_ScGeom_CapillaryPhys_Capillarity.hpp"
-#include <yade/pkg/common/ElastMat.hpp>
-#include <yade/pkg/dem/ScGeom.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/dem/ScGeom.hpp>
 
-#include <yade/pkg/dem/CapillaryPhys.hpp>
-#include <yade/pkg/dem/HertzMindlin.hpp>
-#include <yade/core/Omega.hpp>
-#include <yade/core/Scene.hpp>
-#include <yade/lib/base/Math.hpp>
+#include <pkg/dem/CapillaryPhys.hpp>
+#include <pkg/dem/HertzMindlin.hpp>
+#include <core/Omega.hpp>
+#include <core/Scene.hpp>
+#include <lib/base/Math.hpp>
 
 YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 

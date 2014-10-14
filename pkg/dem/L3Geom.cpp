@@ -1,12 +1,12 @@
 
-#include<yade/pkg/dem/L3Geom.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Wall.hpp>
-#include<yade/pkg/common/Facet.hpp>
+#include<pkg/dem/L3Geom.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Wall.hpp>
+#include<pkg/common/Facet.hpp>
 
 #ifdef YADE_OPENGL
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
-	#include<yade/lib/opengl/GLUtils.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/GLUtils.hpp>
 	#include<GL/glu.h>
 #endif
 

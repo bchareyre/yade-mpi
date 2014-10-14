@@ -12,10 +12,10 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-#include <yade/lib/base/Math.hpp>
-#include <yade/lib/factory/Factorable.hpp>
-#include <yade/lib/pyutil/raw_constructor.hpp>
-#include <yade/lib/pyutil/doc_opts.hpp>
+#include <lib/base/Math.hpp>
+#include <lib/factory/Factorable.hpp>
+#include <lib/pyutil/raw_constructor.hpp>
+#include <lib/pyutil/doc_opts.hpp>
 
 // empty functions for ADL
 //namespace{

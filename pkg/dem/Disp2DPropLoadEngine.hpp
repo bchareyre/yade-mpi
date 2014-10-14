@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/core/Omega.hpp>
-#include<yade/pkg/common/BoundaryController.hpp>
-#include<yade/core/Body.hpp>
+#include<core/Omega.hpp>
+#include<pkg/common/BoundaryController.hpp>
+#include<core/Body.hpp>
 
 
 

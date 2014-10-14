@@ -10,15 +10,15 @@
 
 #pragma once
 
-#include<yade/core/Body.hpp>
-#include<yade/core/Cell.hpp>
-#include<yade/core/BodyContainer.hpp>
-#include<yade/core/Engine.hpp>
-#include<yade/core/Material.hpp>
-#include<yade/core/DisplayParameters.hpp>
-#include<yade/core/ForceContainer.hpp>
-#include<yade/core/InteractionContainer.hpp>
-#include<yade/core/EnergyTracker.hpp>
+#include<core/Body.hpp>
+#include<core/Cell.hpp>
+#include<core/BodyContainer.hpp>
+#include<core/Engine.hpp>
+#include<core/Material.hpp>
+#include<core/DisplayParameters.hpp>
+#include<core/ForceContainer.hpp>
+#include<core/InteractionContainer.hpp>
+#include<core/EnergyTracker.hpp>
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255 

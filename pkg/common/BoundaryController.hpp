@@ -1,5 +1,5 @@
 #pragma once
-#include<yade/core/GlobalEngine.hpp>
+#include<core/GlobalEngine.hpp>
 class BoundaryController: public GlobalEngine{
 	virtual void action() {
 		{ throw std::runtime_error("BoundaryController must not be used in simulations directly (BoundaryController::action called)."); }

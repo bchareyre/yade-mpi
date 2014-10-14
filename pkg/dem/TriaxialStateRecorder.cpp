@@ -9,14 +9,14 @@
 *************************************************************************/
 
 #include "TriaxialStateRecorder.hpp"
-// #include <yade/pkg/dem/TriaxialCompressionEngine.hpp>
-#include <yade/pkg/dem/TriaxialStressController.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include <yade/core/Omega.hpp>
-#include <yade/core/Scene.hpp>
-#include <yade/pkg/dem/ScGeom.hpp>
-#include <yade/pkg/dem/FrictPhys.hpp>
-#include <yade/pkg/dem/Shop.hpp>
+// #include <pkg/dem/TriaxialCompressionEngine.hpp>
+#include <pkg/dem/TriaxialStressController.hpp>
+#include<pkg/common/Sphere.hpp>
+#include <core/Omega.hpp>
+#include <core/Scene.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <pkg/dem/FrictPhys.hpp>
+#include <pkg/dem/Shop.hpp>
 
 CREATE_LOGGER(TriaxialStateRecorder);
 TriaxialStateRecorder::~TriaxialStateRecorder() {};

@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include<yade/lib/multimethods/FunctorWrapper.hpp>
-#include<yade/core/Bound.hpp>
-#include<yade/core/State.hpp>
-#include<yade/core/Shape.hpp>
-#include<yade/core/Functor.hpp>
-#include<yade/core/Dispatcher.hpp>
-#include<yade/core/IGeom.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/IPhys.hpp>
+#include<lib/multimethods/FunctorWrapper.hpp>
+#include<core/Bound.hpp>
+#include<core/State.hpp>
+#include<core/Shape.hpp>
+#include<core/Functor.hpp>
+#include<core/Dispatcher.hpp>
+#include<core/IGeom.hpp>
+#include<core/Body.hpp>
+#include<core/Interaction.hpp>
+#include<core/IPhys.hpp>
 
 #define RENDERS(name) public: virtual string renders() const { return #name;}; FUNCTOR1D(name);
 

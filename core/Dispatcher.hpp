@@ -9,10 +9,10 @@
 #pragma once
 
 
-#include<yade/core/Engine.hpp>
-#include<yade/core/Functor.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/lib/multimethods/DynLibDispatcher.hpp>
+#include<core/Engine.hpp>
+#include<core/Functor.hpp>
+#include<core/Omega.hpp>
+#include<lib/multimethods/DynLibDispatcher.hpp>
 
 #include<boost/preprocessor/cat.hpp>
 

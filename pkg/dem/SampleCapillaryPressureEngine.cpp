@@ -9,11 +9,11 @@
 *************************************************************************/
 
 #include "SampleCapillaryPressureEngine.hpp"
-#include <yade/pkg/dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/lib/base/Math.hpp>
+#include <pkg/dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
+#include<core/Scene.hpp>
+#include<core/Omega.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<lib/base/Math.hpp>
 
 YADE_PLUGIN((SampleCapillaryPressureEngine));
 CREATE_LOGGER(SampleCapillaryPressureEngine);

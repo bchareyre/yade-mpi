@@ -16,8 +16,8 @@
 #ifdef YADE_OPENGL
 
 #include "Gl1_Primitives.hpp"
-#include <yade/lib/opengl/OpenGLWrapper.hpp>
-#include <yade/core/Scene.hpp>
+#include <lib/opengl/OpenGLWrapper.hpp>
+#include <core/Scene.hpp>
 
 YADE_PLUGIN((Gl1_Aabb)(Gl1_Box)(Gl1_Facet));
 YADE_PLUGIN((GlBoundFunctor)(GlShapeFunctor)(GlIGeomFunctor)(GlIPhysFunctor)(GlStateFunctor)

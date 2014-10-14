@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <yade/pkg/common/ElastMat.hpp>
-#include <yade/pkg/dem/FrictPhys.hpp>
-#include <yade/pkg/common/Dispatching.hpp>
-#include <yade/pkg/dem/ScGeom.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/dem/FrictPhys.hpp>
+#include <pkg/common/Dispatching.hpp>
+#include <pkg/dem/ScGeom.hpp>
 
 class NormalInelasticMat : public FrictMat
 {

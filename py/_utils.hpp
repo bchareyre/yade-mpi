@@ -1,15 +1,15 @@
-#include<yade/pkg/dem/Shop.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/dem/DemXDofGeom.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/dem/Tetra.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/NormShearPhys.hpp>
-#include<yade/lib/computational-geometry/Hull2d.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
-#include<yade/pkg/dem/ViscoelasticPM.hpp>
+#include<pkg/dem/Shop.hpp>
+#include<core/Scene.hpp>
+#include<core/Omega.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/dem/Tetra.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<lib/computational-geometry/Hull2d.hpp>
+#include<lib/pyutil/doc_opts.hpp>
+#include<pkg/dem/ViscoelasticPM.hpp>
 
 #include<numpy/ndarrayobject.h>
 

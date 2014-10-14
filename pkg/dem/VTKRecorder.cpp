@@ -22,16 +22,16 @@
   #include<vtkMultiBlockDataSet.h>
 #endif
 
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/pkg/dem/ConcretePM.hpp>
-#include<yade/pkg/dem/WirePM.hpp>
-#include<yade/pkg/dem/JointedCohesiveFrictionalPM.hpp>
-#include<yade/pkg/dem/Shop.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/common/Facet.hpp>
+#include<pkg/common/Box.hpp>
+#include<pkg/dem/ConcretePM.hpp>
+#include<pkg/dem/WirePM.hpp>
+#include<pkg/dem/JointedCohesiveFrictionalPM.hpp>
+#include<pkg/dem/Shop.hpp>
 #ifdef YADE_LIQMIGRATION
-	#include<yade/pkg/dem/ViscoelasticCapillarPM.hpp>
+	#include<pkg/dem/ViscoelasticCapillarPM.hpp>
 #endif
 
 YADE_PLUGIN((VTKRecorder));

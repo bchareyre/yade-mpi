@@ -7,11 +7,11 @@
 *************************************************************************/
 #pragma once
 
-#include<yade/pkg/common/FieldApplier.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/lib/base/Math.hpp>
-#include<yade/pkg/common/Callbacks.hpp>
-#include<yade/pkg/dem/GlobalStiffnessTimeStepper.hpp>
+#include<pkg/common/FieldApplier.hpp>
+#include<core/Interaction.hpp>
+#include<lib/base/Math.hpp>
+#include<pkg/common/Callbacks.hpp>
+#include<pkg/dem/GlobalStiffnessTimeStepper.hpp>
 
 #ifdef YADE_OPENMP
 	#include<omp.h>

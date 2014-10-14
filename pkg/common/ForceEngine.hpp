@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
+#include<core/PartialEngine.hpp>
 
 class ForceEngine: public PartialEngine{
 	public:

@@ -1,5 +1,5 @@
-#include <yade/pkg/dem/CapillaryPhys.hpp>
-#include <yade/pkg/dem/ScGeom.hpp>
+#include <pkg/dem/CapillaryPhys.hpp>
+#include <pkg/dem/ScGeom.hpp>
 
 YADE_PLUGIN((CapillaryPhys)(Ip2_FrictMat_FrictMat_CapillaryPhys));
 

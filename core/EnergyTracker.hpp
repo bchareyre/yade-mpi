@@ -1,6 +1,6 @@
 #pragma once
-#include<yade/lib/base/openmp-accu.hpp>
-#include<yade/lib/serialization/Serializable.hpp>
+#include<lib/base/openmp-accu.hpp>
+#include<lib/serialization/Serializable.hpp>
 
 namespace py=boost::python;
 

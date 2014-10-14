@@ -4,12 +4,12 @@
 #ifdef YADE_OPENGL
 
 #include"OpenGLRenderer.hpp"
-#include<yade/lib/opengl/OpenGLWrapper.hpp>
-#include<yade/lib/opengl/GLUtils.hpp>
-#include<yade/core/Timing.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Aabb.hpp>
-#include<yade/lib/pyutil/gil.hpp>
+#include<lib/opengl/OpenGLWrapper.hpp>
+#include<lib/opengl/GLUtils.hpp>
+#include<core/Timing.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Aabb.hpp>
+#include<lib/pyutil/gil.hpp>
 
 #ifdef __APPLE__
 #  include <OpenGL/glu.h>

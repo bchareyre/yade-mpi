@@ -1,7 +1,7 @@
 // 2011 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 // 2012 © Kneib Francois <francois.kneib@irstea.fr>
 #pragma once
-#include<yade/pkg/dem/ScGeom.hpp>
+#include<pkg/dem/ScGeom.hpp>
 
 
 class CylScGeom: public ScGeom {

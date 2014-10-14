@@ -1,6 +1,6 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include <yade/pkg/common/MatchMaker.hpp>
+#include <pkg/common/MatchMaker.hpp>
 
 YADE_PLUGIN((MatchMaker));
 

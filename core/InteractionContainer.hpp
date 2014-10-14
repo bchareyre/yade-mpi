@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include<yade/lib/serialization/Serializable.hpp>
+#include<lib/serialization/Serializable.hpp>
 #include<boost/thread/mutex.hpp>
 
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
 
-#include<yade/core/Interaction.hpp>
-#include<yade/core/BodyContainer.hpp>
+#include<core/Interaction.hpp>
+#include<core/BodyContainer.hpp>
 
 /* This InteractionContainer implementation has reference to the body container and
 stores interactions in 2 places:

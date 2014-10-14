@@ -1,6 +1,6 @@
-#include<yade/core/Clump.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/Integrator.hpp>
+#include<core/Clump.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/Integrator.hpp>
 
 #ifdef YADE_OPENMP
   #include<omp.h>

@@ -3,9 +3,9 @@
 #pragma once
 
 #ifndef Q_MOC_RUN 
-#include<yade/core/Omega.hpp>
-#include<yade/pkg/common/OpenGLRenderer.hpp>
-#include<yade/pkg/common/PeriodicEngines.hpp>
+#include<core/Omega.hpp>
+#include<pkg/common/OpenGLRenderer.hpp>
+#include<pkg/common/PeriodicEngines.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #endif 
 

@@ -2,7 +2,7 @@
 //
 
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
-#include<yade/core/Serializable.hpp>
+#include<core/Serializable.hpp>
 /*! Storage for general 3d view settings.
 
 Is saved along with simulation and passed to every call to render(...).

@@ -13,7 +13,7 @@
 #include <cholmod.h>
 #endif
 //For pyRunString
-#include<yade/lib/pyutil/gil.hpp>
+#include<lib/pyutil/gil.hpp>
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::~TemplateFlowEngine_@TEMPLATE_FLOW_NAME@() {}

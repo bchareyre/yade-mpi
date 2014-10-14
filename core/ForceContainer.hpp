@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/core/Body.hpp>
+#include<lib/base/Math.hpp>
+#include<core/Body.hpp>
 
 #include<boost/static_assert.hpp>
 // make sure that (void*)&vec[0]==(void*)&vec

@@ -7,14 +7,14 @@
 *************************************************************************/
 
 #include "CapillaryStressRecorder.hpp"
-#include <yade/pkg/common/Sphere.hpp>
-#include <yade/pkg/common/ElastMat.hpp>
-#include <yade/pkg/dem/CapillaryPhys.hpp>
-#include <yade/pkg/dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
-#include <yade/pkg/dem/TriaxialCompressionEngine.hpp>
+#include <pkg/common/Sphere.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/dem/CapillaryPhys.hpp>
+#include <pkg/dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
+#include <pkg/dem/TriaxialCompressionEngine.hpp>
 
-#include <yade/core/Omega.hpp>
-#include <yade/core/Scene.hpp>
+#include <core/Omega.hpp>
+#include <core/Scene.hpp>
 
 YADE_PLUGIN((CapillaryStressRecorder));
 CREATE_LOGGER(CapillaryStressRecorder);

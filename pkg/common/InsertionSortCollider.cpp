@@ -2,12 +2,12 @@
 // 2013 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 
 #include"InsertionSortCollider.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/NewtonIntegrator.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<core/Scene.hpp>
+#include<core/Interaction.hpp>
+#include<core/InteractionContainer.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/NewtonIntegrator.hpp>
+#include<pkg/common/Sphere.hpp>
 
 #include<boost/static_assert.hpp>
 #ifdef YADE_OPENMP

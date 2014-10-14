@@ -2,16 +2,16 @@
 // 2012 © Kneib Francois <francois.kneib@irstea.fr>
 
 #pragma once
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/core/Shape.hpp>
-#include<yade/core/Body.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<core/Shape.hpp>
+#include<core/Body.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/common/Sphere.hpp>
 #ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
+	#include<pkg/common/GLDrawFunctors.hpp>
 #endif
-#include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg/common/CylScGeom6D.hpp>
+#include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
+#include<pkg/common/CylScGeom6D.hpp>
 
 class Cylinder: public Sphere{
 	public:

@@ -1,11 +1,11 @@
 #ifdef YADE_SPH
 #include"SPHEngine.hpp"
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/dem/ViscoelasticPM.hpp>
-#include<yade/pkg/common/Sphere.hpp>
+#include<core/Scene.hpp>
+#include<pkg/dem/ViscoelasticPM.hpp>
+#include<pkg/common/Sphere.hpp>
 
-#include<yade/core/State.hpp>
-#include<yade/core/Omega.hpp>
+#include<core/State.hpp>
+#include<core/Omega.hpp>
 
 void SPHEngine::action(){
   {

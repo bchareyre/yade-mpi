@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include<yade/core/Bound.hpp>
-#include<yade/core/Interaction.hpp>
-#include<yade/core/GlobalEngine.hpp>
+#include<core/Bound.hpp>
+#include<core/Interaction.hpp>
+#include<core/GlobalEngine.hpp>
 
-#include<yade/pkg/common/Dispatching.hpp>
+#include<pkg/common/Dispatching.hpp>
 
 class Collider: public GlobalEngine {
 	public:

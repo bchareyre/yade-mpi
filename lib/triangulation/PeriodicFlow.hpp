@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <yade/lib/triangulation/FlowBoundingSphere.hpp>//include after #define XVIEW
+#include <lib/triangulation/FlowBoundingSphere.hpp>//include after #define XVIEW
 // #include "Timer.h"
 // #include "PeriodicTesselation.h"
 // #include "basicVTKwritter.hpp"

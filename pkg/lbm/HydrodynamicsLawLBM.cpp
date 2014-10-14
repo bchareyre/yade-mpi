@@ -24,11 +24,11 @@
 #ifdef LBM_ENGINE
 
 #include"HydrodynamicsLawLBM.hpp"
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include<yade/pkg/common/Box.hpp>
-#include<yade/pkg/common/Sphere.hpp>
-#include<yade/pkg/dem/CohesiveFrictionalContactLaw.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include<pkg/common/Box.hpp>
+#include<pkg/common/Sphere.hpp>
+#include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
 
 
 namespace bfs=boost::filesystem;

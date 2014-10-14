@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/lib/triangulation/KinematicLocalisationAnalyser.hpp>
+#include<core/GlobalEngine.hpp>
+#include<lib/triangulation/KinematicLocalisationAnalyser.hpp>
 
 /*! \brief compute fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing.
 	

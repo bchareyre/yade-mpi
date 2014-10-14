@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include<yade/lib/base/Math.hpp>
-#include<yade/lib/serialization/Serializable.hpp>
-#include<yade/lib/multimethods/Indexable.hpp>
-#include<yade/core/Dispatcher.hpp>
+#include<lib/base/Math.hpp>
+#include<lib/serialization/Serializable.hpp>
+#include<lib/multimethods/Indexable.hpp>
+#include<core/Dispatcher.hpp>
 
 class IGeom : public Serializable, public Indexable
 {

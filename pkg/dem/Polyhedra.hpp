@@ -6,16 +6,16 @@
 
 #ifdef YADE_CGAL
 
-#include<yade/core/Shape.hpp>
-#include<yade/core/IGeom.hpp>
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/core/Material.hpp>
-#include<yade/pkg/common/Aabb.hpp>
-#include<yade/pkg/common/Dispatching.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/pkg/common/Wall.hpp>
-#include<yade/pkg/common/Facet.hpp>
-#include<yade/lib/base/openmp-accu.hpp>
+#include<core/Shape.hpp>
+#include<core/IGeom.hpp>
+#include<core/GlobalEngine.hpp>
+#include<core/Material.hpp>
+#include<pkg/common/Aabb.hpp>
+#include<pkg/common/Dispatching.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<pkg/common/Wall.hpp>
+#include<pkg/common/Facet.hpp>
+#include<lib/base/openmp-accu.hpp>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_3.h>
@@ -180,11 +180,11 @@ REGISTER_SERIALIZABLE(PolyhedraPhys);
 
 //***************************************************************************
 #ifdef YADE_OPENGL
-	#include<yade/pkg/common/GLDrawFunctors.hpp>
-	#include<yade/lib/opengl/OpenGLWrapper.hpp>
-	#include<yade/lib/opengl/GLUtils.hpp>
+	#include<pkg/common/GLDrawFunctors.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/GLUtils.hpp>
 	#include<GL/glu.h>
-	#include<yade/pkg/dem/Shop.hpp>
+	#include<pkg/dem/Shop.hpp>
 	
 	/*! Draw Polyhedra using OpenGL */
 	class Gl1_Polyhedra: public GlShapeFunctor{	

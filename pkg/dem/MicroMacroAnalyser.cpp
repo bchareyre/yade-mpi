@@ -7,19 +7,19 @@
 *************************************************************************/
 #ifdef YADE_CGAL
 
-#include<yade/pkg/common/ElastMat.hpp>
-#include<yade/pkg/dem/ScGeom.hpp>
-#include<yade/pkg/dem/FrictPhys.hpp>
-#include<yade/core/Omega.hpp>
-#include<yade/core/Scene.hpp>
-#include <yade/pkg/common/Sphere.hpp>
-#include<yade/lib/triangulation/KinematicLocalisationAnalyser.hpp>
-#include<yade/lib/triangulation/TriaxialState.h>
-#include <yade/lib/triangulation/Tenseur3.h>
+#include<pkg/common/ElastMat.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/dem/FrictPhys.hpp>
+#include<core/Omega.hpp>
+#include<core/Scene.hpp>
+#include <pkg/common/Sphere.hpp>
+#include<lib/triangulation/KinematicLocalisationAnalyser.hpp>
+#include<lib/triangulation/TriaxialState.h>
+#include <lib/triangulation/Tenseur3.h>
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
-#include<yade/pkg/dem/TriaxialCompressionEngine.hpp>
+#include<pkg/dem/TriaxialCompressionEngine.hpp>
 #include "MicroMacroAnalyser.hpp"
 
 YADE_PLUGIN((MicroMacroAnalyser));

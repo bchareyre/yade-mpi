@@ -1,7 +1,7 @@
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
-#include<yade/core/Scene.hpp>
+#include<core/GlobalEngine.hpp>
+#include<core/Scene.hpp>
 
 class Scene;
 class ForceResetter: public GlobalEngine{

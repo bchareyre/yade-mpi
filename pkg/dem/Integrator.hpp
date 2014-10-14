@@ -1,6 +1,6 @@
 #pragma once
 
-#include<yade/core/TimeStepper.hpp>
+#include<core/TimeStepper.hpp>
 
 class Integrator;
 
