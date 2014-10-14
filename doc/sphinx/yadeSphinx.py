@@ -214,8 +214,12 @@ writer=None
 
 for writer in ['html','latex','epub']:
 	genWrapperRst()
-        commLine = "sphinx-build -a -E -b %s -d %s . %s"%(writer,outDir+'/doctrees', (outDir+'/%s'%writer))
-        os.system(commLine)
+	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
+	sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
+	try:
+		sphinx.main(sys.argv)
+	except SystemExit:
+		pass
 	if writer=='html':
 		makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
 	elif writer=='latex':
