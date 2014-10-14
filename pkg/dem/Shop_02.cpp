@@ -503,3 +503,17 @@ void Shop::growParticle(Body::id_t bodyID, Real multiplier, bool updateMass)
 		else contact->refR2 = rad;
 	}
 }
+
+py::tuple Shop::aabbExtrema(Real cutoff, bool centers){
+	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
+	Real inf=std::numeric_limits<Real>::infinity();
+	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		Vector3r rrr(s->radius,s->radius,s->radius);
+		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
+		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
+	}
+	Vector3r dim=maximum-minimum;
+	return py::make_tuple(Vector3r(minimum+.5*cutoff*dim),Vector3r(maximum-.5*cutoff*dim));
+}

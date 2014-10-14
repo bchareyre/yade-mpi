@@ -42,7 +42,7 @@
 	#include"yade/pkg/common/Gl1_NormPhys.hpp"
 #endif
 
-#include"yade/py/_utils.cpp"
+#include "yade/py/_utils.hpp"
 
 
 CREATE_LOGGER(Shop);
@@ -324,7 +324,7 @@ Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume){
 	Real V;
 	if(!scene->isPeriodic){
 		if(_volume<=0){// throw std::invalid_argument("utils.porosity must be given (positive) *volume* for aperiodic simulations.");
-		  py::tuple extrema = aabbExtrema(); //aabbExtrema() defined in _utils.cpp
+		  py::tuple extrema = aabbExtrema();
 		  V = py::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
 		}
 		else

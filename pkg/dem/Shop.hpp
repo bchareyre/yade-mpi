@@ -143,4 +143,8 @@ class Shop{
 		//! Change of size of a single sphere or a clump
 		// DEPREC, update wrt growParticles()
 		static void growParticle(Body::id_t bodyID, Real multiplier, bool updateMass);
+		
+		/* \todo implement groupMask */
+		static py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false);
 };
+
