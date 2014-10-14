@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include<yade/lib/triangulation/FlowBoundingSphere.hpp>//include after #define XVIEW
+#include <yade/lib/triangulation/FlowBoundingSphere.hpp>//include after #define XVIEW
 // #include "Timer.h"
 // #include "PeriodicTesselation.h"
 // #include "basicVTKwritter.hpp"
@@ -180,7 +180,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 			CellHandle& cell = *cellIt;
 			Point& p1 = cell->info();
 			if (cell->info().blocked) {
-				setBlocked(cell);}
+				this->setBlocked(cell);}
 			if (cell->info().isGhost) {cerr<<"skipping a ghost"<<endl; continue;}
 			for (int j=0; j<4; j++){
 				neighbourCell = cell->neighbor(j);
