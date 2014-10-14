@@ -44,9 +44,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	  backgroundSolver=solver;
 	  backgroundCompleted=true;
 	}
-  #ifdef YADE_OPENMP
+	#ifdef YADE_OPENMP
 	solver->ompThreads = ompThreads>0? ompThreads : omp_get_max_threads();
-  #endif
+	#endif
         timingDeltas->checkpoint ( "Triangulating" );
 	updateVolumes ( *solver );
         timingDeltas->checkpoint ( "Update_Volumes" );
