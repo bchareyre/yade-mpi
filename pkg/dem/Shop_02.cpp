@@ -351,7 +351,12 @@ py::tuple Shop::fabricTensor(bool splitTensor, bool revertSign, Real thresholdFo
 
 Matrix3r Shop::getStress(Real volume){
 	Scene* scene=Omega::instance().getScene().get();
-	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():1;
+	Real volumeNonPeri = 0;
+	if (!scene->isPeriodic) {
+	  py::tuple extrema = Shop::aabbExtrema();
+	  volumeNonPeri = py::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
+	}
+	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():volumeNonPeri;
 	Matrix3r stressTensor = Matrix3r::Zero();
 	const bool isPeriodic = scene->isPeriodic;
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
