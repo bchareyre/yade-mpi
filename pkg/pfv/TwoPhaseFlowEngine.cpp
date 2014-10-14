@@ -19,10 +19,7 @@
 #include "TwoPhaseFlowEngine.hpp"
 
 YADE_PLUGIN((TwoPhaseFlowEngineT));
-
 YADE_PLUGIN((TwoPhaseFlowEngine));
-
-void TwoPhaseFlowEngine::fancyFunction(Real what) {std::cerr<<"yes, I'm a new function"<<std::endl;}
 
 void TwoPhaseFlowEngine::initializeCellIndex()
 {
@@ -89,7 +86,7 @@ void TwoPhaseFlowEngine:: computePoreCapillaryPressure(CellHandle cell)
   cell->info().p() = Pg - Pc; 
 }
 
-void TwoPhaseFlowEngine::computePoreThroatRadius()
+void TwoPhaseFlowEngine::computePoreThroatCircleRadius()
 {
   //Calculate the porethroat radii of the inscribed sphere in each pore-body. 
   RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -209,8 +206,7 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
 	  M(0,4) = pow((r0+Rin),2);
 	  M(1,4) = pow((r1+Rin),2);
 	  M(2,4) = pow((r2+Rin),2);
-	  M(3,4) = pow((r3+Rin),2);
-	
+	  M(3,4) = pow((r3+Rin),2);	
 	
 	  if (first){
 	    first = false;
@@ -244,6 +240,57 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
       }
     cell -> info().poreBodyRadius = Rin;
    }
+}
+
+void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
+{
+// 	RTriangulation& Tri = T[solver->noCache?(!currentTes):currentTes].Triangulation();
+	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+        static unsigned int number = 0;
+        char filename[80];
+	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"%s/out_%d.vtk",folder,number++);
+	int firstReal=-1;
+
+	//count fictious vertices and cells
+	solver->vtkInfiniteVertices=solver->vtkInfiniteCells=0;
+ 	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (!isDrawable) solver->vtkInfiniteCells+=1;
+	}
+	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+                if (!v->info().isReal()) solver->vtkInfiniteVertices+=1;
+                else if (firstReal==-1) firstReal=solver->vtkInfiniteVertices;}
+
+        basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-solver->vtkInfiniteVertices, (unsigned int) Tri.number_of_finite_cells()-solver->vtkInfiniteCells);
+
+        vtkfile.open(filename,"test");
+
+        vtkfile.begin_vertices();
+        double x,y,z;
+        for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+		if (v->info().isReal()){
+		x = (double)(v->point().point()[0]);
+                y = (double)(v->point().point()[1]);
+                z = (double)(v->point().point()[2]);
+                vtkfile.write_point(x,y,z);}
+        }
+        vtkfile.end_vertices();
+
+        vtkfile.begin_cells();
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+        	if (isDrawable){vtkfile.write_cell(cell->vertex(0)->info().id()-firstReal, cell->vertex(1)->info().id()-firstReal, cell->vertex(2)->info().id()-firstReal, cell->vertex(3)->info().id()-firstReal);}
+        }
+        vtkfile.end_cells();
+
+	vtkfile.begin_data("Saturation",CELL_DATA,SCALARS,FLOAT);
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(cell->info().saturation);}
+	}
+	vtkfile.end_data();
 }
 
 #endif //TwoPhaseFLOW

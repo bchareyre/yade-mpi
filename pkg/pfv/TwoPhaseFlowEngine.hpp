@@ -26,7 +26,6 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	bool isTrapW;
 	bool isTrapNW;
 	double saturation;//the saturation of single pore (will be used in quasi-static imbibition and dynamic flow)
-	bool isImbibition;//Flag for marking pore unit which contains NW-W interface (used by Thomas)
 	double trapCapP;//for calculating the pressure of trapped pore, cell->info().p() = pressureNW- trapCapP. OR cell->info().p() = pressureW + trapCapP
 	bool hasInterface; //Indicated whether a NW-W interface is present within the pore body
 	std::vector<double> poreThroatRadius;
@@ -68,22 +67,21 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	
 	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine
 	//if it is useful for everyone
-	void fancyFunction(Real what);
 	void initializeCellIndex();
 	void computePoreBodyVolume();	
 	void computePoreBodyRadius();
-	void computePoreThroatRadius();
+	void computePoreThroatCircleRadius();
 	void computePoreSatAtInterface(CellHandle cell);
 	void computePoreCapillaryPressure(CellHandle cell);
-
+	void savePhaseVtk(const char* folder);
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 	((bool,initialWetting,true,,"Initial wetting saturated (=true) or non-wetting saturated (=false)"))
 	((bool, isPhaseTrapped,true,,"If True, both phases can be entrapped by the other, which would correspond to snap-off. If false, both phases are always connected to their reservoirs, thus no snap-off."))
-	
+
 	,/*TwoPhaseFlowEngineT()*/,
 	,
-	.def("fancyFunction",&TwoPhaseFlowEngine::fancyFunction,(boost::python::arg("what")=0),"test function")
+	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	)
 	DECLARE_LOGGER;
 };
