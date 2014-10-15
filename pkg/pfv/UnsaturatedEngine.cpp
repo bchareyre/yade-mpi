@@ -294,22 +294,16 @@ void UnsaturatedEngine::updatePressure()
 ///boundingCells[2] always connect W-reservoir. 
 void UnsaturatedEngine::initWaterReservoirBound()
 {
-    if (solver->boundingCells[2].size()==0) {cerr<<"ERROR! set bndCondIsPressure[2] true. boundingCells.size=0!";}
-    else {
         for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
-            if ((*it)->info().index == 0) continue;
             (*it)->info().isWRes = true;
-            (*it)->info().isNWRes = false;}}
+            (*it)->info().isNWRes = false;}
 }
 ///boundingCells[3] always connect NW-reservoir
 void UnsaturatedEngine::initAirReservoirBound()
 {
-    if (solver->boundingCells[3].size()==0) {cerr<<"ERROR! set bndCondIsPressure[3] true. boundingCells.size=0!";}
-    else {
         for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
-            if((*it)->info().index == 0) continue;
             (*it)->info().isNWRes = true;
-            (*it)->info().isWRes = false;}}
+            (*it)->info().isWRes = false;}
 }
 
 void UnsaturatedEngine::invade()
@@ -389,46 +383,46 @@ void UnsaturatedEngine::updateReservoirs1()
         cell->info().isWRes = false;
         cell->info().isNWRes = false;
     }
-    if(solver->debugOut) {cout<<"----updateReservoirs1.initial----"<<endl;}
+//     if(solver->debugOut) {cout<<"----updateReservoirs1.initial----"<<endl;}
 
     initWaterReservoirBound();
-    if(solver->debugOut) {cout<<"----updateReservoirs1.initWaterReservoirBound----"<<endl;}
+//     if(solver->debugOut) {cout<<"----updateReservoirs1.initWaterReservoirBound----"<<endl;}
     initAirReservoirBound();
-    if(solver->debugOut) {cout<<"----updateReservoirs1.initAirReservoirBound----"<<endl;}
+//     if(solver->debugOut) {cout<<"----updateReservoirs1.initAirReservoirBound----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
-        if(solver->debugOut) cerr<< "iterating on "<<bool((*it)==NULL)<<endl;
-        if ((*it)==NULL or (*it)->info().index == 0) continue;
+//         if(solver->debugOut) cerr<< "iterating on "<<bool((*it)==NULL)<<endl;
+        if ((*it)==NULL) continue;
         waterReservoirRecursion(*it);
     }
-    if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion----"<<endl;}
+//     if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion----"<<endl;}
     
     for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
-        if(solver->debugOut) cerr<< "iterating(2) on "<<bool((*it)==NULL)<<endl;
-        if ((*it)==NULL or (*it)->info().index == 0) continue;
+//         if(solver->debugOut) cerr<< "iterating(2) on "<<bool((*it)==NULL)<<endl;
+        if ((*it)==NULL) continue;
         airReservoirRecursion(*it);
     }
-    if(solver->debugOut) {cout<<"----updateReservoirs1.airReservoirRecursion----"<<endl;}
+//     if(solver->debugOut) {cout<<"----updateReservoirs1.airReservoirRecursion----"<<endl;}
 }
 
 void UnsaturatedEngine::waterReservoirRecursion(CellHandle cell)
 {
     if (cell==NULL) cerr<<"null cell found"<<endl;
-    if(solver->debugOut) cerr<<"checking cell ="<<cell->info().index<<endl;
+//     if(solver->debugOut) cerr<<"checking cell ="<<cell->info().index<<endl;
     for (int facet = 0; facet < 4; facet ++) {
-	if(solver->debugOut) cerr<<"checking facet ="<<facet<<", i.e. cell"<<cell->neighbor(facet)->info().index<<endl;
+// 	if(solver->debugOut) cerr<<"checking facet ="<<facet<<", i.e. cell"<<cell->neighbor(facet)->info().index<<endl;
         CellHandle nCell = cell->neighbor(facet);
 	if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
         
         if (nCell->info().Pcondition) continue;
-	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.1----"<<endl;}
+// 	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.1----"<<endl;}
 	
 	if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (nCell->info().p() != bndCondValue[2]) continue;
         if (nCell->info().isWRes==true) continue;
         nCell->info().isWRes = true;
 	nCell->info().isNWRes = false;
-	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.2----"<<endl;}
+// 	if(solver->debugOut) {cout<<"----updateReservoirs1.waterReservoirRecursion.2----"<<endl;}
         waterReservoirRecursion(nCell);
     }
 //     cerr<<"done"<<endl;
@@ -942,7 +936,6 @@ void UnsaturatedEngine::checkBoundingCellsInfo()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (tri.is_infinite(cell)) continue;
-        if (cell->info().index==0) continue;
         if ((cell->info().isFictious==true)&&(cell->info().Pcondition==false)) {
             file << cell->info().index <<" "<<cell->info().p()<<" "<<cell->info().isNWRes<<" "<<cell->info().isWRes<<endl;
         }
@@ -961,7 +954,6 @@ void UnsaturatedEngine::checkReservoirInfo(int boundN)
             file << "#Checking the water reservoir cells states\n";
             file << "CellID" << "	CellPressure" << "	isNWRes" << "	isWRes" <<endl;
             for (FlowSolver::VCellIterator it = solver->boundingCells[boundN].begin() ; it != solver->boundingCells[boundN].end(); it++) {
-                if ((*it)->info().index == 0) continue;
                 file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isNWRes<<" "<<(*it)->info().isWRes<<endl;
             }
             file.close();
@@ -972,7 +964,6 @@ void UnsaturatedEngine::checkReservoirInfo(int boundN)
             file << "#Checking the air reservoir cells state\n";
             file << "CellID"<<"	CellPressure"<<"	isNWRes"<<"	isWRes"<<endl;
             for (FlowSolver::VCellIterator it = solver->boundingCells[boundN].begin(); it != solver->boundingCells[boundN].end(); it++) {
-                if ((*it)->info().index == 0) continue;
                 file << (*it)->info().index <<" "<<(*it)->info().p()<<" "<<(*it)->info().isNWRes<<" "<<(*it)->info().isWRes<<endl;
             }
             file.close();
