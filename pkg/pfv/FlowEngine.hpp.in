@@ -99,6 +99,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 
 		void imposeFlux(Vector3r pos, Real flux);
 		unsigned int imposePressure(Vector3r pos, Real p);
+		unsigned int imposePressureFromId(long id, Real p);
 		void setImposedPressure(unsigned int cond, Real p);
 		void clearImposedPressure();
 		void clearImposedFlux();
@@ -165,6 +166,11 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Real volumeCellTripleFictious (Cellhandle cell);
 		template<class Cellhandle>
 		Real volumeCell (Cellhandle cell);
+		template<class Cellhandle>
+		Vector3r cellBarycenterFromHandle (Cellhandle cell) {return makeVector3r(solver->cellBarycenter(cell));}
+		Vector3r cellBarycenterFromId (long id) {
+			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return Vector3r(0,0,0);}
+			else return cellBarycenterFromHandle(solver->T[solver->currentTes].cellHandles[id]);}
 		void Oedometer_Boundary_Conditions();
 		void averageRealCellVelocity();
 		void saveVtk(const char* folder) {solver->saveVtk(folder);}
@@ -304,6 +310,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		metisForced=false;
 		,
 		.def("imposeFlux",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposeFlux,(boost::python::arg("pos"),boost::python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
+		.def("imposePressureFromId",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposePressureFromId,(boost::python::arg("id"),boost::python::arg("p")),"Impose pressure in cell of index 'id' (after remeshing the same condition will apply for the same location, regardless of what the new cell index is at this location). The index of the condition itself is returned (for multiple imposed pressures at different points).")
 		.def("imposePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposePressure,(boost::python::arg("pos"),boost::python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 		.def("setImposedPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::setImposedPressure,(boost::python::arg("cond"),boost::python::arg("p")),"Set pressure value at the point indexed 'cond'.")
 		.def("clearImposedPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::clearImposedPressure,"Clear the list of points with pressure imposed.")
@@ -334,6 +341,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("updateBCs",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 		.def("emulateAction",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 		.def("getCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getCell,(boost::python::arg("pos")),"get id of the cell containing (X,Y,Z).")
+		.def("getCellBarycenter",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellBarycenterFromId,(boost::python::arg("id")),"get barycenter of cell 'id'.")
 		.def("getCellCenter",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellCenter,(boost::python::arg("id")),"get voronoi center of cell 'id'.")
 		.def("getCellPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::cellPressure,(boost::python::arg("id")),"get pressure in cell 'id'.")
 		.def("setCellPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::setCellPressure,(boost::python::arg("id"),boost::python::arg("pressure")),"set pressure in cell 'id'.")
