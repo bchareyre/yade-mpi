@@ -424,7 +424,7 @@ void FlowBoundingSphere<Tesselation>::applyUserDefinedPressure(RTriangulation& T
 }
 
 template <class Tesselation> 
-CVector FlowBoundingSphere<Tesselation>::cellCenter(CellHandle& cell)
+CVector FlowBoundingSphere<Tesselation>::cellBarycenter(CellHandle& cell)
 {
 	CVector center ( 0,0,0 );
 	for ( int k=0;k<4;k++ ) center= center + 0.25* (cell->vertex(k)->point()-CGAL::ORIGIN);
