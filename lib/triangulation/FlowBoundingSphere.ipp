@@ -424,6 +424,14 @@ void FlowBoundingSphere<Tesselation>::applyUserDefinedPressure(RTriangulation& T
 }
 
 template <class Tesselation> 
+CVector FlowBoundingSphere<Tesselation>::cellCenter(CellHandle& cell)
+{
+	CVector center ( 0,0,0 );
+	for ( int k=0;k<4;k++ ) center= center + 0.25* (cell->vertex(k)->point()-CGAL::ORIGIN);
+	return center;
+}
+
+template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
         CellHandle oldCell;
@@ -435,14 +443,12 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
 		else {
 			Real boundPos=0; int coord=0;
-			for ( int k=0;k<4;k++ ) {
-				if (!newCell->vertex (k)->info().isFictious) center= center+0.3333333333*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
-				else {
+			for ( int k=0;k<4;k++ ) if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+			for ( int k=0;k<4;k++ ) if (newCell->vertex (k)->info().isFictious) {
 					coord=boundary (newCell->vertex(k)->info().id()).coordinate;
 					boundPos=boundary (newCell->vertex(k)->info().id()).p[coord];
+					center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
 				}
-			}
-			center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
 		}
                 oldCell = Tri.locate(Point(center[0],center[1],center[2]));
 		newCell->info().getInfo(oldCell->info());
@@ -750,8 +756,9 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
         FiniteCellsIterator cellEnd = Tri.finite_cells_end();
 
         for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++){
-		cell->info().p() = pZero; cell->info().dv()=0;}
-
+		if (!cell->info().Pcondition) cell->info().p() = pZero;
+		cell->info().dv()=0;
+	}
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		boundingCells[bound].clear();

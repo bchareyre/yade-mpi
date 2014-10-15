@@ -127,6 +127,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		//return the list of constriction values
 		vector<double> getConstrictions();
 		vector<Constriction> getConstrictionsFull();
+		CVector cellCenter(CellHandle& cell);
 
 		void generateVoxelFile ( );
 		
