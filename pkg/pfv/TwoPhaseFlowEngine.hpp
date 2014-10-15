@@ -74,6 +74,16 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreSatAtInterface(CellHandle cell);
 	void computePoreCapillaryPressure(CellHandle cell);
 	void savePhaseVtk(const char* folder);
+
+	//FIXME, needs to trigger initSolver() Somewhere, else changing flow.debug or other similar things after first calculation has no effect
+	//FIXME, I removed indexing cells from inside UnsatEngine (SoluteEngine shouldl be ok (?)) in order to get pressure computed, problem is they are not indexed at all if flow is not calculated
+	void computeOnePhaseFlow() {scene = Omega::instance().getScene().get(); if (!solver) cerr<<"no solver!"<<endl; solver->gaussSeidel(scene->dt);}
+	
+	CELL_SCALAR_GETTER(bool,.isWRes,cellIsWRes)
+	CELL_SCALAR_GETTER(bool,.isNWRes,cellIsNWRes)
+	CELL_SCALAR_GETTER(Real,.saturation,cellSaturation)
+	CELL_SCALAR_SETTER(Real,.saturation,setCellSaturation)
+
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 	((bool,initialWetting,true,,"Initial wetting saturated (=true) or non-wetting saturated (=false)"))
@@ -82,6 +92,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	,/*TwoPhaseFlowEngineT()*/,
 	,
 	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
+	.def("getCellIsWRes",&TwoPhaseFlowEngine::cellIsWRes,"get status wrt 'wetting reservoir' state")
+	.def("getCellIsNWRes",&TwoPhaseFlowEngine::cellIsNWRes,"get status wrt 'non-wetting reservoir' state")
+	.def("getCellSaturation",&TwoPhaseFlowEngine::cellSaturation,"get saturation of one pore")
+	.def("setCellSaturation",&TwoPhaseFlowEngine::setCellSaturation,"change saturation of one pore")
+	.def("computeOnePhaseFlow",&TwoPhaseFlowEngine::computeOnePhaseFlow,"compute pressure and fluxes in the W-phase")
 	)
 	DECLARE_LOGGER;
 };
