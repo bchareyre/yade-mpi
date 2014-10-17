@@ -12,13 +12,13 @@ fr = 0.5;
 rho=1000.0
 
 k = 1.0
-mu = 0.01
 tc = 0.0001; en = 0.7; et = 0.7;
 Rad = 10.0e-3
+h = 2*Rad
 o.dt = 0.00001
 
 # Add material
-mat1 = O.materials.append(ViscElMat(frictionAngle=fr,density=rho, SPHmode=True,mu=mu,tc=tc, en=en, et=et))
+mat1 = O.materials.append(ViscElMat(frictionAngle=fr,density=rho, SPHmode=True,h=h,tc=tc, en=en, et=et, KernFunctionPressure = 1, KernFunctionVisco = 1))
 
 # Add spheres
 d = 0.8
@@ -42,10 +42,15 @@ o.engines = [
   ),
   CentralGravityEngine(accel=50.0, label='gr', centralBody=idCentralBody),
   NewtonIntegrator(damping=0.1),
-  SPHEngine(mask=1, k=k, rho0 = rho),
+  SPHEngine(mask=1, k=k, rho0 = rho, h=h, KernFunctionDensity= 1),
   VTKRecorder(iterPeriod=1000, mask=1, fileName='./cpt/spheres-', recorders=['spheres','velocity','colors','intr','ids','mask','materialId','stress']),
 ]
 
+
+enlargeF = h/Rad*1.1
+print "enlargeF = %g"%enlargeF
+is2aabb.aabbEnlargeFactor = enlargeF
+ss2sc.interactionDetectionFactor = enlargeF
 
 O.step()
 qt.View()
