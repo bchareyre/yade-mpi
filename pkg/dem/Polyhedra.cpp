@@ -220,6 +220,20 @@ void Polyhedra::GenerateRandomGeometry(){
 	}
 }
 
+//**************************************************************************
+/* Get polyhdral surfaces */
+vector<vector<int>> Polyhedra::GetSurfaces() const {
+	vector<vector<int>> ret(P.size_of_facets());
+	int i=0;
+	for (Polyhedron::Facet_const_iterator f = P.facets_begin(); f != P.facets_end(); f++, i++){
+		Polyhedron::Halfedge_around_facet_const_circulator h=f->facet_begin();
+		do {
+			ret[i].push_back(std::distance(P.vertices_begin(), h->vertex()));
+		} while (++h != f->facet_begin());
+	}
+	return ret;
+}
+
 
 //****************************************************************************************
 /* Destructor */

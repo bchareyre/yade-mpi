@@ -54,6 +54,7 @@ class Polyhedra: public Shape{
 		Vector3r GetCentroid(){Initialize(); return centroid;}
 		Vector3r GetInertia(){Initialize(); return inertia;}
 		vector<int> GetSurfaceTriangulation(){Initialize(); return faceTri;}
+		vector<vector<int>> GetSurfaces() const;
 		void Initialize();		
 		bool IsInitialized(){return init;}
 		std::vector<Vector3r> GetOriginalVertices();
@@ -93,6 +94,7 @@ class Polyhedra: public Shape{
 			.def("GetOri",&Polyhedra::GetOri,"return polyhedra's orientation")
 			.def("GetCentroid",&Polyhedra::GetCentroid,"return polyhedra's centroid")
 			.def("GetSurfaceTriangulation",&Polyhedra::GetSurfaceTriangulation,"triangulation of facets (for plotting)")
+			.def("GetSurfaces",&Polyhedra::GetSurfaces,"get indices of surfaces' vertices (for postprocessing)")
 		);		
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };

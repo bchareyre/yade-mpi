@@ -168,6 +168,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 	// register from-python converter and to-python converter
 
 	boost::python::to_python_converter<std::vector<std::vector<std::string> >,custom_vvector_to_list<std::string> >();
+	boost::python::to_python_converter<std::vector<std::vector<int> >,custom_vvector_to_list<int> >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 
