@@ -1,4 +1,230 @@
 ==================================================
+yade-1.12.0
+Mon, 20 Aug 2014 21:22:00 +0200
+
+Anton Gladky (27):
+      Remove RELEASE file.
+      Use toleranceWarning and toleranceCritical for DEM-PFV check.
+      Fix crash after clumps removing. Closes LP:1354433
+      Add checkClumpHopper autotest.
+      Fix crash after removal of the whole clump.
+      Fix calculation of massR in ViscoelasticPM
+      Fix cs calculation in ViscoelasticPM
+      Fix ViscElPM one more time.
+      Create an array of clump`s memberIds to remove.
+      Return fictional value from deprecated functions.
+      Respect returnin value in computeForceTorqueViscEl
+      Update Schwager2007 URL
+      Add one more paper
+      Merge pull request #44 from fifthguy/master
+      Add firstIterRun parameter to PyRunner.
+      Use system call "sphinx-build" instead of python module.
+      Fix compilation error in PeriodicFlow.hpp
+      Set python versions explicitly.
+      Move function declarations of _utils.cpp into .hpp
+      Fix runtime error in debug mode and without openmp.
+      Drop including "yade/" folder in cpp and hpp files.
+      Fix docs-generation.
+      SPH-code refactoring.
+      Use only vtkCommonCore vtkIOImage vtkIOXML components for VTK.
+      Use Python 2.7 only
+      Reintroduce viscosity in SPH-modell.
+      Add RELEASE file.
+
+Bruno Chareyre (33):
+      -include UnsaturatedEngine to start Chao's work
+      fix a few mistakes and make a real (not empty) test function
+      - replace hand-defined positions by scene's positions
+      Merge branch 'master' of https://github.com/yade/trunk into chaoUnsat
+      remove pack.particleSD and variants, unmaintained and deprecated by makeCloud (functions kept temporarily but returning error)
+      fix https://bugs.launchpad.net/yade/+bug/1362090
+      fix https://bugs.launchpad.net/yade/+bug/1308074
+      fix https://bugs.launchpad.net/yade/+bug/1368591 + remove a useless test
+      remove a temporary fix for https://bugs.launchpad.net/yade/+bug/923929, after better fix in https://github.com/yade/trunk/commit/4ea76ad6e47ac5074a389ad61712a0840e8560a5, thanks Anton
+      parallel removal of old interactions
+      replace LOG_ERROR by LOG_WARN for notifying deprecation of GravityEngine
+      improve falling back to 1-thread in parrallel collider (fix https://bugs.launchpad.net/yade/+bug/1368591)
+      fix missing brackets resulting in wrong permeability in periodic PFV
+      point to Bourrier2013 for a partial explanation of the CohesiveFrictional contact law
+      fix doc regarding requestErase() - https://bugs.launchpad.net/yade/+bug/1370736, thanks Jan
+      selective blocking of cells of the mesh in FlowEngines (preliminary steps)
+      remove empty file
+      PFV: don't skip perm calculation for blocked cells, yet
+      fix filename
+      remove cpp with wrong filename
+      reset id of erased bodies; enabling this: b=Body(); O.bodies.erase(O.bodies.append(b)); O.bodies.append(b)
+      turn DeprecationWarning (not displayed) into UserWarning (displayed) since the error messages where cryptic
+      no indexing of blocked cells in PFV
+      decrease verbosity of blocking PFV cells
+      DFNFlow unblock cells as fractures reach them + additional attributes in JCFPM
+      split resetNetwork and resetLinearSystem + add more getter/setter
+      split TwoPhaseFlowEngine in hpp/cpp for inclusion in child engines
+      #ifdef guard for openmp function
+      don't overwrite imposed fluid pressure when initializing the values (more flexible) + a function returning barycenter + improved "locate" for interpolation
+      increased flexibility of imposing fluid pressure in FlowEngine's
+      specialized getter/setter's for TwoPhaseFlowEngine + no re-indexing of cells in UnsatEngine
+      better #def/#ifdef logic for TwoPhaseFlowEngine
+      rename cellCenter->cellBarycenter (missing in prev. commit)
+
+Chao Yuan (86):
+      - my first work on drainage simulation
+      Commit the first working code for drainage
+      - make the FAR constant more flexible (a parameter in addBoundaries)
+      -add poreRadius
+      -a test commit to escape big mess...
+      Merge github.com:yade/trunk into chaoUnsat
+      -add saveLatticeNode functions for generating axial-normal slice with "0" and "1"
+      -add isWaterReservoir, isAirReservoir.
+      -add another version for drainage.
+      -delete unnecessary recursion for invadeSingleCell2()
+      Merge github.com:yade/trunk into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      -add UnsatCellInfo, UnsatVertexInfo
+      clean code
+      -add temp function for pore connection
+      Merge github.com:yade/trunk into chaoUnsat
+      -update boundary attributes
+      -a backup for laptop
+      -add UnsatVertexInfo(void) for future use
+      -test commit
+      -test commit
+      Merge remote-tracking branch 'origin/chaoUnsat' into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      -clean code
+      add capillaryCellVolume in cellinfo, optimize getSaturation()
+      -replace cell->info().p  with isAir/WaterReservoir
+      -add solidLine in cell info. partly code for force.
+      clean code, fix mistake on Facet_Force.
+      a test version of computing fluid force.
+      fix solidLine[i][j] when facetNFictious case(1).
+      -fix noCache.
+      -fix solidLine[i][j] when facetNFictious case(2).
+      -clean code.
+      fix reservoir attr. change boundcells.isWaterReservoir=true when finish drainage.
+      clean code.
+      add temp test func.
+      add cell->info().trapCapP; fix pressure calculation for trapped phase.
+      clean code.
+      Merge github.com:yade/trunk into chaoUnsat
+      clean code.add action()
+      add getSaturation2() for mode 2.
+      Merge github.com:yade/trunk into chaoUnsat
+      borrow saveVTK from FlowEngine
+      normalize two invade modes.
+      make computeForce optional;a bakcup
+      a temporary save, change waterReservoir=bound[2], add invadeBounday option
+      -make invade from boundary optional.(default false)
+      -fix Line_Solid_Pore() in Network.
+      Merge github.com:yade/trunk into chaoUnsat
+      -big change, inherit from FlowEngine.
+      remove old files
+      clean code
+      fix force calculation.
+      add compute specific interficial area, lots of bugs...
+      fix computeCellInterfacialArea with fictious vertex
+      -test. no big change.
+      Merge github.com:yade/trunk into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      -fix ‘python’ declared bug
+      -clean some info in debug
+      -fix core dump in computerForcePoreForceWithCache, currentTes shoule be solver->T[solver->currentTes],NOT solver->T[currentTes]
+      Merge github.com:yade/trunk into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      -update with PFV
+      -use bndCondValue to mark reservoir.
+      -fix reservoirs determination; fix invade(), Pw can be negative (mode1)
+      -change invade rule, use bndCondValue to determine invasion. reservoirInfo depends on bndCondValue; merge isInvadeBoundary.(mode1)
+      -change invade rule for mode2. merge some functions
+      -fix getWindowsSaturations.
+      -add pore radius checking funcs(tmp)
+      -rename variables for computePoreRadius(); clean code.
+      -clean code
+      Merge github.com:yade/trunk into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      -add debugOut to test isInvadeBoundary=True isPhaseTrapped=True
+      -insert debugOut. (core dump fixed by ulimit -s 16000)
+      Merge github.com:yade/trunk into chaoUnsat
+      This is TwoPhaseFlowEngine (alpha version) yeah!
+      Merge github.com:yade/trunk into chaoUnsat
+      -merge TwoPhaseFlowEngine, add more cell infos.
+      Merge branch 'master' of github.com:yade/trunk
+      -add savePhaseVtk. rename function.
+      -remove check cell.index
+      Merge branch 'master' of github.com:yade/trunk
+      comment #define TWOPHASEFLOW
+
+Christian Jakob (6):
+      insert updatePorosity option in TriaxialStressController
+      fix long line in github doc
+      small fix of a warning in NewtonIntegrator
+      minor fix in doc introduction.rst
+      include fluid stiffness for TSC for undrained flow condition
+      fix fluidStiffness for TSC when FlowEngine is deactivated
+
+Dominik Boemer (1):
+      Add check-script for ViscoElasticPM.
+
+Francois (1):
+      Correct contact tracking bugs for grids.     They essencially came from the new logic of laws that have to return booleans.
+
+Jan Stransky (7):
+      Added force and torque export to VTKRecorder (question #252413)
+      fixed typo in utils.polyhedron function
+      enable periodic simulations with Polhedron and Tetra
+      rename PolyhedraVolumetricLaw -> Law2_PolyhedraGeom_PolyhedraPhys_Veolumetric
+      deleted vtk output of force for boxes (bug #1376734)
+      added Polyhedra::GetSurfaces function
+      Added volumePower attribute to Law2_PolyhedraGeom_PolyhedraPhys_Volumetric, Polyhedra code small cleanup
+
+Janek Kozicki (2):
+      Fix bug in 'inspect' that made editing values annoying.
+      Merge doc/sphinx/references.bib into doc/references.bib
+
+Jerome Duriez (3):
+      Re-write of "Yade on GitHub" wiki page in sphinx doc.
+      Anecdotic commit to keep a track (in code comment) of a useful link for JCFpm paraview analysis
+      Removal of very last wiki-link github-related in rst files
+
+Raphael Maurin (1):
+      New force engine to couple Yade with a 1D RANS code.     Add a new force engine applying the main hydrodynamical forces in function of a 1D average fluid velocity vector which depends only on the depth.     The engine is calculating at each time step the drag, lift and buoyant forces for each particle.     Complete the references for the documentation associated to the engine.
+
+T Sweijen (1):
+      Merge two-phase flow engine
+
+Thinkpad (1):
+      -a test commit from laptop
+
+cyuan (7):
+      a small change for check reservoir boundingCells.
+      -add temp function for generating sample windows, calculating responding saturation...
+      -add savePhaseVtk
+      Merge github.com:yade/trunk into chaoUnsat
+      Merge github.com:yade/trunk into chaoUnsat
+      -replace abs, max, min by std::abs, std::max, std::min
+      Merge github.com:yade/trunk into chaoUnsat
+
+cyuanLaptop (1):
+      -change debugOut
+
+fifthguy (1):
+      Fixed a bug that appeared when running the uniaxial-post.py script from examples. Edited py/post2d.py to capture exception while importing Vector3 from minieigen.
+
+jduriez (12):
+      Correction of an error using psd() with monodisperse packings (false = False in python). Add of an explanatory message
+      Few changes in capillary doc: assumption of null wetting angle, hyperlinks, and some comments in source code
+      One forgotten change during previous commit about TriaxialStressController <-> 3DTriaxialEngine ? https://github.com/yade/trunk/commit/77bc6d75b780bcbad5bdadc5bb3645badb009cd9
+      Adding mention of different save files kinds. Tried to comment differences, please correct if I was wrong
+      Typos and precisions in capillary doc
+      porosity() function infers now a volume value for non-periodic cases, rather than throwing an error. Positiv volume values eventually passed as argument override this inferred value
+      porosity doc changed according to previous commit
+      getStress() considers now an adequate volume value for non-periodic case (values passed as parameters may still also be taken into account)
+      Re-introducing change from https://github.com/yade/trunk/commit/ab91b3cf8654f6d563dede10184e784a8ce84219, reverted since, without reason
+      Improvement of https://github.com/yade/trunk/commit/05599b23808991dbfef6b85400c7ddd32be594e0 regarding volume computation in getStress for non periodic cases
+      Typo in CapillaryPhys doc
+      Parallelization of interaction loops in Law2_..._Capillarity (which is in fact not a LawFunctor handled by InteractionLoop). Moreover adopting the FOREACH iterator for the non-parallel flavour.
+
+==================================================
 yade-1.11.0
 Mon, 4 Aug 2014 18:54:00 +0200
 
