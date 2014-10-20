@@ -34,7 +34,7 @@ class ViscElMat : public FrictMat {
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
 #ifdef YADE_SPH
 		((bool,SPHmode,false,,"True, if SPH-mode is enabled."))
-		((Real,mu,-1,, "Viscosity. See Mueller [Mueller2003]_ ."))                                              // [Mueller2003], (14)
+		((Real,mu,-1,, "Viscosity. See Mueller [Morris1997]_ ."))                                              // [Mueller2003], (14)
 		((Real,h,-1,,  "Core radius. See Mueller [Mueller2003]_ ."))                                            // [Mueller2003], (1)
 		((int,KernFunctionPressure,Lucy,, "Kernel function for pressure calculation (by default - Lucy). The following kernel functions are available: Lucy=1."))
 		((int,KernFunctionVisco,   Lucy,, "Kernel function for viscosity calculation (by default - Lucy). The following kernel functions are available: Lucy=1."))

@@ -112,8 +112,24 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   
   const BodyContainer& bodies = *scene->bodies;
   
+  //////////////////////////////////////////////////////////////////
+  // Copy-paste
+  // Handle periodicity.
+  const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
+  const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
+  
   const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
   const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
+
+  const Vector3r c1x = (geom.contactPoint - de1.pos);
+  const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
+  
+  const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
+  const Real normalVelocity	= geom.normal.dot(relativeVelocity);
+  
+  // Copy-paste  
+  //////////////////////////////////////////////////////////////////
+  
   
   const Real Mass1 = bodies[id1]->state->mass;
   const Real Mass2 = bodies[id2]->state->mass;
@@ -125,7 +141,7 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   
   if (xixj.norm() < phys.h) {
     Real fpressure = 0.0;
-    if (bodies[id1]->rho!=0.0 and bodies[id2]->rho!=0.0) {
+    if (Rho1!=0.0 and Rho2!=0.0) {
       // from [Monaghan1992], (3.3), multiply by Mass2, because we need a force, not du/dt
       fpressure = - Mass1 * Mass2 * (
                   bodies[id1]->press/(Rho1*Rho1) + 
@@ -134,7 +150,16 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
                   * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
     }
     
-    force = fpressure*geom.normal;
+    Vector3r fvisc = Vector3r::Zero();
+    if (Rho1!=0.0 and Rho2!=0.0) {
+      // from [Morris1997], (22), multiply by Mass2, because we need a force, not du/dt
+      fvisc = phys.mu * Mass1 * Mass2 *
+      (-normalVelocity*geom.normal)/(Rho1*Rho1) *
+      1 / (xixj.norm()) *
+      phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
+      //phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
+    }
+    force = fpressure*geom.normal + fvisc;
     return true;
   } else {
     return false;

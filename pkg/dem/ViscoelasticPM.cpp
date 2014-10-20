@@ -255,7 +255,7 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 #ifdef YADE_SPH
 	if (mat1->SPHmode and mat2->SPHmode)  {
 		phys->SPHmode=true;
-		phys->mu=(mat1->mu+mat2->mu)/2.0;
+		phys->mu=(mat1->mu+mat2->mu);
 		phys->h=(mat1->h+mat2->h)/2.0;
 	}
 	
