@@ -24,13 +24,13 @@
 //**********************************************************************************
 //return volume and centroid of polyhedron
 
-bool P_volume_centroid(Polyhedron P, double * volume, Vector3r * centroid){
+bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid){
 
 
 	Vector3r basepoint = FromCGALPoint(P.vertices_begin()->point()); 
 	Vector3r A,B,C,D; 
 	(*volume) = 0;
-	double vtet;
+	Real vtet;
 	(*centroid) = Vector3r(0.,0.,0.);
 	
 	//compute centroid and volume
@@ -77,26 +77,26 @@ Matrix3r TetraInertiaTensor(Vector3r av,Vector3r bv,Vector3r cv,Vector3r dv){
 	#define z4 dv[2]
 
 	// Jacobian of transformation to the reference 4hedron
-	double detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
+	Real detJ=(x2-x1)*(y3-y1)*(z4-z1)+(x3-x1)*(y4-y1)*(z2-z1)+(x4-x1)*(y2-y1)*(z3-z1)
 		-(x2-x1)*(y4-y1)*(z3-z1)-(x3-x1)*(y2-y1)*(z4-z1)-(x4-x1)*(y3-y1)*(z2-z1);
 	detJ=std::abs(detJ);
-	double a=detJ*(y1*y1+y1*y2+y2*y2+y1*y3+y2*y3+
+	Real a=detJ*(y1*y1+y1*y2+y2*y2+y1*y3+y2*y3+
 		y3*y3+y1*y4+y2*y4+y3*y4+y4*y4+z1*z1+z1*z2+
 		z2*z2+z1*z3+z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
-	double b=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+
+	Real b=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+
 		x1*x4+x2*x4+x3*x4+x4*x4+z1*z1+z1*z2+z2*z2+z1*z3+
 		z2*z3+z3*z3+z1*z4+z2*z4+z3*z4+z4*z4)/60.;
-	double c=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+x1*x4+
+	Real c=detJ*(x1*x1+x1*x2+x2*x2+x1*x3+x2*x3+x3*x3+x1*x4+
 		x2*x4+x3*x4+x4*x4+y1*y1+y1*y2+y2*y2+y1*y3+
 		y2*y3+y3*y3+y1*y4+y2*y4+y3*y4+y4*y4)/60.;
 	// a' in the article etc.
-	double a__=detJ*(2*y1*z1+y2*z1+y3*z1+y4*z1+y1*z2+
+	Real a__=detJ*(2*y1*z1+y2*z1+y3*z1+y4*z1+y1*z2+
 		2*y2*z2+y3*z2+y4*z2+y1*z3+y2*z3+2*y3*z3+
 		y4*z3+y1*z4+y2*z4+y3*z4+2*y4*z4)/120.;
-	double b__=detJ*(2*x1*z1+x2*z1+x3*z1+x4*z1+x1*z2+
+	Real b__=detJ*(2*x1*z1+x2*z1+x3*z1+x4*z1+x1*z2+
 		2*x2*z2+x3*z2+x4*z2+x1*z3+x2*z3+2*x3*z3+
 		x4*z3+x1*z4+x2*z4+x3*z4+2*x4*z4)/120.;
-	double c__=detJ*(2*x1*y1+x2*y1+x3*y1+x4*y1+x1*y2+
+	Real c__=detJ*(2*x1*y1+x2*y1+x3*y1+x4*y1+x1*y2+
 		2*x2*y2+x3*y2+x4*y2+x1*y3+x2*y3+2*x3*y3+
 		x4*y3+x1*y4+x2*y4+x3*y4+2*x4*y4)/120.;
 
@@ -122,8 +122,8 @@ Matrix3r TetraInertiaTensor(Vector3r av,Vector3r bv,Vector3r cv,Vector3r dv){
 
 //**********************************************************************************
 //distace of point from a plane (squared) with sign
-double Oriented_squared_distance(Plane P, CGALpoint x){
-	double h = P.a()*x.x()+P.b()*x.y()+P.c()*x.z()+P.d();
+Real Oriented_squared_distance(Plane P, CGALpoint x){
+	Real h = P.a()*x.x()+P.b()*x.y()+P.c()*x.z()+P.d();
 	return ((h>0.)-(h<0.))*pow(h,2)/(CGALvector(P.a(),P.b(),P.c())).squared_length();
 }
 
@@ -139,7 +139,7 @@ bool Is_inside_Polyhedron(Polyhedron P, CGALpoint inside){
 
 //**********************************************************************************
 // test if point is inside polyhedra not closer than lim to its boundary
-bool Is_inside_Polyhedron(Polyhedron P, CGALpoint inside, double lim){
+bool Is_inside_Polyhedron(Polyhedron P, CGALpoint inside, Real lim){
 	Polyhedron::Plane_iterator pi;	
 	lim = pow(lim,2);
 	for(pi=P.planes_begin(); pi!=P.planes_end(); ++pi){
@@ -200,7 +200,7 @@ bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int> &sep_plane){
 			Plane X(eIter1->vertex()->point(),CGAL::cross_product((eIter1->vertex()->point() - eIter1->opposite()->vertex()->point()),(eIter2->vertex()->point() - eIter2->opposite()->vertex()->point())));		
 			if (!X.has_on_positive_side(B.vertices_begin()->point())) X = X.opposite();
 
-			double lim = pow(DISTANCE_LIMIT,2);
+			Real lim = pow(DISTANCE_LIMIT,2);
 			for (Polyhedron::Vertex_iterator vIter = A.vertices_begin(); vIter != A.vertices_end(); ++vIter){
 				if (Oriented_squared_distance(X, vIter->point())>lim) {found = false; break;};	
 			}				
@@ -234,7 +234,7 @@ bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int> &sep_plane){
 	//test all pairs of edges from A & B
 	Plane X;
 	CGALvector vA;
-	double lim = pow(DISTANCE_LIMIT,2);
+	Real lim = pow(DISTANCE_LIMIT,2);
 	i = 0;
 	for (Polyhedron::Edge_iterator eIter1 = A.edges_begin(); eIter1 != A.edges_end(); ++eIter1, i++){
 		vA = eIter1->vertex()->point() - eIter1->opposite()->vertex()->point();
@@ -259,9 +259,9 @@ bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int> &sep_plane){
 
 //**********************************************************************************
 //norm of difference between two planes
-double PlaneDifference(const Plane &a, const Plane &b){
-	double la = sqrt(pow(a.a(),2) + pow(a.b(),2) + pow(a.c(),2) + pow(a.d(),2)); 
-	double lb = sqrt(pow(b.a(),2) + pow(b.b(),2) + pow(b.c(),2) + pow(b.d(),2)); 
+Real PlaneDifference(const Plane &a, const Plane &b){
+	Real la = sqrt(pow(a.a(),2) + pow(a.b(),2) + pow(a.c(),2) + pow(a.d(),2)); 
+	Real lb = sqrt(pow(b.a(),2) + pow(b.b(),2) + pow(b.c(),2) + pow(b.d(),2)); 
 	return pow(a.a()/la-b.a()/lb,2) + pow(a.b()/la-b.b()/lb,2) + pow(a.c()/la-b.c()/lb,2) + pow(a.d()/la-b.d()/lb,2);
 
 	//in case we do not care of the orientation	
@@ -270,7 +270,7 @@ double PlaneDifference(const Plane &a, const Plane &b){
 
 //**********************************************************************************
 //connect triagular facets if possible
-Polyhedron Simplify(Polyhedron P, double limit){
+Polyhedron Simplify(Polyhedron P, Real limit){
 	bool elimination = true;
 	while(elimination){
 		elimination = false;
@@ -367,7 +367,7 @@ CGALpoint PlaneIntersection( Plane a,  Plane b,  Plane c){
 //solve system of 3x3 by Cramers rule
 Vector3r SolveLinSys3x3(Matrix3r A, Vector3r y){
 	//only system 3x3 by Cramers rule 
-	double det =    A(0,0)*A(1,1)*A(2,2)+A(0,1)*A(1,2)*A(2,0)+A(0,2)*A(1,0)*A(2,1)-A(0,2)*A(1,1)*A(2,0)-A(0,1)*A(1,0)*A(2,2)-A(0,0)*A(1,2)*A(2,1);	
+	Real det =    A(0,0)*A(1,1)*A(2,2)+A(0,1)*A(1,2)*A(2,0)+A(0,2)*A(1,0)*A(2,1)-A(0,2)*A(1,1)*A(2,0)-A(0,1)*A(1,0)*A(2,2)-A(0,0)*A(1,2)*A(2,1);	
 	if (det == 0) {cerr << "error in linear solver" << endl; return Vector3r(0,0,0);}
 	return Vector3r((y(0)*A(1,1)*A(2,2)+A(0,1)*A(1,2)*y(2)+A(0,2)*y(1)*A(2,1)-A(0,2)*A(1,1)*y(2)-A(0,1)*y(1)*A(2,2)-y(0)*A(1,2)*A(2,1))/det, (A(0,0)*y(1)*A(2,2)+y(0)*A(1,2)*A(2,0)+A(0,2)*A(1,0)*y(2)-A(0,2)*y(1)*A(2,0)-y(0)*A(1,0)*A(2,2)-A(0,0)*A(1,2)*y(2))/det, (A(0,0)*A(1,1)*y(2)+A(0,1)*y(1)*A(2,0)+y(0)*A(1,0)*A(2,1)-y(0)*A(1,1)*A(2,0)-A(0,1)*A(1,0)*y(2)-A(0,0)*y(1)*A(2,1))/det);
 }
@@ -395,10 +395,10 @@ Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB){
 	std::transform( PA.facets_begin(), PA.facets_end(), PA.planes_begin(),Plane_equation());	
 	std::transform( PB.facets_begin(), PB.facets_end(), PB.planes_begin(),Plane_equation());
 	vector<bool> from_A(Int.size_of_facets());
-	vector<double> minsA(Int.size_of_facets());
-	vector<double> minsB(Int.size_of_facets());
+	vector<Real> minsA(Int.size_of_facets());
+	vector<Real> minsB(Int.size_of_facets());
 	int i=0;
-	double minA, minB, k;
+	Real minA, minB, k;
 	for(pi = Int.planes_begin(); pi!=Int.planes_end(); ++pi,i++){
 		minA = 1.;
 		minB = 1.;
@@ -454,13 +454,13 @@ Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB){
 
 //**********************************************************************************
 //not used
-double CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal){
+Real CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal){
 	//calculate area of projection of Intersection into the normal plane
-	double area = 0.;
-	double abs_size;
+	Real area = 0.;
+	Real abs_size;
 	Polyhedron::Halfedge_around_facet_circulator hfc0;
 	CGALvector normal2;
-	double norm2;	
+	Real norm2;	
 	std::transform( Int.facets_begin(), Int.facets_end(), Int.planes_begin(),Plane_equation());
 	for(Polyhedron::Facet_iterator fi = Int.facets_begin(); fi!= Int.facets_end(); ++fi){
 		assert(fi->is_triangle()); 
@@ -477,7 +477,7 @@ double CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal){
 
 //**********************************************************************************
 //prepare data for CGAL convex hull
-vector<Plane> MergePlanes(vector<Plane> planes1, vector<Plane> planes2, double limit){
+vector<Plane> MergePlanes(vector<Plane> planes1, vector<Plane> planes2, Real limit){
 	vector<Plane> P = planes1;
 	bool add;
 	for(vector<Plane>::iterator i = planes2.begin(); i!=planes2.end(); ++i){
@@ -503,7 +503,7 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 	vector<CGALpoint> dual_planes;
 	// test if do intersect, find some intersecting point
 	bool intersection_found = false;
-	double lim = pow(DISTANCE_LIMIT,2);
+	Real lim = pow(DISTANCE_LIMIT,2);
 	std::transform( A.facets_begin(), A.facets_end(), A.planes_begin(),Plane_equation());
 	// test centroid of previous intersection
 	if(Is_inside_Polyhedron(A,X,DISTANCE_LIMIT) && Oriented_squared_distance(B,X)<=-lim) {
@@ -603,10 +603,10 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 	} else {
 		if (!do_intersect(A, B, sep_plane)) return Intersection; 
 		//some intersection point
-		double dist_S, dist_T;
-		double lim2 = pow(DISTANCE_LIMIT,2);
+		Real dist_S, dist_T;
+		Real lim2 = pow(DISTANCE_LIMIT,2);
 		CGALvector d1;
-		double factor = sqrt(DISTANCE_LIMIT * 1.5);
+		Real factor = sqrt(DISTANCE_LIMIT * 1.5);
 		//test vertices A - not needed, edges are enough
 		for (Polyhedron::Vertex_iterator vIter = A.vertices_begin(); vIter != A.vertices_end() && !intersection_found; vIter++){
 			d1 = centroidA-vIter->point();
@@ -687,15 +687,15 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 //**********************************************************************************
 /*
 //returnes intersection of Sphere and polyhedron (possibly empty) - not finished
-bool Sphere_Polyhedron_intersection(Polyhedron A, double r, CGALpoint C, CGALpoint centroid,  double volume, CGALvector normal, double area){
+bool Sphere_Polyhedron_intersection(Polyhedron A, Real r, CGALpoint C, CGALpoint centroid,  Real volume, CGALvector normal, Real area){
 	volume = 0;
 	area = 0;
 	
-	double r2 = pow(r,2);
+	Real r2 = pow(r,2);
 	//check points
         Polyhedron::Vertex_iterator closest_vert;
-	double dist2;
-	double min_dist2 = (C-centroid).squared_length();
+	Real dist2;
+	Real min_dist2 = (C-centroid).squared_length();
 	//test vertices
 	for(Polyhedron::Vertex_iterator vi=A.vertices_begin(); vi!=A.vertices_end(); ++vi){
 		dist2 = (C-vi->point()).squared_length();
@@ -711,8 +711,8 @@ bool Sphere_Polyhedron_intersection(Polyhedron A, double r, CGALpoint C, CGALpoi
 	v1 = v1/sqrt(v1.squared_length());
 	Polyhedron::Halfedge_around_vertex_circulator closest_edge;
 	int i =0;
-	double cos_angle;
-	double max_cos_angle=-1;
+	Real cos_angle;
+	Real max_cos_angle=-1;
 	CGALvector v2;
 	for(Polyhedron::Halfedge_around_vertex_circulator hfi=closest_vert->vertex_begin(); i<(int)closest_vert->degree(); ++hfi, i++){
 		v2 = hfi->opposite()->vertex()->point()-closest_vert->point();
@@ -721,7 +721,7 @@ bool Sphere_Polyhedron_intersection(Polyhedron A, double r, CGALpoint C, CGALpoi
 		if(cos_angle > max_cos_angle) closest_edge=hfi;  max_cos_angle=cos_angle; //find the edge with minimum angle
 	} 
 	if(max_cos_angle<=0) return false; //all edges goes with angle above or equal 90
- 	double k = (C - closest_vert->point())*v2;  //find closest point on the most descending edge (it must be on edge, otherwise opposite point would be already closer)
+ 	Real k = (C - closest_vert->point())*v2;  //find closest point on the most descending edge (it must be on edge, otherwise opposite point would be already closer)
 	CGALpoint closest_point = closest_vert->point() + k*v2;
 	if((C-closest_point).squared_length()<r2){ //test if we are already inside the sphere
 	
@@ -743,7 +743,7 @@ bool Sphere_Polyhedron_intersection(Polyhedron A, double r, CGALpoint C, CGALpoi
 	else closest_plane = closest_edge->opposite()->facet()->plane();
 	closest_point = closest_plane.projection(C);
 	if((C-closest_point).squared_length()<r2){ //test if we are already inside the sphere
-		double h = sqrt((C-closest_point).squared_length());
+		Real h = sqrt((C-closest_point).squared_length());
 		volume = 3.1415*pow(h,2)/3*(3*r-h);
 		return true;	
 	}
@@ -837,7 +837,7 @@ shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction
 	for(Polyhedron::Vertex_iterator vi = S2.vertices_begin(); vi !=  S2.vertices_end(); vi++){ v2.push_back(FromCGALPoint(vi->point()));}; 
 	shared_ptr<Body> BP = NewPolyhedra(v2, body->material);
 	//BP->shape->color = body->shape->color;
-	BP->shape->color = Vector3r(double(rand())/RAND_MAX,double(rand())/RAND_MAX,double(rand())/RAND_MAX);
+	BP->shape->color = Vector3r(Real(rand())/RAND_MAX,Real(rand())/RAND_MAX,Real(rand())/RAND_MAX);
 	scene->bodies->insert(BP);
 	//set proper state variables
 	BP->state->vel = OrigVel + OrigAngVel.cross(BP->state->pos-OrigPos);

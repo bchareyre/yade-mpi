@@ -60,7 +60,7 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	Int = Polyhedron_Polyhedron_intersection(PA,PB,ToCGALPoint(bang->contactPoint),ToCGALPoint(se31.position),ToCGALPoint(se32.position+shift2), bang->sep_plane);	
 
 	//volume and centroid of intersection
-	double volume;
+	Real volume;
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
  	if(isnan(volume) || volume<=1E-25 || volume > min(A->GetVolume(),B->GetVolume())) {
@@ -76,10 +76,10 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 	if((se32.position+shift2-centroid).dot(normal)<0) normal*=-1;	
 
 	//calculate area of projection of Intersection into the normal plane
-	//double area = CalculateProjectionArea(Int, ToCGALVector(normal));
+	//Real area = CalculateProjectionArea(Int, ToCGALVector(normal));
 	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
-        double area = volume/1E-8;
-
+        //Real area = volume/1E-8;
+        Real area = std::pow(volume,2./3.);
 	// store calculated stuff in bang; some is redundant
 	bang->equivalentCrossSection=area;
 	bang->contactPoint=centroid;
@@ -145,15 +145,15 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sha
 	Int = Polyhedron_Plane_intersection(PB,A,ToCGALPoint(se32.position),ToCGALPoint(bang->contactPoint));
 
 	//volume and centroid of intersection
-	double volume;
+	Real volume;
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
 	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume())  {bang->equivalentPenetrationDepth=0; return true;}
 	if (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//calculate area of projection of Intersection into the normal plane
-        double area = volume/1E-8;
-	//double area = CalculateProjectionArea(Int, CGALnormal);
+        Real area = volume/1E-8;
+	//Real area = CalculateProjectionArea(Int, CGALnormal);
 	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
 
 	// store calculated stuff in bang; some is redundant
@@ -206,7 +206,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sh
 		v[1]=help;	
 	}
 
-	double f_area = sqrt(f_normal.squared_length());
+	Real f_area = sqrt(f_normal.squared_length());
 	for (int i=3; i<6; i++) v[i] = v[i-3]-f_normal/f_area*0.05*sqrt(f_area); // vertices in global coordinates
 
 	Polyhedron PA;
@@ -240,7 +240,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sh
 	Int = Polyhedron_Polyhedron_intersection(PA,PB,ToCGALPoint(bang->contactPoint),ToCGALPoint(se31.position),ToCGALPoint(se32.position), bang->sep_plane);	
 
 	//volume and centroid of intersection
-	double volume;
+	Real volume;
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
  	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume()) {bang->equivalentPenetrationDepth=0; return true;}
@@ -251,8 +251,8 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sh
 	if((se32.position-centroid).dot(normal)<0) normal*=-1;
 
 	//calculate area of projection of Intersection into the normal plane
-        double area = volume/1E-8;
-	//double area = CalculateProjectionArea(Int, ToCGALVector(normal));
+        Real area = volume/1E-8;
+	//Real area = CalculateProjectionArea(Int, ToCGALVector(normal));
 	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
 		
 	// store calculated stuff in bang; some is redundant
@@ -301,7 +301,7 @@ bool Ig2_Sphere_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const s
 	}
 
 	//volume and centroid of intersection
-	double volume, area;
+	Real volume, area;
         CGALvector normalCGAL;
 	CGALpoint centroidCGAL=ToCGALPoint(se32.position);
 	Sphere_Polyhedron_intersection(PB, r, ToCGALPoint(se31.position), centroidCGAL,  volume, normalCGAL, area);

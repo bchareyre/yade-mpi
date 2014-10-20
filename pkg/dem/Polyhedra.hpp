@@ -58,7 +58,7 @@ class Polyhedra: public Shape{
 		void Initialize();		
 		bool IsInitialized(){return init;}
 		std::vector<Vector3r> GetOriginalVertices();
-		double GetVolume(){Initialize(); return volume;}
+		Real GetVolume(){Initialize(); return volume;}
 		Quaternionr GetOri(){Initialize(); return orientation;}
 		Polyhedron GetPolyhedron(){return P;};
 		void Clear(){v.clear(); P.clear(); init = 0; size = Vector3r(1.,1.,1.); faceTri.clear();};
@@ -73,7 +73,7 @@ class Polyhedra: public Shape{
 		//sign of performed initialization
 		bool init;
 		//centroid Volume
-		double volume;
+		Real volume;
 		//centroid inerta - diagonal of the tensor
 		Vector3r inertia;
 		//orientation, that provides diagonal inertia tensor
@@ -149,15 +149,15 @@ REGISTER_SERIALIZABLE(Bo1_Polyhedra_Aabb);
 /*! Elastic material */
 class PolyhedraMat: public Material{
 	public:
-		 PolyhedraMat(double N, double S, double F){Kn=N; Ks=S; frictionAngle=F;};
-		 double GetStrength(){return strength;};
+		 PolyhedraMat(Real N, Real S, Real F){Kn=N; Ks=S; frictionAngle=F;};
+		 Real GetStrength(){return strength;};
 	virtual ~PolyhedraMat(){};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraMat,Material,"Elastic material with Coulomb friction.",
-		((Real,Kn,1e8,,"Normal volumetric 'stiffness' (N/m3)."))
+		((Real,Kn,1e8,,"Normal 'stiffness' (N/m3 for Law_.._Volumetric, N/m for Law2_.._Simple)."))
 		((Real,Ks,1e5,,"Shear stiffness (N/m)."))
 		((Real,frictionAngle,.5,,"Contact friction angle (in radians)."))
 		((bool,IsSplitable,0,,"To be splitted ... or not"))
-		((double,strength,100,,"Stress at whis polyhedra of volume 4/3*pi [mm] breaks.")),
+		((Real,strength,100,,"Stress at whis polyhedra of volume 4/3*pi [mm] breaks.")),
 		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(PolyhedraMat,Material);
@@ -240,7 +240,7 @@ class Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys: public IPhysFunctor{
 REGISTER_SERIALIZABLE(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys);
 
 //***************************************************************************
-/*! Calculate physical response based on penetration configuration given by TTetraGeom. */
+/*! Calculate physical response based on penetration configuration given by PolyhedraGeom. */
 
 class Law2_PolyhedraGeom_PolyhedraPhys_Volumetric: public LawFunctor{
 	OpenMPAccumulator<Real> plasticDissipation;
@@ -248,14 +248,15 @@ class Law2_PolyhedraGeom_PolyhedraPhys_Volumetric: public LawFunctor{
 	Real elasticEnergy ();
 	Real getPlasticDissipation();
 	void initPlasticDissipation(Real initVal=0);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric,LawFunctor,"Calculate physical response of 2 :yref:`vector<Polyhedra>` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric,LawFunctor,"Calculate physical response of 2 :yref:`vector<Polyhedra>` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`. Normal force is proportional to the volume of intersection",
+	((Real,volumePower,1.,,"Power of volume used in evaluation of normal force. Default is 1.0 - normal force is linearly proportional to volume. 1.0/3.0 would mean that normal force is proportional to the cube root of volume, approximation of penetration depth."))
 	((Vector3r,shearForce,Vector3r::Zero(),,"Shear force from last step"))
 	((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts. This will trace only plastic energy in this law, see O.trackEnergy for a more complete energies tracing"))
 	((int,plastDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
 	((int,elastPotentialIx,-1,(Attr::hidden|Attr::noSave),"Index for elastic potential energy (with O.trackEnergy)"))
 	,,
 	.def("elasticEnergy",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::elasticEnergy,"Compute and return the total elastic energy in all \"FrictPhys\" contacts")
-	.def("plasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_ScGeom_FrictPhys_CundallStrack::traceEnergy` is true.")
+	.def("plasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::traceEnergy` is true.")
 	.def("initPlasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
 	);
 	FUNCTOR2D(PolyhedraGeom,PolyhedraPhys);
@@ -285,9 +286,9 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 //Test if point is inside Polyhedron
 bool Is_inside_Polyhedron(Polyhedron P, CGALpoint inside);
 //return approximate intersection of sphere & polyhedron 
-bool Sphere_Polyhedron_intersection(Polyhedron A, double r, CGALpoint C, CGALpoint centroid,  double volume, CGALvector normal, double area);
+bool Sphere_Polyhedron_intersection(Polyhedron A, Real r, CGALpoint C, CGALpoint centroid,  Real volume, CGALvector normal, Real area);
 //return volume and centroid of polyhedra
-bool P_volume_centroid(Polyhedron P, double * volume, Vector3r * centroid);
+bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 //CGAL - miniEigen communication
 Vector3r FromCGALPoint(CGALpoint A);
 Vector3r FromCGALVector(CGALvector A);
@@ -297,14 +298,14 @@ CGALvector ToCGALVector(Vector3r A);
 bool do_intersect(Polyhedron A, Polyhedron B);
 bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int> &sep_plane);
 //connect triagular facets if possible
-Polyhedron Simplify(Polyhedron P, double lim);
+Polyhedron Simplify(Polyhedron P, Real lim);
 //list of facets and edges
 void PrintPolyhedron(Polyhedron P);
 void PrintPolyhedron2File(Polyhedron P,FILE* X);
 //normal by least square fitting of separating segments
 Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB);
 //calculate area of projection of polyhedron into the plane
-double CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal);
+Real CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal);
 //split polyhedron
 shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point);
 //new polyhedra
