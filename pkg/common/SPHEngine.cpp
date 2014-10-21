@@ -146,7 +146,7 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
       fpressure = - Mass1 * Mass2 * (
                   bodies[id1]->press/(Rho1*Rho1) + 
                   bodies[id2]->press/(Rho2*Rho2) 
-                  ) 
+                  )
                   * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
     }
     
@@ -154,7 +154,7 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
     if (Rho1!=0.0 and Rho2!=0.0) {
       // from [Morris1997], (22), multiply by Mass2, because we need a force, not du/dt
       fvisc = phys.mu * Mass1 * Mass2 *
-      (-normalVelocity*geom.normal)/(Rho1*Rho1) *
+      (-normalVelocity*geom.normal)/(Rho1*Rho2) *
       1 / (xixj.norm()) *
       phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
       //phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
