@@ -96,6 +96,7 @@ void FlowBoundingSphere<Tesselation>::resetLinearSystem() {noCache=true;}
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::averageRelativeCellVelocity()
 {
+	if (noCache && T[!currentTes].Max_id()<=0) return;
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         Point posAvFacet;
         int numCells = 0;
@@ -142,6 +143,7 @@ bool FlowBoundingSphere<Tesselation>::isOnSolid  (double X, double Y, double Z)
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::averageFluidVelocity()
 {
+	if (noCache && T[!currentTes].Max_id()<=0) return 0;
 	averageRelativeCellVelocity();
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	int numVertex = 0;
@@ -187,7 +189,8 @@ void FlowBoundingSphere<Tesselation>::averageFluidVelocity()
 }
 template <class Tesselation> 
 vector<Real> FlowBoundingSphere<Tesselation>::averageFluidVelocityOnSphere(unsigned int Id_sph)
-{
+{	//FIXME: we are computing everything again for each other Id_sph...
+	if (noCache && T[!currentTes].Max_id()<=0) return vector<Real>(3,0);
 	averageRelativeCellVelocity();
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();	
 	Real volumes; CGT::CVector velocityVolumes;
@@ -220,7 +223,7 @@ double FlowBoundingSphere<Tesselation>::getPorePressure (double X, double Y, dou
 template <class Tesselation>
 int FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
 {
-	if (noCache) {cout<<"Triangulation does not exist. Waht did you do?!"<<endl; return -1;}
+	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return -1;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	CellHandle cell = Tri.locate(Point(X,Y,Z));
 	return cell->info().id;
@@ -948,14 +951,16 @@ void FlowBoundingSphere<Tesselation>::gaussSeidel(Real dt)
 template <class Tesselation>
 double FlowBoundingSphere<Tesselation>::boundaryFlux(unsigned int boundaryId)
 {
-	RTriangulation& Tri = T[currentTes].Triangulation();
+	if (noCache && T[!currentTes].Max_id()<=0) return 0;
+	bool tes = noCache?(!currentTes):currentTes;
+	RTriangulation& Tri = T[tes].Triangulation();
 	double Q1=0;
 
 	VectorCell tmpCells;
 	tmpCells.resize(10000);
 	VCellIterator cells_it = tmpCells.begin();
 
-	VCellIterator cell_up_end = Tri.incident_cells(T[currentTes].vertexHandles[boundaryId],cells_it);
+	VCellIterator cell_up_end = Tri.incident_cells(T[tes].vertexHandles[boundaryId],cells_it);
 	for (VCellIterator it = tmpCells.begin(); it != cell_up_end; it++)
 	{
 		const CellHandle& cell = *it;
@@ -1090,6 +1095,7 @@ void FlowBoundingSphere<Tesselation>::displayStatistics()
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 {
+	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[250];

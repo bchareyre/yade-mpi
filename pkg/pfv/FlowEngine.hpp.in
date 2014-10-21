@@ -309,7 +309,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		ellapsedIter=0;
 		metisForced=false;
 		,
-		.def("imposeFlux",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposeFlux,(boost::python::arg("pos"),boost::python::arg("p")),"Impose incoming flux in boundary cell of location 'pos'.")
+		.def("imposeFlux",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposeFlux,(boost::python::arg("pos"),boost::python::arg("p")),"Impose a flux in cell located  at 'pos' (i.e. add a source term in the flow problem). Outflux positive, influx negative.")
 		.def("imposePressureFromId",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposePressureFromId,(boost::python::arg("id"),boost::python::arg("p")),"Impose pressure in cell of index 'id' (after remeshing the same condition will apply for the same location, regardless of what the new cell index is at this location). The index of the condition itself is returned (for multiple imposed pressures at different points).")
 		.def("imposePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposePressure,(boost::python::arg("pos"),boost::python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")
 		.def("setImposedPressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::setImposedPressure,(boost::python::arg("cond"),boost::python::arg("p")),"Set pressure value at the point indexed 'cond'.")

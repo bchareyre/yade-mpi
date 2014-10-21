@@ -407,7 +407,7 @@ void PeriodicFlowEngine::locateCell ( CellHandle baseCell, unsigned int& index, 
 }
 
 void PeriodicFlowEngine::updateVolumes (FlowSolver& flow)
-{
+{	//FIXME: replace by the non-periodic version
         if ( debug ) cout << "Updating volumes.............." << endl;
         Real invDeltaT = 1/scene->dt;
         double newVol, dVol;
@@ -438,6 +438,9 @@ void PeriodicFlowEngine::updateVolumes (FlowSolver& flow)
                 cell->info().dv() = dVol * invDeltaT;
                 cell->info().volume() = newVol;
         }
+        for (unsigned int n=0; n<flow.imposedF.size();n++) {
+		flow.IFCells[n]->info().dv()+=flow.imposedF[n].second;
+		flow.IFCells[n]->info().Pcondition=false;}
         if ( debug ) cout << "Updated volumes, total =" <<totVol<<", dVol="<<totDVol<<" "<< totVol0<<" "<< totVol1<<endl;
 }
 
@@ -493,6 +496,7 @@ void PeriodicFlowEngine::buildTriangulation ( double pZero, FlowSolver& flow)
 		if (flow.errorCode>0) return;
 		//Fill this vector than can be later used to speedup loops
 		if (!cell->info().isGhost) Tes.cellHandles[cell->info().baseIndex]=cell;
+		cell->info().id=cell->info().baseIndex;
 	}
 	Tes.cellHandles.resize(baseIndex+1);
 
