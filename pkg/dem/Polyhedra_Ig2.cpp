@@ -5,21 +5,22 @@
 
 #include"Polyhedra.hpp"
 #include"Polyhedra_Ig2.hpp"
+#include<pkg/dem/ScGeom.hpp>
 
 #define _USE_MATH_DEFINES
 
-YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom)	);
+YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) );
 
 //**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedras. */
 
-bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
+bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 
 	//get polyhedras
 	const Se3r& se31=state1.se3; 
 	const Se3r& se32=state2.se3;
-	Polyhedra* A = static_cast<Polyhedra*>(cm1.get());		
-	Polyhedra* B = static_cast<Polyhedra*>(cm2.get());
+	Polyhedra* A = static_cast<Polyhedra*>(shape1.get());		
+	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
 
 	bool isNew = !interaction->geom;
 
@@ -104,12 +105,12 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,cons
 //**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedron and Wall. */
 
-bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
+bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 
-	const int& PA(cm1->cast<Wall>().axis); 
-	const int& sense(cm1->cast<Wall>().sense);
+	const int& PA(shape1->cast<Wall>().axis); 
+	const int& sense(shape1->cast<Wall>().sense);
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;	
-	Polyhedra* B = static_cast<Polyhedra*>(cm2.get());
+	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
 
 	bool isNew = !interaction->geom;
 
@@ -170,13 +171,13 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sha
 //**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedron and Facet. */
 
-bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
+bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 
 
 	const Se3r& se31=state1.se3; 
 	const Se3r& se32=state2.se3;
-	Facet*   A = static_cast<Facet*>(cm1.get());	
-	Polyhedra* B = static_cast<Polyhedra*>(cm2.get());
+	Facet*   A = static_cast<Facet*>(shape1.get());	
+	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
 
 	bool isNew = !interaction->geom;
 
@@ -267,15 +268,137 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const sh
 }
 
 //**********************************************************************************
-/*! Create Polyhedra (collision geometry) from colliding Polyhedron and Wall. */
+/*! Create Polyhedra (collision geometry) from colliding Polyhedron and Sphere. */
 
-/*
-bool Ig2_Sphere_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
+bool Ig2_Sphere_Polyhedra_ScGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 
 	const Se3r& se31=state1.se3; 
 	const Se3r& se32=state2.se3;
-	Polyhedra* B = static_cast<Polyhedra*>(cm2.get());
-	const Real& r=cm1->cast<Sphere>().radius;
+
+	Sphere* A = static_cast<Sphere*>(shape1.get());	
+	Real radius = A->radius;
+	Real r2 = radius*radius;
+	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
+
+	bool isNew = !interaction->geom;
+	shared_ptr<ScGeom> geom;
+
+	// use polyhedron surface triangulation
+	const std::vector<int> faceTri = B->GetSurfaceTriangulation();
+	// get vertices in global coordinate system
+	std::vector<Vector3r> pts(B->v);
+	for (int i=0; i<pts.size(); i++) pts[i] = se32.position + se32.orientation*pts[i];
+
+	//******************************************************************************
+	// find the closest point of polyhedron to the sphere center, see following paper for notation
+	// http://automatica.dei.unipd.it/public/Schenato/PSC/2010_2011/gruppo4-Building_termo_identification/IdentificazioneTermodinamica20062007/eggpsc/Simulatore%20termico/Generazione%20Mesh/1995%20-%203D%20Distance%20from%20a%20Point%20to%20a%20Triangle.pdf
+	bool isInside = true; // if center is inside polyhedron
+	const Vector3r& p0 = se31.position;
+	const Vector3r& center = p0;
+	Vector3r closest; // closest point to be found
+	Real dst2min = DBL_MAX; // minimal squared distance (large number initially)
+	// auxiliary value
+	Vector3r p1,p2,p3,e1,e2,e3,e,n,p0a,p10,p20,p30,v1,v2,v3,pa,pb,r,p0aa,pp,ppp;
+	Real dst,f1,f2,f3,t,e1n,e2n,e3n,en,p10n,p20n,p30n,o1,o2,o3,dst2,edst2,edst2min;
+	PointTriangleRelation rel=none,relTemp,relTemp2;
+	for (int i=0; i<faceTri.size()/3; i++) { // iterate over all triangles...
+		// triangle vertices
+		p1 = pts[faceTri[3*i+0]];
+		p2 = pts[faceTri[3*i+1]];
+		p3 = pts[faceTri[3*i+2]];
+		// triangle edges vectors
+		e1 = p2-p1; e1n = e1.norm();
+		e2 = p3-p2; e2n = e2.norm();
+		e3 = p1-p3; e3n = e3.norm();
+		n = (e1.cross(-e3)).normalized(); // tirangle outer normal
+		dst = (p0-p1).dot(n); // oriented distance of p0 to triangle plane
+		if (dst>0) isInside = false; // p0 lies in positive halfspace of triangle, cannot be inside
+		p0a = p0 - dst*n; // p0 projected to triangle plane
+		p10 = p0a-p1;
+		p20 = p0a-p2;
+		p30 = p0a-p3;
+		// inside/outside with respect to individual edges
+		o1 = (p10.cross(p20)).dot(n);
+		o2 = (p20.cross(p30)).dot(n);
+		o3 = (p30.cross(p10)).dot(n);
+		if (o1>0 && o2>0 && o3>0) { // p0a is inside triangle
+			pp = p0a;
+			relTemp = inside;
+		} else {
+			edst2min = DBL_MAX;
+			for (int j=0; j<3; j++) { // iterate over 3 edges end find the closest point of them
+				pa = j==0? p1 : (j==1? p2 : p3);
+				pb = j==0? p2 : (j==1? p3 : p1);
+				r = (((pb-p0a).cross(pa-p0a)).cross(pb-pa)).normalized();
+				p0aa = p0a + (pa-p0a).dot(r)*r; // projection of p0a on the edge
+				e = pb-pa;
+				en = e.norm();
+				e /= en;
+				t = (p0aa-pa).dot(e)/en; // parameter of edge line
+				if      (t<0.) { ppp = pa; relTemp2=vertex; }
+				else if (t>1.) { ppp = pb; relTemp2=vertex; }
+				else { ppp = p0aa; relTemp2=edge; }
+				edst2 = (ppp-p0).squaredNorm();
+				if (edst2 < edst2min) {
+					edst2min = edst2;
+					pp = ppp;
+					relTemp = relTemp2;
+				}
+			}
+		}
+		dst2 = (pp-p0).squaredNorm();
+		if (dst2 < dst2min) { // dst2 is now the minimal squared distance and pp is now the closest found point so far
+			dst2min = dst2;
+			closest = pp;
+			rel = relTemp;
+		}
+	}
+	//******************************************************************************
+
+	if (isNew && !(isInside || dst2min<=r2) ) return false;
+
+	if (isNew) {
+		geom = shared_ptr<ScGeom>(new ScGeom());
+		geom->radius1 = geom->radius2 = radius;
+		interaction->geom = geom;
+	} else {
+		geom = YADE_PTR_CAST<ScGeom>(interaction->geom);
+	}
+
+	Real penetrationDepth;
+	Vector3r normal,contactPoint;
+	if (isInside) { // some artificial tricks for unlikely case
+		normal = se32.position - center;
+		dst = normal.norm();
+		penetrationDepth = radius;
+		normal /= dst;
+		contactPoint = center + normal*(.5*radius);
+	} else { 
+		if (rel==none) { LOG_FATAL("TODO"); }
+		Real coeff = rel==edge? edgeCoeff : (rel==vertex? vertexCoeff : 1.0);
+		normal = closest - center;
+		dst = normal.norm();
+		normal /= dst;
+		penetrationDepth = radius - dst;
+		contactPoint = center + normal*(radius-.5*penetrationDepth);
+		penetrationDepth *= coeff;
+	}
+	geom->normal = normal;
+	geom->penetrationDepth = penetrationDepth;
+	geom->contactPoint = contactPoint;
+
+	geom->precompute(state1,state2,scene,interaction,normal,isNew,shift2,false/*avoidGranularRatcheting only for sphere-sphere*/);
+
+	return true;
+}
+
+/*
+bool Ig2_Sphere_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
+
+	const Se3r& se31=state1.se3; 
+	const Se3r& se32=state2.se3;
+	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
+	const Real& r=shape1->cast<Sphere>().radius;
 
 	//cout << "Sphere x Polyhedra" << endl;
 

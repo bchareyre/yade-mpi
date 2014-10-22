@@ -393,7 +393,7 @@ def tetra(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=Non
 def polyhedron(vertices,dynamic=True,fixed=False,wire=True,color=None,highlight=False,noBound=False,material=-1,mask=1,chain=-1):
 	"""Create polyhedron with given parameters.
 
-	:param [Vector3,Vector3,Vector3,Vector3] vertices: coordinates of vertices in the global coordinate system.
+	:param [[Vector3]] vertices: coordinates of vertices in the global coordinate system.
 
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()

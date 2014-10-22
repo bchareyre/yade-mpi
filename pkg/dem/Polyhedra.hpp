@@ -25,6 +25,10 @@
 #include <CGAL/convex_hull_3.h>
 #include <CGAL/Tetrahedron_3.h>
 #include <CGAL/linear_least_squares_fitting_3.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/AABB_triangle_primitive.h>
+#include <CGAL/squared_distance_3.h>
 
 #include<time.h>
 
@@ -36,6 +40,7 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel  K;
 typedef CGAL::Polyhedron_3<K>	Polyhedron;
 typedef CGAL::Delaunay_triangulation_3<K> Triangulation;
 typedef K::Point_3 CGALpoint;
+typedef K::Triangle_3 CGALtriangle;
 typedef K::Vector_3 CGALvector;
 typedef CGAL::Aff_transformation_3<K> Transformation;
 typedef K::Segment_3 Segment;
@@ -43,6 +48,8 @@ typedef CGAL::Triangle_3<K> Triangle;
 typedef CGAL::Plane_3<K> Plane;
 typedef CGAL::Line_3<K> Line;
 typedef CGAL::Origin CGAL_ORIGIN;
+typedef CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_primitive<K,std::vector<Triangle>::iterator>>> CGAL_AABB_tree;
+
 
 //**********************************************************************************
 class Polyhedra: public Shape{
@@ -147,36 +154,29 @@ REGISTER_SERIALIZABLE(Bo1_Polyhedra_Aabb);
 
 //***************************************************************************
 /*! Elastic material */
-class PolyhedraMat: public Material{
+class PolyhedraMat: public FrictMat{
 	public:
-		 PolyhedraMat(Real N, Real S, Real F){Kn=N; Ks=S; frictionAngle=F;};
 		 Real GetStrength(){return strength;};
 	virtual ~PolyhedraMat(){};
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraMat,Material,"Elastic material with Coulomb friction.",
-		((Real,Kn,1e8,,"Normal 'stiffness' (N/m3 for Law_.._Volumetric, N/m for Law2_.._Simple)."))
-		((Real,Ks,1e5,,"Shear stiffness (N/m)."))
-		((Real,frictionAngle,.5,,"Contact friction angle (in radians)."))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraMat,FrictMat,"Elastic material with Coulomb friction.",
 		((bool,IsSplitable,0,,"To be splitted ... or not"))
 		((Real,strength,100,,"Stress at whis polyhedra of volume 4/3*pi [mm] breaks.")),
 		/*ctor*/ createIndex();
 	);
-	REGISTER_CLASS_INDEX(PolyhedraMat,Material);
+	REGISTER_CLASS_INDEX(PolyhedraMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(PolyhedraMat);
 
 //***************************************************************************
-class PolyhedraPhys: public IPhys{
+class PolyhedraPhys: public FrictPhys{
 	public:
 	virtual ~PolyhedraPhys(){};
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraPhys,IPhys,"Simple elastic material with friction for volumetric constitutive laws",
-		((Real,kn,0,,"Normal stiffness"))
-		((Vector3r,normalForce,Vector3r::Zero(),,"Normal force after previous step (in global coordinates)."))
-		((Real,ks,0,,"Shear stiffness"))
-		((Vector3r,shearForce,Vector3r::Zero(),,"Shear force after previous step (in global coordinates)."))	
-		((Real,tangensOfFrictionAngle,NaN,,"tangens of angle of internal friction")),
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraPhys,FrictPhys,"Simple elastic material with friction for volumetric constitutive laws",
+		/*attrs*/
+		,
 		/*ctor*/ createIndex();	
 	);
-	REGISTER_CLASS_INDEX(PolyhedraPhys,IPhys);
+	REGISTER_CLASS_INDEX(PolyhedraPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(PolyhedraPhys);
 
@@ -238,6 +238,17 @@ class Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys: public IPhysFunctor{
 	);
 };
 REGISTER_SERIALIZABLE(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys);
+
+class Ip2_FrictMat_PolyhedraMat_FrictPhys: public IPhysFunctor{
+	public:
+		virtual void go(const shared_ptr<Material>& b1,
+			const shared_ptr<Material>& b2,
+			const shared_ptr<Interaction>& interaction);
+	FUNCTOR2D(FrictMat,PolyhedraMat);
+	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_PolyhedraMat_FrictPhys,IPhysFunctor,"",		
+	);
+};
+REGISTER_SERIALIZABLE(Ip2_FrictMat_PolyhedraMat_FrictPhys);
 
 //***************************************************************************
 /*! Calculate physical response based on penetration configuration given by PolyhedraGeom. */

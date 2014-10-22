@@ -13,7 +13,7 @@
 
 #define _USE_MATH_DEFINES
 
-YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (Law2_PolyhedraGeom_PolyhedraPhys_Volumetric)
+YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (Ip2_FrictMat_PolyhedraMat_FrictPhys) (Law2_PolyhedraGeom_PolyhedraPhys_Volumetric)
 	/* some code in cpp (this file): */ 
 	#ifdef YADE_OPENGL
 		(Gl1_Polyhedra) (Gl1_PolyhedraGeom) (Gl1_PolyhedraPhys)
@@ -398,15 +398,21 @@ void Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys::go( const shared_ptr<Material>
 	const shared_ptr<PolyhedraMat>& mat2 = YADE_PTR_CAST<PolyhedraMat>(b2);
 	interaction->phys = shared_ptr<PolyhedraPhys>(new PolyhedraPhys());
 	const shared_ptr<PolyhedraPhys>& contactPhysics = YADE_PTR_CAST<PolyhedraPhys>(interaction->phys);
-	Real Kna 	= mat1->Kn;
-	Real Knb 	= mat2->Kn;
-	Real Ksa 	= mat1->Ks;
-	Real Ksb 	= mat2->Ks;
+	Real Kna 	= mat1->young;
+	Real Knb 	= mat2->young;
+	Real Ksa 	= mat1->young*mat1->poisson;
+	Real Ksb 	= mat2->young*mat2->poisson;
 	Real frictionAngle = std::min(mat1->frictionAngle,mat2->frictionAngle);	
         contactPhysics->tangensOfFrictionAngle = std::tan(frictionAngle);
 	contactPhysics->kn = Kna*Knb/(Kna+Knb);
 	contactPhysics->ks = Ksa*Ksb/(Ksa+Ksb);
 };
+
+void Ip2_FrictMat_PolyhedraMat_FrictPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
+	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(pp1);
+	const shared_ptr<PolyhedraMat>& mat2 = YADE_PTR_CAST<PolyhedraMat>(pp2);
+	Ip2_FrictMat_FrictMat_FrictPhys().go(mat1,mat2,interaction);
+}
 
 //**************************************************************************************
 #if 1

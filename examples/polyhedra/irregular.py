@@ -16,8 +16,8 @@ from yade import qt
 
 m = PolyhedraMat()
 m.density = 2600 #kg/m^3 
-m.Ks = 20000
-m.Kn = 1E6 #Pa
+m.young = 1E6 #Pa
+m.poisson = 20000/1E6
 m.frictionAngle = 0.6 #rad
 
 O.bodies.append(utils.wall(0,axis=2,sense=1, material = m))

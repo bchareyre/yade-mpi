@@ -3,20 +3,20 @@ from yade import plot, polyhedra_utils
 
 gravel = PolyhedraMat()
 gravel.density = 2600 #kg/m^3 
-gravel.Ks = 20000
-gravel.Kn = 1E7 #Pa
+gravel.young = 1E7 #Pa
+gravel.poisson = 20000/1E7
 gravel.frictionAngle = 0.5 #rad
 
 steel = PolyhedraMat()
 steel.density = 7850 #kg/m^3 
-steel.Ks = 10*gravel.Ks
-steel.Kn = 10*gravel.Kn
+steel.young = 10*gravel.young
+steel.poisson = gravel.poisson
 steel.frictionAngle = 0.4 #rad
 
 rubber = PolyhedraMat()
 rubber.density = 1000 #kg/m^3 
-rubber.Ks = gravel.Ks/10
-rubber.Kn = gravel.Kn/10
+rubber.young = gravel.young/10
+rubber.poisson = gravel.poisson
 rubber.frictionAngle = 0.7 #rad
 
 O.bodies.append(polyhedra_utils.polyhedra(gravel,v=((0,0,-0.05),(0.3,0,-0.05),(0.3,0.3,-0.05),(0,0.3,-0.05),(0,0,0),(0.3,0,0),(0.3,0.3,0),(0,0.3,0)),fixed=True, color=(0.35,0.35,0.35)))

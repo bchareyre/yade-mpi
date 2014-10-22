@@ -5,8 +5,8 @@ from yade import polyhedra_utils
 
 m = PolyhedraMat()
 m.density = 1000  
-m.Ks = 5E6
-m.Kn = 5E8 
+m.young = 5E8 
+m.poisson = 5E6/5E8
 m.frictionAngle = 0.7 
 
 size = 0.1;

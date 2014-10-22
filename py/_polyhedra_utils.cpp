@@ -100,7 +100,7 @@ Real PWaveTimeStep(){
 			Real density=b->state->mass/p->GetVolume();
 			//get equivalent radius and use same equation as for sphere
 			Real equi_radius=pow(p->GetVolume()/((4./3.)*Mathr::PI),1./3.);				
-			dt=min(dt,equi_radius/sqrt(ebp->Kn*equi_radius/density));
+			dt=min(dt,equi_radius/sqrt(ebp->young*equi_radius/density));
 		}
 	}
 	if (dt==std::numeric_limits<Real>::infinity()) {
