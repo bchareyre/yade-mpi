@@ -75,7 +75,13 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreSatAtInterface(CellHandle cell);
 	void computePoreCapillaryPressure(CellHandle cell);
 	void savePhaseVtk(const char* folder);
-
+	void computePoreThroatRadius();
+	double computeEffPoreThroatRadius(CellHandle cell, int j);
+	double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
+	double bisection(CellHandle cell, int j, double a, double b);
+	double computeTriRadian(double a, double b, double c);
+	double computeDeltaForce(CellHandle cell,int j, double rC);
+	
 	//FIXME, needs to trigger initSolver() Somewhere, else changing flow.debug or other similar things after first calculation has no effect
 	//FIXME, I removed indexing cells from inside UnsatEngine (SoluteEngine shouldl be ok (?)) in order to get pressure computed, problem is they are not indexed at all if flow is not calculated
 	void computeOnePhaseFlow() {scene = Omega::instance().getScene().get(); if (!solver) cerr<<"no solver!"<<endl; solver->gaussSeidel(scene->dt);}
