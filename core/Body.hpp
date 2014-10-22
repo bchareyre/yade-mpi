@@ -95,12 +95,6 @@ class Body: public Serializable{
 		((long,chain,-1,,"Id of chain to which the body belongs."))
 		((long,iterBorn,-1,,"Step number at which the body was added to simulation."))
 		((Real,timeBorn,-1,,"Time at which the body was added to simulation."))
-#ifdef YADE_SPH
-		((Real,rho, -1.0,, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
-		((Real,rho0,-1.0,, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)
-		((Real,press,0.0,, "Pressure (only for SPH-model)"))             // [Mueller2003], (12)
-		((Real,Cs,0.0,,    "Color field (only for SPH-model)"))          // [Mueller2003], (15)
-#endif
 #ifdef YADE_LIQMIGRATION
 		((Real,Vf, 0.0,,   "Individual amount of liquid"))
 		((Real,Vmin, 0.0,, "Minimal amount of liquid"))
@@ -121,11 +115,6 @@ class Body: public Serializable{
 		.add_property("timeBorn",&Body::timeBorn,"Returns time at which the body was added to simulation.")
 		.def_readwrite("chain",&Body::chain,"Returns Id of chain to which the body belongs.")
 		.def("intrs",&Body::py_intrs,"Return all interactions in which this body participates.")
-#ifdef YADE_SPH
-		.add_property("rho",  &Body::rho, "Returns the current density (only for SPH-model).")
-		.add_property("rho0", &Body::rho0,"Returns the rest density (only for SPH-model).")
-		.add_property("press",&Body::press,"Returns the pressure (only for SPH-model).")
-#endif
 	);
 };
 REGISTER_SERIALIZABLE(Body);

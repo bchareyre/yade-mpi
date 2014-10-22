@@ -598,9 +598,8 @@ void VTKRecorder::action(){
 					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
 				}
 #ifdef YADE_SPH
-				spheresCsSPH->InsertNextValue(b->Cs); 
-				spheresRhoSPH->InsertNextValue(b->rho); 
-				spheresPressSPH->InsertNextValue(b->press); 
+				spheresRhoSPH->InsertNextValue(b->state->rho); 
+				spheresPressSPH->InsertNextValue(b->state->press); 
 				spheresCoordNumbSPH->InsertNextValue(b->coordNumber()); 
 #endif
 #ifdef YADE_LIQMIGRATION

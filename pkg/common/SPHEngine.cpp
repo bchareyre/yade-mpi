@@ -12,14 +12,14 @@ void SPHEngine::action(){
     YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
       if(mask>0 && (b->groupMask & mask)==0) continue;
       this->calculateSPHRho(b);
-      b->press=std::max(0.0, k*(b->rho - b->rho0));
+      b->state->press=std::max(0.0, k*(b->state->rho - b->state->rho0));
     } YADE_PARALLEL_FOREACH_BODY_END();
   }
 }
 
 void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
-  if (b->rho0<0) {
-    b->rho0 = rho0;
+  if (b->state->rho0<0) {
+    b->state->rho0 = rho0;
   }
   Real rho = 0;
   
@@ -49,7 +49,7 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
   }
   // Self mass contribution
   rho += b->state->mass*kernelFunctionCurDensity(0.0, h);
-  b->rho = rho;
+  b->state->rho = rho;
 }
 
 Real smoothkernelLucy(const double & r, const double & h) {
@@ -134,8 +134,8 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   const Real Mass1 = bodies[id1]->state->mass;
   const Real Mass2 = bodies[id2]->state->mass;
   
-  const Real Rho1 = bodies[id1]->rho;
-  const Real Rho2 = bodies[id2]->rho;
+  const Real Rho1 = bodies[id1]->state->rho;
+  const Real Rho2 = bodies[id2]->state->rho;
   
   const Vector3r xixj = de2.pos - de1.pos;
   
@@ -144,8 +144,8 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
     if (Rho1!=0.0 and Rho2!=0.0) {
       // from [Monaghan1992], (3.3), multiply by Mass2, because we need a force, not du/dt
       fpressure = - Mass1 * Mass2 * (
-                  bodies[id1]->press/(Rho1*Rho1) + 
-                  bodies[id2]->press/(Rho2*Rho2) 
+                  bodies[id1]->state->press/(Rho1*Rho1) + 
+                  bodies[id2]->state->press/(Rho2*Rho2) 
                   )
                   * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
     }
