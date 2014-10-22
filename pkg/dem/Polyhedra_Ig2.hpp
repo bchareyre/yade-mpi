@@ -63,8 +63,8 @@ class Ig2_Sphere_Polyhedra_ScGeom: public IGeomFunctor
 		FUNCTOR2D(Sphere,Polyhedra);
 		DEFINE_FUNCTOR_ORDER_2D(Sphere,Polyhedra);
 		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Polyhedra_ScGeom,IGeomFunctor,"Create/update geometry of collision between Sphere and Polyhedra",
-			((Real,edgeCoeff,1.0,,"TODO"))
-			((Real,vertexCoeff,1.0,,"TODO"))
+			((Real,edgeCoeff,1.0,,"multiplier of penetrationDepth when sphere contacts edge (simulating smaller volume of actual intersection or when several polyhedrons has common edge)"))
+			((Real,vertexCoeff,1.0,,"multiplier of penetrationDepth when sphere contacts vertex (simulating smaller volume of actual intersection or when several polyhedrons has common vertex)"))
 		);	
 		DECLARE_LOGGER;	
 	private:
