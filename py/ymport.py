@@ -396,3 +396,48 @@ def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 	if returnConnectivityTable:
 		return facets, nodes, elems
 	return facets
+
+def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
+	""" Import tetrahedral mesh from .ele file, return list of created tetrahedrons.
+
+		:param string nodeFileName: name of .node file
+		:param string eleFileName: name of .ele file
+		:param (float,float,float)|Vector3 shift: (X,Y,Z) parameter moves the specimen.
+		:param float scale: factor scales the given data.
+		:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.polyhedron`
+	"""
+	f = open(nodeFileName)
+	line = f.readline()
+	while line.startswith('#'):
+		line = f.readline()
+	ls = line.split()
+	nVertices = int(ls[0])
+	if int(ls[1])!=3:
+		raise RuntimeError, "wrong .node file, number of dimensions should be 3"
+	vertices = [None for i in xrange(nVertices)]
+	shift = Vector3(shift)
+	for i in xrange(nVertices):
+		line = f.readline()
+		while line.startswith('#'):
+			line = f.readline()
+		ls = line.split()
+		if not ls:
+			continue
+		v = shift + scale*Vector3(tuple(float(ls[j]) for j in (1,2,3)))
+		vertices[int(ls[0])-1] = v
+	f.close()
+	#
+	f = open(eleFileName)
+	line = f.readline()
+	while line.startswith('#'):
+		line = f.readline()
+	ls = line.split()
+	if int(ls[1])!=4:
+		raise RuntimeError, "wrong .ele file, unsupported tetrahedra's number of nodes"
+	nTetras = int(ls[0])
+	tetras = [None for i in xrange(nTetras)]
+	for i in xrange(nTetras):
+		ls = f.readline().split()
+		tetras[int(ls[0])-1] = utils.polyhedron([vertices[int(ls[j])-1] for j in (1,2,3,4)],**kw)
+	f.close()
+	return tetras
