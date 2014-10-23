@@ -53,8 +53,8 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
 }
 
 Real smoothkernelLucy(const double & r, const double & h) {
-  if (r<=h) {
-    // Lucy Kernel function, 
+  if (r<=h && h>0) {
+    // Lucy Kernel function, [Lucy1977] (27) 
     return 105./(16.*M_PI*h*h*h) * (1 + 3 * r / h) * pow((1.0 - r / h), 3);
   } else {
     return 0;
@@ -62,8 +62,8 @@ Real smoothkernelLucy(const double & r, const double & h) {
 }
 
 Real smoothkernelLucyGrad(const double & r, const double & h) {
-  if (r<=h) {
-    // 1st derivative of Lucy Kernel function, 
+  if (r<=h && h>0) {
+    // 1st derivative of Lucy Kernel function, [Lucy1977] (27)
     return 105./(16.*M_PI*h*h*h) * (-12 * r) * (1/( h * h ) - 2 * r / (h * h * h ) + r * r / (h * h * h * h));
   } else {
     return 0;
@@ -71,14 +71,61 @@ Real smoothkernelLucyGrad(const double & r, const double & h) {
 }
 
 Real smoothkernelLucyLapl(const double & r, const double & h) {
-  if (r<=h) {
-    // 2nd derivative of Lucy Kernel function, 
+  if (r<=h && h>0) {
+    // 2nd derivative of Lucy Kernel function, [Lucy1977] (27)
     return 105./(16.*M_PI*h*h*h) * (-12) / (h * h * h * h) * (h * h - 2 * r * h + 3 * r * r);
   } else {
     return 0;
   }
 }
+//=========================================================================
 
+Real smoothkernelBSpline(const double & r, const double & h) {
+  // BSpline Kernel function, [Monaghan1985] (22)
+  if (r<=2.0*h && h>0) {
+    const Real coefA = 3.0 / (4.0 * M_PI * h * h * h);
+    const Real r_h = r / h;
+    if (r<=h) {
+      return coefA * (10.0/3.0 - 7 * r_h * r_h + 4 * r_h * r_h * r_h);
+    } else {
+      return coefA * pow((2 - r_h), 2)*((5 - 4 * r_h) / 3.0);
+    }
+  } else {
+    return 0;
+  }
+}
+
+Real smoothkernelBSplineGrad(const double & r, const double & h) {
+  // 1st derivative of BSpline Kernel function, [Monaghan1985] (22) 
+  if (r<=2.0*h && h>0) {
+    const Real coefA = 3.0 / (4.0 * M_PI * h * h * h);
+    const Real r_h = r / h;
+    if (r<=h) {
+      return coefA * (-2)  / (h * h) * ( 7 * r - 6 * r * r / h);
+    } else {
+      return coefA * 2 / h * (-6 + 7 * r / h - 2 * r * r / (h * h ) );
+    }
+  } else {
+    return 0;
+  }
+}
+
+Real smoothkernelBSplineLapl(const double & r, const double & h) {
+  // 2nd derivative of BSpline Kernel function, [Monaghan1985] (22) 
+  if (r<=2.0*h && h>0) {
+    const Real coefA = 3.0 / (4.0 * M_PI * h * h * h);
+    const Real r_h = r / h;
+    if (r<=h) {
+      return coefA * (-2)  / (h * h) * ( 7  - 12 * r_h);
+    } else {
+      return coefA * 2 / (h * h) * ( 7 - 4 * r_h);
+    }
+  } else {
+    return 0;
+  }
+}
+
+//=========================================================================
 KernelFunction returnKernelFunction(const int a, const typeKernFunctions typeF) {
   return returnKernelFunction(a, a, typeF);
 }
@@ -94,6 +141,16 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
       return smoothkernelLucyGrad;
     } else if (typeF==Lapl) {
       return smoothkernelLucyLapl;
+    } else {
+      KERNELFUNCDESCR
+    }
+  } else if (a==BSpline) {
+    if (typeF==Norm) {
+      return smoothkernelBSpline;
+    } else if (typeF==Grad) {
+      return smoothkernelBSplineGrad;
+    } else if (typeF==Lapl) {
+      return smoothkernelBSplineLapl;
     } else {
       KERNELFUNCDESCR
     }
@@ -139,28 +196,32 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   
   const Vector3r xixj = de2.pos - de1.pos;
   
-  if (xixj.norm() < phys.h) {
-    Real fpressure = 0.0;
-    if (Rho1!=0.0 and Rho2!=0.0) {
-      // from [Monaghan1992], (3.3), multiply by Mass2, because we need a force, not du/dt
-      fpressure = - Mass1 * Mass2 * (
-                  bodies[id1]->state->press/(Rho1*Rho1) + 
-                  bodies[id2]->state->press/(Rho2*Rho2) 
-                  )
-                  * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
+  if ( phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h)) {
+    if (xixj.norm() < phys.h) {
+      Real fpressure = 0.0;
+      if (Rho1!=0.0 and Rho2!=0.0) {
+        // from [Monaghan1992], (3.3), multiply by Mass2, because we need a force, not du/dt
+        fpressure = - Mass1 * Mass2 * (
+                    bodies[id1]->state->press/(Rho1*Rho1) + 
+                    bodies[id2]->state->press/(Rho2*Rho2) 
+                    )
+                    * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
+      }
+      
+      Vector3r fvisc = Vector3r::Zero();
+      if (Rho1!=0.0 and Rho2!=0.0) {
+        // from [Morris1997], (22), multiply by Mass2, because we need a force, not du/dt
+        fvisc = phys.mu * Mass1 * Mass2 *
+        (normalVelocity*geom.normal)/(Rho1*Rho2) *
+        1 / (xixj.norm()) *
+        phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
+        //phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
+      }
+      force = fpressure*geom.normal + fvisc;
+      return true;
+    } else {
+      return false;
     }
-    
-    Vector3r fvisc = Vector3r::Zero();
-    if (Rho1!=0.0 and Rho2!=0.0) {
-      // from [Morris1997], (22), multiply by Mass2, because we need a force, not du/dt
-      fvisc = phys.mu * Mass1 * Mass2 *
-      (-normalVelocity*geom.normal)/(Rho1*Rho2) *
-      1 / (xixj.norm()) *
-      phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
-      //phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
-    }
-    force = fpressure*geom.normal + fvisc;
-    return true;
   } else {
     return false;
   }
