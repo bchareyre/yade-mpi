@@ -63,7 +63,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		shared_ptr<FlowSolver> backgroundSolver;
 		volatile bool backgroundCompleted;
 		Cell cachedCell;
-		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool isClump; bool exists; posData(){exists=0;}};
+		struct posData {Body::id_t id; Vector3r pos; Real radius; bool isSphere; bool isClump; bool exists; posData(){exists=0; isClump=0;}};
 		vector<posData> positionBufferCurrent;//reflect last known positions before we start computations
 		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
 		//copy positions in a buffer for faster and/or parallel access
