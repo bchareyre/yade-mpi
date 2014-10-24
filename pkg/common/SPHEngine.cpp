@@ -55,7 +55,8 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
 Real smoothkernelLucy(const double & r, const double & h) {
   if (r<=h && h>0) {
     // Lucy Kernel function, [Lucy1977] (27) 
-    return 105./(16.*M_PI*h*h*h) * (1 + 3 * r / h) * pow((1.0 - r / h), 3);
+    const Real r_h = r / h;
+    return 105./(16.*M_PI*h*h*h) * (1 + 3 * r_h) * pow((1.0 - r_h), 3);
   } else {
     return 0;
   }
@@ -64,7 +65,7 @@ Real smoothkernelLucy(const double & r, const double & h) {
 Real smoothkernelLucyGrad(const double & r, const double & h) {
   if (r<=h && h>0) {
     // 1st derivative of Lucy Kernel function, [Lucy1977] (27)
-    return 105./(16.*M_PI*h*h*h) * (-12 * r) * (1/( h * h ) - 2 * r / (h * h * h ) + r * r / (h * h * h * h));
+    return 105./(16.*M_PI*h*h*h) * (-12 * r) * pow((h - r), 2) / ( h * h * h * h );
   } else {
     return 0;
   }
