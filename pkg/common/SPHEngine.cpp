@@ -197,31 +197,27 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   const Vector3r xixj = de2.pos - de1.pos;
   
   if ( phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h)) {
-    if (xixj.norm() < phys.h) {
-      Real fpressure = 0.0;
-      if (Rho1!=0.0 and Rho2!=0.0) {
-        // from [Monaghan1992], (3.3), multiply by Mass2, because we need a force, not du/dt
-        fpressure = - Mass1 * Mass2 * (
-                    bodies[id1]->state->press/(Rho1*Rho1) + 
-                    bodies[id2]->state->press/(Rho2*Rho2) 
-                    )
-                    * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
-      }
-      
-      Vector3r fvisc = Vector3r::Zero();
-      if (Rho1!=0.0 and Rho2!=0.0) {
-        // from [Morris1997], (22), multiply by Mass2, because we need a force, not du/dt
-        fvisc = phys.mu * Mass1 * Mass2 *
-        (normalVelocity*geom.normal)/(Rho1*Rho2) *
-        1 / (xixj.norm()) *
-        phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
-        //phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
-      }
-      force = fpressure*geom.normal + fvisc;
-      return true;
-    } else {
-      return false;
+    Real fpressure = 0.0;
+    if (Rho1!=0.0 and Rho2!=0.0) {
+      // from [Monaghan1992], (3.3), multiply by Mass2, because we need a force, not du/dt
+      fpressure = - Mass1 * Mass2 * (
+                  bodies[id1]->state->press/(Rho1*Rho1) + 
+                  bodies[id2]->state->press/(Rho2*Rho2) 
+                  )
+                  * phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
     }
+    
+    Vector3r fvisc = Vector3r::Zero();
+    if (Rho1!=0.0 and Rho2!=0.0) {
+      // from [Morris1997], (22), multiply by Mass2, because we need a force, not du/dt
+      fvisc = phys.mu * Mass1 * Mass2 *
+      (-normalVelocity*geom.normal)/(Rho1*Rho2) *
+      1 / (xixj.norm()) *
+      phys.kernelFunctionCurrentPressure(xixj.norm(), phys.h);
+      //phys.kernelFunctionCurrentVisco(xixj.norm(), phys.h);
+    }
+    force = fpressure*geom.normal + fvisc;
+    return true;
   } else {
     return false;
   }
