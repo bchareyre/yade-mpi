@@ -13,7 +13,7 @@
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
-// #define DFNFLOW
+#define DFNFLOW
 
 #ifdef DFNFLOW
 #include "FlowEngine_DFNFlowEngineT.hpp"
@@ -125,7 +125,7 @@ public:
 };
 
 
-typedef TemplateFlowEngine_DFNFlowEngineT<DFNCellInfo,DFNVertexInfo, DFNTesselation> DFNFlowEngineT;
+typedef TemplateFlowEngine_DFNFlowEngineT<DFNCellInfo,DFNVertexInfo, DFNTesselation,DFNBoundingSphere> DFNFlowEngineT;
 REGISTER_SERIALIZABLE(DFNFlowEngineT);
 YADE_PLUGIN((DFNFlowEngineT));
 
