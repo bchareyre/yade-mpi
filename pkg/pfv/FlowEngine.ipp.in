@@ -474,6 +474,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                 	totDVol+=dVol;}
         }
 	if (defTolerance>0)  epsVolMax = totDVol/totVol;
+	//FIXME: move this loop to FlowBoundingSphere
 	for (unsigned int n=0; n<flow.imposedF.size();n++) {
 		flow.IFCells[n]->info().dv()+=flow.imposedF[n].second;
 		flow.IFCells[n]->info().Pcondition=false;}
