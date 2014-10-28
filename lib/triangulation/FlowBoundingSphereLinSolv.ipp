@@ -200,7 +200,9 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 				//Add diagonal term
 				is[T_nnz] = index;
 				js[T_nnz] = index;
-				vs[T_nnz] = (cell->info().kNorm())[0]+ (cell->info().kNorm())[1]+ (cell->info().kNorm())[2]+ (cell->info().kNorm())[3];
+				vs[T_nnz]=0;
+				for (int j=0;j<4;j++) if (!cell->neighbor(j)->info().blocked) vs[T_nnz]+= (cell->info().kNorm())[j];
+// 				vs[T_nnz] = (cell->info().kNorm())[0]+ (cell->info().kNorm())[1]+ (cell->info().kNorm())[2]+ (cell->info().kNorm())[3];
 				if (fluidBulkModulus>0) vs[T_nnz] += (1.f/(dt*fluidBulkModulus*cell->info().invVoidVolume()));
 				++T_nnz;
 			}
@@ -218,7 +220,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 						vs[T_nnz] = - (cell->info().kNorm())[j];
 						T_nnz++;
 					}
-				} else if (neighbourCell->info().Pcondition) {
+				} else if (neighbourCell->info().Pcondition && !neighbourCell->info().blocked) {
 					//ADD TO b, FIXME : use updated volume change
 					T_b[index-1]+=cell->info().kNorm()[j]*neighbourCell->info().p();
 				}
@@ -298,7 +300,7 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToGs (Real dt)
 }
 
 template<class _Tesselation, class FlowType>
-void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) {T_cells[ii]->info().p()=T_x[ii-1];} }
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=T_x[ii-1];}
 
 template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
