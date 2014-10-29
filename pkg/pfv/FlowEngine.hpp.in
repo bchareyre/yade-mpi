@@ -183,9 +183,9 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		CELL_VECTOR_GETTER(,cellCenter)
 		CELL_VECTOR_GETTER(.averageCellVelocity,cellVelocity)
 		CELL_SCALAR_GETTER(double,.p(),cellPressure)
-		CELL_SCALAR_SETTER(double,.p(),setCellPressure)
+		CELL_SCALAR_SETTER_EXTRA(double,.p(),setCellPressure,solver->resetRHS())
 		CELL_SCALAR_GETTER(bool,.Pcondition,cellPImposed)
-		CELL_SCALAR_SETTER(bool,.Pcondition,setCellPImposed)
+		CELL_SCALAR_SETTER_EXTRA(bool,.Pcondition,setCellPImposed,solver->resetLinearSystem())
 		boost::python::list getVertices(unsigned int id){
 			boost::python::list ids;
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}

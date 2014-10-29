@@ -71,6 +71,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	isLinearSystemSet=0;
 	isFullLinearSystemGSSet=0;
 	areCellsOrdered=0;//true when orderedCells is filled, turn it false after retriangulation
+	updatedRHS=false;
 	ZERO=0;
 	#ifdef TAUCS_LIB
 	T_A = &SystemMatrix;
@@ -156,7 +157,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		orderedCells.clear();
 		const FiniteCellsIterator cellEnd = Tri.finite_cells_end();
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
-			orderedCells.push_back(cell);
+			orderedCells.push_back(cell); cell->info().index=0;
 			if (!cell->info().Pcondition && !cell->info().blocked) ++ncols;}
 //		//Segfault on 14.10, and useless overall since SuiteSparse has preconditionners (including metis)
 // 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
@@ -227,6 +228,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 			}
 		}
 	}
+	updatedRHS = true;
 	if (!isLinearSystemSet) {
 		if (useSolver==1 || useSolver==2){
 		#ifdef TAUCS_LIB
@@ -514,7 +516,7 @@ template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 {
 #ifdef EIGENSPARSE_LIB
-	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions())) ncols = setLinearSystem(dt);
+	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
 	copyCellsToLin(dt);
 	//FIXME: we introduce new Eigen vectors, then we have to copy from/to c-arrays, can be optimized later
 	Eigen::VectorXd eb(ncols); Eigen::VectorXd ex(ncols);

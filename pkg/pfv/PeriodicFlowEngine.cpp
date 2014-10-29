@@ -493,7 +493,7 @@ void PeriodicFlowEngine::buildTriangulation ( double pZero, FlowSolver& flow)
 	const FiniteCellsIterator cellend=Tes.Triangulation().finite_cells_end();
         for ( FiniteCellsIterator cell=Tes.Triangulation().finite_cells_begin(); cell!=cellend; cell++ ){
                 locateCell ( cell,index,baseIndex,flow );
-		if (flow.errorCode>0) return;
+		if (flow.errorCode>0) {LOG_ERROR("problem here, flow.errorCode>0"); return;}
 		//Fill this vector than can be later used to speedup loops
 		if (!cell->info().isGhost) Tes.cellHandles[cell->info().baseIndex]=cell;
 		cell->info().id=cell->info().baseIndex;

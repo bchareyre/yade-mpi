@@ -95,8 +95,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void computePermeability();
 		virtual void gaussSeidel (Real dt=0);
 		virtual void resetNetwork();
-		virtual void resetLinearSystem();
-
+		virtual void resetLinearSystem();//reset both A and B in the linear system A*P=B, done typically after updating the mesh 
+		virtual void resetRHS() {};////reset only B in the linear system A*P=B, done typically after changing values of imposed pressures 
 
 		double kFactor; //permeability moltiplicator
 		std::string key; //to give to consolidation files a name with iteration number

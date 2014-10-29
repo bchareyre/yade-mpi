@@ -53,13 +53,15 @@ public:
 	using FlowType::computedOnce;
 	using FlowType::resetNetwork;
 	using FlowType::tesselation;
+	using FlowType::resetRHS;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
 	bool isLinearSystemSet;
 	bool isFullLinearSystemGSSet;
 	bool areCellsOrdered;//true when orderedCells is filled, turn it false after retriangulation
-
+	bool updatedRHS;
+	
 	#ifdef EIGENSPARSE_LIB
 	//Eigen's sparse matrix and solver
 	Eigen::SparseMatrix<double> A;
@@ -180,6 +182,7 @@ public:
 		computedOnce=true;
 	}
 	virtual void resetLinearSystem();
+	virtual void resetRHS() {updatedRHS=false;};
 };
 
 } //namespace CGT

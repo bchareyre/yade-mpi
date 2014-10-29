@@ -622,6 +622,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 				O1O2 = O1O2Vector.norm(); 
 				normal= (O1O2Vector/O1O2);
 				surfaceDist = O1O2 - r2 - r1;
+				//FIXME: what is that?
 				O1CVector = (O1O2/2. + (pow(r1,2) - pow(r2,2)) / (2.*O1O2))*normal;
 				O2CVector = -(O1O2Vector - O1CVector);
 				meanRad = (r2 + r1)/2.;
