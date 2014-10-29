@@ -2,17 +2,16 @@
 Installation
 ###############
 
-Yade can be installed from packages (precompiled binaries) or source code. 
+Yade can be installed from packages (pre-compiled binaries) or source code. 
 The choice depends on what you need: if you don't plan to modify Yade itself, 
 package installation is easier. In the contrary case, you must download and 
-install source code.
+install the source code.
 
 Packages
 ----------
 
 Pre-built packages are provided for all currently supported Debian and Ubuntu 
-versions of distributions and available on `yade-dem.org <http://yade-dem.org/packages/>`_  
-server. 
+versions of distributions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>`_ . 
 
 These are ``daily`` versions of packages and are updating regularly and include 
 all the newly added features.
@@ -20,13 +19,13 @@ all the newly added features.
 To install daily-version one needs to add this repository to your 
 /etc/apt/sources.list, add a PGP-key AA915EEB as a trusted and install yadedaily ::
 
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ precise/" >> /etc/apt/sources.list'
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trusty/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
 	sudo apt-get update
 	sudo apt-get install yadedaily
 
-If you have another distribution, not Ubuntu Precise (Version 12.04), be sure to use the
-correct name in the first line (for instance, jessie, trusty or wheezy). For the list
+If you have another distribution, not Ubuntu Trusty (Version 14.04 LTS), be sure to use the
+correct name in the first line (for instance, precise, jessie or wheezy). For the list
 of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
 After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
@@ -74,7 +73,7 @@ Download
 ^^^^^^^^^^
 
 If you want to install from source, you can install either a release 
-(numbered version, which is frozen) or the current developement version 
+(numbered version, which is frozen) or the current development version 
 (updated by the developers frequently). You should download the development 
 version (called ``trunk``) if you want to modify the source code, as you 
 might encounter problems that will be fixed by the developers. Release 
@@ -96,7 +95,7 @@ Alternatively, a read-only checkout is possible via https without a GitHub accou
 
 		git clone https://github.com/yade/trunk.git
    
-For those behind firewall, you can download `any revision  <https://www.yade-dem.org/source/>`_ of the repository as compressed archive.
+For those behind firewall, you can download the sources from our `GitHub <https://github.com/yade>`_ repository as compressed archive.
 
 Release and trunk sources are compiled in the same way.
 
@@ -166,8 +165,9 @@ All four of them are available in many different versions. Different combination
 
 Some packages listed here are relatively new and they can be absent
 in your distribution (for example, libmetis-dev or python-gts). They can be 
-installed from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_
-or just ignored. In this case some features can be disabled.
+installed from `yade-dem.org/packages <http://yade-dem.org/packages/>`_ or
+from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
+If not installed the related features will be disabled automatically.
 
 If you are using other distribution, than Debian or its derivatives, you should
 install the softwares listed above. Their names can differ from the 
