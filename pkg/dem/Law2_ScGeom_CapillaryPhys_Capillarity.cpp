@@ -6,11 +6,6 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-//Modifs : Parameters renamed as MeniscusParameters
-//id1/id2 as id1 is the smallest grain, FIXME : wetting angle?
-//FIXME : in triaxialStressController, change test about null force in updateStiffness
-//FIXME : needs "requestErase" somewhere
-
 #include "Law2_ScGeom_CapillaryPhys_Capillarity.hpp"
 #include <pkg/common/ElastMat.hpp>
 #include <pkg/dem/ScGeom.hpp>
@@ -117,7 +112,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			Real D = alpha*((b2->state->pos-b1->state->pos).norm()-(currentContactGeometry->radius1+ currentContactGeometry->radius2)); // scGeom->penetrationDepth could probably be used here?
 
 			if ((currentContactGeometry->penetrationDepth>=0)|| D<=0 || createDistantMeniscii) { //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
-				D=0; // defines fCap when spheres interpenetrate. D<0 leads to wrong interpolation has D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
+				D=max(0.,D); // defines fCap when spheres interpenetrate. D<0 leads to wrong interpolation has D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
 				if (!hertzOn) {
 					if (fusionDetection && !cundallContactPhysics->meniscus) bodiesMenisciiList.insert(interaction);
 					cundallContactPhysics->meniscus=true;
@@ -160,6 +155,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				if (!Vinterpol) {
 					if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove(interaction);
 					if (D>0) scene->interactions->requestErase(interaction);
+					else LOG_ERROR("No meniscus found at a contact. capillaryPressure may be to large wrt. to the loaded data files.")
 				}
 				/// wetting angles
 				if (!hertzOn) {
