@@ -109,10 +109,10 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			R2=alpha*std::max(currentContactGeometry->radius2,currentContactGeometry->radius1) ;
 
 			/// intergranular distance
-			Real D = alpha*((b2->state->pos-b1->state->pos).norm()-(currentContactGeometry->radius1+ currentContactGeometry->radius2)); // scGeom->penetrationDepth could probably be used here?
+			Real D = - alpha * currentContactGeometry->penetrationDepth;
 
-			if ((currentContactGeometry->penetrationDepth>=0)|| D<=0 || createDistantMeniscii) { //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
-				D=max(0.,D); // defines fCap when spheres interpenetrate. D<0 leads to wrong interpolation has D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
+			if ( D<0 || createDistantMeniscii) { //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
+				D=max(0.,D); // defines fCap when spheres interpenetrate. D<0 leads to wrong interpolation as D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
 				if (!hertzOn) {
 					if (fusionDetection && !cundallContactPhysics->meniscus) bodiesMenisciiList.insert(interaction);
 					cundallContactPhysics->meniscus=true;
@@ -138,7 +138,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				solution(Pinterpol? capillary->interpolate(R1,R2,Dinterpol, Pinterpol, currentIndexes) : MeniscusParameters());
 				/// capillary adhesion force
 				Real Finterpol = solution.F;
-				Vector3r fCap = Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->normal;
+				Vector3r fCap = - Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->normal;
 				if (!hertzOn) cundallContactPhysics->fCap = fCap;
 				else mindlinContactPhysics->fCap = fCap;
 				/// meniscus volume
@@ -155,7 +155,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				if (!Vinterpol) {
 					if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove(interaction);
 					if (D>0) scene->interactions->requestErase(interaction);
-					else LOG_ERROR("No meniscus found at a contact. capillaryPressure may be to large wrt. to the loaded data files.")
+					else LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files.")
 				}
 				/// wetting angles
 				if (!hertzOn) {
@@ -197,8 +197,8 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					//LINEAR VERSION : capillary force is divided by (fusionNumber + 1) - NOTE : any decreasing function of fusionNumber can be considered in fact
 					else if (fusionNumber !=0) hertzOn?mindlinContactPhysics->fCap:cundallContactPhysics->fCap /= (fusionNumber+1.);
 				}
-				scene->forces.addForce(interaction->getId1(), hertzOn?mindlinContactPhysics->fCap:cundallContactPhysics->fCap);
-				scene->forces.addForce(interaction->getId2(),-(hertzOn?mindlinContactPhysics->fCap:cundallContactPhysics->fCap));
+				scene->forces.addForce(interaction->getId1(),-(hertzOn?mindlinContactPhysics->fCap:cundallContactPhysics->fCap));
+				scene->forces.addForce(interaction->getId2(),  hertzOn?mindlinContactPhysics->fCap:cundallContactPhysics->fCap );
 			}
 		}
 	}
