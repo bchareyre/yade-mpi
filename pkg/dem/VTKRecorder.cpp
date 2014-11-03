@@ -138,10 +138,6 @@ void VTKRecorder::action(){
 	spheresId->SetName("id");
 
 #ifdef YADE_SPH
-	vtkSmartPointer<vtkDoubleArray> spheresCsSPH = vtkSmartPointer<vtkDoubleArray>::New();
-	spheresCsSPH->SetNumberOfComponents(1);
-	spheresCsSPH->SetName("SPH_Cs");
-	
 	vtkSmartPointer<vtkDoubleArray> spheresRhoSPH = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresRhoSPH->SetNumberOfComponents(1);
 	spheresRhoSPH->SetName("SPH_Rho");
@@ -760,7 +756,6 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(spheresAngVelLen);
 		}
 #ifdef YADE_SPH
-		spheresUg->GetPointData()->AddArray(spheresCsSPH);
 		spheresUg->GetPointData()->AddArray(spheresRhoSPH);
 		spheresUg->GetPointData()->AddArray(spheresPressSPH);
 		spheresUg->GetPointData()->AddArray(spheresCoordNumbSPH);
