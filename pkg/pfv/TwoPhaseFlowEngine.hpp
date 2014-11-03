@@ -81,6 +81,10 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	double bisection(CellHandle cell, int j, double a, double b);
 	double computeTriRadian(double a, double b, double c);
 	double computeDeltaForce(CellHandle cell,int j, double rC);
+	void initialization();
+	void computeSolidLine();
+	void initializeReservoirs();
+	
 	
 	//FIXME, needs to trigger initSolver() Somewhere, else changing flow.debug or other similar things after first calculation has no effect
 	//FIXME, I removed indexing cells from inside UnsatEngine (SoluteEngine shouldl be ok (?)) in order to get pressure computed, problem is they are not indexed at all if flow is not calculated
@@ -95,6 +99,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 	((bool,initialWetting,true,,"Initial wetting saturated (=true) or non-wetting saturated (=false)"))
 	((bool, isPhaseTrapped,true,,"If True, both phases can be entrapped by the other, which would correspond to snap-off. If false, both phases are always connected to their reservoirs, thus no snap-off."))
+	((bool, drainageFirst, true,,"If true, activate drainage first (initial saturated), then imbibition; if false, activate imbibition first (initial unsaturated), then drainage."))
+
 
 	,/*TwoPhaseFlowEngineT()*/,
 	,
@@ -104,6 +110,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getCellSaturation",&TwoPhaseFlowEngine::cellSaturation,"get saturation of one pore")
 	.def("setCellSaturation",&TwoPhaseFlowEngine::setCellSaturation,"change saturation of one pore")
 	.def("computeOnePhaseFlow",&TwoPhaseFlowEngine::computeOnePhaseFlow,"compute pressure and fluxes in the W-phase")
+	.def("initialization",&TwoPhaseFlowEngine::initialization,"Initialize invasion setup. Build network, compute pore geometry info and initialize reservoir boundary conditions. ")
+
 	)
 	DECLARE_LOGGER;
 };

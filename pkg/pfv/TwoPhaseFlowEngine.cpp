@@ -431,5 +431,77 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 	vtkfile.end_data();
 }
 
+void TwoPhaseFlowEngine::initialization()
+{
+		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
+		setPositionsBuffer(true);//copy sphere positions in a buffer...
+		buildTriangulation(0.0,*solver);//create a triangulation and initialize pressure in the elements (connecting with W-reservoir), everything will be contained in "solver"
+// 		initializeCellIndex();//initialize cell index
+		computePoreThroatRadius();//save pore throat radius before drainage. Thomas, here you can also revert this to computePoreThroatCircleRadius().
+		computePoreBodyRadius();//save pore body radius before imbibition
+		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
+		computeSolidLine();//save cell->info().solidLine[j][y]
+		initializeReservoirs();//initial pressure, reservoir flags and local pore saturation
+		solver->noCache = true;
+}
+
+void TwoPhaseFlowEngine::computeSolidLine()
+{
+    RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+    for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+        for(int j=0; j<4; j++) {
+            solver->lineSolidPore(cell, j);
+        }
+    }
+    if(solver->debugOut) {cout<<"----computeSolidLine-----."<<endl;}
+}
+
+void TwoPhaseFlowEngine::initializeReservoirs()
+{
+    boundaryConditions(*solver);
+    solver->pressureChanged=true;
+    solver->reApplyBoundaryConditions();
+    ///keep boundingCells[2] as W-reservoir.
+    for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
+        (*it)->info().isWRes = true;
+        (*it)->info().isNWRes = false;
+        (*it)->info().saturation=1.0;
+    }
+    ///keep boundingCells[3] as NW-reservoir.
+    for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
+        (*it)->info().isNWRes = true;
+        (*it)->info().isWRes = false;
+        (*it)->info().saturation=0.0;
+    }
+
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    ///if we start from drainage
+    if(drainageFirst)
+    {
+        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+            if (cell->info().Pcondition) continue;
+	    cell->info().p()=bndCondValue[2];
+            cell->info().isWRes = true;
+            cell->info().isNWRes= false;
+            cell->info().saturation=1.0;
+        }
+    }
+    ///if we start from imbibition
+    if(!drainageFirst)
+    {
+        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+            if (cell->info().Pcondition) continue;
+	    cell->info().p()=bndCondValue[3];
+            cell->info().isWRes = false;
+            cell->info().isNWRes= true;
+            cell->info().saturation=0.0;
+        }
+    }
+    if(solver->debugOut) {cout<<"----initializeReservoirs----"<<endl;}    
+}
+
+
 #endif //TwoPhaseFLOW
  
