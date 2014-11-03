@@ -54,9 +54,9 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
 
 Real smoothkernelLucy(const double & r, const double & h) {
   if (r<=h && h>0) {
-    // Lucy Kernel function, [Lucy1977] (27) 
+    // Lucy Kernel function, [Lucy1977] (27)
     const Real r_h = r / h;
-    return 105./(16.*M_PI*h*h*h) * (1 + 3 * r_h) * pow((1.0 - r_h), 3);
+    return 105./(16.*M_PI*h*h*h) * (1. + 3. * r_h) * std::pow((1. - r_h), 3);
   } else {
     return 0;
   }
@@ -65,7 +65,7 @@ Real smoothkernelLucy(const double & r, const double & h) {
 Real smoothkernelLucyGrad(const double & r, const double & h) {
   if (r<=h && h>0) {
     // 1st derivative of Lucy Kernel function, [Lucy1977] (27)
-    return 105./(16.*M_PI*h*h*h) * (-12 * r) * pow((h - r), 2) / ( h * h * h * h );
+    return 105./(16.*M_PI*h*h*h) * (-12. * r) * std::pow((h - r), 2) / ( h * h * h * h );
   } else {
     return 0;
   }
@@ -74,52 +74,99 @@ Real smoothkernelLucyGrad(const double & r, const double & h) {
 Real smoothkernelLucyLapl(const double & r, const double & h) {
   if (r<=h && h>0) {
     // 2nd derivative of Lucy Kernel function, [Lucy1977] (27)
-    return 105./(16.*M_PI*h*h*h) * (-12) / (h * h * h * h) * (h * h - 2 * r * h + 3 * r * r);
+    return 105./(16.*M_PI*h*h*h) * (-12.) / (h * h * h * h) * (h * h - 2. * r * h + 3. * r * r);
   } else {
     return 0;
   }
 }
 //=========================================================================
 
-Real smoothkernelBSpline(const double & r, const double & h) {
+Real smoothkernelBSpline1(const double & r, const double & h) {
+  // BSpline Kernel function, [Monaghan1985] (21)
+  if (r<=2.0*h && h>0) {
+    const Real coefA = 3. / (2. * M_PI * h * h * h);
+    const Real r_h = r / h;
+    if (r<=h) {
+      return coefA * (2. /3. - r_h * r_h + 1. / 2. * r_h * r_h * r_h);
+    } else {
+      return coefA / 6. * std::pow((2. - r_h), 3);
+    }
+  } else {
+    return 0;
+  }
+}
+
+Real smoothkernelBSpline1Grad(const double & r, const double & h) {
+  // 1st derivative of BSpline Kernel function, [Monaghan1985] (21)
+  if (r<=2.*h && h>0) {
+    const Real coefA = 3. / (2. * M_PI * h * h * h);
+    const Real r_h = r / h;
+    if (r<=h) {
+      return coefA * (-2. * r_h ) * (1. - 3. / 2. * r_h);
+    } else {
+      return coefA * (-1. / 2.) * std::pow((2. - r_h), 2);
+    }
+  } else {
+    return 0;
+  }
+}
+
+Real smoothkernelBSpline1Lapl(const double & r, const double & h) {
+  // 2nd derivative of BSpline Kernel function, [Monaghan1985] (21)
+  if (r<=2.0*h && h>0) {
+    const Real coefA = 3. / (2. * M_PI * h * h * h);
+    const Real r_h = r / h;
+    if (r<=h) {
+      return coefA * (-2. + 3. * r_h);
+    } else {
+      return coefA * (2. - r_h);
+    }
+  } else {
+    return 0;
+  }
+}
+
+//=========================================================================
+
+Real smoothkernelBSpline2(const double & r, const double & h) {
   // BSpline Kernel function, [Monaghan1985] (22)
   if (r<=2.0*h && h>0) {
-    const Real coefA = 3.0 / (4.0 * M_PI * h * h * h);
+    const Real coefA = 3. / (4. * M_PI * h * h * h);
     const Real r_h = r / h;
     if (r<=h) {
-      return coefA * (10.0/3.0 - 7 * r_h * r_h + 4 * r_h * r_h * r_h);
+      return coefA * (10. /3. - 7. * r_h * r_h + 4 * r_h * r_h * r_h);
     } else {
-      return coefA * pow((2 - r_h), 2)*((5 - 4 * r_h) / 3.0);
+      return coefA * std::pow((2. - r_h), 2)*((5. - 4. * r_h) / 3.);
     }
   } else {
     return 0;
   }
 }
 
-Real smoothkernelBSplineGrad(const double & r, const double & h) {
-  // 1st derivative of BSpline Kernel function, [Monaghan1985] (22) 
+Real smoothkernelBSpline2Grad(const double & r, const double & h) {
+  // 1st derivative of BSpline Kernel function, [Monaghan1985] (22)
   if (r<=2.0*h && h>0) {
-    const Real coefA = 3.0 / (4.0 * M_PI * h * h * h);
+    const Real coefA = 3. / (4. * M_PI * h * h * h);
     const Real r_h = r / h;
     if (r<=h) {
-      return coefA * (-2)  / (h * h) * ( 7 * r - 6 * r * r / h);
+      return coefA * (-2.)  / (h * h) * ( 7. * r - 6. * r * r / h);
     } else {
-      return coefA * 2 / h * (-6 + 7 * r / h - 2 * r * r / (h * h ) );
+      return coefA * 2. / h * (-6. + 7. * r / h - 2. * r * r / (h * h ) );
     }
   } else {
     return 0;
   }
 }
 
-Real smoothkernelBSplineLapl(const double & r, const double & h) {
-  // 2nd derivative of BSpline Kernel function, [Monaghan1985] (22) 
+Real smoothkernelBSpline2Lapl(const double & r, const double & h) {
+  // 2nd derivative of BSpline Kernel function, [Monaghan1985] (22)
   if (r<=2.0*h && h>0) {
-    const Real coefA = 3.0 / (4.0 * M_PI * h * h * h);
+    const Real coefA = 3. / (4. * M_PI * h * h * h);
     const Real r_h = r / h;
     if (r<=h) {
-      return coefA * (-2)  / (h * h) * ( 7  - 12 * r_h);
+      return coefA * (-2.)  / (h * h) * ( 7.  - 12. * r_h);
     } else {
-      return coefA * 2 / (h * h) * ( 7 - 4 * r_h);
+      return coefA * 2. / (h * h) * ( 7. - 4. * r_h);
     }
   } else {
     return 0;
@@ -145,13 +192,23 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
     } else {
       KERNELFUNCDESCR
     }
-  } else if (a==BSpline) {
+  } else if (a==BSpline1) {
     if (typeF==Norm) {
-      return smoothkernelBSpline;
+      return smoothkernelBSpline1;
     } else if (typeF==Grad) {
-      return smoothkernelBSplineGrad;
+      return smoothkernelBSpline1Grad;
     } else if (typeF==Lapl) {
-      return smoothkernelBSplineLapl;
+      return smoothkernelBSpline1Lapl;
+    } else {
+      KERNELFUNCDESCR
+    }
+  } else if (a==BSpline2) {
+    if (typeF==Norm) {
+      return smoothkernelBSpline2;
+    } else if (typeF==Grad) {
+      return smoothkernelBSpline2Grad;
+    } else if (typeF==Lapl) {
+      return smoothkernelBSpline2Lapl;
     } else {
       KERNELFUNCDESCR
     }
