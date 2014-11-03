@@ -22,20 +22,13 @@ void KinemCTDEngine::action()
 
 	if( ((compSpeed > 0) && (current_sigma < targetSigma)) || ((compSpeed < 0) && (current_sigma > targetSigma)) )
 	{
-		if(temoin!=0)
-		{
-// 			cout << "j'ai ici un temoin #0 visiblement. En effet temoin =" <<boost::lexical_cast<string>(temoin) << endl;
-			temoin=0;
-// 			cout << "Maintenant (toujours dans le if temoin!=0), temoin =" <<boost::lexical_cast<string>(temoin) << endl;
-		}
+		if(temoin!=0) temoin=0;
 		
 		letMove(0.0,-compSpeed*dt);
 	}
 	else if (temoin==0)
 	{
 		stopMovement();
-// 		cout << "Mouvement stoppe, temoin = " << boost::lexical_cast<string>(temoin) << endl;
-// 		cout << " Dans le if, temoin =" << boost::lexical_cast<string>(temoin) << endl;
 		string f;
 		if (compSpeed > 0)
 			f="Sigmax_";
@@ -44,7 +37,6 @@ void KinemCTDEngine::action()
 
 		Omega::instance().saveSimulation(Key + f +boost::lexical_cast<string> (floor(targetSigma)) + "kPaReached.xml");
 		temoin=1;
-// 		cout << " Fin du if, temoin =" << boost::lexical_cast<string>(temoin) << endl << endl;
 	}
 
 	
@@ -57,7 +49,6 @@ void KinemCTDEngine::action()
 			temoin_save[j]=1;
 		}
 	}
-// 	cout << "Fin de ApplyCondi, temoin = " << boost::lexical_cast<string>(temoin) << endl;
 
 }
 
@@ -117,7 +108,7 @@ void KinemCNLEngine::action()
 	}
 	else if (temoin<2)
 	{
-		stopMovement();		// INDISPENSABLE !
+		stopMovement();
 		it_stop=scene->iter;
 		cout << "Shear stopped : gammaLim reached at it "<< it_stop << endl;
 		temoin=2;
@@ -156,7 +147,7 @@ void KinemCNSEngine::action()
 	}
 	else if (temoin<2)
 	{
-		stopMovement();		// INDISPENSABLE !
+		stopMovement();
 		it_stop=scene->iter;
 		cout << "Cisaillement arrete : gammaLim atteint a l'iteration "<< it_stop << endl;
 		temoin=2;

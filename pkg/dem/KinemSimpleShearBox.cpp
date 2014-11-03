@@ -48,7 +48,6 @@ void KinemSimpleShearBox::letMove(Real dX, Real dY)
 {
 
 	if(LOG)	cout << "It : " << scene->iter << endl;
-// 	computeDu();
 
 // 	const Real& dt = scene->dt; // dt value obtained by getBoxes_Dt
 
@@ -152,24 +151,9 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 	
 	if(firstRun)
 	{
-// 		if ( !myLdc )	// FIXME : reenable this feature since Law2 is a functor ?? But difference in stiffnesses normally now taken into account
-// 		{
-// 			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
-// 			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
-// 			for ( ;itFirst!=itLast; ++itFirst )
-// 			{
-// 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity" ) 
-// 				{
-// 					myLdc =  YADE_PTR_CAST<Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
-// 					coeff_dech = myLdc ->coeff_dech;
-// 					if(LOG) cout << "Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
-// 				}
-// 			}
-// 		}
 
 		alpha=Mathr::PI/2.0;;
 		y0 = topbox->state->pos.y();
-// 		cout << "y0 initialise à : " << y0 << endl;
 		f0 = fSup.y();
 		firstRun=false;
 	}
@@ -179,9 +163,6 @@ void KinemSimpleShearBox::computeDY(Real KnC)
 	Real hCurrent = topbox->state->pos.y();
 	computeScontact();
 	Real fDesired = f0 + KnC * 1.0e9 * Scontact * (hCurrent-y0); // The value of the force desired, with the fact that KnC is in MPa/mm 
-// 	cout << "Je veux atteindre a cet it fDesired = "<< fDesired << endl;
-// 	cout << "Alors que f0 =  = "<< f0 << endl;
-// 	cout << "Car terme correctif = " << KnC * 1.0e9 * Scontact * (hCurrent-y0)<< endl;
 
 	if( stiffness==0 )
 	{
