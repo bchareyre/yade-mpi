@@ -102,7 +102,7 @@ Real smoothkernelBSpline1Grad(const double & r, const double & h) {
     const Real coefA = 3. / (2. * M_PI * h * h * h);
     const Real r_h = r / h;
     if (r<=h) {
-      return coefA * (-2. * r_h ) * (1. - 3. / 2. * r_h);
+      return coefA * ( -r_h ) * (2. - 3. / 2. * r_h);
     } else {
       return coefA * (-1. / 2.) * std::pow((2. - r_h), 2);
     }
