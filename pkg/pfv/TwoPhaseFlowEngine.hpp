@@ -103,7 +103,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	
 	//FIXME, needs to trigger initSolver() Somewhere, else changing flow.debug or other similar things after first calculation has no effect
 	//FIXME, I removed indexing cells from inside UnsatEngine (SoluteEngine shouldl be ok (?)) in order to get pressure computed, problem is they are not indexed at all if flow is not calculated
-	void computeOnePhaseFlow() {scene = Omega::instance().getScene().get(); if (!solver) cerr<<"no solver!"<<endl; solver->gaussSeidel(scene->dt);}
+	void computeOnePhaseFlow() {scene = Omega::instance().getScene().get(); if (!solver) cerr<<"no solver!"<<endl; solver->gaussSeidel(scene->dt);initSolver(*solver);}
 	
 	CELL_SCALAR_GETTER(bool,.isWRes,cellIsWRes)
 	CELL_SCALAR_GETTER(bool,.isNWRes,cellIsNWRes)
