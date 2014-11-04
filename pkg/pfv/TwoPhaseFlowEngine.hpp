@@ -13,8 +13,8 @@
 
 //keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
-#define TWOPHASEFLOW
-//#ifdef TWOPHASEFLOW
+//#define TWOPHASEFLOW
+#ifdef TWOPHASEFLOW
 
 #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
 
