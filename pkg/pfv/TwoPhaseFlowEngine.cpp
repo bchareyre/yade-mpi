@@ -40,21 +40,26 @@ void TwoPhaseFlowEngine::computePoreBodyVolume()
     }
 }
 
-void TwoPhaseFlowEngine:: computePoreSatAtInterface(CellHandle cell)
+double TwoPhaseFlowEngine:: computePoreSatAtInterface(int ID)
 {
     //This function calculates the new saturation of pore at the interface between wetting/nonwetting 
     //filled pores. It substracts the outgoing flux from the water volume  
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+      if(cell->info().id == ID){
+    
     double qout = 0.0, Vw = 0.0;
     
     for(unsigned int ngb = 0; ngb < 4; ngb++)
     {
       //find out/influx of water
-      if(cell->neighbor(ngb)->info().isWRes){
-	qout= qout + std::abs(cell->info().kNorm() [ngb])*(cell->neighbor ( ngb )->info().p()-cell->info().p());    
-      }
+       if(cell->neighbor(ngb)->info().isWRes){
+	qout= qout + std::abs(cell->info().kNorm() [ngb])*(cell->info().p()-cell->neighbor ( ngb )->info().p()); 
+       }
     }
    
-    Vw = cell->info().saturation * cell->info().poreBodyVolume - (qout * scene->dt);  
+    Vw = (cell->info().saturation * cell->info().poreBodyVolume) - (qout * scene->dt);  
     cell->info().saturation = Vw / cell->info().poreBodyVolume;
    
    
@@ -67,6 +72,9 @@ void TwoPhaseFlowEngine:: computePoreSatAtInterface(CellHandle cell)
     if(cell->info().saturation > 1.0){
       cout << endl <<"dt was too large!,saturation larger than 1 in cell " << cell->info().id;
       cell->info().saturation = 1.0;}
+      return cell->info().saturation;
+      }  
+}
 }
 
 void TwoPhaseFlowEngine:: computePoreCapillaryPressure(CellHandle cell)
@@ -380,7 +388,7 @@ double TwoPhaseFlowEngine::computeDeltaForce(CellHandle cell,int j, double rC)
     return deltaF;
 }
 
-void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
+void TwoPhaseFlowEngine::savePhaseVtk1(const char* folder)
 {
 // 	RTriangulation& Tri = T[solver->noCache?(!currentTes):currentTes].Triangulation();
 	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
