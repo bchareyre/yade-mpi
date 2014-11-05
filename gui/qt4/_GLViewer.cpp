@@ -42,9 +42,12 @@ class pyGLViewer{
 		string pyStr(){return string("<GLViewer for view #")+boost::lexical_cast<string>(viewNo)+">";}
 		void saveDisplayParameters(size_t n){GLV;  glv->saveDisplayParameters(n);}
 		void useDisplayParameters(size_t n){GLV;  glv->useDisplayParameters(n);}
+		void loadState(string filename){GLV; QString origStateFileName=glv->stateFileName(); glv->setStateFileName(QString(filename.c_str())); glv->restoreStateFromFile(); glv->saveStateToFile(); glv->setStateFileName(origStateFileName);}
+		void saveState(string filename){GLV;  QString origStateFileName=glv->stateFileName(); glv->setStateFileName(QString(filename.c_str())); glv->saveStateToFile(); glv->setStateFileName(origStateFileName);}
 		string get_timeDisp(){GLV;  const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}
 		void set_timeDisp(string s){GLV;  int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
 		void set_bgColor(const Vector3r& c){ QColor cc(255*c[0],255*c[1],255*c[2]); GLV;  glv->setBackgroundColor(cc);} Vector3r get_bgColor(){ GLV;  QColor c(glv->backgroundColor()); return Vector3r(c.red()/255.,c.green()/255.,c.blue()/255.);}
+		void saveSnapshot(string filename) {GLV; glv->nextFrameSnapshotFilename = filename;}
 		#undef GLV
 		#undef VEC_GET_SET
 		#undef BOOL_GET_SET
@@ -93,10 +96,11 @@ BOOST_PYTHON_MODULE(_GLViewer){
 		.def("fitSphere",&pyGLViewer::fitSphere,(py::arg("center"),py::arg("radius")),"Adjust scene bounds so that sphere given by *center* and *radius* fits in.")
 		.def("showEntireScene",&pyGLViewer::showEntireScene)
 		.def("center",&pyGLViewer::center,(py::arg("median")=true),"Center view. View is centered either so that all bodies fit inside (*median* = False), or so that 75\% of bodies fit inside (*median* = True).")
-		.def("saveState",&pyGLViewer::saveDisplayParameters,(py::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderer`.")
-		.def("loadState",&pyGLViewer::useDisplayParameters,(py::arg("slot")),"Load display parameters from slot saved previously into, identified by its number.")
+		.def("saveState",&pyGLViewer::saveState,(py::arg("stateFilename")=".qglviewer.xml"),"Save display parameters into a file. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderer`.")
+		.def("loadState",&pyGLViewer::loadState,(py::arg("stateFilename")=".qglviewer.xml"),"Load display parameters from file saved previously into.")
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
 		.def("close",&pyGLViewer::close)
+		.def("saveSnapshot",&pyGLViewer::saveSnapshot,(py::arg("filename")),"Save the current view to image file")
 		.add_property("selection",&pyGLViewer::get_selection,&pyGLViewer::set_selection)
 		;
 }

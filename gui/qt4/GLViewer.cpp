@@ -83,7 +83,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_Y,"Show the yx [shift: yz] (up-right) plane (clip plane: align normal with +y)");
 	setKeyDescription(Qt::Key_Z,"Show the zy [shift: zx] (up-right) plane (clip plane: align normal with +z)");
 	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
-	setKeyDescription(Qt::Key_S & Qt::AltModifier,"Save QGLViewer state to /tmp/qglviewerState.xml");
+	setKeyDescription(Qt::Key_S,"Save QGLViewer state to /tmp/qglviewerState.xml");
 	setKeyDescription(Qt::Key_T,"Switch orthographic / perspective camera");
 	setKeyDescription(Qt::Key_O,"Set narrower field of view");
 	setKeyDescription(Qt::Key_P,"Set wider field of view");
@@ -136,7 +136,7 @@ string GLViewer::getState(){
 	QString origStateFileName=stateFileName();
 	string tmpFile=Omega::instance().tmpFilename();
 	setStateFileName(QString(tmpFile.c_str())); saveStateToFile(); setStateFileName(origStateFileName);
-	LOG_DEBUG("State saved to temp file "<<tmpFile);
+	LOG_WARN("State saved to temp file "<<tmpFile);
 	// read tmp file contents and return it as string
 	// this will replace all whitespace by space (nowlines will disappear, which is what we want)
 	ifstream in(tmpFile.c_str()); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
@@ -149,7 +149,7 @@ void GLViewer::setState(string state){
 	std::ofstream out(tmpFile.c_str());
 	if(!out.good()){ LOG_ERROR("Error opening temp file `"<<tmpFile<<"', loading aborted."); return; }
 	out<<state; out.close();
-	LOG_DEBUG("Will load state from temp file "<<tmpFile);
+	LOG_WARN("Will load state from temp file "<<tmpFile);
 	QString origStateFileName=stateFileName(); setStateFileName(QString(tmpFile.c_str())); restoreStateFromFile(); setStateFileName(origStateFileName);
 	boost::filesystem::remove(boost::filesystem::path(tmpFile));
 }
@@ -238,6 +238,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if(e->key()==Qt::Key_S){
 		LOG_INFO("Saving QGLViewer state to /tmp/qglviewerState.xml");
 		setStateFileName("/tmp/qglviewerState.xml"); saveStateToFile(); setStateFileName(QString::null);
+	}
+	else if(e->key()==Qt::Key_L){
+		LOG_INFO("Loading QGLViewer state from /tmp/qglviewerState.xml");
+		setStateFileName("/tmp/qglviewerState.xml"); restoreStateFromFile(); setStateFileName(QString::null);
 	}
 	else if(e->key()==Qt::Key_X || e->key()==Qt::Key_Y || e->key()==Qt::Key_Z){
 		int axisIdx=(e->key()==Qt::Key_X?0:(e->key()==Qt::Key_Y?1:2));
