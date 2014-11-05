@@ -49,15 +49,16 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      phys->isCohesive =0;
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
-	      return true;
+	      return true; // do we need this? -> yes if it ends the loop (avoid the following calculations)
 	      }
-	  }
-	  else { 
+	  } else { 
 	    D = phys->initD - std::abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); 
-	    }
+	  }
 	} else { 
 	  D = geom->penetrationDepth - phys->initD; 
 	}
+	
+	phys->crackJointAperture = D<0? -D : 0.; // for DFNFlow
 
 	/* Determination of interaction */
 	if (D < 0) { //spheres do not touch 
@@ -69,7 +70,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      phys->isCohesive =0;
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
-	      return true;
+	      return true; // do we need this? not sure -> yes, it ends the loop (avoid the following calculations)
 	    }
 	  }
 	  
@@ -94,20 +95,18 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    cracksFileExist=true;
 	    /// Timos
 	    if (!neverErase) return false; 
-	    else 
-	    {
+	    else {
 	      phys->shearForce = Vector3r::Zero();
 	      phys->normalForce = Vector3r::Zero();
 	      phys->isCohesive =0;
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
-	      phys->interactionIsCracked = 1;
+	      phys->isBroken = true;
+	      return true; // do we need this? not sure -> yes, it ends the loop (avoid the following calculations)
 	    }
-	    return true;
+// 	    return true; // do we need this? no
 	  }
 	}
-// 	phys->crackJointAperture = D;
-	phys->crackJointAperture = -D;
 	
 	/* NormalForce */
 	Real Fn = 0;
@@ -167,20 +166,21 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    }
 	    cracksFileExist=true;
 	    
-	    // delete contact if in tension, set the contact properties to friction if in compression
-	    if ( D < 0 ) { 
+	    // set the contact properties to friction if in compression, delete contact if in tension
+	    phys->isBroken = true;
+	    phys->isCohesive = 0;
+	    phys->FnMax = 0;
+	    phys->FsMax = 0;
+// 	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep?
+	    if ( D < 0 ) { // spheres do not touch
 	      if (!neverErase) return false;
-	      else 
-	      {
+	      else {
 		phys->shearForce = Vector3r::Zero();
 		phys->normalForce = Vector3r::Zero();
-		phys->isCohesive =0;
-		phys->FnMax = 0;
-		phys->FsMax = 0;
-		phys->interactionIsCracked=1;
-		return true;
+		return true; // do we need this? not sure -> yes, it ends the loop (avoid the following calculations)
 	      }
 	    }
+// 	    return true; // do we need this one? no
 	  }
 	}
 	

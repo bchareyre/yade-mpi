@@ -29,14 +29,12 @@ class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 	DFNCellInfo() : crack(false)  {}
 };
 
-
 class DFNVertexInfo : public FlowVertexInfo_DFNFlowEngineT {
 	public:
 	//same here if needed
 };
 
 typedef CGT::_Tesselation<CGT::TriangulationTypes<DFNVertexInfo,DFNCellInfo> > DFNTesselation;
-
 #ifdef LINSOLV
 class DFNBoundingSphere : public CGT::FlowBoundingSphereLinSolv<DFNTesselation>
 #else
@@ -44,10 +42,8 @@ class DFNBoundingSphere : public CGT::FlowBoundingSphere<DFNTesselation>
 #endif
 {
 public:
-  
   void saveVtk(const char* folder)
   {
-//     CGT::FlowBoundingSphere<DFNTesselation>::saveVtk(folder)
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[80];
@@ -64,7 +60,8 @@ public:
 	}
 	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                 if (!v->info().isReal()) vtkInfiniteVertices+=1;
-                else if (firstReal==-1) firstReal=vtkInfiniteVertices;}
+                else if (firstReal==-1) firstReal=vtkInfiniteVertices;
+	}
 
         basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-vtkInfiniteVertices, (unsigned int) Tri.number_of_finite_cells()-vtkInfiniteCells);
 
@@ -111,9 +108,8 @@ public:
 		if (isDrawable){vtkfile.write_data(cell->info().averageVelocity()[0],cell->info().averageVelocity()[1],cell->info().averageVelocity()[2]);}
 	}
 	vtkfile.end_data();}
-// 	/// Check this one, cell info()->cracked not defined yet
+	
 	if(1){
-// // 	trickPermeability();
 	vtkfile.begin_data("fracturedCells",CELL_DATA,SCALARS,FLOAT);
 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
@@ -121,14 +117,11 @@ public:
 	}
 	vtkfile.end_data();}
   }
-  // e.g. vtk recorders
 };
-
 
 typedef TemplateFlowEngine_DFNFlowEngineT<DFNCellInfo,DFNVertexInfo, DFNTesselation,DFNBoundingSphere> DFNFlowEngineT;
 REGISTER_SERIALIZABLE(DFNFlowEngineT);
 YADE_PLUGIN((DFNFlowEngineT));
-
 class DFNFlowEngine : public DFNFlowEngineT
 {
 	public :
@@ -140,9 +133,8 @@ class DFNFlowEngine : public DFNFlowEngineT
 	Real totalFracureArea; /// Trying to get fracture's surface
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"This is an enhancement of the FlowEngine for intact and fractured rocks that takes into acount pre-existing discontinuities and bond breakage between particles. The local conductivity around the broken link is calculated according to parallel plates model",
-	((Real, myNewAttribute, 0,,"useless example, Input values to be implemented: newCrackResidualPermeability, jointResidualPermeability, crackOpeningFactor"))
+	((Real, jointResidual, 0,,"calibration parameter for residual aperture of joints"))
 	((bool, updatePositions, false,,"update particles positions when rebuilding the mesh (experimental)"))
-	((Real, jointResidual, 0,,"Calibration parameter for residual aperture of joints"))
  	((bool, printFractureTotalArea, 0,,"The final fracture area computed through the network")) /// Trying to get fracture's surface
 	,
 	,
@@ -154,6 +146,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 };
 REGISTER_SERIALIZABLE(DFNFlowEngine);
 YADE_PLUGIN((DFNFlowEngine));
+
 //In this version, we never update positions when !updatePositions, i.e. keep triangulating the same positions
 void DFNFlowEngine::setPositionsBuffer(bool current)
 {
@@ -174,14 +167,13 @@ void DFNFlowEngine::setPositionsBuffer(bool current)
 	}
 }
 
-void DFNFlowEngine::trickPermeability (RTriangulation::Facet_circulator& facet, Real aperture, Real residualAperture)
+void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, Real aperture, Real residualAperture)
 {
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
 	const CellHandle& cell1 = facet->first;
 	const CellHandle& cell2 = facet->first->neighbor(facet->second);
 	if ( Tri.is_infinite(cell1) || Tri.is_infinite(cell2)) cerr<<"Infinite cell found in trickPermeability, should be handled somehow, maybe"<<endl;
-	cell1->info().kNorm()[facet->second] =pow((aperture+residualAperture),3) / (12 * viscosity);
-	cell2->info().kNorm()[Tri.mirror_index(cell1, facet->second)] =pow((aperture+residualAperture),3) / (12 * viscosity);
+	cell1->info().kNorm()[facet->second]=cell2->info().kNorm()[Tri.mirror_index(cell1, facet->second)] = pow((aperture+residualAperture),3)/(12*viscosity);
 	//For vtk recorder:
 	cell1->info().crack= 1;
 	cell2->info().crack= 1;
@@ -207,12 +199,9 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Finite_edges_iterator& edg
 // 	double edgeArea = solver->T[solver->currentTes].computeVFacetArea(edge); cout<<"edge area="<<edgeArea<<endl;
 }
 
-
 void DFNFlowEngine::trickPermeability()
 {
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-	//We want to change permeability perpendicular to the 10th edge, let's say.
-	//in the end this function should have a loop on all edges I guess
 	const JCFpmPhys* jcfpmphys;
 	const shared_ptr<InteractionContainer> interactions = scene->interactions;
 	int numberOfCrackedOrJoinedInteractions = 0; /// DEBUG
@@ -223,25 +212,33 @@ void DFNFlowEngine::trickPermeability()
 // 	const ScGeom* geom; // = static_cast<ScGeom*>(ig.get());
 	FiniteEdgesIterator edge = Tri.finite_edges_begin();
 	for( ; edge!= Tri.finite_edges_end(); ++edge) {
+	  
 		const VertexInfo& vi1=(edge->first)->vertex(edge->second)->info();
 		const VertexInfo& vi2=(edge->first)->vertex(edge->third)->info();
 		const shared_ptr<Interaction>& interaction=interactions->find( vi1.id(),vi2.id() );
-		if (interaction && interaction->isReal()) {  
-			numberOfCrackedOrJoinedInteractions +=1; /// DEBUG
+		
+		if (interaction && interaction->isReal()) {
 			
 			jcfpmphys = YADE_CAST<JCFpmPhys*>(interaction->phys.get());
-// 			if ( (jcfpmphys->interactionIsCracked || jcfpmphys->isOnJoint) ) {Real aperture=jcfpmphys->dilation; Real residualAperture = jcfpmphys->isOnJoint? jointResidual : 0; trickPermeability(edge,aperture, residualAperture);};
-// 			if ( (jcfpmphys->interactionIsCracked || jcfpmphys->isOnJoint) ) {Real aperture=(geom->penetrationDepth - jcfpmphys->initD); Real residualAperture = jcfpmphys->isOnJoint? jointResidual : 0; trickPermeability(edge,aperture, residualAperture);};
-			if ( (jcfpmphys->interactionIsCracked || jcfpmphys->isOnJoint) ) {
-			  Real residualAperture = jcfpmphys->isOnJoint? jointResidual : 1e-5;
-// 			  Real aperture = jcfpmphys->crackJointAperture;
-// 			  Real aperture = jcfpmphys->crackJointAperture > 0? jcfpmphys->crackJointAperture : 0.0000000001;
-			  Real aperture = (jcfpmphys->crackJointAperture + residualAperture) > 1e-4? jcfpmphys->crackJointAperture : 1e-4 ;
-// 			  cout<<"crackJointperture = " << aperture <<endl;
-// 			  cout<<"initial Aperture = " << residualAperture <<endl;
-			  SumOfApertures += aperture; /// DEBUG
-			  trickPermeability(edge,aperture, residualAperture);};
-			  // TEST LUC PULL COMMIT 
+			
+			if ( jcfpmphys->isOnJoint || jcfpmphys->isBroken ) {
+				
+				numberOfCrackedOrJoinedInteractions +=1;
+				
+				// here are some workarounds
+// 				Real residualAperture = jcfpmphys->isOnJoint? jointResidual : 0.1*jointResidual;
+				Real residualAperture = jcfpmphys->isOnJoint? jointResidual : 0.; // do we define a residual aperture for induced cracks?
+// 				Real residualAperture = jointResidual;
+// 				cout<<"residual aperture = " << residualAperture <<endl;
+				
+				Real aperture = jcfpmphys->crackJointAperture;
+// 				cout<<"aperture = " << aperture <<endl;
+
+				SumOfApertures += aperture;
+				trickPermeability(edge, aperture, residualAperture);
+// 				trickPermeability(edge, jcfpmphys->crackJointAperture, residualAperture); // we should be able to use this line
+				
+			};	
 		}
 	}
 	AverageAperture = SumOfApertures/numberOfCrackedOrJoinedInteractions; /// DEBUG

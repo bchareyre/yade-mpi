@@ -68,7 +68,7 @@ class JCFpmPhys: public NormShearPhys {
 			((Real,jointCumulativeSliding,0,,"sliding distance for particles interacting on a joint. Used, when :yref:`<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint>` is true, to take into account dilatancy due to shearing. [-]"))
 			((Real,tanDilationAngle,0,,"tangent of the angle defining the dilatancy of the joint surface (auto. computed from :yref:`JCFpmMat.jointDilationAngle`). [-]"))
 			((Real,dilation,0,,"defines the normal displacement in the joint after sliding treshold. [m]"))
-			((bool,interactionIsCracked,0,,"flag for cracked interactions"))
+			((bool,isBroken,false,,"flag for broken interactions"))
 			((Real,crackJointAperture,0,,"Relative displacement between 2 spheres (in case of a crack it is equivalent of the crack aperture)"))
 			,
 			createIndex();
