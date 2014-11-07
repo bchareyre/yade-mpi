@@ -13,7 +13,7 @@
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
-// #define DFNFLOW
+#define DFNFLOW
 
 #ifdef DFNFLOW
 #include "FlowEngine_DFNFlowEngineT.hpp"
@@ -230,6 +230,8 @@ void DFNFlowEngine::trickPermeability()
 				Real residualAperture = jcfpmphys->isOnJoint? jointResidual : 0.; // do we define a residual aperture for induced cracks?
 // 				Real residualAperture = jointResidual;
 // 				cout<<"residual aperture = " << residualAperture <<endl;
+				
+				if (!jcfpmphys->isOnJoint && jcfpmphys->crackJointAperture<=0) continue; // avoid trick permeability for closed induced crack (permeability=matrix permeability)
 				
 				Real aperture = jcfpmphys->crackJointAperture;
 // 				cout<<"aperture = " << aperture <<endl;
