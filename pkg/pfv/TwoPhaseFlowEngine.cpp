@@ -49,17 +49,25 @@ double TwoPhaseFlowEngine:: computePoreSatAtInterface(int ID)
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
       if(cell->info().id == ID){
     
-    double qout = 0.0, Vw = 0.0;
+    double qout = 0.0, Vw = 0.0, dt = 0.0;
     
     for(unsigned int ngb = 0; ngb < 4; ngb++)
     {
       //find out/influx of water
-       if(cell->neighbor(ngb)->info().isWRes){
+       if((cell->neighbor(ngb)->info().isWRes) && (cell->neighbor(ngb)->info().isFictious == 0)){
 	qout= qout + std::abs(cell->info().kNorm() [ngb])*(cell->info().p()-cell->neighbor ( ngb )->info().p()); 
        }
     }
    
-    Vw = (cell->info().saturation * cell->info().poreBodyVolume) - (qout * scene->dt);  
+    Vw = (cell->info().saturation * cell->info().poreBodyVolume) - (qout * scene->dt); 
+    
+    //Functionality to calculate the smallest time step
+    if((1e-16 < Vw) && (Vw < 1e16)){
+      if((1e-16 < qout) && (qout < 1e16)){
+	dt = (Vw / qout);
+	if(dt!=0.0){dtDynTPF = std::min(dt,dtDynTPF);}
+      }
+    }
     cell->info().saturation = Vw / cell->info().poreBodyVolume;
    
    
@@ -76,6 +84,7 @@ double TwoPhaseFlowEngine:: computePoreSatAtInterface(int ID)
       }  
 }
 }
+
 
 void TwoPhaseFlowEngine:: computePoreCapillaryPressure(CellHandle cell)
 {

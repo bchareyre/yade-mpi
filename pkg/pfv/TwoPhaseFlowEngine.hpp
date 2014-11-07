@@ -119,7 +119,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((bool,initialWetting,true,,"Initial wetting saturated (=true) or non-wetting saturated (=false)"))
 	((bool, isPhaseTrapped,true,,"If True, both phases can be entrapped by the other, which would correspond to snap-off. If false, both phases are always connected to their reservoirs, thus no snap-off."))
 	((bool, drainageFirst, true,,"If true, activate drainage first (initial saturated), then imbibition; if false, activate imbibition first (initial unsaturated), then drainage."))
-
+	((double,dtDynTPF,0.0,,"Parameter which stores the smallest time step, based on the residence time"))
 
 	,/*TwoPhaseFlowEngineT()*/,
 	,
