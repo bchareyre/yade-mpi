@@ -118,7 +118,7 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1,attrs=[]):
 	outFile.close()
 	return len(bodies)
   
-#textExt===============================================================
+#textClumps===============================================================
 def textClumps(filename, format='x_y_z_r_clumpId', comment='',mask=-1):
 	"""Save clumps-members into a text file. Non-clumps members are bodies are silently skipped.
 
@@ -162,6 +162,48 @@ def textClumps(filename, format='x_y_z_r_clumpId', comment='',mask=-1):
 	out.write(output)
 	out.close()
 	return countClumps,count
+
+#textPolyhedra===============================================================
+def textPolyhedra(fileName, comment='',mask=-1, explanationComment=True):
+	"""Save polyhedra into a text file. Non-polyhedra bodies are silently skipped.
+
+	:param string filename: the name of the output file
+	:param string comment: the text, which will be added as a comment at the top of file. If you want to create several lines of text, please use '\\\\n#' for next lines.
+	:param int mask: export only polyhedra with the corresponding mask
+	:param str explanationComment: inclde explanation of format to the beginning of file
+	:return: number of polyhedra which were written.
+	:rtype: int
+	"""
+	count = 0
+	f = open(fileName,'w')
+	f.writelines('# %s\n'%l for l in [
+		'YADE export of polyhedra.',
+		'Each polyhedron export contains first line with id, nuber of vertices and number of surfaces.',
+		'x,y,z coordinates of each vertex follows (each vertex on separate line).',
+		'ids if vertices of individual surfaces follows (numbering from 0, each surface on separate line).',
+		'',
+		'Example of tetrahedron and cube with random ids:',
+		'23 4 4',
+		'0.1 0.2 0.3','1.3 0.1 -0.1','-0.2 1.2 0','0 -0.1 1.5',
+		'0 2 1','0 3 2','0 1 3','1 2 3',
+		'65 8 6',
+		'4 0 0','5 0 0','4 1 0','5 1 0','4 0 1','5 0 1','4 1 1','5 1 1',
+		'0 2 3 1','0 1 5 4','1 3 7 5','3 2 6 7','2 0 4 6','4 5 7 6',
+		'',
+	])
+	if comment:
+		f.write('#\n# %s\n'%comment)
+	for b in O.bodies:
+		if not isinstance(b.shape,Polyhedra) or not mask & b.mask:
+			continue
+		count += 1
+		vertices = [b.state.pos + b.state.ori*v for v in b.shape.v]
+		surfaces = b.shape.GetSurfaces()
+		f.write('%d %d %d\n'%(b.id,len(vertices),len(surfaces)))
+		f.writelines('%.8e %.8e %.8e\n'%(v[0],v[1],v[2]) for v in vertices)
+		f.writelines(' '.join(str(i) for i in surface)+'\n' for surface in surfaces)
+	f.close()
+	return count
 
 #VTKWriter===============================================================
 class VTKWriter:

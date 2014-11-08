@@ -160,7 +160,8 @@ class PolyhedraMat: public FrictMat{
 	virtual ~PolyhedraMat(){};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraMat,FrictMat,"Elastic material with Coulomb friction.",
 		((bool,IsSplitable,0,,"To be splitted ... or not"))
-		((Real,strength,100,,"Stress at whis polyhedra of volume 4/3*pi [mm] breaks.")),
+		((Real,strength,100,,"Stress at which polyhedra of volume 4/3*pi [mm] breaks."))
+		((Real,young,1e8,,"TODO")),
 		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(PolyhedraMat,FrictMat);
