@@ -10,8 +10,6 @@
 #  CGAL_LIBRARIES: the libraries needed to use CGAL
 #  CGAL_FOUND: if false, do not try to use CGAL
 
-SET(CGAL_DEFINITIONS -frounding-math)
-
 IF(CGAL_INCLUDE_DIR AND CGAL_LIBRARIES)
     SET(CGAL_FOUND TRUE)
 ELSE(CGAL_INCLUDE_DIR AND CGAL_LIBRARIES)
