@@ -5,6 +5,8 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_CGAL
+
 #pragma once
 #include<core/GlobalEngine.hpp>
 #include<pkg/common/Sphere.hpp>
@@ -137,3 +139,5 @@ public:
 };
 REGISTER_SERIALIZABLE(TesselationWrapper);
 //} // namespace CGT
+
+#endif /* YADE_CGAL */
