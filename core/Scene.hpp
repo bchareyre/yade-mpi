@@ -32,14 +32,6 @@ class Bound;
 	class OpenGLRenderer;
 #endif
 
-#ifdef YADE_LIQMIGRATION
-struct intReal {
-	public:
-		id_t id;
-		Real Vol;
-};
-#endif
-
 class Scene: public Serializable{
 	public:
 		//! Adds material to Scene::materials. It also sets id of the material accordingly and returns it.
@@ -71,8 +63,8 @@ class Scene: public Serializable{
 		shared_ptr<Engine> engineByName(const string& s);
 
 		#ifdef YADE_LIQMIGRATION
-			OpenMPVector<Interaction* > addIntrs;    //Array of added interactions, needed for liquid migration.
-			OpenMPVector<intReal > delIntrs;     //Array of deleted interactions, needed for liquid migration.
+			OpenMPVector<Interaction* > addIntrs;             //Array of added interactions, needed for liquid migration.
+			OpenMPVector<std::pair<id_t, Real > > delIntrs;   //Array of deleted interactions, needed for liquid migration.
 		#endif
 
 		#ifdef YADE_OPENGL

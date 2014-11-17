@@ -122,8 +122,8 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
           phys.Vf1 = phys.Vb/2.0;
           phys.Vf2 = phys.Vb/2.0;
         }
-        const intReal B1={id1, phys.Vf1};
-        const intReal B2={id2, phys.Vf2};
+        const std::pair<id_t, Real > B1 = {id1, phys.Vf1};
+        const std::pair<id_t, Real > B2 = {id2, phys.Vf2};
         scene->delIntrs.push_back(B1);
         scene->delIntrs.push_back(B2);
       #endif
@@ -375,10 +375,10 @@ void LiqControl::action(){
   
   // Update volume water at each deleted interaction for each body
   for (unsigned int i=0; i<scene->delIntrs.size(); i++) {
-    shared_ptr<Body> b = Body::byId(scene->delIntrs[i].id,scene);
-    b->state->Vf += scene->delIntrs[i].Vol;
-    addBodyMapInt(bodyNeedUpdate, scene->delIntrs[i].id);
-    liqVolRup += scene->delIntrs[i].Vol;
+    shared_ptr<Body> b = Body::byId(scene->delIntrs[i].first,scene);
+    b->state->Vf += scene->delIntrs[i].second;
+    addBodyMapInt(bodyNeedUpdate, scene->delIntrs[i].first);
+    liqVolRup += scene->delIntrs[i].second;
   }
   scene->delIntrs.clear();
   
