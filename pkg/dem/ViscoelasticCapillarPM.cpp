@@ -376,7 +376,7 @@ void LiqControl::action(){
   // Update volume water at each deleted interaction for each body
   for (unsigned int i=0; i<scene->delIntrs.size(); i++) {
     shared_ptr<Body> b = Body::byId(scene->delIntrs[i].id,scene);
-    b->Vf += scene->delIntrs[i].Vol;
+    b->state->Vf += scene->delIntrs[i].Vol;
     addBodyMapInt(bodyNeedUpdate, scene->delIntrs[i].id);
     liqVolRup += scene->delIntrs[i].Vol;
   }
@@ -405,8 +405,8 @@ void LiqControl::action(){
       Real Vf1 = 0.0;
       Real Vf2 = 0.0;
       
-      if ((b1->Vmin)<b1->Vf) { Vf1 = (b1->Vf - b1->Vmin)/bI[id1]; }
-      if ((b2->Vmin)<b2->Vf) { Vf2 = (b2->Vf - b2->Vmin)/bI[id2]; }
+      if ((b1->state->Vmin)<b1->state->Vf) { Vf1 = (b1->state->Vf - b1->state->Vmin)/bI[id1]; }
+      if ((b2->state->Vmin)<b2->state->Vf) { Vf2 = (b2->state->Vf - b2->state->Vmin)/bI[id2]; }
       
       Real Vrup = Vf1+Vf2;
       
@@ -435,7 +435,7 @@ void LiqControl::action(){
   
   // Update water volume in body
   for (mapBodyReal::const_iterator it = bodyUpdateLiquid.begin(); it != bodyUpdateLiquid.end(); ++it) {
-    Body::byId(it->first)->Vf += it->second;
+    Body::byId(it->first)->state->Vf += it->second;
   }
   
   // Update contacts around body
@@ -445,11 +445,11 @@ void LiqControl::action(){
 }
 
 void LiqControl::updateLiquid(shared_ptr<Body> b){
-  if (b->Vf<=b->Vmin) {
+  if (b->state->Vf<=b->state->Vmin) {
     return;
   } else {
     // How much liquid can body share
-    const Real LiqCanBeShared = b->Vf - b->Vmin;
+    const Real LiqCanBeShared = b->state->Vf - b->state->Vmin;
     
     // Check how much liquid can accept contacts 
     Real LiqContactsAccept = 0.0;
@@ -467,11 +467,11 @@ void LiqControl::updateLiquid(shared_ptr<Body> b){
       //There are some contacts, which can be filled
       Real FillLevel = 0.0;
       if (LiqContactsAccept > LiqCanBeShared) {   // Share all available liquid from body to contacts
-        const Real LiquidWillBeShared = b->Vf - b->Vmin;
-        b->Vf = b->Vmin;
+        const Real LiquidWillBeShared = b->state->Vf - b->state->Vmin;
+        b->state->Vf = b->state->Vmin;
         FillLevel = LiquidWillBeShared/LiqContactsAccept;
       } else {                                    // Not all available liquid from body can be shared
-        b->Vf -= LiqContactsAccept;
+        b->state->Vf -= LiqContactsAccept;
         FillLevel = 1.0;
       }
       
@@ -567,8 +567,8 @@ Real LiqControl::liqVolBody (id_t id) const {
   Scene* scene=Omega::instance().getScene().get();
   const BodyContainer& bodies = *scene->bodies;
   if (id >=0 and bodies[id]) {
-    if (bodies[id]->Vf > 0) {
-      return bodies[id]->Vf + liqVolIterBody(bodies[id]);
+    if (bodies[id]->state->Vf > 0) {
+      return bodies[id]->state->Vf + liqVolIterBody(bodies[id]);
     } else {
       return liqVolIterBody(bodies[id]);
     }
@@ -582,7 +582,7 @@ Real LiqControl::totalLiqVol(int mask=0) const{
   FOREACH(const shared_ptr<Body>& b, *scene->bodies){
     if((mask>0 && (b->groupMask & mask)==0) or (!b)) continue;
     totalLiqVol += liqVolIterBody(b);
-    if (b->Vf > 0) {totalLiqVol +=b->Vf;}
+    if (b->state->Vf > 0) {totalLiqVol +=b->state->Vf;}
   }
   return totalLiqVol;
 }

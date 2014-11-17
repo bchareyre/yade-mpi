@@ -67,6 +67,10 @@ class State: public Serializable, public Indexable{
 		((Real,rho0,-1.0,, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)
 		((Real,press,0.0,, "Pressure (only for SPH-model)"))             // [Mueller2003], (12)
 #endif
+#ifdef YADE_LIQMIGRATION
+		((Real,Vf, 0.0,,   "Individual amount of liquid"))
+		((Real,Vmin, 0.0,, "Minimal amount of liquid"))
+#endif
 		,
 		/* additional initializers */
 			((pos,se3.position))

@@ -32,20 +32,20 @@ id5 = O.bodies.append(sphere(center=[(r1+r2)*d*2,(r1+r2)*d,0],  radius=r2,materi
 Vf = 0.0e-1
 Vfmin = 0.0e-1
 
-O.bodies[id1].Vf = Vf
-O.bodies[id1].Vmin = Vfmin
+O.bodies[id1].state.Vf = Vf
+O.bodies[id1].state.Vmin = Vfmin
 
-O.bodies[id2].Vf = Vf
-O.bodies[id2].Vmin = Vfmin
+O.bodies[id2].state.Vf = Vf
+O.bodies[id2].state.Vmin = Vfmin
 
-O.bodies[id3].Vf = Vf
-O.bodies[id3].Vmin = Vfmin
+O.bodies[id3].state.Vf = Vf
+O.bodies[id3].state.Vmin = Vfmin
 
-O.bodies[id4].Vf = Vf
-O.bodies[id4].Vmin = Vfmin
+O.bodies[id4].state.Vf = Vf
+O.bodies[id4].state.Vmin = Vfmin
 
-O.bodies[id5].Vf = Vf
-O.bodies[id5].Vmin = Vfmin
+O.bodies[id5].state.Vf = Vf
+O.bodies[id5].state.Vmin = Vfmin
 
 vel = 0.0
 O.bodies[id1].state.vel=[0,0,vel]
@@ -69,11 +69,11 @@ o.engines = [
 
 def showData():
   print "Step %d"%O.iter
-  print "idB=%d, Vf=%s, Vmin=%s;"%(id1, O.bodies[id1].Vf, O.bodies[id1].Vmin)
-  print "idB=%d, Vf=%s, Vmin=%s;"%(id2, O.bodies[id2].Vf, O.bodies[id2].Vmin)
-  print "idB=%d, Vf=%s, Vmin=%s;"%(id3, O.bodies[id3].Vf, O.bodies[id3].Vmin)
-  print "idB=%d, Vf=%s, Vmin=%s;"%(id4, O.bodies[id4].Vf, O.bodies[id4].Vmin)
-  print "idB=%d, Vf=%s, Vmin=%s;"%(id5, O.bodies[id5].Vf, O.bodies[id5].Vmin)
+  print "idB=%d, Vf=%s, Vmin=%s;"%(id1, O.bodies[id1].state.Vf, O.bodies[id1].state.Vmin)
+  print "idB=%d, Vf=%s, Vmin=%s;"%(id2, O.bodies[id2].state.Vf, O.bodies[id2].state.Vmin)
+  print "idB=%d, Vf=%s, Vmin=%s;"%(id3, O.bodies[id3].state.Vf, O.bodies[id3].state.Vmin)
+  print "idB=%d, Vf=%s, Vmin=%s;"%(id4, O.bodies[id4].state.Vf, O.bodies[id4].state.Vmin)
+  print "idB=%d, Vf=%s, Vmin=%s;"%(id5, O.bodies[id5].state.Vf, O.bodies[id5].state.Vmin)
   
   try:
     print "Interaction[1, 2].Vb=%s"%(O.interactions[id1,id2].phys.Vb)
@@ -102,8 +102,8 @@ showData()
 O.run(1, True)
 
 for i in range(5):
-  O.bodies[i].Vf = 0
-  O.bodies[i].Vmin = 0
+  O.bodies[i].state.Vf = 0
+  O.bodies[i].state.Vmin = 0
 
 O.interactions[id1,id2].phys.Vmax = 5.0
 lqc.addLiqInter(id1, id2, 1.0)

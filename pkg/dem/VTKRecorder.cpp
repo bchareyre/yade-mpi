@@ -600,10 +600,10 @@ void VTKRecorder::action(){
 #endif
 #ifdef YADE_LIQMIGRATION
 				if (recActive[REC_LIQ]) {
-					spheresLiqVol->InsertNextValue(b->Vf);
+					spheresLiqVol->InsertNextValue(b->state->Vf);
 					const Real tmpVolIter = liqVolIterBody(b);
 					spheresLiqVolIter->InsertNextValue(tmpVolIter);
-					spheresLiqVolTotal->InsertNextValue(tmpVolIter + b->Vf);
+					spheresLiqVolTotal->InsertNextValue(tmpVolIter + b->state->Vf);
 				}
 #endif
 				if (recActive[REC_MATERIALID]) spheresMaterialId->InsertNextValue(b->material->id);

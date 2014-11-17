@@ -95,10 +95,6 @@ class Body: public Serializable{
 		((long,chain,-1,,"Id of chain to which the body belongs."))
 		((long,iterBorn,-1,,"Step number at which the body was added to simulation."))
 		((Real,timeBorn,-1,,"Time at which the body was added to simulation."))
-#ifdef YADE_LIQMIGRATION
-		((Real,Vf, 0.0,,   "Individual amount of liquid"))
-		((Real,Vmin, 0.0,, "Minimal amount of liquid"))
-#endif
 		,
 		/* ctor */,
 		/* py */
