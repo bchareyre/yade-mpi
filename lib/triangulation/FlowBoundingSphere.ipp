@@ -143,7 +143,7 @@ bool FlowBoundingSphere<Tesselation>::isOnSolid  (double X, double Y, double Z)
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::averageFluidVelocity()
 {
-	if (noCache && T[!currentTes].Max_id()<=0) return 0;
+	if (noCache && T[!currentTes].Max_id()<=0) return;
 	averageRelativeCellVelocity();
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	int numVertex = 0;
