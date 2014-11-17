@@ -31,14 +31,14 @@ if ('LIQMIGRATION' in features):
   id2 = O.bodies.append(sphere(center=[0,0,-(r1+r2)*d],radius=r2,material=mat1,fixed=True, color=[0,1,0]))
   
   
-  O.bodies[id0].Vf = 0.3e-1
-  O.bodies[id0].Vmin = 0.1e-1
+  O.bodies[id0].state.Vf = 0.3e-1
+  O.bodies[id0].state.Vmin = 0.1e-1
   
-  O.bodies[id1].Vf = 0.4e-1
-  O.bodies[id1].Vmin = 0.1e-1
+  O.bodies[id1].state.Vf = 0.4e-1
+  O.bodies[id1].state.Vmin = 0.1e-1
   
-  O.bodies[id2].Vf = 0.5e-1
-  O.bodies[id2].Vmin = 0.1e-1
+  O.bodies[id2].state.Vf = 0.5e-1
+  O.bodies[id2].state.Vmin = 0.1e-1
   
   vel = -0.15
   O.bodies[id1].state.vel=[0,0,vel]
@@ -59,9 +59,9 @@ if ('LIQMIGRATION' in features):
   
   def showData():
     print "Step %d"%O.iter
-    print "idB=%d, Vf=%s, Vmin=%s;"%(id0, O.bodies[id0].Vf, O.bodies[id0].Vmin)
-    print "idB=%d, Vf=%s, Vmin=%s;"%(id1, O.bodies[id1].Vf, O.bodies[id1].Vmin)
-    print "idB=%d, Vf=%s, Vmin=%s;"%(id2, O.bodies[id2].Vf, O.bodies[id2].Vmin)
+    print "idB=%d, Vf=%s, Vmin=%s;"%(id0, O.bodies[id0].state.Vf, O.bodies[id0].state.Vmin)
+    print "idB=%d, Vf=%s, Vmin=%s;"%(id1, O.bodies[id1].state.Vf, O.bodies[id1].state.Vmin)
+    print "idB=%d, Vf=%s, Vmin=%s;"%(id2, O.bodies[id2].state.Vf, O.bodies[id2].state.Vmin)
     try:
       print "Interaction[%d, %d].Vb=%s"%(id0, id1, O.interactions[id0,id1].phys.Vb)
     except:
@@ -85,9 +85,9 @@ if ('LIQMIGRATION' in features):
   
   switchVel()
   O.run(5, True)
-  if ((abs((O.bodies[id0].Vf - 0.03)/0.03) > tolerance) or 
-      (abs((O.bodies[id1].Vf - 0.04)/0.04) > tolerance) or
-      (abs((O.bodies[id2].Vf - 0.05)/0.05) > tolerance)):
+  if ((abs((O.bodies[id0].state.Vf - 0.03)/0.03) > tolerance) or 
+      (abs((O.bodies[id1].state.Vf - 0.04)/0.04) > tolerance) or
+      (abs((O.bodies[id2].state.Vf - 0.05)/0.05) > tolerance)):
     resultStatus += 1
   
   liqcontrol.particleconserve=False
@@ -95,9 +95,9 @@ if ('LIQMIGRATION' in features):
   O.run(5, True)
   switchVel()
   O.run(5, True)
-  if ((abs((O.bodies[id0].Vf - 0.0465)/0.0465) > tolerance) or 
-      (abs((O.bodies[id1].Vf - 0.0325)/0.0325) > tolerance) or
-      (abs((O.bodies[id2].Vf - 0.041)/0.041) > tolerance)):
+  if ((abs((O.bodies[id0].state.Vf - 0.0465)/0.0465) > tolerance) or 
+      (abs((O.bodies[id1].state.Vf - 0.0325)/0.0325) > tolerance) or
+      (abs((O.bodies[id2].state.Vf - 0.041)/0.041) > tolerance)):
     resultStatus += 1
 else:
   print "This checkLiquidMigration.py cannot be executed because LIQMIGRATION is disables"
