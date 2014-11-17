@@ -10,7 +10,7 @@
 
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else
-//when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
+//when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
 #ifdef TWOPHASEFLOW
 
 class UnsaturatedEngine : public TwoPhaseFlowEngine
