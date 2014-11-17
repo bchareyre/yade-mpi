@@ -1,5 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
+#include <cmath>
 
 /*! Computing convex hull of a 2d cloud of points passed to the constructor,
 	using Graham scan algorithm.
@@ -65,7 +66,7 @@ Real simplePolygonArea2d(vector<Vector2r> P){
 	Real ret=0.; size_t n=P.size();
 	for(size_t i=0; i<n-1; i++) { ret+=P[i][0]*P[i+1][1]-P[i+1][0]*P[i][1];}
 	ret+=P[n-1][0]*P[0][1]-P[0][0]*P[n-1][1];
-	return abs(ret/2.);
+	return std::abs(ret/2.);
 }
 
 

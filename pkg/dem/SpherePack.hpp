@@ -2,7 +2,6 @@
 
 #pragma once
 
-
 #include<lib/base/Logging.hpp>
 #include<lib/base/Math.hpp>
 
@@ -110,11 +109,14 @@ public:
     }
 		FOREACH(Sph& s, pack) s.c=rot*s.c;
 	}
-	void scale(Real scale){ Vector3r mid=midPt(); cellSize*=scale; FOREACH(Sph& s, pack) {s.c=scale*(s.c-mid)+mid; s.r*=abs(scale); } }
-	#if 0
-		void shrinkMaxRelOverlap(Real maxRelOverlap);
-		Real maxRelOverlap();
-	#endif
+	void scale(Real scale){ 
+		Vector3r mid=midPt(); 
+		cellSize*=scale; 
+		FOREACH(Sph& s, pack) {
+			s.c=scale*(s.c-mid)+mid; 
+			s.r*=std::abs(scale); 
+		}
+	}
 
 	// iteration 
 	size_t len() const{ return pack.size(); }
