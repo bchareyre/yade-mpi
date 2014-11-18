@@ -64,12 +64,12 @@ O.engines=[
 	newton
 ]
 
-triax.goal1=triax.goal2=triax.goal3=10000
+triax.goal1=triax.goal2=triax.goal3=-10000
 
 while 1:
   O.run(1000, True)
   unb=unbalancedForce()
-  if unb<0.001 and abs(10000-triax.meanStress)/10000<0.001:
+  if unb<0.001 and abs(-10000-triax.meanStress)/10000<0.001:
     break
 
 setContactFriction(radians(finalFricDegree))
@@ -83,14 +83,14 @@ triax.goal1=triax.goal3=0
 triax.internalCompaction=False
 triax.wall_bottom_activated=False
 #load
-triax.goal2=11000; O.run(2000,1)
+triax.goal2=-11000; O.run(2000,1)
 #unload
-triax.goal2=10000; O.run(2000,1)
+triax.goal2=-10000; O.run(2000,1)
 #load
-triax.goal2=11000; O.run(2000,1)
+triax.goal2=-11000; O.run(2000,1)
 e22=triax.strain[1]
 #unload
-triax.goal2=10000; O.run(2000,1)
+triax.goal2=-10000; O.run(2000,1)
 
 e22=e22-triax.strain[1]
 modulus = 1000./abs(e22)
@@ -120,12 +120,12 @@ flow.bndCondValue=[0,0,0,0,0,0]
 newton.damping=0
 
 #we want the theoretical value from Terzaghi's solution
-#keep in mind that we are not in an homogeneous material and the smal strain
+#keep in mind that we are not in an homogeneous material and the small strain
 #assumption is not verified => we don't expect perfect match
 #there can be also an overshoot of pressure in the very beginning due to dynamic effects
 Cv=permeability*modulus/1e4
 zeroTime=O.time
-zeroe22 = triax.strain[1]
+zeroe22 = - triax.strain[1]
 dryFraction=0.05 #the top layer is affected by drainage on a certain depth, we account for it here
 drye22 = 1000/modulus*dryFraction
 wetHeight=1*(1-dryFraction)
@@ -137,7 +137,7 @@ def consolidation(Tv): #see your soil mechanics handbook...
 		U=U-2/M**2*exp(-M**2*Tv)
 	return U
 
-triax.goal2=11000
+triax.goal2=-11000
 
 
 
@@ -145,8 +145,8 @@ from yade import plot
 
 ## a function saving variables
 def history():
-  	plot.addData(e22=triax.strain[1]-zeroe22,e22_theory=drye22+(1-dryFraction)*consolidation((O.time-zeroTime)*Cv/wetHeight**2)*1000./modulus,t=O.time,p=flow.getPorePressure((0.5,0.1,0.5)),s22=triax.stress(3)[1]-10000)
-  	#plot.addData(e22=triax.strain[1],t=O.time,s22=-triax.stress(2)[1],p=flow.MeasurePorePressure((0.5,0.5,0.5)))
+  	plot.addData(e22=-triax.strain[1]-zeroe22,e22_theory=drye22+(1-dryFraction)*consolidation((O.time-zeroTime)*Cv/wetHeight**2)*1000./modulus,t=O.time,p=flow.getPorePressure((0.5,0.1,0.5)),s22=-triax.stress(3)[1]-10000)
+  	#plot.addData(e22=-triax.strain[1],t=O.time,s22=-triax.stress(2)[1],p=flow.MeasurePorePressure((0.5,0.5,0.5)))
 
 O.engines=O.engines+[PyRunner(iterPeriod=200,command='history()',label='recorder')]
 ##make nice animations:

@@ -109,8 +109,8 @@ class CapillaryTriaxialTest : public FileGenerator
 		((Real,dampingMomentum,0.2,,"Coefficient of Cundal-Non-Viscous damping (applied on on the 3 components of torques)"))
 		((Real,StabilityCriterion,0.01,,"Value of unbalanced force for which the system is considered stable. Used in conditionals to switch between loading stages."))
 		((Real,wallOversizeFactor,1.3,,"Make boundaries larger than the packing to make sure spheres don't go out during deformation."))
-		((Real,sigmaIsoCompaction,50000,,"Confining stress during isotropic compaction."))
-		((Real,sigmaLateralConfinement,50000,,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`CapillaryTriaxialTest::SigmaIsoCompaction`."))
+		((Real,sigmaIsoCompaction,-50000,,"Confining stress during isotropic compaction (< 0 for real - compressive - compaction)."))
+		((Real,sigmaLateralConfinement,-50000,,"Lateral stress during triaxial loading (< 0 for classical compressive cases). An isotropic unloading is performed if the value is not equal to :yref:`CapillaryTriaxialTest::SigmaIsoCompaction`."))
 		
 		((int,timeStepUpdateInterval,50,,"interval for :yref:`GlobalStiffnessTimeStepper`"))
 		((int,timeStepOutputInterval,50,,"interval for outputing general information on the simulation (stress,unbalanced force,...)"))

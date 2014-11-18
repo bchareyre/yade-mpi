@@ -30,8 +30,8 @@ triax=TriaxialCompressionEngine(
 	wall_back_id=wallIds[4],
 	wall_front_id=wallIds[5],
 	internalCompaction=False,
-	sigmaIsoCompaction=50e3,
-	sigmaLateralConfinement=50e3,
+	sigmaIsoCompaction=-50e3,
+	sigmaLateralConfinement=-50e3,
 	max_vel=10,
 	strainRate=0.03,
 	label="triax"
@@ -60,7 +60,7 @@ O.engines=[
 from yade import plot
 O.engines=O.engines[0:5]+[PyRunner(iterPeriod=20,command='history()',label='recorder')]+O.engines[5:7]
 def history():
-  	plot.addData(e11=O.engines[4].strain[0], e22=O.engines[4].strain[1], e33=O.engines[4].strain[2],
+  	plot.addData(e11=-O.engines[4].strain[0], e22=-O.engines[4].strain[1], e33=-O.engines[4].strain[2],
 		    s11=-O.engines[4].stress(0)[0],
 		    s22=-O.engines[4].stress(2)[1],
 		    s33=-O.engines[4].stress(4)[2],

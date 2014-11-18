@@ -32,8 +32,8 @@ triax=TriaxialCompressionEngine(
 	## define the rest of triax params here
 	## see in pkg/dem/PreProcessor/TriaxialTest.cpp:524 etc
 	## which are assigned in the c++ preprocessor actually
-	sigmaIsoCompaction=50e3,
-	sigmaLateralConfinement=50e3,
+	sigmaIsoCompaction=-50e3,
+	sigmaLateralConfinement=-50e3,
 	max_vel=10,
 	strainRate=0.01,
 	label="triax"
@@ -56,7 +56,7 @@ O.engines=[
 from yade import plot
 O.engines=O.engines[0:5]+[PyRunner(iterPeriod=20,command='history()',label='recorder')]+O.engines[5:7]
 def history():
-  	plot.addData(e11=triax.strain[0], e22=triax.strain[1], e33=triax.strain[2],
+  	plot.addData(e11=-triax.strain[0], e22=-triax.strain[1], e33=-triax.strain[2],
 		    s11=-triax.stress(0)[0],
 		    s22=-triax.stress(2)[1],
 		    s33=-triax.stress(4)[2],

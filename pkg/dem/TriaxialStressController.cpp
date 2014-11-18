@@ -75,7 +75,7 @@ void TriaxialStressController::updateStiffness() {
 	}
 }
 
-void TriaxialStressController::controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel)
+void TriaxialStressController::controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel) // controls walls such that Sum Forces from Sample on Wall = resultantForce
 {
 	scene->forces.sync();
 	Real translation=normal[wall].dot(getForce(scene,wall_id[wall])-resultantForce);
@@ -168,31 +168,31 @@ void TriaxialStressController::action()
 	if (!internalCompaction) {
 		Vector3r wallForce (0, goal2*width*depth, 0);
 		if (wall_bottom_activated) {
-			if (stressMask & 2)  controlExternalStress(wall_bottom, -wallForce, p_bottom, max_vel2);
+			if (stressMask & 2)  controlExternalStress(wall_bottom, wallForce, p_bottom, max_vel2);
 			else p_bottom->vel[1] += (-normal[wall_bottom][1]*0.5*goal2*height -p_bottom->vel[1])*(1-strainDamping);
 		} else p_bottom->vel=Vector3r::Zero();
 		if (wall_top_activated) {
-			if (stressMask & 2)  controlExternalStress(wall_top, wallForce, p_top, max_vel2);
+			if (stressMask & 2)  controlExternalStress(wall_top, -wallForce, p_top, max_vel2);
 			else p_top->vel[1] += (-normal[wall_top][1]*0.5*goal2*height -p_top->vel[1])*(1-strainDamping);
 		} else p_top->vel=Vector3r::Zero();
 		
 		wallForce = Vector3r(goal1*height*depth, 0, 0);
 		if (wall_left_activated) {
-			if (stressMask & 1) controlExternalStress(wall_left, -wallForce, p_left, max_vel1);
+			if (stressMask & 1) controlExternalStress(wall_left, wallForce, p_left, max_vel1);
 			else p_left->vel[0] += (-normal[wall_left][0]*0.5*goal1*width -p_left->vel[0])*(1-strainDamping);
 		} else p_left->vel=Vector3r::Zero();
 		if (wall_right_activated) {
-			if (stressMask & 1) controlExternalStress(wall_right, wallForce, p_right, max_vel1);
+			if (stressMask & 1) controlExternalStress(wall_right, -wallForce, p_right, max_vel1);
 			else p_right->vel[0] += (-normal[wall_right][0]*0.5*goal1*width -p_right->vel[0])*(1-strainDamping);
 		} else p_right->vel=Vector3r::Zero();
 
 		wallForce = Vector3r(0, 0, goal3*height*width);
 		if (wall_back_activated) {
-			if (stressMask & 4) controlExternalStress(wall_back, -wallForce, p_back, max_vel3);
+			if (stressMask & 4) controlExternalStress(wall_back, wallForce, p_back, max_vel3);
 			else p_back->vel[2] += (-normal[wall_back][2]*0.5*goal3*depth -p_back->vel[2])*(1-strainDamping);
 		} else p_back->vel=Vector3r::Zero();
 		if (wall_front_activated) {
-			if (stressMask & 4) controlExternalStress(wall_front, wallForce, p_front, max_vel3);
+			if (stressMask & 4) controlExternalStress(wall_front, -wallForce, p_front, max_vel3);
 			else p_front->vel[2] += (-normal[wall_front][2]*0.5*goal3*depth -p_front->vel[2])*(1-strainDamping);
 		} else p_front->vel=Vector3r::Zero();
 	}
@@ -200,14 +200,14 @@ void TriaxialStressController::action()
 	{
 		p_bottom->vel=Vector3r::Zero(); p_top->vel=Vector3r::Zero(); p_left->vel=Vector3r::Zero(); p_right->vel=Vector3r::Zero(); p_back->vel=Vector3r::Zero(); p_front->vel=Vector3r::Zero();
 		if (isARadiusControlIteration) {
-			Real sigma_iso_ = bool(stressMask & 1)*goal1 +  bool(stressMask & 2)*goal2 +  bool(stressMask & 4)*goal3;
+			Real sigma_iso_ = std::abs( bool(stressMask & 1)*goal1 +  bool(stressMask & 2)*goal2 +  bool(stressMask & 4)*goal3 );
 			sigma_iso_ /=  bool(stressMask & 1) +  bool(stressMask & 2) +  bool(stressMask & 4);
-			if (sigma_iso_<=meanStress) maxMultiplier = finalMaxMultiplier;
+			if (sigma_iso_<=std::abs(meanStress)) maxMultiplier = finalMaxMultiplier;
 			if (meanStress==0) previousMultiplier = maxMultiplier;
 			else {
 				//     		previousMultiplier = 1+0.7*(sigma_iso-s)*(previousMultiplier-1.f)/(s-previousStress); // = (Dsigma/apparentModulus)*0.7
 				//     		previousMultiplier = std::max(2-maxMultiplier, std::min(previousMultiplier, maxMultiplier));
-				previousMultiplier = 1.+(sigma_iso_-meanStress)/sigma_iso_*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
+                                previousMultiplier = 1.+(sigma_iso_-std::abs(meanStress))/sigma_iso_*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
 			}
 			previousStress = meanStress;
 			//Real apparentModulus = (s-previousStress)/(previousMultiplier-1.f);
@@ -234,24 +234,24 @@ void TriaxialStressController::computeStressStrain()
 	if (height0 == 0) height0 = height;
 	if (width0 == 0) width0 = width;
 	if (depth0 == 0) depth0 = depth;
-	strain[0] = log(width0/width);
-	strain[1] = log(height0/height);
-	strain[2] = log(depth0/depth);
+	strain[0] = log(width/width0); // all strain values are positiv for extension
+	strain[1] = log(height/height0);
+	strain[2] = log(depth/depth0);
 	volumetricStrain=strain[0]+strain[1]+strain[2];
 
 	Real invXSurface = 1.f/(height*depth);
 	Real invYSurface = 1.f/(width*depth);
 	Real invZSurface = 1.f/(width*height);
 
- 	force[wall_bottom]=getForce(scene,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface;
-	force[wall_top]=   getForce(scene,wall_id[wall_top]);    stress[wall_top]=force[wall_top]*invYSurface;
+ 	force[wall_bottom]=getForce(scene,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface; // all stress values are positiv for tension
+	force[wall_top]=   getForce(scene,wall_id[wall_top]);    stress[wall_top]=-force[wall_top]*invYSurface;
 	force[wall_left]=  getForce(scene,wall_id[wall_left]);   stress[wall_left]=force[wall_left]*invXSurface;
-	force[wall_right]= getForce(scene,wall_id[wall_right]);  stress[wall_right]= force[wall_right]*invXSurface;
-	force[wall_front]= getForce(scene,wall_id[wall_front]);  stress[wall_front]=force[wall_front]*invZSurface;
+	force[wall_right]= getForce(scene,wall_id[wall_right]);  stress[wall_right]= -force[wall_right]*invXSurface;
+	force[wall_front]= getForce(scene,wall_id[wall_front]);  stress[wall_front]=-force[wall_front]*invZSurface;
         force[wall_back]=  getForce(scene,wall_id[wall_back]);   stress[wall_back]= force[wall_back]*invZSurface;
 
-	for (int i=0; i<6; i++) meanStress-=stress[i].dot(normal[i]);
-	meanStress/=6.;
+	for (int i=0; i<6; i++) meanStress+=stress[i].dot(pow(-1.0,i)*normal[i]); // normal[i] is always inwards
+	meanStress/=6.; // ( sXX(xLeft) + sXX(xRight) + sYY(yBottom) + sYY(yTop) + sZZ(zBack) + sZZ(zFront) ) / 6
 }
 
 void TriaxialStressController::controlInternalStress ( Real multiplier )

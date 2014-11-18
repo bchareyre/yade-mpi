@@ -75,7 +75,7 @@ class TriaxialStressController : public BoundaryController
 		Vector3r getStrainRate();
 
 		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
-		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. sigmaIso has to be defined during growing phases."
+		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. All strains and stresses values are considered as positiv for extension."
 		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
    		((unsigned int,stiffnessUpdateInterval,10,,"target strain rate (./s)"))
@@ -103,9 +103,9 @@ class TriaxialStressController : public BoundaryController
 		((Real,width0,0,,"Reference size for strain definition. See :yref:`TriaxialStressController::width`"))
 		((Real,depth0,0,,"Reference size for strain definition. See :yref:`TriaxialStressController::depth`"))
 		
-		((Real,goal1,0,,"prescribed stress/strain rate on axis 1, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,goal2,0,,"prescribed stress/strain rate on axis 2, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
-		((Real,goal3,0,,"prescribed stress/strain rate on axis 3, as defined by :yref:`TriaxialStressController::stressMask` (see also :yref:`TriaxialStressController::isAxisymetric`)"))
+		((Real,goal1,0,,"prescribed stress/strain rate (> 0 in extension) on axis 1, as defined by :yref:`TriaxialStressController::stressMask`"))
+		((Real,goal2,0,,"prescribed stress/strain rate (> 0 in extension) on axis 2, as defined by :yref:`TriaxialStressController::stressMask`"))
+		((Real,goal3,0,,"prescribed stress/strain rate (> 0 in extension) on axis 3, as defined by :yref:`TriaxialStressController::stressMask`"))
 		((unsigned int,stressMask,7,,"Bitmask determining if the components of :yref:`TriaxialStressController::goal` are stress (1) or strain (0). 0 for none, 7 for all, 1 for sigma1, etc."))
 		((Real,maxMultiplier,1.001,,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))
@@ -113,7 +113,7 @@ class TriaxialStressController : public BoundaryController
 		((Real,previousStress,0,Attr::readonly,"|yupdate|"))
 		((Real,previousMultiplier,1,Attr::readonly,"|yupdate|"))
 		((bool,internalCompaction,true,,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
-		((Real,meanStress,0,Attr::readonly,"Mean stress in the packing. |yupdate|"))
+		((Real,meanStress,0,Attr::readonly,"Mean stress (> 0 in extension) in the packing. |yupdate|"))
 		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`).|yupdate|"))
 		((Real,externalWork,0,Attr::readonly,"Energy provided by boundaries.|yupdate|"))
 		((bool,updatePorosity,false,,"If true porosity calculation will be updated once (will automatically reset to false after one calculation step). Can be used, when volume of particles changes during the simulation (e.g. when particles are erased or when clumps are created)."))
@@ -127,6 +127,7 @@ class TriaxialStressController : public BoundaryController
 		/* extra initializers */
 		,
    		/* constructor */
+		strain = Vector3r::Zero();
    		first = true;
 		stiffness.resize(6);
 		previousTranslation.assign(Vector3r::Zero());
@@ -139,7 +140,7 @@ class TriaxialStressController : public BoundaryController
 		normal[wall_back].z()=1;
 		porosity=1;
 		,
-		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
+		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain and are > 0 in extension.")
 		.def_readonly("strainRate",&TriaxialStressController::getStrainRate,"Current strain rate in a vector d/dt(exx,eyy,ezz).")
  		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
@@ -148,7 +149,7 @@ class TriaxialStressController : public BoundaryController
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel3",&TriaxialStressController::max_vel3,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
-		.def("stress",&TriaxialStressController::getStress,(boost::python::arg("id")),"Return the mean stress vector acting on boundary 'id', with 'id' between 0 and 5.")
+		.def("stress",&TriaxialStressController::getStress,(boost::python::arg("id")),"Returns the mean stress (> 0 in tension) existing in the sample, as measured along boundary 'id', with 'id' between 0 and 5.")
 		)
 		DECLARE_LOGGER;
 };

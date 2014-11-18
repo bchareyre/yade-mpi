@@ -39,7 +39,7 @@ key=table.key
 targetPorosity = 0.43 #the porosity we want for the packing
 compFricDegree = table.compFricDegree # initial contact friction during the confining phase (will be decreased during the REFD compaction process)
 finalFricDegree = 30 # contact friction during the deviatoric loading
-rate=0.02 # loading rate (strain rate)
+rate=-0.02 # loading rate (strain rate)
 damp=0.2 # damping coefficient
 stabilityThreshold=0.01 # we test unbalancedForce against this value in different loops (see below)
 young=5e6 # contact stiffness
@@ -125,14 +125,14 @@ if nRead==0: yade.qt.Controller(), yade.qt.View()
 #######################################
 
 #the value of (isotropic) confining stress defines the target stress to be applied in all three directions
-triax.goal1=triax.goal2=triax.goal3=10000
+triax.goal1=triax.goal2=triax.goal3=-10000
 
 #while 1:
   #O.run(1000, True)
   ##the global unbalanced force on dynamic bodies, thus excluding boundaries, which are not at equilibrium
   #unb=unbalancedForce()
   #print 'unbalanced force:',unb,' mean stress: ',triax.meanStress
-  #if unb<stabilityThreshold and abs(10000-triax.meanStress)/10000<0.001:
+  #if unb<stabilityThreshold and abs(-10000-triax.meanStress)/10000<0.001:
     #break
 
 #O.save('confinedState'+key+'.yade.gz')
@@ -174,10 +174,10 @@ triax.goal1=triax.goal2=triax.goal3=10000
 ##set stress control on x and z, we will impose strain rate on y
 #triax.stressMask = 5
 ##now goal2 is the target strain rate
-#triax.goal2=-rate
+#triax.goal2=rate
 ## we define the lateral stresses during the test, here the same 10kPa as for the initial confinement.
-#triax.goal1=10000
-#triax.goal3=10000
+#triax.goal1=-10000
+#triax.goal3=-10000
 
 ##we can change damping here. What is the effect in your opinion?
 #newton.damping=0.1
@@ -193,11 +193,11 @@ triax.goal1=triax.goal2=triax.goal3=10000
 
 ### a function saving variables
 #def history():
-  	#plot.addData(e11=triax.strain[0], e22=triax.strain[1], e33=triax.strain[2],
+  	#plot.addData(e11=-triax.strain[0], e22=-triax.strain[1], e33=-triax.strain[2],
   		    #ev=-triax.strain[0]-triax.strain[1]-triax.strain[2],
-		    #s11=triax.stress(triax.wall_right_id)[0],
-		    #s22=triax.stress(triax.wall_top_id)[1],
-		    #s33=triax.stress(triax.wall_front_id)[2],
+		    #s11=-triax.stress(triax.wall_right_id)[0],
+		    #s22=-triax.stress(triax.wall_top_id)[1],
+		    #s33=-triax.stress(triax.wall_front_id)[2],
 		    #i=O.iter)
 
 #if 1:

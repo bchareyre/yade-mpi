@@ -51,12 +51,12 @@ if ('PFVFLOW' in features):
 		newton
 	]
 
-	triax.goal1=triax.goal2=triax.goal3=10000
+	triax.goal1=triax.goal2=triax.goal3=-10000
 
 	while 1:
 		O.run(200, True)
 		unb=unbalancedForce()
-		if unb<0.01 and abs(10000-triax.meanStress)/10000<0.01: break
+		if unb<0.01 and abs(-10000-triax.meanStress)/10000<0.01: break
 
 	setContactFriction(radians(finalFricDegree))
 
@@ -68,11 +68,11 @@ if ('PFVFLOW' in features):
 
 	triax.internalCompaction=False
 	triax.wall_bottom_activated=False
-	triax.goal2=11000; O.run(2000,1)
-	triax.goal2=10000; O.run(2000,1)
-	triax.goal2=11000; O.run(2000,1)
+	triax.goal2=-11000; O.run(2000,1)
+	triax.goal2=-10000; O.run(2000,1)
+	triax.goal2=-11000; O.run(2000,1)
 	e22=triax.strain[1]
-	triax.goal2=10000; O.run(2000,1)
+	triax.goal2=-10000; O.run(2000,1)
 
 	e22=e22-triax.strain[1]
 	modulus = 1000./abs(e22)
@@ -119,7 +119,7 @@ if ('PFVFLOW' in features):
 
 	zeroTime=O.time
 	zeroe22 = triax.strain[1]
-	triax.goal2=11000
+	triax.goal2=-11000
 
 	O.timingEnabled=1
 	from yade import timing
@@ -132,7 +132,7 @@ if ('PFVFLOW' in features):
 			errors+=1
 			print "The difference is more, than the critical tolerance!"
 
-	target=0.00258113045083
+	target=-0.00258113045083
 	if abs((triax.strain[1]-zeroe22-target)/target)>toleranceWarning:
 		print "DEM-PFV: difference in final deformation",triax.strain[1]-zeroe22," vs. target ",target
 		if (abs((triax.strain[1]-zeroe22-target)/target)>toleranceCritical):

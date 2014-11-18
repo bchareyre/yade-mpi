@@ -121,7 +121,7 @@ void TriaxialCompressionEngine::action()
 	if ( scene->iter % testEquilibriumInterval == 0 )
 	{
 		updateParameters ();
-		maxStress = max(maxStress,stress[wall_top][1]);
+		maxStress = max(maxStress,-stress[wall_top][1]);
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< std::abs ( ( meanStress-sigma_iso ) /sigma_iso ));
 	}
 	if ( saveSimulation )
