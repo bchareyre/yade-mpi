@@ -48,12 +48,10 @@ triax=ThreeDTriaxialEngine(
 	stressControl_1 = False,
 	stressControl_2 = False,
 	stressControl_3 = False,
-	## The stress used for (isotropic) internal compaction
-	sigma_iso = 10000,
 	## Independant stress values for anisotropic loadings
-	sigma1=10000,
-	sigma2=10000,
-	sigma3=10000,
+	sigma1=-10000,
+	sigma2=-10000,
+	sigma3=-10000,
 	internalCompaction=True,
 	Key=key,
 )
@@ -86,7 +84,7 @@ while 1:
   #note: triax.stress(k) returns a stress vector, so we need to keep only the normal component
   meanS=(triax.stress(triax.wall_right_id)[0]+triax.stress(triax.wall_top_id)[1]+triax.stress(triax.wall_front_id)[2])/3
   print 'unbalanced force:',unb,' mean stress: ',meanS
-  if unb<stabilityThreshold and abs(meanS-triax.sigma_iso)/triax.sigma_iso<0.001:
+  if unb<stabilityThreshold and abs(meanS+10000)/10000<0.001:
     break
 
 O.save('compressedState'+key+'.xml')
@@ -121,7 +119,7 @@ triax.strainRate1=triax.strainRate3=1000.0
 ##... need to active stress control in 3 directions
 #triax.stressControl_1=triax.stressControl_2=triax.stressControl_3=True
 ##... choose the value of axial stress where we want to stop the compression
-#triax.sigma2=12000
+#triax.sigma2=-12000
 ##... fix a maximum strain rate to go progressivly to the desired stress state in direction 2
 #triax.strainRate2=0.01
 ##... fix a high value of maximum strain rate in radial direction to be sure to keep in any conditions a constant confining pressure
@@ -135,7 +133,7 @@ triax.strainRate1=triax.strainRate3=1000.0
   ##note: triax.stress(k) returns a stress vector, so we need to keep only the normal component
   #axialS=triax.stress(triax.wall_top_id)[1]
   #print 'unbalanced force:',unb,' sigma2: ',axialS
-  #if unb<stabilityThreshold and abs(axialS-triax.sigma2)/triax.sigma2<0.001:
+  #if unb<stabilityThreshold and abs((axialS-triax.sigma2)/triax.sigma2)<0.001:
     #break
 
 #O.save('anisotropicState'+key+'.xml')

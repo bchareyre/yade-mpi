@@ -85,9 +85,10 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		"#.  STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.\n\n"
 		"Transition from COMPACTION to UNLOADING is done automatically if autoUnload==true;\n\n Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is done automatically if autoCompressionActivation=true; Both autoUnload and autoCompressionActivation are true by default.\n\n"
 		"\n\n.. note::\n\t Most of the algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
+		"\n\n.. warning::\n\t This engine is deprecated, please switch to TriaxialStressController if you expect long term support."
 		,
 		((int, warn, 0,,"counter used for sending a deprecation warning once"))
-		((Real,strainRate,0,,"target strain rate (./s)"))
+		((Real,strainRate,0,,"target strain rate (./s, >0 for compression)"))
 		((Real,currentStrainRate,0,,"current strain rate - converging to :yref:`TriaxialCompressionEngine::strainRate` (./s)"))
 		((Real,UnbalancedForce,1,,"mean resultant forces divided by mean contact force"))
 		((Real,StabilityCriterion,0.001,,"tolerance in terms of :yref:`TriaxialCompressionEngine::UnbalancedForce` to consider the packing is stable"))
