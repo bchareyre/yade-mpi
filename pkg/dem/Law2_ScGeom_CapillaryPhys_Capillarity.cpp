@@ -155,7 +155,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				if (!Vinterpol) {
 					if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove(interaction);
 					if (D>0) scene->interactions->requestErase(interaction);
-					else LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files.")
+					else if (Pinterpol > 0) LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files.") // V=0 at a contact reveals a problem if and only if uc* > 0
 				}
 				/// wetting angles
 				if (!hertzOn) {
