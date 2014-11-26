@@ -149,7 +149,7 @@ class TriaxialStressController : public BoundaryController
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel3",&TriaxialStressController::max_vel3,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
-		.def("stress",&TriaxialStressController::getStress,(boost::python::arg("id")),"Returns the mean stress (> 0 in tension) existing in the sample, as measured along boundary 'id', with 'id' between 0 and 5.")
+		.def("stress",&TriaxialStressController::getStress,(boost::python::arg("id")),"Returns the average stress (> 0 in tension) as measured along boundary 'id', with 'id' between 0 and 5.")
 		)
 		DECLARE_LOGGER;
 };
