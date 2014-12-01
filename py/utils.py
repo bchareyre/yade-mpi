@@ -534,16 +534,16 @@ def plotNumInteractionsHistogram(cutoff=0.):
 	pylab.ion()
 	pylab.show()
 
-def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False):
+def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False,sphSph=False):
 	"""Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes and
-	(optional but default) histogram of number of interactions per body.
+	(optional but default) histogram of number of interactions per body. If sphSph only sphere-sphere interactions are considered.
 
 	:returns: If *noShow* is ``False``, displays the figure and returns nothing. If *noShow*, the figure object is returned without being displayed (works the same way as :yref:`yade.plot.plot`).
 	"""
 	import pylab,math
 	from yade import utils
 	for axis in [0,1,2]:
-		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins,aabb=aabb)
+		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins,aabb=aabb,sphSph=sphSph)
 		fc=[0,0,0]; fc[axis]=1.
 		subp=pylab.subplot(220+axis+1,polar=True);
 		# 1.1 makes small gaps between values (but the column is a bit decentered)

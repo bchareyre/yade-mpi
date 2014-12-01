@@ -40,7 +40,7 @@ void setRefSe3(){
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 Real RayleighWaveTimeStep(){return Shop::RayleighWaveTimeStep();};
 
-py::tuple interactionAnglesHistogram(int axis, int mask, size_t bins, py::tuple aabb, Real minProjLen){
+py::tuple interactionAnglesHistogram(int axis, int mask, size_t bins, py::tuple aabb, bool sphSph, Real minProjLen){
 	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
 	Vector3r bbMin(Vector3r::Zero()), bbMax(Vector3r::Zero()); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
@@ -51,6 +51,7 @@ py::tuple interactionAnglesHistogram(int axis, int mask, size_t bins, py::tuple 
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
 		if(useBB && !isInBB(b1->state->pos,bbMin,bbMax) && !isInBB(b2->state->pos,bbMin,bbMax)) continue;
+		if (sphSph && ( !dynamic_cast<Sphere*>(b1->shape.get()) || !dynamic_cast<Sphere*>(b2->shape.get()) ) ) continue;
 		GenericSpheresContact* geom=dynamic_cast<GenericSpheresContact*>(i->geom.get());
 		if(!geom) continue;
 		Vector3r n(geom->normal); n[axis]=0.; Real nLen=n.norm();
@@ -427,7 +428,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
 	py::def("coordsAndDisplacements",coordsAndDisplacements,(py::arg("axis"),py::arg("Aabb")=py::tuple()),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered.");
 	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
-	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
+	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb","sphSph")));
 	py::def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(py::args("aabb")));
 // 	py::def("elasticEnergy",elasticEnergyInAABB);
 	py::def("inscribedCircleCenter",inscribedCircleCenter,(py::arg("v1"),py::arg("v2"),py::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
