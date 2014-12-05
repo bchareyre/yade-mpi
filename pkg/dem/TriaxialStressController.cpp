@@ -200,14 +200,17 @@ void TriaxialStressController::action()
 	{
 		p_bottom->vel=Vector3r::Zero(); p_top->vel=Vector3r::Zero(); p_left->vel=Vector3r::Zero(); p_right->vel=Vector3r::Zero(); p_back->vel=Vector3r::Zero(); p_front->vel=Vector3r::Zero();
 		if (isARadiusControlIteration) {
-			Real sigma_iso_ = std::abs( bool(stressMask & 1)*goal1 +  bool(stressMask & 2)*goal2 +  bool(stressMask & 4)*goal3 );
+			Real sigma_iso_ = bool(stressMask & 1)*goal1 +  bool(stressMask & 2)*goal2 +  bool(stressMask & 4)*goal3;
 			sigma_iso_ /=  bool(stressMask & 1) +  bool(stressMask & 2) +  bool(stressMask & 4);
-			if (sigma_iso_<=std::abs(meanStress)) maxMultiplier = finalMaxMultiplier;
+			if (std::abs(sigma_iso_)<=std::abs(meanStress)) maxMultiplier = finalMaxMultiplier;
 			if (meanStress==0) previousMultiplier = maxMultiplier;
 			else {
 				//     		previousMultiplier = 1+0.7*(sigma_iso-s)*(previousMultiplier-1.f)/(s-previousStress); // = (Dsigma/apparentModulus)*0.7
 				//     		previousMultiplier = std::max(2-maxMultiplier, std::min(previousMultiplier, maxMultiplier));
-                                previousMultiplier = 1.+(sigma_iso_-std::abs(meanStress))/sigma_iso_*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
+			  if (sigma_iso_ < 0) // compressive case: we have to increase radii if meanStress > sigma_iso_, considering that sigma_iso_ < 0. We end with the same expression as before sign change
+			    previousMultiplier = 1.+(sigma_iso_-meanStress)/sigma_iso_*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
+			  else // tensile case: we have to increase radii if meanStress > sigma_iso_ too. But here sigma_iso_ > 0 => another expression
+			    previousMultiplier = 1.+(meanStress-sigma_iso_)/sigma_iso_*(maxMultiplier-1.); // = (Dsigma/apparentModulus)*0.7
 			}
 			previousStress = meanStress;
 			//Real apparentModulus = (s-previousStress)/(previousMultiplier-1.f);
