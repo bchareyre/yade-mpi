@@ -164,7 +164,7 @@ def textClumps(filename, format='x_y_z_r_clumpId', comment='',mask=-1):
 	return countClumps,count
 
 #textPolyhedra===============================================================
-def textPolyhedra(fileName, comment='',mask=-1, explanationComment=True):
+def textPolyhedra(fileName, comment='',mask=-1, explanationComment=True,attrs=[]):
 	"""Save polyhedra into a text file. Non-polyhedra bodies are silently skipped.
 
 	:param string filename: the name of the output file
@@ -199,7 +199,17 @@ def textPolyhedra(fileName, comment='',mask=-1, explanationComment=True):
 		count += 1
 		vertices = [b.state.pos + b.state.ori*v for v in b.shape.v]
 		surfaces = b.shape.GetSurfaces()
-		f.write('%d %d %d\n'%(b.id,len(vertices),len(surfaces)))
+		strAttrs = ''
+		if attrs:
+			for cmd in attrs:
+				v = eval(cmd)
+				if isinstance(v,(int,float)):
+					strAttrs+=' %g'%v
+				elif isinstance(v,Vector3):
+					strAttrs+=' %g %g %g'%tuple(v[i] for i in xrange(3))
+				elif isinstance(v,Matrix3):
+					strAttrs+=' %g'%tuple(v[i] for i in xrange(9))
+		f.write('%d %d %d%s\n'%(b.id,len(vertices),len(surfaces),strAttrs))
 		f.writelines('%.8e %.8e %.8e\n'%(v[0],v[1],v[2]) for v in vertices)
 		f.writelines(' '.join(str(i) for i in surface)+'\n' for surface in surfaces)
 	f.close()
