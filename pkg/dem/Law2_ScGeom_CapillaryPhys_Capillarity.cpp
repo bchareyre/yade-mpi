@@ -61,14 +61,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	if (fusionDetection && !bodiesMenisciiList.initialized) bodiesMenisciiList.prepare(scene);
 
 	bool hertzInitialized = false;
-	#ifdef YADE_OPENMP
-	const long size=scene->interactions->size();
-	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
-	for(long i=0; i<size; i++){
-		const shared_ptr<Interaction>& interaction=(*scene->interactions)[i];
-	#else
-	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){
-	#endif
+	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // could be done in parallel ? Was tried once, but needs maybe more comparison to assert it is OK: http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10842.html
 		/// interaction is real
 		if (interaction->isReal()) {
 			if (!hertzInitialized) {//NOTE: We are assuming that only one type is used in one simulation here
@@ -171,13 +164,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	}
 	if (fusionDetection) checkFusion();
 
-	#ifdef YADE_OPENMP
-	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
-	for(long i=0; i<size; i++){
-		const shared_ptr<Interaction>& interaction=(*scene->interactions)[i];
-	#else
-	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){
-	#endif
+	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // same remark for parallel loops
 		if (interaction->isReal()) {
 			CapillaryPhys* cundallContactPhysics=NULL;
 			MindlinCapillaryPhys* mindlinContactPhysics=NULL;
@@ -216,14 +203,7 @@ void capillarylaw::fill(const char* filename)
 void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 {
 	//Reset fusion numbers
-	#ifdef YADE_OPENMP
-	const long size=scene->interactions->size();
-	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
-	for(long i=0; i<size; i++){
-		const shared_ptr<Interaction>& interaction=(*scene->interactions)[i];
-	#else
-	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){
-	#endif
+	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // same remark for parallel loops, the most problematic part ?
 		if ( !interaction->isReal()) continue;
 		if (!hertzOn) static_cast<CapillaryPhys*>(interaction->phys.get())->fusionNumber=0;
 		else static_cast<MindlinCapillaryPhys*>(interaction->phys.get())->fusionNumber=0;
