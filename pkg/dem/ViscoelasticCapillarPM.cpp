@@ -57,7 +57,9 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
     }
     phys->Capillar=true;
   }
-  
+  #ifdef YADE_LIQMIGRATION
+  phys->LiqMigrEnabled = mat1->LiqMigrEnabled && mat2->LiqMigrEnabled;
+  #endif
   interaction->phys = phys;
 }
 
@@ -84,7 +86,9 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     phys.liqBridgeCreated = true;
     phys.liqBridgeActive = false;
     #ifdef YADE_LIQMIGRATION
-    scene->addIntrs.push_back(I);
+    if (phys.LiqMigrEnabled) {
+      scene->addIntrs.push_back(I);
+    }
     #endif
     Sphere* s1=dynamic_cast<Sphere*>(bodies[id1]->shape.get());
     Sphere* s2=dynamic_cast<Sphere*>(bodies[id2]->shape.get());

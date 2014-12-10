@@ -8,6 +8,9 @@ class ViscElCapMat : public ViscElMat {
 		virtual ~ViscElCapMat();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElCapMat,ViscElMat,"Material for extended viscoelastic model of contact with capillary parameters.",
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
+#ifdef YADE_LIQMIGRATION
+		((bool,LiqMigrEnabled,true,,"True, if liquid migration mechanism is needed. On by default."))
+#endif
 		((Real,Vb,0.0,,"Liquid bridge volume [m^3]"))
 		((Real,gamma,0.0,,"Surface tension [N/m]"))
 		((Real,theta,0.0,,"Contact angle [°]"))
@@ -36,6 +39,7 @@ class ViscElCapPhys : public ViscElPhys{
 		((Real,theta,0.0,,"Contact angle [rad]"))
 		((CapType,CapillarType,None_Capillar,,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert, Soulie"))
 #ifdef YADE_LIQMIGRATION
+		((bool,LiqMigrEnabled,,,"True, if liquid migration mechanism is needed."))
 		((Real,Vmax,0.0,,"Maximal liquid bridge volume [m^3]"))
 		((Real,Vf1,0.0,, "Liquid which will be returned to the 1st body after rupture [m^3]"))
 		((Real,Vf2,0.0,, "Liquid which will be returned to the 2nd body after rupture [m^3]"))
