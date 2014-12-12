@@ -86,14 +86,16 @@ void HydroForceEngine::action(){
 	/* Velocity fluctuation determination (not usually done at each dt, that is why it not placed in the other loop) */
 	if (velFluct == true){
 		/* check size */
-		size_t size=vFluct.size();
+		size_t size=vFluctX.size();
 		if(size<scene->bodies->size()){
 			size=scene->bodies->size();
-			vFluct.resize(size);
+			vFluctX.resize(size);
+			vFluctZ.resize(size);
 		}
 		/* reset stored values to zero */
-		memset(& vFluct[0],0,sizeof(Vector2r)*size);
-	
+		memset(& vFluctX[0],0,size);
+		memset(& vFluctZ[0],0,size);
+
 		/* Create a random number generator rnd() with a gaussian distribution of mean 0 and stdev 1.0 */
 		/* see http://www.boost.org/doc/libs/1_55_0/doc/html/boost_random/reference.html and the chapter 7 of Numerical Recipes in C, second edition (1992) for more details */
 		static boost::minstd_rand0 randGen((int)TimingInfo::getNow(true));
@@ -118,7 +120,8 @@ void HydroForceEngine::action(){
 						Real uStar = sqrt(uStar2);
 						rand1 = rnd();
 						rand2 = -rand1 + rnd();
-						vFluct[id] = Vector2r(rand1*uStar,rand2*uStar);
+						vFluctZ[id] = rand1*uStar;
+						vFluctX[id] = rand2*uStar;
 					}
 				}
 			}
@@ -139,8 +142,7 @@ void HydroForceEngine::action(){
 			if ((p<nCell)&&(p>0)) {
 				Vector3r liftForce = Vector3r::Zero();
 				Vector3r dragForce = Vector3r::Zero();
-				Vector2r fluctVelBody = vFluct[id];//fluid velocity fluctuation associated to the particle's position considered.
-				Vector3r vFluid(vxFluid[p]+fluctVelBody.x(),0.0,fluctVelBody.y()); //fluid velocity at the particle's position
+				Vector3r vFluid(vxFluid[p]+vFluctX[id],0.0,vFluctZ[id]); //fluid velocity at the particle's position
 				Vector3r vPart = b->state->vel;//particle velocity
 				Vector3r vRel = vFluid - vPart;//fluid-particle relative velocity
 
