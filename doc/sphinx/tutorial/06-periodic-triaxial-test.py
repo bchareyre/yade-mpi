@@ -91,7 +91,7 @@ def compactionFinished():
 	# set the current cell configuration to be the reference one
 	O.cell.trsf=Matrix3.Identity
 	# change control type: keep constant confinement in x,y, 20% compression in z
-	triax.goal=(sigmaIso,sigmaIso,-.3)
+	triax.goal=(sigmaIso,sigmaIso,-.2)
 	triax.stressMask=3
 	# allow faster deformation along x,y to better maintain stresses
 	triax.maxStrainRate=(1.,1.,.1)
