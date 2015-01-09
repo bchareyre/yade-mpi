@@ -36,7 +36,6 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		double getMaxImbibitionPc();
 		double getSaturation(bool isSideBoundaryIncluded=false);
 		double getSpecificInterfacialArea();
-		void cleanInterfaceWithinPore();
 
 		void invasion1();
 		void updateReservoirs1();
@@ -185,15 +184,6 @@ void UnsaturatedEngine::updatePressure()
     } 
 }
 
-void UnsaturatedEngine::cleanInterfaceWithinPore()
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      cell->info().hasInterface=false;
-    }  
-}
-
 void UnsaturatedEngine::invasion()
 {
     if (isPhaseTrapped) invasion1();
@@ -258,8 +248,6 @@ void UnsaturatedEngine::invasion1()
 {
     if(solver->debugOut) {cout<<"----start invasion1----"<<endl;}
 
-    ///clean cell.hasInterface
-    cleanInterfaceWithinPore();
     ///update Pw, Pn according to reservoirInfo.
     updatePressure();
     if(solver->debugOut) {cout<<"----invasion1.updatePressure----"<<endl;}
