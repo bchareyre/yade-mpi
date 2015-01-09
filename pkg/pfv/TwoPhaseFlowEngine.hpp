@@ -13,7 +13,7 @@
 
 //keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
-//#define TWOPHASEFLOW
+// #define TWOPHASEFLOW
 #ifdef TWOPHASEFLOW
 
 #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
@@ -74,7 +74,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreThroatCircleRadius();
 	double computePoreSatAtInterface(int ID);
 	void computePoreCapillaryPressure(CellHandle cell);
-	void savePhaseVtk1(const char* folder);
+	void savePhaseVtk(const char* folder);
 	void computePoreThroatRadius();
 	double computeEffPoreThroatRadius(CellHandle cell, int j);
 	double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
@@ -125,7 +125,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	,
 	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"get an integer to indicate which boundary this is allocated to")
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
-	.def("savePhaseVtk1",&TwoPhaseFlowEngine::savePhaseVtk1,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
+	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	.def("getCellIsWRes",&TwoPhaseFlowEngine::cellIsWRes,"get status wrt 'wetting reservoir' state")
 	.def("getCellIsNWRes",&TwoPhaseFlowEngine::cellIsNWRes,"get status wrt 'non-wetting reservoir' state")
 	.def("getCellSaturation",&TwoPhaseFlowEngine::cellSaturation,"get saturation of one pore")

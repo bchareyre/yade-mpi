@@ -34,9 +34,8 @@ void TwoPhaseFlowEngine::computePoreBodyVolume()
     initializeVolumes(*solver);
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    CellHandle neighbourCell;
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-        cell->info().poreBodyVolume = std::abs( cell->info().volume() ) - solver->volumeSolidPore(cell);
+        cell->info().poreBodyVolume = std::abs( cell->info().volume() ) - std::abs(solver->volumeSolidPore(cell));
     }
 }
 
@@ -69,8 +68,7 @@ double TwoPhaseFlowEngine:: computePoreSatAtInterface(int ID)
       }
     }
     cell->info().saturation = Vw / cell->info().poreBodyVolume;
-   
-   
+      
    // The following constrains check the value of saturation
     if(std::abs(cell->info().saturation) < 1e-6){cell->info().saturation = 0.0;} // To prevent dt going to 0
     if(cell->info().saturation < 0.0){
@@ -246,7 +244,7 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
 	    }	  
 	  }
 	
-	  cout << endl << i << " "<<Rin << " "<< dR << " "<< M.determinant();
+	  if(solver->debugOut) {cout << endl << i << " "<<Rin << " "<< dR << " "<< M.determinant();}
 	  if(i > 4000){
 	    cout << endl << "error, finding solution takes too long cell:" << cell->info().id;
 	    check = true;
@@ -310,18 +308,10 @@ double TwoPhaseFlowEngine::computeEffPoreThroatRadiusFine(CellHandle cell, int j
     double deltaForceRMax = computeDeltaForce(cell,j,rmax);
     double effPoreRadius;
     
-    if(deltaForceRMin>deltaForceRMax) {
-      effPoreRadius=rmax;
-    }
-    else if(deltaForceRMax<0) {
-      effPoreRadius=rmax;
-    }
-    else if(deltaForceRMin>0) {
-      effPoreRadius=rmin;
-    }
-    else {
-      effPoreRadius=bisection(cell,j,rmin,rmax);
-    }
+    if(deltaForceRMin>deltaForceRMax) { effPoreRadius=rmax; }
+    else if(deltaForceRMax<0) { effPoreRadius=rmax; }
+    else if(deltaForceRMin>0) { effPoreRadius=rmin; }
+    else { effPoreRadius=bisection(cell,j,rmin,rmax); }
     return effPoreRadius;
 }
 double TwoPhaseFlowEngine::bisection(CellHandle cell, int j, double a, double b)
@@ -397,7 +387,7 @@ double TwoPhaseFlowEngine::computeDeltaForce(CellHandle cell,int j, double rC)
     return deltaF;
 }
 
-void TwoPhaseFlowEngine::savePhaseVtk1(const char* folder)
+void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 {
 // 	RTriangulation& Tri = T[solver->noCache?(!currentTes):currentTes].Triangulation();
 	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
