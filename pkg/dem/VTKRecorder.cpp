@@ -701,6 +701,19 @@ void VTKRecorder::action(){
 						boxesStressVec->InsertNextTupleValue(s);
 						boxesStressLen->InsertNextValue(stress.norm());
 					}
+					if(recActive[REC_FORCE]){
+						scene->forces.sync();
+						const Vector3r& f = scene->forces.getForce(b->getId());
+						const Vector3r& t = scene->forces.getTorque(b->getId());
+						Real ff[3] = { (Real) f[0], (Real) f[1], (Real) f[2] };
+						Real tt[3] = { (Real) t[0], (Real) t[1], (Real) t[2] };
+						Real fn = f.norm();
+						Real tn = t.norm();
+						boxesForceVec->InsertNextTupleValue(ff);
+						boxesForceLen->InsertNextValue(fn);
+						boxesTorqueVec->InsertNextTupleValue(tt);
+						boxesTorqueLen->InsertNextValue(tn);
+					}
 					if (recActive[REC_MATERIALID]) boxesMaterialId->InsertNextValue(b->material->id);
 					if (recActive[REC_MASK]) boxesMask->InsertNextValue(GET_MASK(b));
 				}
@@ -857,7 +870,7 @@ void VTKRecorder::action(){
 			boxesUg->GetCellData()->AddArray(boxesStressVec);
 			boxesUg->GetCellData()->AddArray(boxesStressLen);
 		}
-		if (recActive[REC_FACETS]){
+		if (recActive[REC_FORCE]){
 			boxesUg->GetCellData()->AddArray(boxesForceVec);
 			boxesUg->GetCellData()->AddArray(boxesForceLen);
 			boxesUg->GetCellData()->AddArray(boxesTorqueVec);
