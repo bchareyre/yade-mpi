@@ -20,7 +20,6 @@
 #include <sys/types.h>
 #include <omp.h>
 
-
 #ifdef XVIEW
 // #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
@@ -1117,23 +1116,44 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
         basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-vtkInfiniteVertices, (unsigned int) Tri.number_of_finite_cells()-vtkInfiniteCells);
 
         vtkfile.open(filename,"test");
-
-        vtkfile.begin_vertices();
-        double x,y,z;
+	
+	//!TEMPORARY FIX:
+	//paraview needs zero-based vertex ids (from 0 ... numRealVertices)
+	//in presence of clumps vertex ids are not zero-based anymore
+	//to fix the vkt output vertex ids will be replaced by zero-based ones (CAUTION: output vertex ids != Yade vertex ids!)
+	
+	map<int,int> vertexIdMap;
+	int numVertices = 0;
+	unsigned int minId = 1;
+	
+	vtkfile.begin_vertices();
+	double x,y,z;
         for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-		if (v->info().isReal()){
-		x = (double)(v->point().point()[0]);
-                y = (double)(v->point().point()[1]);
-                z = (double)(v->point().point()[2]);
-                vtkfile.write_point(x,y,z);}
-        }
-        vtkfile.end_vertices();
-
-        vtkfile.begin_cells();
-        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		if (v->info().isReal()) {
+			x = (double)(v->point().point()[0]);
+			y = (double)(v->point().point()[1]);
+			z = (double)(v->point().point()[2]);
+			vtkfile.write_point(x,y,z);
+			vertexIdMap[v->info().id()-firstReal] = numVertices;
+			minId = min(minId,v->info().id()-firstReal);
+			numVertices += 1;
+		}
+	}
+	vtkfile.end_vertices();
+	
+	vtkfile.begin_cells();
+	int id0,id1,id2,id3;
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-        	if (isDrawable){vtkfile.write_cell(cell->vertex(0)->info().id()-firstReal, cell->vertex(1)->info().id()-firstReal, cell->vertex(2)->info().id()-firstReal, cell->vertex(3)->info().id()-firstReal);}
-        }
+		if (isDrawable) {
+			id0 = cell->vertex(0)->info().id()-firstReal;
+			id1 = cell->vertex(1)->info().id()-firstReal;
+			id2 = cell->vertex(2)->info().id()-firstReal;
+			id3 = cell->vertex(3)->info().id()-firstReal;
+			if (minId != 0) vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id1],vertexIdMap[id2],vertexIdMap[id3]);
+			else vtkfile.write_cell(id0, id1, id2, id3);
+		}
+	}
         vtkfile.end_cells();
 
 	if (permeabilityMap){
