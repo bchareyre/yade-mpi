@@ -131,6 +131,8 @@ void HydroForceEngine::action(){
 	}
 	
 	/* Application of hydrodynamical forces */
+	if (activateAverage==true) averageProfile(); //Calculate the average fluid and velocity profile
+	
 	FOREACH(Body::id_t id, ids){
 		Body* b=Body::byId(id,scene).get();
 		if (!b) continue;
@@ -142,31 +144,102 @@ void HydroForceEngine::action(){
 			if ((p<nCell)&&(p>0)) {
 				Vector3r liftForce = Vector3r::Zero();
 				Vector3r dragForce = Vector3r::Zero();
-				Vector3r vFluid(vxFluid[p]+vFluctX[id],0.0,vFluctZ[id]); //fluid velocity at the particle's position
-				Vector3r vPart = b->state->vel;//particle velocity
-				Vector3r vRel = vFluid - vPart;//fluid-particle relative velocity
-
+				Vector3r vRel = Vector3r(vxFluid[p]+vFluctX[id],0.0,vFluctZ[id]) -  b->state->vel;//fluid-particle relative velocity
 				//Drag force calculation
-				Real Rep = vRel.norm()*sphere->radius*2*rhoFluid/viscoDyn; //particles reynolds number
-				Real A = sphere->radius*sphere->radius*Mathr::PI;	//Crossection of the sphere
 				if (vRel.norm()!=0.0) {
-					Real hindranceF = pow(1-phiPart[p],-expoRZ); //hindrance function
-					Real Cd = (0.44 + 24.4/Rep)*hindranceF; //drag coefficient
-					dragForce = 0.5*rhoFluid*A*Cd*vRel.squaredNorm()*vRel.normalized();
+					dragForce = 0.5*densFluid*Mathr::PI*pow(sphere->radius,2.0)*(0.44*vRel.norm()+24.4*viscoDyn/(densFluid*sphere->radius*2))*pow(1-phiPart[p],-expoRZ)*vRel;
 				}
 				//lift force calculation due to difference of fluid pressure between top and bottom of the particle
 				int intRadius = floor(sphere->radius/deltaZ);
 				if ((p+intRadius<nCell)&&(p-intRadius>0)&&(lift==true)) {
-					Real vRelTop = vxFluid[p+intRadius] - vPart[0]; // relative velocity of the fluid wrt the particle at the top of the particle
-					Real vRelBottom = vxFluid[p-intRadius] - vPart[0]; // same at the bottom
-					liftForce[2] = 0.5*rhoFluid*A*Cl*(vRelTop*vRelTop-vRelBottom*vRelBottom);
+					Real vRelTop = vxFluid[p+intRadius] -  b->state->vel[0]; // relative velocity of the fluid wrt the particle at the top of the particle
+					Real vRelBottom = vxFluid[p-intRadius] -  b->state->vel[0]; // same at the bottom
+					liftForce[2] = 0.5*densFluid*Mathr::PI*pow(sphere->radius,2.0)*Cl*(vRelTop*vRelTop-vRelBottom*vRelBottom);
 				}
 				//buoyant weight force calculation
-				Vector3r buoyantForce = -4.0/3.0*Mathr::PI*sphere->radius*sphere->radius*sphere->radius*rhoFluid*gravity;
+				Vector3r buoyantForce = -4.0/3.0*Mathr::PI*pow(sphere->radius,3.0)*densFluid*gravity;
 				//add the hydro forces to the particle
 				scene->forces.addForce(id,dragForce+liftForce+buoyantForce);		
 			}
 		}
 	}
 }
+
+void HydroForceEngine::averageProfile(){
+	//Initialization
+	int Np;
+	int minZ;
+	int maxZ;
+	int numLayer;
+	Real deltaCenter;
+	Real zInf;
+	Real zSup;
+	Real volPart;
+	Vector3r uRel = Vector3r::Zero();
+	Vector3r fDrag  = Vector3r::Zero();
+
+	int nMax = 2*nCell;
+	vector<Real> velAverage(nMax,0.0);
+	vector<Real> phiAverage(nMax,0.0);
+	vector<Real> dragAverage(nMax,0.0);
+
+	//Loop over the particles
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		const Real zPos = b->state->pos[2]-zRef;
+		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
+
+		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
+		if ((Np>=0)&&(Np<nCell)){
+			uRel = Vector3r(vxFluid[Np]+vFluctX[b->id], 0.0,vFluctZ[b->id]) - b->state->vel;
+			// Drag force with a Dallavalle formulation (drag coef.) and Richardson-Zaki Correction (hindrance effect)
+			fDrag = 0.5*Mathr::PI*pow(s->radius,2.0)*densFluid*(0.44*uRel.norm()+24.4*viscoDyn/(densFluid*2.0*s->radius))*pow((1-phiPart[Np]),-expoRZ)*uRel;
+		}
+		else fDrag = Vector3r::Zero();
+
+		minZ= floor((zPos-s->radius)/deltaZ);
+		maxZ= floor((zPos+s->radius)/deltaZ);
+		deltaCenter = zPos - Np*deltaZ;
+	
+		// Loop over the cell in which the particle is contained
+		numLayer = minZ;
+		while (numLayer<=maxZ){
+			if ((numLayer>=0)&&(numLayer<nMax)){ //average under zRef does not interest us, avoid also negative values not compatible with the evaluation of volPart
+				zInf=(numLayer-Np-1)*deltaZ + deltaCenter;
+				zSup=(numLayer-Np)*deltaZ + deltaCenter;
+				if (zInf<-s->radius) zInf = -s->radius;
+				if (zSup>s->radius) zSup = s->radius;
+
+				//Analytical formulation of the volume of a slice of sphere
+				volPart = Mathr::PI*pow(s->radius,2)*(zSup - zInf +(pow(zInf,3)-pow(zSup,3))/(3*pow(s->radius,2)));
+
+				phiAverage[numLayer]+=volPart;
+				velAverage[numLayer]+=volPart*b->state->vel[0];
+				dragAverage[numLayer]+=volPart*fDrag[0];
+			}
+			numLayer+=1;
+		}
+	}
+	//Normalized the weighted velocity by the volume of particles contained inside the cell
+	for(int n=0;n<nMax;n++){
+		if (phiAverage[n]!=0){
+			velAverage[n]/=phiAverage[n];
+			dragAverage[n]/=phiAverage[n];
+			//Normalize the concentration after
+			phiAverage[n]/=vCell;
+		}
+		else {
+			velAverage[n] = 0.0;
+			dragAverage[n] = 0.0;
+		}
+	}
+	//Assign the results to the global/public variables of HydroForceEngine
+	phiPart = phiAverage;
+	vxPart = velAverage;
+	averageDrag = dragAverage;
+
+	//desactivate the average to avoid calculating at each step, only when asked by the user
+	activateAverage=false; 
+}
+
 
