@@ -179,7 +179,9 @@ void HydroForceEngine::averageProfile(){
 	Vector3r fDrag  = Vector3r::Zero();
 
 	int nMax = 2*nCell;
-	vector<Real> velAverage(nMax,0.0);
+	vector<Real> velAverageX(nMax,0.0);
+        vector<Real> velAverageY(nMax,0.0);
+        vector<Real> velAverageZ(nMax,0.0);
 	vector<Real> phiAverage(nMax,0.0);
 	vector<Real> dragAverage(nMax,0.0);
 
@@ -214,7 +216,9 @@ void HydroForceEngine::averageProfile(){
 				volPart = Mathr::PI*pow(s->radius,2)*(zSup - zInf +(pow(zInf,3)-pow(zSup,3))/(3*pow(s->radius,2)));
 
 				phiAverage[numLayer]+=volPart;
-				velAverage[numLayer]+=volPart*b->state->vel[0];
+				velAverageX[numLayer]+=volPart*b->state->vel[0];
+                                velAverageY[numLayer]+=volPart*b->state->vel[1];
+                                velAverageZ[numLayer]+=volPart*b->state->vel[2];
 				dragAverage[numLayer]+=volPart*fDrag[0];
 			}
 			numLayer+=1;
@@ -223,19 +227,25 @@ void HydroForceEngine::averageProfile(){
 	//Normalized the weighted velocity by the volume of particles contained inside the cell
 	for(int n=0;n<nMax;n++){
 		if (phiAverage[n]!=0){
-			velAverage[n]/=phiAverage[n];
+			velAverageX[n]/=phiAverage[n];
+                        velAverageY[n]/=phiAverage[n];
+                        velAverageZ[n]/=phiAverage[n];
 			dragAverage[n]/=phiAverage[n];
 			//Normalize the concentration after
 			phiAverage[n]/=vCell;
 		}
 		else {
-			velAverage[n] = 0.0;
+			velAverageX[n] = 0.0;
+                        velAverageY[n] = 0.0;
+                        velAverageZ[n] = 0.0;
 			dragAverage[n] = 0.0;
 		}
 	}
 	//Assign the results to the global/public variables of HydroForceEngine
 	phiPart = phiAverage;
-	vxPart = velAverage;
+	vxPart = velAverageX;
+	vyPart = velAverageY;
+        vzPart = velAverageZ;
 	averageDrag = dragAverage;
 
 	//desactivate the average to avoid calculating at each step, only when asked by the user
