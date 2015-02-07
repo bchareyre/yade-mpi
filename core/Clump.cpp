@@ -172,10 +172,11 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 							dens = subBody->material->density;
 							const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
 							if((x-subBody->state->pos).squaredNorm() < pow(sphere->radius,2)){
-								M += dv;
-								Sg += dv*x;
+								Real m = dens*dv;
+								M += m;
+								Sg += m*x;
 								//inertia I = sum_i( mass_i*dist^2 + I_s) )	//steiners theorem
-								Ig += dv*( x.dot(x)*Matrix3r::Identity()-x*x.transpose())/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/;
+								Ig += m*( x.dot(x)*Matrix3r::Identity()-x*x.transpose())/*dist^2*/+Matrix3r(Vector3r::Constant(dv*pow(dx,2)/6.).asDiagonal())/*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/;
 								break;
 							}
 						}
@@ -193,9 +194,19 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 				State* subState=subBody->state.get();
 				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
 				Real vol = (4./3.)*Mathr::PI*pow(sphere->radius,3.);
-				M+=vol;
-				Sg+=vol*subState->pos;
-				Ig+=Clump::inertiaTensorTranslate(Vector3r::Constant((2/5.)*vol*pow(sphere->radius,2)).asDiagonal(),vol,-1.*subState->pos);
+				Real m = dens*vol;
+				M+=m;
+				Sg+=m*subState->pos;
+				Ig+=Clump::inertiaTensorTranslate(Vector3r::Constant((2/5.)*m*pow(sphere->radius,2)).asDiagonal(),m,-1.*subState->pos);
+			} else { // non-spherical bodies
+				State* subState = subBody->state.get();
+				const Real& m = subState->mass;
+				const Vector3r& inertia = subState->inertia;
+				const Vector3r& pos = subState->pos;
+				const Quaternionr& ori = subState->ori;
+				M += m;
+				Sg += m*pos;
+				Ig += inertiaTensorTranslate(inertiaTensorRotate(inertia.asDiagonal(),ori),m,-pos);
 			}
 		}
 	}
@@ -212,8 +223,8 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	LOG_TRACE("R_g2c=\n"<<R_g2c);
 	// set quaternion from rotation matrix
 	state->ori=Quaternionr(R_g2c); state->ori.normalize();
-	state->inertia=dens*decomposed.eigenvalues();
-	state->mass=dens*M;
+	state->inertia=decomposed.eigenvalues();
+	state->mass=M;
 	
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
 	state->vel=state->angVel=Vector3r::Zero();
