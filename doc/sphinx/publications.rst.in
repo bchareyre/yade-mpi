@@ -16,7 +16,7 @@ Journal articles
 -----------------
 @bib2rst.bib2rst('../yade-articles.bib')@
 
-Conference materials
+Conference materials and book chapters
 ---------------------
 @bib2rst.bib2rst('../yade-conferences.bib')@
 
