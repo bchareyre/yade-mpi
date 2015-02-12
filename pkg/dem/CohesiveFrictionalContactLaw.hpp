@@ -32,6 +32,7 @@ class CohFrictMat : public FrictMat
 		((Real,etaTwist,-1.,,"Dimensionless twisting strength. If negative, twist moment will be elastic."))
 		((Real,normalCohesion,-1,,"Tensile strength, homogeneous to a pressure. If negative the normal force is purely elastic."))
 		((Real,shearCohesion,-1,,"Shear strength, homogeneous to a pressure. If negative the shear force is purely elastic."))
+		((bool,fragile,true,,"do cohesion disappear when contact strength is exceeded"))
 		((bool,momentRotationLaw,false,,"Use bending/twisting moment at contact. The contact will have moments only if both bodies have this flag true. See :yref:`CohFrictPhys::cohesionDisablesFriction` for details."))
 		,
 		createIndex();
@@ -52,7 +53,7 @@ class CohFrictPhys : public FrictPhys
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictPhys,FrictPhys,"",
 		((bool,cohesionDisablesFriction,false,,"is shear strength the sum of friction and adhesion or only adhesion?"))
 		((bool,cohesionBroken,true,,"is cohesion active? Set to false at the creation of a cohesive contact, and set to true when a fragile contact is broken"))
-		((bool,fragile,true,,"do cohesion disapear when contact strength is exceeded?"))
+		((bool,fragile,true,,"do cohesion disappear when contact strength is exceeded?"))
 		((Real,kr,0,,"rotational stiffness [N.m/rad]"))
 		((Real,ktw,0,,"twist stiffness [N.m/rad]"))
 		((Real,maxRollPl,0.0,,"Coefficient of rolling friction (negative means elastic)."))
@@ -60,7 +61,7 @@ class CohFrictPhys : public FrictPhys
 		((Real,normalAdhesion,0,,"tensile strength"))
 		((Real,shearAdhesion,0,,"cohesive part of the shear strength (a frictional term might be added depending on :yref:`CohFrictPhys::cohesionDisablesFriction`)"))
 		((Real,unp,0,,"plastic normal displacement, only used for tensile behaviour and if :yref:`CohFrictPhys::fragile` =false."))
-		((Real,unpMax,0,,"maximum value of plastic normal displacement, after that the interaction breaks even if :yref:`CohFrictPhys::fragile` =false. The default value (0) means no maximum."))
+		((Real,unpMax,0,,"maximum value of plastic normal displacement (counted positively), after that the interaction breaks even if :yref:`CohFrictPhys::fragile` =false. A negative value (i.e. -1) means no maximum."))
 		((bool,momentRotationLaw,false,,"use bending/twisting moment at contacts. See :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment::always_use_moment_law` for details."))
 		((bool,initCohesion,false,,"Initialize the cohesive behaviour with current state as equilibrium state (same as :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow` but acting on only one interaction)"))
 		((Real,creep_viscosity,-1,,"creep viscosity [Pa.s/m]."))

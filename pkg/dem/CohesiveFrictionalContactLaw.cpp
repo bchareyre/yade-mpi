@@ -119,7 +119,7 @@ bool Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 		if ((-Fn)> phys->normalAdhesion) {//normal plasticity
 			Fn=-phys->normalAdhesion;
 			phys->unp = un+phys->normalAdhesion/phys->kn;
-			if (phys->unpMax && phys->unp<phys->unpMax)
+			if (phys->unpMax>=0 && -phys->unp>phys->unpMax)  // Actually unpMax should be defined as a function of the average particule sizes for instance
 				return false;
 		}
 		phys->normalForce = Fn*geom->normal;
@@ -275,6 +275,7 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 				contactPhysics->normalAdhesion = std::min(sdec1->normalCohesion,sdec2->normalCohesion)*pow(std::min(Db, Da),2);
 				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(Db, Da),2);
 				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
+				contactPhysics->fragile=(sdec1->fragile || sdec2->fragile);
 			}
 			contactPhysics->kn = Kn;
 			contactPhysics->ks = Ks;
@@ -292,6 +293,7 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 				contactPhysics->shearAdhesion = std::min(sdec1->shearCohesion,sdec2->shearCohesion)*pow(std::min(geom->radius2, geom->radius1),2);
 
 				geom->initRotations(*(Body::byId(interaction->getId1(),scene)->state),*(Body::byId(interaction->getId2(),scene)->state));
+				contactPhysics->fragile=(sdec1->fragile || sdec2->fragile);
 				contactPhysics->initCohesion=false;
 			}
 		}
