@@ -65,6 +65,7 @@ using std::make_pair;
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/numeric/conversion/bounds.hpp>

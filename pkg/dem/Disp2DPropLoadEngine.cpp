@@ -19,9 +19,8 @@ YADE_PLUGIN((Disp2DPropLoadEngine));
 void Disp2DPropLoadEngine::postLoad(Disp2DPropLoadEngine&)
 {
 	std::string outputFile="DirSearch" + Key + "Yade";
-	bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 	ofile.open(outputFile.c_str(), std::ios::app);
-	if (!file_exists) ofile<<"theta (!angle in plane (gamma,-du) ) dtau (kPa) dsigma (kPa) dgamma (m) du (m) tau0 (kPa) sigma0 (kPa) d2W coordSs0 coordTot0 coordSsF coordTotF (Yade)" << endl;
+	if (!boost::filesystem::exists( outputFile.c_str() )) ofile<<"theta (!angle in plane (gamma,-du) ) dtau (kPa) dsigma (kPa) dgamma (m) du (m) tau0 (kPa) sigma0 (kPa) d2W coordSs0 coordTot0 coordSsF coordTotF (Yade)" << endl;
 }
 
 

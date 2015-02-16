@@ -29,9 +29,8 @@ MicroMacroAnalyser::~MicroMacroAnalyser(){ /*delete analyser;*/} //no need, its 
 
 void MicroMacroAnalyser::postLoad(MicroMacroAnalyser&)
 {
-	bool file_exists = std::ifstream(outputFile.c_str());  //if file does not exist, we will write colums titles
 	ofile.open(outputFile.c_str(), std::ios::app);
-	if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
+	if (!boost::filesystem::exists( outputFile.c_str() )) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
 }
 
 void MicroMacroAnalyser::action()
@@ -51,9 +50,8 @@ void MicroMacroAnalyser::action()
 	if (!initialized) {
 		setState(1,true,false);
 		//Check file here again, to make sure we write to the correct file when filename is modified after the scene is loaded
-		bool file_exists = std::ifstream(outputFile.c_str());
 		ofile.open(outputFile.c_str(), std::ios::app);
-		if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
+		if (!boost::filesystem::exists( outputFile.c_str() )) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
 		initialized=true;
 	} else if (scene->iter % interval == 0) {
 		setState(2, true, compIncrt);
