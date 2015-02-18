@@ -13,7 +13,7 @@
 
 //keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
-// #define TWOPHASEFLOW
+//#define TWOPHASEFLOW
 #ifdef TWOPHASEFLOW
 
 #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
@@ -112,6 +112,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	CELL_SCALAR_SETTER(Real,.saturation,setCellSaturation)
 	CELL_SCALAR_GETTER(int,.isFictious,cellIsFictious) //Temporary function to allow for simulations in Python
 	CELL_SCALAR_GETTER(bool,.hasInterface,cellHasInterface) //Temporary function to allow for simulations in Python
+	CELL_SCALAR_GETTER(Real,.poreBodyRadius,cellPoreBodyRadius) //Temporary function to allow for simulations in Python	
 	CELL_SCALAR_SETTER(bool,.hasInterface,setCellHasInterface) //Temporary function to allow for simulations in Python
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
@@ -136,6 +137,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getPoreThroatRadius",&TwoPhaseFlowEngine::cellporeThroatRadius,"get 4 pore throat radii")
 	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,"get 4 neigboring cells")
 	.def("getCellHasInterface",&TwoPhaseFlowEngine::cellHasInterface,"indicates whether a NW-W interface is present within the cell")
+	.def("cellPoreBodyRadius",&TwoPhaseFlowEngine::cellPoreBodyRadius,"get the radius of the inscribed sphere in a pore unit")
 	.def("setCellHasInterface",&TwoPhaseFlowEngine::setCellHasInterface,"change wheter a cell has a NW-W interface")
 	)
 	DECLARE_LOGGER;
