@@ -48,7 +48,7 @@ public :
 /// R = ratio(RadiusParticle1 on RadiusParticle2). Here, 10 R values from interpolation files (yade/extra/capillaryFiles), R = 1, 1.1, 1.25, 1.5, 1.75, 2, 3, 4, 5, 10
 const int NB_R_VALUES = 10;
 
-class capillarylaw; // fait appel a la classe def plus bas
+class capillarylaw; // fait appel a la classe def plus bas //TODO: translate this in english
 class Interaction;
 
 ///This container class is used to check if meniscii overlap. Wet interactions are put in a series of lists, with one list per body.
@@ -61,15 +61,14 @@ class BodiesMenisciiList
 		
 	public:
 		BodiesMenisciiList();
-		BodiesMenisciiList(Scene*);
-		bool prepare(Scene*);
+		BodiesMenisciiList(Scene*,bool);
+		bool prepare(Scene*,bool);
 		bool insert(const shared_ptr<Interaction>&);
 		bool remove(const shared_ptr<Interaction>&);
 		list< shared_ptr<Interaction> >& operator[] (int);
 		int size();
 		void display();
 		void checkLengthBuffer(const shared_ptr<Interaction>&);
-		
 		
 		bool initialized;
 };
@@ -85,15 +84,21 @@ class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 		void action();
 		void postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&);
 		
+		bool hertzInitialized;
+		bool hertzOn;
+		bool getHertzOn();
+		
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Law2_ScGeom_CapillaryPhys_Capillarity,GlobalEngine,"This law allows one to take into account capillary forces/effects between spheres coming from the presence of interparticular liquid bridges (menisci).\n\nThe control parameter is the :yref:`capillary pressure<Law2_ScGeom_CapillaryPhys_Capillarity::capillaryPressure>` (or suction) Uc = Ugas - Uliquid. Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of the defined capillary pressure and of the interacting geometry (spheres radii and interparticular distance).\n\nReferences: in english [Scholtes2009b]_; more detailed, but in french [Scholtes2009d]_.\n\nThe law needs ascii files M(r=i) with i=R1/R2 to work (see https://yade-dem.org/wiki/CapillaryTriaxialTest). These ASCII files contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry, assuming a null wetting angle.\n\nIn order to allow capillary forces between distant spheres, it is necessary to enlarge the bounding boxes using :yref:`Bo1_Sphere_Aabb::aabbEnlargeFactor` and make the Ig2 define define distant interactions via :yref:`interactionDetectionFactor<Ig2_Sphere_Sphere_ScGeom::interactionDetectionFactor>`. It is also necessary to disable interactions removal by the constitutive law (:yref:`Law2<Law2_ScGeom_FrictPhys_CundallStrack::neverErase>=True`). The only combinations of laws supported are currently capillary law + :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and capillary law + :yref:`Law2_ScGeom_MindlinPhys_Mindlin` (and the other variants of Hertz-Mindlin).\n\nSee CapillaryPhys-example.py for an example script.",
 	((Real,capillaryPressure,0.,,"Value of the capillary pressure Uc defined as Uc=Ugas-Uliquid"))
 	((bool,fusionDetection,false,,"If true potential menisci overlaps are checked, computing :yref:`fusionNumber<CapillaryPhys.fusionNumber>` for each capillary interaction, and reducing :yref:`fCap<CapillaryPhys.fCap>` according to :yref:`binaryFusion<Law2_ScGeom_CapillaryPhys_Capillarity.binaryFusion>`"))
 	((bool,binaryFusion,true,,"If true, capillary forces are set to zero as soon as, at least, 1 overlap (menisci fusion) is detected. Otherwise :yref:`fCap<CapillaryPhys.fCap>` = :yref:`fCap<CapillaryPhys.fCap>` / (:yref:`fusionNumber<CapillaryPhys.fusionNumber>` + 1 )"))
-	((bool,hertzOn,false,,"|yupdate| true if hertz model is used"))
 	((bool,createDistantMeniscii,false,,"Generate meniscii between distant spheres? Else only maintain the existing ones. For modeling a wetting path this flag should always be false. For a drying path it should be true for one step (initialization) then false, as in the logic of [Scholtes2009c]_"))
 	,/*deprec*/
 	((CapillaryPressure,capillaryPressure,"naming convention"))
-	,,,
+	,,/*constructor*/
+	hertzInitialized = false;
+	hertzOn = false;
+	,
 	 );
 };
 
@@ -108,7 +113,7 @@ class TableauD
   		~TableauD();
 };
 
-// Fonction d'ecriture de tableau, utilisee dans le constructeur pour test 
+// Fonction d'ecriture de tableau, utilisee dans le constructeur pour test //TODO: translate this in english
 class Tableau;
 std::ostream& operator<<(std::ostream& os, Tableau& T);
 
