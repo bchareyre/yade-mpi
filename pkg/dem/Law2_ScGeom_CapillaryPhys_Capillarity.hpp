@@ -61,7 +61,7 @@ class BodiesMenisciiList
 		
 	public:
 		BodiesMenisciiList();
-		BodiesMenisciiList(Scene*,bool);
+		BodiesMenisciiList(Scene*,bool);//TODO: remove?
 		bool prepare(Scene*,bool);
 		bool insert(const shared_ptr<Interaction>&);
 		bool remove(const shared_ptr<Interaction>&);

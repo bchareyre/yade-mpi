@@ -40,7 +40,7 @@ MeniscusParameters::MeniscusParameters()
         F = 0;
         delta1 = 0;
         delta2 = 0;
-};
+}
 
 MeniscusParameters::MeniscusParameters(const MeniscusParameters &source)
 {
@@ -66,10 +66,11 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				if (CapillaryPhys::getClassIndexStatic()==I->phys->getClassIndex()) hertzOn=false;
 				else if (MindlinCapillaryPhys::getClassIndexStatic()==I->phys->getClassIndex()) hertzOn=true;
 				else LOG_ERROR("The capillary law is not implemented for interactions using"<<I->phys->getClassName());
+				bodiesMenisciiList.initialized = false;//must be re-initialized after creation of first real contact in the model
+				hertzInitialized = true;
 				break;
 			}
 		}
-		hertzInitialized = true;
 	}
 	
 	if (fusionDetection && !bodiesMenisciiList.initialized) bodiesMenisciiList.prepare(scene,hertzOn);
@@ -156,7 +157,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove(interaction);
 					if (D>0) scene->interactions->requestErase(interaction);
 					else if ((Pinterpol > 0) && (showError)) {
-						LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files.") // V=0 at a contact reveals a problem if and only if uc* > 0
+						LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files."); // V=0 at a contact reveals a problem if and only if uc* > 0
 						showError = false;//show error message once / avoid console spam
 					}
 				}
@@ -510,11 +511,14 @@ std::ostream& operator<<(std::ostream& os, Tableau& T)
         return os;
 }
 
+//what is this function for? it is never called...
+//TODO: remove?
 BodiesMenisciiList::BodiesMenisciiList(Scene * scene, bool hertzOn)
 {
 	initialized=false;
 	prepare(scene, hertzOn);
 }
+
 
 bool BodiesMenisciiList::prepare(Scene * scene, bool hertzOn)
 {
