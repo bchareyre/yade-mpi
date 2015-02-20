@@ -62,7 +62,10 @@ def formatRest(db):
 		elif type=='phdthesis':
 			line+='%s (%s), **%s**. PhD thesis at *%s*.'%(author,i['year'],i['title'],i['school'])
 		elif type=='mastersthesis':
-			line+='%s (%s), **%s**. Master thesis at *%s*.'%(author,i['year'],i['title'],i['school'])
+			typeThesis = 'Master thesis'
+			if i.has_key('note'):
+				typeThesis = i['note']
+			line+='%s (%s), **%s**. %s at *%s*.'%(author,i['year'],i['title'],typeThesis,i['school'])
 		elif type=='proceedings':
 			if i.has_key('editor'): line+='%s (ed.), '%i['editor']
 			line+='**%s** (%s).'%(i['title'],i['year'])
@@ -77,7 +80,7 @@ def formatRest(db):
 		def escapeUrl(url): return url.replace('<','%3c').replace('>','%3e')
 		if i.has_key('doi'): line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi'])) 
 		if i.has_key('url'): line+=' `(fulltext) <%s>`__'%escapeUrl(i['url'])
-		if i.has_key('note'): line+=' (%s)'%i['note']
+		if (i.has_key('note') and type<>'mastersthesis'): line+=' (%s)'%i['note']
 		ret.append(line)
 	return [l.replace('@tilde@','~') for l in ret]
 
