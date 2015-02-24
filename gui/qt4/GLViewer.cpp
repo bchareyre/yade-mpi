@@ -162,7 +162,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	/* special keys: Escape and Space */
 	else if(e->key()==Qt::Key_A){ toggleAxisIsDrawn(); return; }
 	else if(e->key()==Qt::Key_Escape){
-		if(!isManipulating()){ return; }
+		if(!isManipulating()){ setSelectedName(-1); return; }
 		else { resetManipulation(); displayMessage("Manipulating scene."); }
 	}
 	else if(e->key()==Qt::Key_Space){
