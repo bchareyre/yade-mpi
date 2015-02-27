@@ -478,7 +478,6 @@ void PeriodicFlowEngine::buildTriangulation ( double pZero, FlowSolver& flow)
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
         flow.tesselation().compute();
         flow.defineFictiousCells();
-
         //FIXME: this is already done in addBoundary(?)
         boundaryConditions ( flow );
 	if ( debug ) cout << endl << "boundaryConditions------" << endl << endl;
@@ -499,7 +498,8 @@ void PeriodicFlowEngine::buildTriangulation ( double pZero, FlowSolver& flow)
 		cell->info().id=cell->info().baseIndex;
 	}
 	Tes.cellHandles.resize(baseIndex+1);
-
+	/// Call blockHook here if defined, valid indices and ghost status are available
+	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
 	if ( debug ) cout << endl << "locateCell------" << endl << endl;
         flow.computePermeability ( );
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
