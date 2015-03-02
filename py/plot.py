@@ -381,7 +381,7 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip().split('=',1)[0]
 		if not subPlots: pylab.figure()
-		else: pylab.subplot(subRows,subCols,nPlot)
+		else: pylab.subplot(subRows,subCols,nPlot+1)
 		if plots[p]==None: # image plot
 			if not pStrip in imgData.keys(): imgData[pStrip]=[]
 			# fake (empty) image if no data yet
@@ -670,7 +670,7 @@ def savePylab(baseName,timestamp=False,title=None):
 		pStrip=p.strip().split('=',1)[0]
 		if plots[p]==None: continue # image plots, which is not exported
 		if len(plots)==1: py.write('pylab.figure()\n')
-		else: py.write('pylab.subplot(%d,%d,%d)\n'%(subRows,subCols,nPlots))
+		else: py.write('pylab.subplot(%d,%d,%d)\n'%(subRows,subCols,nPlots+1))
 
 def _mkTimestamp():
 	import time
