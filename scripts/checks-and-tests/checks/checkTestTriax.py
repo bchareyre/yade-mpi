@@ -5,7 +5,7 @@
 # internal compaction without friction, so that it is initially at equilibrium without shear forces. 
 # Positions and reference results are in data folder.
 from yade import pack,utils,export,plot
-import math,os,sys
+import math,os,sys,shutil,tempfile
 
 tolerance=0.01
 interactive=False
@@ -30,3 +30,10 @@ if (errors):
 
 if (errors):
 	resultStatus +=1	#Test is failed
+
+dirpath = tempfile.mkdtemp()
+shutil.move('checkTest.yade',dirpath)
+shutil.move('_Unloaded_380_3.spheres',dirpath)
+shutil.move('_Unloaded_380_3.xml',dirpath)
+shutil.move('WallStresses',dirpath)
+print "Files checkTest.yade, _Unloaded_380_3.spheres, _Unloaded_380_3.xml and WallStresses are moved into %s/ directory"%dirpath
