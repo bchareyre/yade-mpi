@@ -586,6 +586,7 @@ def plot(noShow=False,subPlots=True):
 		>>> import os
 		>>> os.path.exists('someFile.pdf')
 		True
+		>>> os.remove('someFile.pdf')
 		
 	to save the figure to file automatically.
 
