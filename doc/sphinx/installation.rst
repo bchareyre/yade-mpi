@@ -264,3 +264,12 @@ upon detecting the C and C++ compiler to use::
 
 Clang does not support OpenMP-parallelizing for the moment, that is why the 
 feature will be disabled.
+
+
+Yubuntu
+------------
+
+If you are not running Ubuntu nor Debian, there is a way to create a Yubuntu `live-usb <http://en.wikipedia.org/wiki/Live_USB>`_ on any usb mass-storage device (minimum recommended size is 5GB). It is a way to make a bootable usb-key with a preinstalled minimalist operating system (Xubuntu), including Yadedaily and Paraview.
+
+More informations about this alternative are available `here <http://geo.hmg.inpg.fr/~chareyre/pubs/yubuntu/>`_ (see the README file first).
+
