@@ -32,8 +32,7 @@ if (errors):
 	resultStatus +=1	#Test is failed
 
 dirpath = tempfile.mkdtemp()
-shutil.move('checkTest.yade',dirpath)
-shutil.move('_Unloaded_380_3.spheres',dirpath)
-shutil.move('_Unloaded_380_3.xml',dirpath)
-shutil.move('WallStresses',dirpath)
-print "Files checkTest.yade, _Unloaded_380_3.spheres, _Unloaded_380_3.xml and WallStresses are moved into %s/ directory"%dirpath
+
+for fileName in ['./checkTest.yade', './_Unloaded_380_3.spheres', './_Unloaded_380_3.xml', './WallStresses', ]:
+  if (os.path.exists(fileName)): shutil.move(fileName,dirpath)
+  print "File %s moved into %s/ directory"%(fileName,dirpath)

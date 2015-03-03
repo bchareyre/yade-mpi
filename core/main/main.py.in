@@ -96,8 +96,8 @@ if opts.test:
 		import traceback; traceback.print_exc()
 		print 20*'*'+' Thank you '+20*'*'
 		sys.exit(2)
-	os.remove('DirSearchYade')
-	os.remove('MicroMacroAnalysis')
+	if (os.path.exists('./DirSearchYade')): os.remove('./DirSearchYade')
+	if (os.path.exists('./MicroMacroAnalysis')): os.remove('./MicroMacroAnalysis')
 	if result.wasSuccessful():
 		print "*** ALL TESTS PASSED ***"
 		sys.exit(0)
