@@ -410,6 +410,10 @@ py::list numIntrsOfEachBody() {
 	return ret;
 }
 
+Real Shop__getSpheresVolume2D(int mask=-1){ return Shop::getSpheresVolume2D(Omega::instance().getScene(), mask=mask);}
+Real Shop__getVoidRatio2D(Real zlen=1){ return Shop::getVoidRatio2D(Omega::instance().getScene(),zlen);}
+py::tuple Shop__getStressAndTangent(Real volume=0, bool symmetry=true){return Shop::getStressAndTangent(volume,symmetry);}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -474,4 +478,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("TetrahedronWithLocalAxesPrincipal",TetrahedronWithLocalAxesPrincipal,"TODO");
 	py::def("momentum",Shop::momentum,"TODO");
 	py::def("angularMomentum",Shop::angularMomentum,(py::args("origin")=Vector3r(Vector3r::Zero())),"TODO");
+	py::def("getSpheresVolume2D",Shop__getSpheresVolume2D,(py::arg("mask")=-1),"Compute the total volume of discs in the simulation (might crash for now if dynamic bodies are not discs), mask parameter is considered");
+	py::def("voidratio2D",Shop__getVoidRatio2D,(py::arg("zlen")=1),"Compute 2D packing void ratio $\\frac{V-V_s}{V_s}$ where $V$ is overall volume and $V_s$ is volume of disks.\n\n:param float zlen: length in the third direction.\n");
+	py::def("getStressAndTangent",Shop__getStressAndTangent,(py::args("volume")=0,py::args("symmetry")=true),"Compute overall stress of periodic cell using the same equation as function getStress. In addition, the tangent operator is calculated using the equation published in [Kruyt and Rothenburg1998]_:\n\n.. math:: S_{ijkl}=\\frac{1}{V}\\sum_{c}(k_n n_i l_j n_k l_l + k_t t_i l_j t_k l_l)\n\n:param float volume: same as in function getStress\n:param bool symmetry: make the tensors symmetric.\n\n:return: macroscopic stress tensor and tangent operator as py::tuple");
 }

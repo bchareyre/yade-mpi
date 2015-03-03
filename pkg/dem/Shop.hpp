@@ -149,5 +149,11 @@ class Shop{
 		
 		/* \todo implement groupMask */
 		static py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false);
+		
+		//! evaluation of 2D quantities
+		static Real getSpheresVolume2D(const shared_ptr<Scene>& rb=shared_ptr<Scene>(), int mask=-1);
+		static Real getVoidRatio2D(const shared_ptr<Scene>& rb=shared_ptr<Scene>(),Real zlen=1);
+		//! get stress tensor and tangent operator tensor for FEMxDEM coupling. By Ning Guo
+		static py::tuple getStressAndTangent(Real volume=0, bool symmetry=true);
 };
 

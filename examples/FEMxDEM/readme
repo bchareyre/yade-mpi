@@ -1,0 +1,26 @@
+The code is built upon two open source packages: Yade (https://launchpad.net/yade) for DEM modules and Escript (https://launchpad.net/escript-finley) for FEM modules. It implements the hierarchical multiscale model for simulating the boundary value problem (BVP) for granular media. FEM is used to discretize the problem domain. Each Gauss point of the FEM mesh is embedded a representative volume element (RVE) packing simulated by DEM. As hundreds to thousands of RVEs are involved in a medium-sized problem which is critically time consuming, parallelization is achieved in the code through either multiprocessing on a supercomputer or mpi4py on a HPC cluster (more efficient but only experimental).
+For the usage of the code please refer to `GuoFEMxDEM.pdf` (https://www.yade-dem.org/w/images/e/e5/GuoFEMxDEM.pdf) and the example scripts in this folder.
+
+Copyright (C) 2015 Ning Guo. Feel free to use and redistribute. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+The MPI implementation in the multiscale model is quite experimental. The mpipool.py is contributed by Lisandro Dalcín, the author of mpi4py package, which is used in the code to provide MPI functionality (require MPICH or Open MPI). The mpipool.py file is available from this thread (also included in the code):
+ 
+ https://groups.google.com/forum/#!searchin/mpi4py/mpipool/mpi4py/OJG5eZ2f-Pg/8j-zO5CMGlEJ
+
+Alternatively, I found another package playdoh (https://github.com/rossant/playdoh) is also suitable and easy to use for the distributed computation. It also provides the map function similar to that provided by multiprocessing and mpipool. Thus, it might be conveneitly adapted in the current code. Contributions are welcome to improve the MPI functionality, as it is crucial to extend the multiscale simulation for real large-scale problems. We appreciate it if you find better solutions and contact Ning <ceguo@connect.ust.hk>.
+
+The code is part of the work presented in the following papers:
+
+1. Guo, N. and Zhao, J. (2014) A coupled FEM/DEM approach for hierarchical multiscale modelling of granular media. International Journal for Numerical Methods in Engineering 99(11), 789-818. DOI: 10.1002/nme.4702.
+
+2. Guo, N. (2014) Multiscale characterization of the shear behavior of granular media. PhD Thesis, The Hong Kong University of Science and Technology, Hong Kong.
+
+3. Zhao, J. and Guo, N. (2015) The interplay between anisotropy and strain localisation in granular soils: a multiscale insight. Géotechnique, under review.
+
+4. Guo, N. and Zhao, J. (2015) Multiscale insights into classic geomechanics problems. International Journal for Numerical and Analytical Methods in Geomechanics, under review.
+
+5. Guo, N. and Zhao, J. (2015) Parallel hierarchical multiscale modelling of hydro-mechanical problems for saturated granular soil. International Journal for Numerical Methods in Engineering, in preparation.
+
+6. Guo, N. and Zhao, J. (2015) 3D multiscale analysis of strain localization in granular media. International Journal of Solids and Structures, in preparation.
+
+We appreciate it if you use the code in your publication and cite one or two above references.
