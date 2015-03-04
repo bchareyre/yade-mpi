@@ -220,7 +220,8 @@ def box(center,extents,orientation=Quaternion(1,0,0,0),dynamic=None,fixed=False,
 	b=Body()
 	b.shape=Box(extents=extents,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=8*extents[0]*extents[1]*extents[2]
-	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
+	# I = m*dim**2/12. = (m=V) = V*(2*extent)**2/12. = V*extent**2*4/12. = V*extent**2/3.
+	geomInert=(V/3.)*Vector3(extents[1]**2+extents[2]**2,extents[0]**2+extents[2]**2,extents[0]**2+extents[1]**2)
 	_commonBodySetup(b,V,geomInert,material,pos=center,dynamic=dynamic,fixed=fixed)
 	b.state.ori=orientation
 	b.mask=mask
