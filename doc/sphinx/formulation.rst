@@ -537,7 +537,12 @@ We evaluate $\nnext{\dot{q}}$ from $\nnext{q}$ and $\nnext{\locframe{\vec{\omega
 
 Clumps (rigid aggregates)
 -------------------------
-DEM simulations frequently make use of rigid aggregates of particles to model complex shapes [Price2007]_ called *clumps*, typically composed of many spheres. Dynamic properties of clumps are computed from the properties of its members: the clump's mass $m_c$ is summed over members, the inertia tensor $\mathbf{I}_c$ with respect to the clump's centroid is computed using the parallel axes theorem; local axes are oriented such that they are principal and inertia tensor is diagonal and clump's orientation is changed to compensate rotation of the local system, as to not change the clump members' positions in global space. Initial positions and orientations of all clump members in local coordinate system are stored.
+DEM simulations frequently make use of rigid aggregates of particles to model complex shapes [Price2007]_ called *clumps*, typically composed of many spheres. Dynamic properties of clumps are computed from the properties of its members: 
+
+* For non-overlapping clump members the clump's mass $m_c$ is summed over members, the inertia tensor $\mathbf{I}_c$ is computed using the parallel axes theorem: $\mathbf{I}_c = \sum_i( m_i*d_i^2 + I_i)$, where $m_i$ is the mass of clump member $i$, $d_i$ is the distance from center of clump member $i$ to clump's centroid and $I_i$ is the inertia tensor of the clump member $i$.
+* For overlapping clump members the clump's mass $m_c$ is summed over cells using a regular grid spacing inside axis-aligned bounding box (:yref:`Aabb`) of the clump, the inertia tensor is computed using the parallel axes theorem: $\mathbf{I}_c = \sum_j( m_j*d_j^2 + I_j)$, where $m_j$ is the mass of cell $j$, $d_j$ is the distance from cell center to clump's centroid and $I_j$ is the inertia tensor of the cell $j$.
+
+Local axes are oriented such that they are principal and inertia tensor is diagonal and clump's orientation is changed to compensate rotation of the local system, as to not change the clump members' positions in global space. Initial positions and orientations of all clump members in local coordinate system are stored.
 
 In Yade (class :yref:`Clump`), clump members behave as stand-alone particles during simulation for purposes of collision detection and contact resolution, except that they have no contacts created among themselves within one clump. It is at the stage of motion integration that they are treated specially. Instead of integrating each of them separately, forces/torques on those particles $\vec{F}_i$, $\vec{T}_i$ are converted to forces/torques on the clump itself. Let us denote $r_i$ relative position of each particle with regards to clump's centroid, in global orientation. Then summary force and torque on the clump are
 
@@ -684,7 +689,7 @@ This algorithm is implemented in the :yref:`yade.utils.PWaveTimeStep` function.
 Let us compare this result to :eq:`eq-dtcr-global`; this necessitates making several simplifying hypotheses:
 
 * all particles are spherical and have the same radius $R$;
-* the sphere's material has the same $E$ and $\rho$
+* the sphere's material has the same $E$ and $\rho$;
 * the average number of contacts per sphere is $N$;
 * the contacts have sufficiently uniform spatial distribution around each particle;
 * the $\xi=K_N/K_T$ ratio is constant for all interactions;
