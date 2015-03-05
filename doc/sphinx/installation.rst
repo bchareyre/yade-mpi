@@ -97,7 +97,8 @@ Alternatively, a read-only checkout is possible via https without a GitHub accou
    
 For those behind firewall, you can download the sources from our `GitHub <https://github.com/yade>`_ repository as compressed archive.
 
-Release and trunk sources are compiled in the same way.
+Release and trunk sources are compiled in the same way. To be notified about new commits
+into the trunk, use `watch option on GitHub <https://help.github.com/articles/watching-repositories/>`_.
 
 Prerequisites
 ^^^^^^^^^^^^^
