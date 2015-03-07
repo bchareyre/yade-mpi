@@ -251,8 +251,6 @@ class pyBodyContainer{
 			//get volume of the clump template using regular cubic cell array inside axis aligned bounding box of the clump:
 			//(some parts are duplicated from intergration algorithm in Clump::updateProperties)
 			Real dx = rMin/5.; 	//edge length of cell
-			Real aabbMax = max(max(aabb.max().x()-aabb.min().x(),aabb.max().y()-aabb.min().y()),aabb.max().z()-aabb.min().z());
-			if (aabbMax/dx > 150) dx = aabbMax/150;//limit dx
 			Real dv = pow(dx,3);		//volume of a single cell
 			Vector3r x;			//position vector (center) of cell
 			Real relVolSumTmp = 0.0;	//volume of clump template
@@ -265,28 +263,6 @@ class pyBodyContainer{
 					}
 				}
 			}
-			/**
-			### old method, not working for multiple overlaps:
-			//check for overlaps and correct volumes (-= volume of spherical caps):
-			Real distCMTmp, overlapTmp, hCapjj, hCapkk;
-			for (int jj = 0; jj < numCM; jj++) {
-				for (int kk = jj; kk < numCM; kk++) {
-					if (jj != kk) {
-						distCMTmp = (relPosTmp[jj] - relPosTmp[kk]).norm(); //distance between two spheres
-						overlapTmp = (relRadTmp[jj] + relRadTmp[kk]) - distCMTmp;//positive if overlapping ...
-						if (overlapTmp > 0.0) {//calculation of overlapping spheres, see http://mathworld.wolfram.com/Sphere-SphereIntersection.html
-							hCapjj = relRadTmp[jj] - (distCMTmp*distCMTmp - relRadTmp[kk]*relRadTmp[kk] + relRadTmp[jj]*relRadTmp[jj])/(2*distCMTmp);
-							hCapkk = relRadTmp[kk] - (distCMTmp*distCMTmp - relRadTmp[jj]*relRadTmp[jj] + relRadTmp[kk]*relRadTmp[kk])/(2*distCMTmp);
-							//calculation of spherical cap, see http://en.wikipedia.org/wiki/Spherical_cap
-							relVolTmp[jj] -= (1./3.)*Mathr::PI*hCapjj*hCapjj*(3.*relRadTmp[jj] - hCapjj);// correct relative volumes
-							relVolTmp[kk] -= (1./3.)*Mathr::PI*hCapkk*hCapkk*(3.*relRadTmp[kk] - hCapkk);
-						}
-					}
-				}
-			}
-			//get relative volume of the clump:
-			for (int jj = 0; jj < numCM; jj++) relVolSumTmp += relVolTmp[jj];
-			**/
 			
 			//get pointer lists of spheres, that should be replaced:
 			int numReplaceTmp = round(num*amounts[ii]);
