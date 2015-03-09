@@ -1359,7 +1359,7 @@ information about job status changes is being printed, until::
 
 Separating output files from jobs
 ----------------------------------
-As one might output data to external files during simulation (using classes such as :yref:`VTKRecorder`, it is important to name files in such way that they are not overwritten by next (or concurrent) job in the same batch. A special tag ``O.tags['id']`` is provided for such purposes: it is comprised of date, time and PID, which makes it always unique (e.g. ``20100413T144723p7625``); additional advantage is that alphabetical order of the ``id`` tag is also chronological. To add the used parameterset or if set the description of the job you could add O.tags['params'] to the filename.
+As one might output data to external files during simulation (using classes such as :yref:`VTKRecorder`), it is important to name files in such way that they are not overwritten by next (or concurrent) job in the same batch. A special tag ``O.tags['id']`` is provided for such purposes: it is comprised of date, time and PID, which makes it always unique (e.g. ``20100413T144723p7625``); additional advantage is that alphabetical order of the ``id`` tag is also chronological. To add the used parameter set or the description of the job, if set, you could add O.tags['params'] to the filename.
 
 For smaller simulations, prepending all output file names with ``O.tags['id']`` can be sufficient:
 
