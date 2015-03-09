@@ -36,10 +36,9 @@ Welcome to Yade's documentation!
 
   references.rst
 
-.. only:: html and epub
-	Indices and tables
-	==================
-	* :ref:`genindex`
-	* :ref:`modindex`
-	* :ref:`search`
+Indices and tables
+==================
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 

@@ -1,9 +1,9 @@
-.. only:: html and epub
-	References
-	============
 
-	All external articles referenced in Yade documentation.
+References
+============
 
-	.. note:: This file is generated from :ysrc:`doc/references.bib`.
+All external articles referenced in Yade documentation.
+
+.. note:: This file is generated from :ysrc:`doc/references.bib`.
 
 @bib2rst.bib2rst('../references.bib')@
