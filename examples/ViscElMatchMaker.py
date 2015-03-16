@@ -18,13 +18,13 @@ mat3 = O.materials.append(ViscElMat(frictionAngle=fr,tc=tc,en=en,et=et,density=r
 
 
 id11 = O.bodies.append(sphere(center=[0,0,0],radius=r1,material=mat1,fixed=True,color=[0,0,1]))
-id12 = O.bodies.append(sphere(center=[0,0,(r1+r2+0.005*r2)],radius=r2,material=mat2,fixed=False,color=[0,0,1]))
+id12 = O.bodies.append(sphere(center=[0,0,(r1+r2)],radius=r2,material=mat2,fixed=False,color=[0,0,1]))
 
 id21 = O.bodies.append(sphere(center=[3*r1,0,0],radius=r1,material=mat1,fixed=True,color=[0,1,0]))
-id22 = O.bodies.append(sphere(center=[3*r1,0,(r1+r2+0.005*r2)],radius=r2,material=mat3,fixed=False,color=[0,1,0]))
+id22 = O.bodies.append(sphere(center=[3*r1,0,(r1+r2)],radius=r2,material=mat3,fixed=False,color=[0,1,0]))
 
 id31 = O.bodies.append(sphere(center=[6*r1,0,0],radius=r1,material=mat2,fixed=True,color=[1,0,0]))
-id32 = O.bodies.append(sphere(center=[6*r1,0,(r1+r2+0.005*r2)],radius=r2,material=mat3,fixed=False,color=[1,0,0]))
+id32 = O.bodies.append(sphere(center=[6*r1,0,(r1+r2)],radius=r2,material=mat3,fixed=False,color=[1,0,0]))
 
 o.engines = [
   ForceResetter(),
@@ -33,7 +33,8 @@ o.engines = [
     [Ig2_Sphere_Sphere_ScGeom()],
     [Ip2_ViscElMat_ViscElMat_ViscElPhys( 
       en=MatchMaker(matches=((mat1,mat2,.9),(mat1,mat3,.5),(mat2,mat3,.1))),          # Set parameters
-      et=MatchMaker(matches=((mat1,mat2,.9),(mat1,mat3,.5),(mat2,mat3,.1)))
+      et=MatchMaker(matches=((mat1,mat2,.9),(mat1,mat3,.5),(mat2,mat3,.1))),
+      frictAngle=MatchMaker(matches=((mat1,mat2,.1),(mat1,mat3,.2),(mat2,mat3,.3)))
       )],
     [Law2_ScGeom_ViscElPhys_Basic()],
   ),
@@ -60,5 +61,9 @@ O.step()
 from yade import qt
 qt.View()
 
-#O.run(100000, True)
+print "Friction coefficient for id11 and id12 is %g"%(math.atan(O.interactions[id11,id12].phys.tangensOfFrictionAngle))
+print "Friction coefficient for id21 and id22 is %g"%(math.atan(O.interactions[id21,id22].phys.tangensOfFrictionAngle))
+print "Friction coefficient for id31 and id32 is %g"%(math.atan(O.interactions[id31,id32].phys.tangensOfFrictionAngle))
+
+O.run(100000, True)
 #plot.saveGnuplot('sim-data_')

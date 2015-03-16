@@ -244,7 +244,11 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 		phys->mR = 0;
 	}
 
-	phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle)); 
+	if (frictAngle) {
+		phys->tangensOfFrictionAngle = std::tan((*frictAngle)(mat1->id,mat2->id));
+	} else {
+		phys->tangensOfFrictionAngle = std::tan(std::min(mat1->frictionAngle, mat2->frictionAngle));
+	}
 	phys->shearForce = Vector3r(0,0,0);
 	
 	if ((mRtype1 != mRtype2) or (mRtype1>2) or (mRtype2>2) or (mRtype1<1) or (mRtype2<1) ) {
