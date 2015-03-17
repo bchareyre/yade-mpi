@@ -75,7 +75,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	
 	if (fusionDetection && !bodiesMenisciiList.initialized) bodiesMenisciiList.prepare(scene,hertzOn);
 
-	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // could be done in parallel ? Was tried once, but needs maybe more comparison to assert it is OK: http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10842.html
+	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // could be done in parallel as soon as OpenMPVector class (lib/base/openmp-accu.hpp) is extended See http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10842.html and msg11238.html
 		/// interaction is real
 		if (interaction->isReal()) {
 			CapillaryPhys* cundallContactPhysics=NULL;
@@ -175,7 +175,14 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	}
 	if (fusionDetection) checkFusion();
 
-	FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // same remark for parallel loops
+        #ifdef YADE_OPENMP
+        const long size=scene->interactions->size();
+        #pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+        for(long i=0; i<size; i++){
+            const shared_ptr<Interaction>& interaction=(*scene->interactions)[i];
+        #else
+        FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){
+        #endif
 		if (interaction->isReal()) {
 			CapillaryPhys* cundallContactPhysics=NULL;
 			MindlinCapillaryPhys* mindlinContactPhysics=NULL;

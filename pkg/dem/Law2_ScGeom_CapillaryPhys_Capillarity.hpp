@@ -55,7 +55,7 @@ class Interaction;
 class BodiesMenisciiList
 {
 	private:
-		vector< list< shared_ptr<Interaction> > > interactionsOnBody;
+		vector< list< shared_ptr<Interaction> > > interactionsOnBody; // would require use of OpenMPVector (lib/base/openmp-accu.hpp) for parallel coding, see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10842.html and msg11238.html
 		
 		//shared_ptr<Interaction> empty;
 		
@@ -122,7 +122,7 @@ class Tableau
 {	
 	public: 
 		Real R;
-		std::vector<TableauD> full_data;
+		std::vector<TableauD> full_data; // full_data contains a lot of TableauD, for different D. that are the Laplace solutions for a given r, and a given D
 		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2);		
 		std::ifstream& operator<< (std::ifstream& file);		
 		Tableau();
@@ -134,7 +134,7 @@ class capillarylaw
 {
 	public:
 		capillarylaw();
-		std::vector<Tableau> data_complete;
+		std::vector<Tableau> data_complete; // each Tableau of data_complete corresponds to one capillary file M(r=..), in ascending order of r
 		MeniscusParameters interpolate(Real R1, Real R2, Real D, Real P, int* index);		
 		void fill (const char* filename);
 };
