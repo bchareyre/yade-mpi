@@ -107,6 +107,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	
 	CELL_SCALAR_GETTER(bool,.isWRes,cellIsWRes)
 	CELL_SCALAR_GETTER(bool,.isNWRes,cellIsNWRes)
+	CELL_SCALAR_GETTER(bool,.isTrapW,cellIsTrapW)
+	CELL_SCALAR_GETTER(bool,.isTrapNW,cellIsTrapNW)
 	CELL_SCALAR_SETTER(bool,.isNWRes,setCellIsNWRes)
 	CELL_SCALAR_GETTER(Real,.saturation,cellSaturation)
 	CELL_SCALAR_SETTER(Real,.saturation,setCellSaturation)
@@ -130,6 +132,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	.def("getCellIsWRes",&TwoPhaseFlowEngine::cellIsWRes,"get status wrt 'wetting reservoir' state")
 	.def("getCellIsNWRes",&TwoPhaseFlowEngine::cellIsNWRes,"get status wrt 'non-wetting reservoir' state")
+	.def("getCellIsTrapW",&TwoPhaseFlowEngine::cellIsTrapW,"get status wrt 'trapped wetting phase' state")
+	.def("getCellIsTrapNW",&TwoPhaseFlowEngine::cellIsTrapNW,"get status wrt 'trapped non-wetting phase' state")
 	.def("getCellSaturation",&TwoPhaseFlowEngine::cellSaturation,"get saturation of one pore")
 	.def("setCellSaturation",&TwoPhaseFlowEngine::setCellSaturation,"change saturation of one pore")
 	.def("computeOnePhaseFlow",&TwoPhaseFlowEngine::computeOnePhaseFlow,"compute pressure and fluxes in the W-phase")
