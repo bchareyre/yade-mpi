@@ -587,8 +587,8 @@ void Network<Tesselation>::lineSolidPore(CellHandle cell, int j)
 		VertexHandle SV2 = cell->vertex(facetVertices[j][facetRe2]);
 		VertexHandle SV3 = cell->vertex(facetVertices[j][facetF1]);
 
-		cell->info().solidLine[j][facetRe1]=lineSolidFacet(SV2->point(), SV3->point(), SV1->point());
-		cell->info().solidLine[j][facetRe2]=lineSolidFacet(SV3->point(), SV1->point(), SV2->point());
+		cell->info().solidLine[j][facetRe1]=lineSolidFacet(SV1->point(), SV2->point(), SV3->point());
+		cell->info().solidLine[j][facetRe2]=lineSolidFacet(SV2->point(), SV1->point(), SV3->point());
 
 		Boundary &bi =  boundary(SV3->info().id());
 		double A [3], B[3];
