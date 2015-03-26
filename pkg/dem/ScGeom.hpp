@@ -73,7 +73,7 @@ class ScGeom6D: public ScGeom {
 		((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),(Attr::readonly),"Orientation of body 1 one at initialisation time |yupdate|"))
 		((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),(Attr::readonly),"Orientation of body 2 one at initialisation time |yupdate|"))
 		((Quaternionr,twistCreep,Quaternionr(1.0,0.0,0.0,0.0),(Attr::readonly),"Stored creep, substracted from total relative rotation for computation of elastic moment |yupdate|"))
-		((Real,twist,0,(Attr::noSave | Attr::readonly),"Elastic twist angle (around :yref:`normal<ScGeom6D.normal> axis`) of the contact."))
+		((Real,twist,0,(Attr::noSave | Attr::readonly),"Elastic twist angle (around :yref:`normal axis<ScGeom6D.normal>`) of the contact."))
 		((Vector3r,bending,Vector3r::Zero(),(Attr::noSave | Attr::readonly),"Bending at contact as a vector defining axis of rotation and angle (angle=norm)."))
 		,
 		/* extra initializers */,
