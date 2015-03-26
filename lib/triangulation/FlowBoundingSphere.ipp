@@ -317,12 +317,15 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 					const CVector& Surfk = cell->info().facetSurfaces[j];
 					//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
 					//The ratio void surface / facet surface
+					//Area of the facet (i.e. the triangle)
 					Real area = sqrt(Surfk.squared_length()); if (area<=0) cerr <<"AREA <= 0!!"<<endl;
 					CVector facetNormal = Surfk/area;
 					const std::vector<CVector>& crossSections = cell->info().facetSphereCrossSections;
+					//This is the cross-sectional area of the throat
 					CVector fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
 					/// handle fictious vertex since we can get the projected surface easily here
 					if (cell->vertex(j)->info().isFictious) {
+						//projection of facet on the boundary
 						Real projSurf=std::abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
 						tempVect=-projSurf*boundary(cell->vertex(j)->info().id()).normal;
 						cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
@@ -334,9 +337,11 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 					CVector facetForce = cell->info().p()*facetUnitForce;
 										
 					for (int y=0; y<3;y++) {
+						//1st the drag (viscous) force weighted by surface of spheres in the throat
 						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + facetForce*cell->info().solidSurfaces[j][y];
-						//add to cached value
+						//(add to cached value)
 						cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidSurfaces[j][y];
+						//2nd the partial integral of pore pressure, which boils down to weighting by partial cross-sectional area
 						//uncomment to get total force / comment to get only viscous forces (Bruno)
 						if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
 							cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
