@@ -60,6 +60,7 @@ void VTKRecorder::action(){
 			recActive[REC_MATERIALID]=true;
 			recActive[REC_STRESS]=true;
 			recActive[REC_FORCE]=true;
+			recActive[REC_COORDNUMBER]=true;
 			if (scene->isPeriodic) { recActive[REC_PERICELL]=true; }
 		}
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
@@ -82,6 +83,7 @@ void VTKRecorder::action(){
 		else if(rec=="pericell" && scene->isPeriodic) recActive[REC_PERICELL]=true;
 		else if(rec=="liquidcontrol") recActive[REC_LIQ]=true;
 		else if(rec=="bstresses") recActive[REC_BSTRESS]=true;
+		else if(rec=="coordNumber") recActive[REC_COORDNUMBER]=true;
 		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, pericell, liquidcontrol, bstresses). Ignored.");
 	}
 	// cpm needs interactions
@@ -168,6 +170,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> spheresMask = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresMask->SetNumberOfComponents(1);
 	spheresMask->SetName("mask");
+
+	vtkSmartPointer<vtkDoubleArray> spheresCoordNumb = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresCoordNumb->SetNumberOfComponents(1);
+	spheresCoordNumb->SetName("coordNumber");
 	
 	vtkSmartPointer<vtkDoubleArray> clumpId = vtkSmartPointer<vtkDoubleArray>::New();
 	clumpId->SetNumberOfComponents(1);
@@ -263,6 +269,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> facetsTorqueLen = vtkSmartPointer<vtkDoubleArray>::New();
 	facetsTorqueLen->SetNumberOfComponents(1);
 	facetsTorqueLen->SetName("torqueLen");
+  
+	vtkSmartPointer<vtkDoubleArray> facetsCoordNumb = vtkSmartPointer<vtkDoubleArray>::New();
+	facetsCoordNumb->SetNumberOfComponents(1);
+	facetsCoordNumb->SetName("coordNumber");
 
 	// boxes
 	vtkSmartPointer<vtkPoints> boxesPos = vtkSmartPointer<vtkPoints>::New();
@@ -328,10 +338,10 @@ void VTKRecorder::action(){
 
 	// extras for JCFpm
 	vtkSmartPointer<vtkDoubleArray> damage = vtkSmartPointer<vtkDoubleArray>::New();
-	damage->SetNumberOfComponents(1);;
+	damage->SetNumberOfComponents(1);
 	damage->SetName("damage");
 	vtkSmartPointer<vtkDoubleArray> damageRel = vtkSmartPointer<vtkDoubleArray>::New();
-	damageRel->SetNumberOfComponents(1);;
+	damageRel->SetNumberOfComponents(1);
 	damageRel->SetName("damageRel");
 	vtkSmartPointer<vtkDoubleArray> intrIsCohesive = vtkSmartPointer<vtkDoubleArray>::New();
 	intrIsCohesive->SetNumberOfComponents(1);
@@ -593,6 +603,9 @@ void VTKRecorder::action(){
 					damage->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreak + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreak);
 					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
 				}
+				if (recActive[REC_COORDNUMBER]){
+					spheresCoordNumb->InsertNextValue(b->coordNumber());
+				}
 #ifdef YADE_SPH
 				spheresRhoSPH->InsertNextValue(b->state->rho); 
 				spheresPressSPH->InsertNextValue(b->state->press); 
@@ -650,6 +663,9 @@ void VTKRecorder::action(){
 				}
 				if (recActive[REC_MATERIALID]) facetsMaterialId->InsertNextValue(b->material->id);
 				if (recActive[REC_MASK]) facetsMask->InsertNextValue(GET_MASK(b));
+				if (recActive[REC_COORDNUMBER]){
+					facetsCoordNumb->InsertNextValue(b->coordNumber());
+				}
 				continue;
 			}
 		}
@@ -809,6 +825,7 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(spheresDirIII);
 		}
 		if (recActive[REC_MATERIALID]) spheresUg->GetPointData()->AddArray(spheresMaterialId);
+		if (recActive[REC_COORDNUMBER]) spheresUg->GetCellData()->AddArray(spheresCoordNumb);
 
 		#ifdef YADE_VTK_MULTIBLOCK
 		if(!multiblock)
@@ -844,6 +861,7 @@ void VTKRecorder::action(){
 		}
 		if (recActive[REC_MATERIALID]) facetsUg->GetCellData()->AddArray(facetsMaterialId);
 		if (recActive[REC_MASK]) facetsUg->GetCellData()->AddArray(facetsMask);
+		if (recActive[REC_COORDNUMBER]) facetsUg->GetCellData()->AddArray(facetsCoordNumb);
 		#ifdef YADE_VTK_MULTIBLOCK
 			if(!multiblock)
 		#endif
@@ -858,7 +876,7 @@ void VTKRecorder::action(){
 			#else
 				writer->SetInput(facetsUg);
 			#endif
-			writer->Write();	
+			writer->Write();
 		}
 	}
 	vtkSmartPointer<vtkUnstructuredGrid> boxesUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
