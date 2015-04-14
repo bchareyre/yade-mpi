@@ -29,6 +29,7 @@ IF(${ENABLE_GUI})
           RESULT_VARIABLE rv
           )
     INSTALL(FILES ${CMAKE_BINARY_DIR}/img_rc.py ${CMAKE_BINARY_DIR}/ui_controller.py  DESTINATION ${YADE_PY_PATH}/yade/qt)
+    
   ELSE(USE_QT5)
     INCLUDE(${QT_USE_FILE})
     
