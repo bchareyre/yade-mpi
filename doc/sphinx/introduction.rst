@@ -175,21 +175,22 @@ Normal simulations, however, are run continuously. Starting/stopping the loop is
 
 Saving and loading
 ------------------
-Simulation can be saved at any point to (optionally compressed) XML file. With some limitations,
-it is generally possible to load the XML later and resume the simulation as if it were not
-interrupted. Note that since XML is merely readable dump of Yade's internal objects, it might not
+Simulation can be saved at any point to a binary file (optionaly compressed if the filename has extensions such as ".gz" or ".bz2").
+Saving to a XML file is also possible though resulting in larger files and slower save/load, it is used when the filename contains "xml". With some limitations,
+it is generally possible to load the scene later and resume the simulation as if it were not
+interrupted. Note that since the saved scene is a dump of Yade's internal objects, it might not
 (probably will not) open with different Yade version.
 
 .. ipython::
 
-	In [1]: O.save('/tmp/a.xml.bz2')
+	In [1]: O.save('/tmp/a.yade.bz2')
 
 	In [2]: O.reload() 
 
 	@suppress
-	In [4]: O.save('/tmp/another.xml.bz2')
+	In [4]: O.save('/tmp/another.yade.bz2')
 
-	In [3]: O.load('/tmp/another.xml.bz2')
+	In [3]: O.load('/tmp/another.yade.bz2')
 
 The principal use of saving the simulation to XML is to use it as temporary in-memory storage
 for checkpoints in simulation, e.g. for reloading the initial state and running again with
