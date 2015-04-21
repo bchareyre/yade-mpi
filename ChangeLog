@@ -1,4 +1,170 @@
 ==================================================
+yade-1.14.0
+Tue, 21 Apr 2015 22:36:55 +0200
+
+Anton Gladky (36):
+      Remove RELEASE file.
+      Fix typo in SPH.
+      Move SPH-body parameters into body->state.
+      Add one more kernel function in SPH.
+      Change sign in calculation of viscosity in SPH
+      Simplify Lucy kernel function
+      Remove Cs parameter from VTK-export (sph only).
+      Implement second variant of BSpline kernel function.
+      Fix typo in Bspline  kernel functio (sph).
+      Fix date typo in Changelog
+      Move Vf and Vmin from Body`s parameter to Body->state.
+      Replace struct intReal by standard std::pair
+      Prevent returning of a real value from void-function.
+      Fix probably a wrong using of if-condition.
+      Minor fix of using of std::abs function.
+      Drop some if-conditions, which have always constant value.
+      Drop default inclusion of DFNFLOW.
+      Add some missing #ifdef YADE_CGAL.
+      Fix check-script for LIQMIGRATION.
+      Drop -frounding-math compiler flag from FindCGAL.
+      Drop embedded floating_point_utilities_v3.
+      Reintroduce  floating_point_utilities_v3.
+      Add missing files from last commit.
+      Add LiqMigrEnabled parameter.
+      Fix compilation with  GCC-5. (Closes: #778190)
+      +2 Project works
+      Add an opportunity to list works, other than master thesis.
+      Fix body unselecting. (Closes: LP:1423130)
+      Fix MatplotlibDeprecationWarning: The use of 0
+      Remove DirSearchYade, MicroMacroAnalysis and someFile.pdf
+      Clean current directory after --check
+      Check file existance before its moving and removing.
+      Add information, how to be notidied after each commit.
+      Add an opportunity to set frictAngl through MatchMaker in ViscEl
+      Add an option coordNumber to be exported in VTK.
+      Add one more master thesis.
+
+Bruno Chareyre (28):
+      FlowEngine: set cell's id in periodic triangulations + couple smallfix
+      fix bad bugs in DFNFlowEngine following uninitialized 'isClump'
+      use the dedicated solver in DFNFlowEngine
+      some code documentation
+      FlowEngine: discard blocked cells completely when assembling the permeability matrix
+      #undef DFNFLOW
+      FlowEngine: enhanced setter macro, detect changes in imposed pressure and update the linear system accordingly
+      explicit error message when trying to interpolate capillary forces out-of-range of the data files
+      fix save/load QGL camera state via text files
+      Documentation. Define sign convention globaly in TriaxialStressController docstring, not repeated in attributes documentation
+      bib reference of 1st workshop
+      fix mistakes in conferences.bib
+      +13 journal papers using yade
+      +14 conference papers
+      small update in the publication page
+      fix and sort some bib references + change the title of the conference section
+      +1 journal paper
+      +1 conference paper
+      +1 journal paper and fix alphabetic ordering of a few items
+      FlowEngine safely impose flux at every iteration without remeshing + documentation
+      implement blockHook for PeriodicFlowEngine as well
+      Add .mailmap file defining git alias for multiple adress emails
+      sphinx '..only::' directive removing some parts that break in latex
+      integrate Ning's FEMxDEM doc in yade's doc
+      add references in relation with FEMxDEM + couple fixes in *.bib
+      remove  FEMxDEM readme, replace by FEMxDEM.rst for inclusion in doc
+      remove '..only:' from sphinx files - not yet supported on older sphinx then breaking the html build | update bib's
+      Update introduction.rst
+
+Chao Yuan (7):
+      move computePoreThroatRadius() to 2PFlow
+      -move initialization() to 2PF
+      -fix inconsistency in invasionSingleCell and getMaxImbibitionPC; clean code; remove savePhaseVTK in Unsat
+      -remove cleanInterfaceWithinPore() in Unsat.
+      fix inconsistency of side boundary cell pressure of closeBC drainage.
+      Add some comments on FlowEngine(by bruno).
+      Fix error in computing cell->info.solidLine
+
+Christian Jakob (10):
+      fix force and torque vtk output for boxes
+      temporary fix for pfv vtk output when vertex ids were not zero-based
+      fix fusion detection for hertz model in capillary law
+      reduce error message spam for capillary law
+      remove unused testing function in capillary law
+      fix previous commit for case (fusionDetection && hertz model) in capillary law (re-initiate bodiesMenisciiList at first real contact) and add some comments
+      improve/fix documentation about clumps
+      insert link to user manual in documentation of NewtonIntegrator
+      update DEM background doc for clumps
+      some code cleaning in clump methods
+
+Francois Kneib (1):
+      Add the Yubuntu (live-usb with Xubuntu and Yade) alternative for installation.
+
+Jan Stránský (10):
+      PolyhedraMat and PolyhedraPhys are now inherited from FrictMat and FrictPhys, modified related examples     Added Ig2_Sphere_Polyhedra_ScGeom
+      Added examples for Ig2_Sphere_Polyhedra_ScGeom, added ymport.ele function
+      Added documentation of Ig2_Sphere_Polyhedra_ScGeom
+      Allowed Polyhedra-Wall interaction if Wall.sense==0
+      fixed Cpm for Sphere-Box interactions
+      added export.textPolyhedra function
+      added Elias2014 article to yade-articles.bib
+      add attrs parameter to export.textPolyhedra
+      modified Clump::updateProprties to handel non-spherical bodies, added associated example
+      box inertia computation correction
+
+Jerome Duriez (19):
+      Sign convention change for fCap, to be consistent with global framework. Plus other minor changes. As discussed in http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10868.html and http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10877.html
+      Doc hyperlinks, and erase of commented lines
+      Many changes towards a more consistent sign convention throughout the code for stresses and strains. Should fix e.g. https://bugs.launchpad.net/yade/+bug/1381282. The goal is to know directly the meaning of a strain or stress value each time one is encountered. Relying on the classical Continuum Mechanics convention (editorial choice...). A global announcement is planned in a couple of days, in case some errors appear in the meantime.
+      Other changes regarding sign convention. Add of deprecation warnings (existing in the code and at execution) in the doc. Fix of script-session2.py previously broken
+      See https://bugs.launchpad.net/yade/+bug/1394942 answer # 3
+      Minor doc fixes
+      Anecdotic doc change, see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10972.html
+      Add of O.thisScene() function to know in which scene we are
+      Add of sphSph parameter in plotDirections() to take into account only sph-sph interactions in polar histograms. Seems it does not modify really the plots, but it is easier to figure out with the parameter
+      TSC engine: internal compaction now may consider isotropic tensile cases. See http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg11047.html
+      Removal of parallel loops in capillary Law2: needs maybe more verification, and improvements for fusion detection
+      Typo in the doc (missing space)
+      Correction of minor inconsistency between comment and command
+      Extra parenthesis removed in doc
+      Doc of capillary law2, concerning fusionDetection, precised (see https://lists.launchpad.net/yade-dev/msg11792.html)
+      Doc typos
+      Parallelization of one loop of Law2_ScGeom_CapillaryPhys_Capillarity (see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg11238.html) and some comments
+      Typo in ScGeom, precision about twist doc (axis) in ScGeom6D
+      Minor fix of previous commit (hyperlink)
+
+Klaus Thoeni (2):
+      update references
+      update some links and typos
+
+Luc Scholtes (3):
+      changes for DFNFlow + corrections in JCFpm associated with the use of the never erase flag
+      minor changes in DFN Flow
+      add references
+
+Luc Sibille (5):
+      Add 2 article references in yade-articles.bib
+      correct a proceeding reference
+      correct reference key in 1 proceeding
+      fix missing comas after key references
+      add fragile parameter to CohFrictMat and redefine unpMax CohFrictPhys
+
+Ning GUO (2):
+      Ning Guo's FEMxDEM package added to trunk
+      Example REV generation for FEMxDEM
+
+Raphael Maurin (6):
+      add some references in yade-conference.bib
+      Switch a private argument to public in HydroforceEngine.
+      HydroForceEngine: minor fix + add an averaging function     Minor fix : modify some default value of the parameters, remove unecessary parameters.     Add a 1D averaging function which evaluate the average depth profiles of the solid volume fraction, the solid velocity, and the drag force.     The averaging is weighted by the volume occupied by the particles in the layer considered.
+      Add new function to compute stress tensor depth profile.     Compute and return the stress tensor for each cell of height dz, between two limit points given by the user.     The stress tensor computed include contributions from both particles inertia and Love-Weber stress tensor. This last take into account only the part of the branch vector contained in the cell.
+      Minor fix in getStressProfile.     The order of the argument in _utils.cpp was not the right one.
+      HydroForceEngine: small modifications in the averaging function.     Perform the averaging also on the y and z component of the particle velocity, instead of only x before.
+
+T Sweijen (7):
+      update for dynamic two-phase flow
+      small correction
+      add initSolver()
+      delta t for dynamic two-phase flow
+      add function to get the pore body radius
+      add one get functions for pore volume and rename that of inscribed sphere
+      add one get functions for pore volume and rename that of inscribed sphere
+
+==================================================
 yade-1.12.0
 Mon, 20 Oct 2014 21:22:00 +0200
 
