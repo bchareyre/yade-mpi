@@ -41,55 +41,36 @@ INCLUDE(FindNumPy)
 INCLUDE(FindLoki)
 INCLUDE(FindPythonModule)
 INCLUDE(GNUInstallDirs)
+
+INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
+
 #===========================================================
 # HACK!!! If the version of gcc is 4.8 or greater, we add -ftrack-macro-expansion=0 
 # and -save-temps into compiler to reduce the memory consumption during compilation.
 # See http://bugs.debian.org/726009 for more information
 # Can be removed later, if gcc fixes its regression
 # Taken from http://stackoverflow.com/questions/4058565/check-gcc-minor-in-cmake
- 
+
 EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 IF (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
   MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0 and -save-temps")
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ftrack-macro-expansion=0 -save-temps")
+  ADD_DEFINITIONS("-ftrack-macro-expansion=0 -save-temps")
 ENDIF()
 
 #===========================================================
 
 IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ftemplate-depth-512")
+  ADD_DEFINITIONS("-ftemplate-depth-512")
 ENDIF()
 
-#===========================================================
+SET(CMAKE_CXX_FLAGS  ${CMAKE_CXX_FLAGS} " -fPIC -O2 -fstack-protector-strong --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++0x")
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++0x")
-INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
-#===========================================================
+IF (DEBUG)
+  SET(CMAKE_VERBOSE_MAKEFILE 1)
+  SET(CMAKE_BUILD_TYPE Debug)
+  ADD_DEFINITIONS("-DYADE_DEBUG -g")
+ENDIF (DEBUG)
 
-#===========================================================
-
-IF (CMAKE_CXX_FLAGS)
-  #If flags are set, add only neccessary flags
-  IF (DEBUG)
-    SET(CMAKE_VERBOSE_MAKEFILE 1)
-    SET(CMAKE_BUILD_TYPE Debug)
-    ADD_DEFINITIONS("-DYADE_DEBUG")
-  ELSE (DEBUG)
-    SET(CMAKE_BUILD_TYPE Release)
-    SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC")
-  ENDIF (DEBUG)
-ELSE (CMAKE_CXX_FLAGS)
-  #If flags are not set, add all useful flags
-  IF (DEBUG)
-    SET(CMAKE_VERBOSE_MAKEFILE 1)
-    SET(CMAKE_BUILD_TYPE Debug)
-    ADD_DEFINITIONS("-DYADE_DEBUG")
-    SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fPIC -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security")
-  ELSE (DEBUG)
-    SET(CMAKE_BUILD_TYPE Release)
-    SET(CMAKE_CXX_FLAGS  "-Wall -fPIC -g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -s")
-  ENDIF (DEBUG)
-ENDIF (CMAKE_CXX_FLAGS)
 #===========================================================
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
