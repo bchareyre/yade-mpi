@@ -11,11 +11,7 @@ from yade.wrapper import *
 from yade._customConverters import *
 from yade import utils
 from yade import *
-
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 class TestPBC(unittest.TestCase):
 	# prefix test names with PBC: 

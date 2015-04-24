@@ -9,7 +9,6 @@ Auxiliary functions for polyhedra
 import math,random,doctest,geom,numpy
 from yade import Vector3
 from yade.wrapper import *
-#from miniEigen import *
 try: # use psyco if available
 	import psyco
 	psyco.full()

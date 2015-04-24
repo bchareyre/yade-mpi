@@ -38,10 +38,7 @@ import matplotlib,os,time,math,itertools
 import yade.runtime
 if not yade.runtime.hasDisplay: matplotlib.use('Agg')
 
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKAgg')

@@ -17,11 +17,8 @@ try: # use psyco if available
 	psyco.full()
 except ImportError: pass
 
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
 
+from minieigen import *
 
 # c++ implementations for performance reasons
 from yade._utils import *

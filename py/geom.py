@@ -6,10 +6,7 @@ Creates geometry objects from facets.
 from yade.wrapper import *
 import utils,math,numpy
 
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 #facetBox===============================================================
 def facetBox(center,extents,orientation=Quaternion((0,1,0),0.0),wallMask=63,**kw):

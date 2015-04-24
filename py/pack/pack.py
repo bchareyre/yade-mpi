@@ -23,10 +23,8 @@ from yade import utils
 
 from yade.wrapper import *
 
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+
+from minieigen import *
 
 ## compatibility hack for python 2.5 (21/8/2009)
 ## can be safely removed at some point

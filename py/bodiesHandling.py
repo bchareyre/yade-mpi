@@ -6,10 +6,7 @@ Miscellaneous functions, which are useful for handling bodies.
 from yade.wrapper import *
 import utils,math,numpy
 
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 #spheresPackDimensions==================================================
 def spheresPackDimensions(idSpheres=[],mask=-1):

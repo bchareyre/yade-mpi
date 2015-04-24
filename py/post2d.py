@@ -59,11 +59,7 @@ This example can be found in examples/concrete/uniax-post.py ::
 
 """
 from yade.wrapper import *
-
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 class Flatten:
 	"""Abstract class for converting 3d point into 2d. Used by post2d.data2d."""
@@ -181,10 +177,8 @@ def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold
 	Scalar fields contain 'val' (value from *extractor*), vector fields have 'valX' and 'valY' (2 components returned by the *extractor*).
 	"""
 	
-	try:
-		from miniEigen import Vector3
-	except ImportError:
-		from minieigen import Vector3
+
+	from minieigen import Vector3
 		
 	xx,yy,dd1,dd2,rr=[],[],[],[],[]
 	nDim=0

@@ -11,10 +11,7 @@ logging.basicConfig(level=logging.INFO)
 from yade import *
 import yade.qt
 
-try:
-  from minieigen import *
-except ImportError:
-  from miniEigen import *
+from minieigen import *
 
 seqSerializableShowType=True # show type headings in serializable sequences (takes vertical space, but makes the type hyperlinked)
 

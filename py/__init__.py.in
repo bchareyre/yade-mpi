@@ -73,19 +73,11 @@ globals().update(deprecatedTypes)
 # declare what should be imported for "from yade import *"
 __all__=deprecatedTypes.keys()+['O']
 
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 from wrapper import *
 # import to separate namespace to be able to call dir(miniEigen) and dir(wrapper) below
 import wrapper 
-
-try:
-	import minieigen
-except ImportError:
-	import miniEigen
 
 # out-of-class docstrings for some classes
 import _extraDocs
@@ -93,10 +85,6 @@ import _extraDocs
 import utils # some others?
 __all__+=['utils',]+dir(wrapper)
 
-try:
-	__all__+=dir(miniEigen)
-except NameError:
-	pass
 
 # make O and wrapper.Omega part of __builtin__ (equvialent to global)
 import __builtin__

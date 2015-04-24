@@ -12,11 +12,7 @@ from yade._customConverters import *
 from math import *
 from yade import system
 from yade import *
-
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 allClasses=system.childClasses('Serializable')
 

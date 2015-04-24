@@ -199,15 +199,6 @@ void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT*
 }
 
 template<typename MatrixT>
-void Matrix_SVD(const MatrixT& in, MatrixT* mU, MatrixT* mS, MatrixT* mV){
-	assert(mU); assert(mS);  assert(mV);
-	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
-	*mU = svd.matrixU();
-	*mV = svd.matrixV();
-	*mS = svd.singularValues().asDiagonal();
-}
-
-template<typename MatrixT>
 void matrixEigenDecomposition(const MatrixT& m, MatrixT& mRot, MatrixT& mDiag){
 	//assert(mRot); assert(mDiag);
 	Eigen::SelfAdjointEigenSolver<MatrixT> a(m); mRot=a.eigenvectors(); mDiag=a.eigenvalues().asDiagonal();

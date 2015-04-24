@@ -433,12 +433,8 @@ ELSE (CHUNKSIZE)
   ADD_LIBRARY(yade SHARED ${SRC_CORE} ${SRC_PKG} ${SRC_LIB})
 ENDIF (CHUNKSIZE)
 #===========================================================
-find_python_module(minieigen)
-IF (PY_minieigen)
-  MESSAGE(STATUS "Use system minieigen version")
-ELSE (PY_minieigen)
-  MESSAGE(STATUS "Use embedded version of minieigen. Please, consider installing the corresponding package")
-ENDIF (PY_minieigen)
+find_python_module(minieigen REQUIRED)
+
 find_python_module(Tkinter REQUIRED)
 #===========================================================
 
@@ -461,13 +457,6 @@ IF(ENABLE_GUI)
   TARGET_LINK_LIBRARIES(yade _GLViewer ${GUI_LIBS})
 ENDIF(ENABLE_GUI)
 
-#====================================
-IF (NOT (PY_minieigen))
-  ADD_LIBRARY(miniEigen SHARED py/mathWrap/miniEigen.cpp)
-  SET_TARGET_PROPERTIES(miniEigen PROPERTIES PREFIX "")
-  TARGET_LINK_LIBRARIES(miniEigen ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-  INSTALL(TARGETS miniEigen DESTINATION ${YADE_PY_PATH})
-ENDIF (NOT (PY_minieigen))
 #====================================
 #Back compatibility with scons
 SET (realVersion ${YADE_VERSION})

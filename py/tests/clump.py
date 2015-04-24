@@ -10,11 +10,7 @@ from yade._customConverters import *
 from yade import utils
 from yade import *
 from math import *
-
-try:
-	from minieigen import *
-except ImportError:
-	from miniEigen import *
+from minieigen import *
 
 class TestSimpleClump(unittest.TestCase):
 	"Test things on a simple clump composed of 2 spheres."
