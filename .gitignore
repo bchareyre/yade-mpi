@@ -30,3 +30,5 @@ doc/sphinx/yade.polyhedra_utils.rst
 *.kdev4
 *.pyc
 *~
+.idea
+trunk.iml
