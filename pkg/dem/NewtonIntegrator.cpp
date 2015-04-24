@@ -242,13 +242,13 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 	Vector3r angVel_b_n = l_b_n.cwiseQuotient(state->inertia); // local angular velocity at time n
 	if (densityScaling) angVel_b_n*=state->densityScaling;
 	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
-	const Quaternionr Q_half = state->ori + dt/2. * dotQ_n; // Q at time n+1/2
+	const Quaternionr Q_half = Quaternionr(state->ori.coeffs() + dt/2. * dotQ_n.coeffs()); // Q at time n+1/2
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
 	Vector3r angVel_b_half = l_b_half.cwiseQuotient(state->inertia); // local angular velocity at time n+1/2
 	if (densityScaling) angVel_b_half*=state->densityScaling;
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
-	state->ori=state->ori+dt*dotQ_half; // Q at time n+1
+	state->ori=Quaternionr(state->ori.coeffs()+dt*dotQ_half.coeffs()); // Q at time n+1
 	state->angVel=state->ori*angVel_b_half; // global angular velocity at time n+1/2
 
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {

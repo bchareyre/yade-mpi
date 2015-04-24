@@ -137,7 +137,7 @@ stateVector& Integrator::getSceneStateDot(void){
 
 			angvelquat = Quaternionr(0.0,angvel_current[0],angvel_current[1],angvel_current[2]);	
 					
-			oridot_current=0.5*angvelquat*ori_current;
+			oridot_current=Quaternionr(0.5*(angvelquat*ori_current).coeffs());
 
 		
 			//	if (densityScaling) accel*=state->densityScaling;

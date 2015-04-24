@@ -140,7 +140,7 @@ void Disp2DPropLoadEngine::computeAlpha()
 	Quaternionr orientationLeftBox,orientationRightBox;
 	orientationLeftBox = leftbox->state->ori;
 	orientationRightBox = rightbox->state->ori;
-	if(orientationLeftBox!=orientationRightBox)
+	if(orientationLeftBox.matrix()!=orientationRightBox.matrix())
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
 	}

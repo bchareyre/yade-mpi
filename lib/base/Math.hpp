@@ -2,10 +2,10 @@
 #pragma once
 
 #ifdef QUAD_PRECISION
-	typedef long double quad;
-	typedef quad Real;
+	using quad = long double;
+	using Real = quad;
 #else
-	typedef double Real;
+	using Real = double;
 #endif
 
 #include <algorithm>
@@ -102,37 +102,34 @@ using boost::shared_ptr;
 #include <Eigen/Eigenvalues>
 #include <float.h>
 
-// templates of those types with single parameter are not possible, use macros for now
-#define VECTOR2_TEMPLATE(Scalar) Eigen::Matrix<Scalar,2,1>
-#define VECTOR3_TEMPLATE(Scalar) Eigen::Matrix<Scalar,3,1>
-#define VECTOR6_TEMPLATE(Scalar) Eigen::Matrix<Scalar,6,1>
-#define MATRIX3_TEMPLATE(Scalar) Eigen::Matrix<Scalar,3,3>
-#define MATRIX6_TEMPLATE(Scalar) Eigen::Matrix<Scalar,6,6>
 
-// this would be the proper way, but only works in c++-0x (not yet supported by gcc (4.5))
-#if 0
-	template<typename Scalar> using Vector2=Eigen::Matrix<Scalar,2,1>;
-	template<typename Scalar> using Vector3=Eigen::Matrix<Scalar,3,1>;
-	template<typename Scalar> using Matrix3=Eigen::Matrix<Scalar,3,3>;
-	typedef Vector2<int> Vector2i;
-	typedef Vector2<Real> Vector2r;
-	// etc
-#endif
+template<typename Scalar> using Vector2 = Eigen::Matrix<Scalar,2,1>;
+using Vector2i = Vector2<int>;
+using Vector2r = Vector2<Real>;
 
-typedef VECTOR2_TEMPLATE(int) Vector2i;
-typedef VECTOR2_TEMPLATE(Real) Vector2r;
-typedef VECTOR3_TEMPLATE(int) Vector3i;
-typedef VECTOR3_TEMPLATE(Real) Vector3r;
-typedef VECTOR6_TEMPLATE(Real) Vector6r;
-typedef VECTOR6_TEMPLATE(int) Vector6i;
-typedef MATRIX3_TEMPLATE(Real) Matrix3r;
-typedef MATRIX6_TEMPLATE(Real) Matrix6r;
+template<typename Scalar> using Vector3 = Eigen::Matrix<Scalar,3,1>;
+using Vector3i = Vector3<int>;
+using Vector3r = Vector3<Real>;
 
-typedef Eigen::Quaternion<Real> Quaternionr;
-typedef Eigen::AngleAxis<Real> AngleAxisr;
-typedef Eigen::AlignedBox<Real,2> AlignedBox2r;
-typedef Eigen::AlignedBox<Real,3> AlignedBox3r;
-using Eigen::AngleAxis; using Eigen::Quaternion;
+template<typename Scalar> using Vector6 = Eigen::Matrix<Scalar,6,1>;
+using Vector6i = Vector6<int>;
+using Vector6r = Vector6<Real>;
+
+template<typename Scalar> using Matrix3 = Eigen::Matrix<Scalar,3,3>;
+using Matrix3i = Matrix3<int>;
+using Matrix3r = Matrix3<Real>;
+
+template<typename Scalar> using Matrix6 = Eigen::Matrix<Scalar,6,6>;
+using Matrix6i = Matrix6<int>;
+using Matrix6r = Matrix6<Real>;
+
+using Quaternionr = Eigen::Quaternion<Real>;
+using AngleAxisr  = Eigen::AngleAxis<Real>;
+using AlignedBox2r = Eigen::AlignedBox<Real,2>;
+using AlignedBox3r = Eigen::AlignedBox<Real,3>;
+
+using Eigen::AngleAxis;
+using Eigen::Quaternion;
 
 // in some cases, we want to initialize types that have no default constructor (OpenMPAccumulator, for instance)
 // template specialization will help us here
@@ -140,35 +137,27 @@ template<typename EigenMatrix> EigenMatrix ZeroInitializer(){ return EigenMatrix
 template<> int ZeroInitializer<int>();
 template<> Real ZeroInitializer<Real>();
 
-
 // io
-template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR2_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y(); return os; };
-template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR3_TEMPLATE(Scalar)& v){ os << v.x()<<" "<<v.y()<<" "<<v.z(); return os; };
-template<class Scalar> std::ostream & operator<<(std::ostream &os, const VECTOR6_TEMPLATE(Scalar)& v){ os << v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<" "<<v[4]<<" "<<v[5]; return os; };
-template<class Scalar> std::ostream & operator<<(std::ostream &os, const Eigen::Quaternion<Scalar>& q){ os<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z(); return os; };
-// operators
-//template<class Scalar> VECTOR3_TEMPLATE(Scalar) operator*(Scalar s, const VECTOR3_TEMPLATE(Scalar)& v) {return v*s;}
-//template<class Scalar> MATRIX3_TEMPLATE(Scalar) operator*(Scalar s, const MATRIX3_TEMPLATE(Scalar)& m) { return m*s; }
-//template<class Scalar> Quaternion<Scalar> operator*(Scalar s, const Quaternion<Scalar>& q) { return q*s; }
-//template<typename Scalar> void matrixEigenDecomposition(const MATRIX3_TEMPLATE(Scalar) m, MATRIX3_TEMPLATE(Scalar)& mRot, MATRIX3_TEMPLATE(Scalar)& mDiag){ Eigen::SelfAdjointEigenSolver<MATRIX3_TEMPLATE(Scalar)> a(m); mRot=a.eigenvectors(); mDiag=a.eigenvalues().asDiagonal(); }
-// http://eigen.tuxfamily.org/dox/TutorialGeometry.html
-template<typename Scalar> MATRIX3_TEMPLATE(Scalar) matrixFromEulerAnglesXYZ(Scalar x, Scalar y, Scalar z){ MATRIX3_TEMPLATE(Scalar) m; m=AngleAxis<Scalar>(x,VECTOR3_TEMPLATE(Scalar)::UnitX())*AngleAxis<Scalar>(y,VECTOR3_TEMPLATE(Scalar)::UnitY())*AngleAxis<Scalar>(z,VECTOR3_TEMPLATE(Scalar)::UnitZ()); return m;}
-template<typename Scalar> bool operator==(const Quaternion<Scalar>& u, const Quaternion<Scalar>& v){ return u.x()==v.x() && u.y()==v.y() && u.z()==v.z() && u.w()==v.w(); }
-template<typename Scalar> bool operator!=(const Quaternion<Scalar>& u, const Quaternion<Scalar>& v){ return !(u==v); }
-template<typename Scalar> bool operator==(const MATRIX3_TEMPLATE(Scalar)& m, const MATRIX3_TEMPLATE(Scalar)& n){ for(int i=0;i<3;i++)for(int j=0;j<3;j++)if(m(i,j)!=n(i,j)) return false; return true; }
-template<typename Scalar> bool operator!=(const MATRIX3_TEMPLATE(Scalar)& m, const MATRIX3_TEMPLATE(Scalar)& n){ return !(m==n); }
-template<typename Scalar> bool operator==(const MATRIX6_TEMPLATE(Scalar)& m, const MATRIX6_TEMPLATE(Scalar)& n){ for(int i=0;i<6;i++)for(int j=0;j<6;j++)if(m(i,j)!=n(i,j)) return false; return true; }
-template<typename Scalar> bool operator!=(const MATRIX6_TEMPLATE(Scalar)& m, const MATRIX6_TEMPLATE(Scalar)& n){ return !(m==n); }
-template<typename Scalar> bool operator==(const VECTOR6_TEMPLATE(Scalar)& u, const VECTOR6_TEMPLATE(Scalar)& v){ return u[0]==v[0] && u[1]==v[1] && u[2]==v[2] && u[3]==v[3] && u[4]==v[4] && u[5]==v[5]; }
-template<typename Scalar> bool operator!=(const VECTOR6_TEMPLATE(Scalar)& u, const VECTOR6_TEMPLATE(Scalar)& v){ return !(u==v); }
-template<typename Scalar> bool operator==(const VECTOR3_TEMPLATE(Scalar)& u, const VECTOR3_TEMPLATE(Scalar)& v){ return u.x()==v.x() && u.y()==v.y() && u.z()==v.z(); }
-template<typename Scalar> bool operator!=(const VECTOR3_TEMPLATE(Scalar)& u, const VECTOR3_TEMPLATE(Scalar)& v){ return !(u==v); }
-template<typename Scalar> bool operator==(const VECTOR2_TEMPLATE(Scalar)& u, const VECTOR2_TEMPLATE(Scalar)& v){ return u.x()==v.x() && u.y()==v.y(); }
-template<typename Scalar> bool operator!=(const VECTOR2_TEMPLATE(Scalar)& u, const VECTOR2_TEMPLATE(Scalar)& v){ return !(u==v); }
-template<typename Scalar> Quaternion<Scalar> operator*(Scalar f, const Quaternion<Scalar>& q){ return Quaternion<Scalar>(q.coeffs()*f); }
-template<typename Scalar> Quaternion<Scalar> operator+(Quaternion<Scalar> q1, const Quaternion<Scalar>& q2){ return Quaternion<Scalar>(q1.coeffs()+q2.coeffs()); }	/* replace all those by standard math functions
-	this is a non-templated version, to avoid compilation because of static constants;
-*/
+template<class Scalar> std::ostream & operator<<(std::ostream &os, const Vector2<Scalar>& v) {
+  os << v.x()<<" "<<v.y();
+  return os;
+}
+
+template<class Scalar> std::ostream & operator<<(std::ostream &os, const Vector3<Scalar>& v) {
+  os << v.x()<<" "<<v.y()<<" "<<v.z();
+  return os;
+}
+
+template<class Scalar> std::ostream & operator<<(std::ostream &os, const Vector6<Scalar>& v) {
+  os << v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<" "<<v[4]<<" "<<v[5];
+  return os;
+}
+
+template<class Scalar> std::ostream & operator<<(std::ostream &os, const Eigen::Quaternion<Scalar>& q) {
+  os<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z();
+  return os;
+}
+
 template<typename Scalar>
 struct Math{
 	static const Scalar PI;
@@ -183,14 +172,22 @@ struct Math{
 
 	static Scalar UnitRandom(){ return ((double)rand()/((double)(RAND_MAX))); }
 	static Scalar SymmetricRandom(){ return 2.*(((double)rand())/((double)(RAND_MAX)))-1.; }
-	static Scalar FastInvCos0(Scalar fValue){ Scalar fRoot = sqrt(((Scalar)1.0)-fValue); Scalar fResult = -(Scalar)0.0187293; fResult *= fValue; fResult += (Scalar)0.0742610; fResult *= fValue; fResult -= (Scalar)0.2121144; fResult *= fValue; fResult += (Scalar)1.5707288; fResult *= fRoot; return fResult; }
+	static Scalar FastInvCos0(Scalar fValue) {
+	  Scalar fRoot = sqrt(((Scalar)1.0)-fValue);
+	  Scalar fResult = -(Scalar)0.0187293;
+	  fResult *= fValue; fResult += (Scalar)0.0742610;
+	  fResult *= fValue; fResult -= (Scalar)0.2121144;
+	  fResult *= fValue; fResult += (Scalar)1.5707288;
+	  fResult *= fRoot;
+	  return fResult;
+	 }
 };
-typedef Math<Real> Mathr;
+using Mathr = Math<Real>;
 
 /* this was removed in eigen3, see http://forum.kde.org/viewtopic.php?f=74&t=90914 */
 template<typename MatrixT>
 void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT* positive){
-	assert(unitary); assert(positive); 
+	assert(unitary); assert(positive);
 	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
 	MatrixT mU, mV, mS;
 	mU = svd.matrixU();
@@ -203,7 +200,7 @@ void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT*
 
 template<typename MatrixT>
 void Matrix_SVD(const MatrixT& in, MatrixT* mU, MatrixT* mS, MatrixT* mV){
-	assert(mU); assert(mS);  assert(mV); 
+	assert(mU); assert(mS);  assert(mV);
 	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
 	*mU = svd.matrixU();
 	*mV = svd.matrixV();
@@ -216,32 +213,23 @@ void matrixEigenDecomposition(const MatrixT& m, MatrixT& mRot, MatrixT& mDiag){
 	Eigen::SelfAdjointEigenSolver<MatrixT> a(m); mRot=a.eigenvectors(); mDiag=a.eigenvalues().asDiagonal();
 }
 
-
-/*
- * Extra yade math functions and classes
- */
-
-
 /* convert Vector6r in the Voigt notation to corresponding 2nd order symmetric tensor (stored as Matrix3r)
 	if strain is true, then multiply non-diagonal parts by .5
 */
 template<typename Scalar>
-MATRIX3_TEMPLATE(Scalar) voigt_toSymmTensor(const VECTOR6_TEMPLATE(Scalar)& v, bool strain=false){
+Matrix3<Scalar> voigt_toSymmTensor(const Vector6<Scalar>& v, bool strain=false){
 	Real k=(strain?.5:1.);
-	MATRIX3_TEMPLATE(Scalar) ret; ret<<v[0],k*v[5],k*v[4], k*v[5],v[1],k*v[3], k*v[4],k*v[3],v[2]; return ret;
+	Matrix3<Scalar> ret; ret<<v[0],k*v[5],k*v[4], k*v[5],v[1],k*v[3], k*v[4],k*v[3],v[2]; return ret;
 }
 /* convert 2nd order tensor to 6-vector (Voigt notation), symmetrizing the tensor;
 	if strain is true, multiply non-diagonal compoennts by 2.
 */
 template<typename Scalar>
-VECTOR6_TEMPLATE(Scalar) tensor_toVoigt(const MATRIX3_TEMPLATE(Scalar)& m, bool strain=false){
+Vector6<Scalar> tensor_toVoigt(const Matrix3<Scalar>& m, bool strain=false){
 	int k=(strain?2:1);
-	VECTOR6_TEMPLATE(Scalar) ret; ret<<m(0,0),m(1,1),m(2,2),k*.5*(m(1,2)+m(2,1)),k*.5*(m(2,0)+m(0,2)),k*.5*(m(0,1)+m(1,0)); return ret;
+	Vector6<Scalar> ret; ret<<m(0,0),m(1,1),m(2,2),k*.5*(m(1,2)+m(2,1)),k*.5*(m(2,0)+m(0,2)),k*.5*(m(0,1)+m(1,0)); return ret;
 }
 
-
-
-__attribute__((unused))
 const Real NaN(std::numeric_limits<Real>::signaling_NaN());
 
 // void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real threshold=1e-6f);
@@ -257,17 +245,15 @@ template<typename Scalar> void quaterniontoGLMatrix(const Quaternion<Scalar>& q,
 	m[3]=0.;           m[7]=0.;           m[11]=0.;           m[15]=1.;
 }
 
-
-
 // se3
 template <class Scalar>
 class Se3
 {
 	public :
-		VECTOR3_TEMPLATE(Scalar)	position;
+		Vector3<Scalar>	position;
 		Quaternion<Scalar>	orientation;
 		Se3(){};
-		Se3(VECTOR3_TEMPLATE(Scalar) rkP, Quaternion<Scalar> qR){ position = rkP; orientation = qR; }
+		Se3(Vector3<Scalar> rkP, Quaternion<Scalar> qR){ position = rkP; orientation = qR; }
 		Se3(const Se3<Scalar>& s){position = s.position;orientation = s.orientation;}
 		Se3(Se3<Scalar>& a,Se3<Scalar>& b){
 			position  = b.orientation.inverse()*(a.position - b.position);  
@@ -275,13 +261,13 @@ class Se3
 		}
 		Se3<Scalar> inverse(){ return Se3(-(orientation.inverse()*position), orientation.inverse());}
 		void toGLMatrix(float m[16]){ orientation.toGLMatrix(m); m[12] = position[0]; m[13] = position[1]; m[14] = position[2];}
-		VECTOR3_TEMPLATE(Scalar) operator * (const VECTOR3_TEMPLATE(Scalar)& b ){return orientation*b+position;}
+		Vector3<Scalar> operator * (const Vector3<Scalar>& b ){return orientation*b+position;}
 		Se3<Scalar> operator * (const Quaternion<Scalar>& b ){return Se3<Scalar>(position , orientation*b);}
 		Se3<Scalar> operator * (const Se3<Scalar>& b ){return Se3<Scalar>(orientation*b.position+position,orientation*b.orientation);}
 };
 
 // functions
-template<typename Scalar> Scalar unitVectorsAngle(const VECTOR3_TEMPLATE(Scalar)& a, const VECTOR3_TEMPLATE(Scalar)& b){ return acos(a.dot(b)); }
+template<typename Scalar> Scalar unitVectorsAngle(const Vector3<Scalar>& a, const Vector3<Scalar>& b){ return acos(a.dot(b)); }
 // operators
 
 
@@ -289,7 +275,7 @@ template<typename Scalar> Scalar unitVectorsAngle(const VECTOR3_TEMPLATE(Scalar)
  * Mask
  */
 #ifdef YADE_MASK_ARBITRARY
-typedef std::bitset<YADE_MASK_ARBITRARY_SIZE> mask_t;
+using mask_t = std::bitset<YADE_MASK_ARBITRARY_SIZE>;
 bool operator==(const mask_t& g, int i);
 bool operator==(int i, const mask_t& g);
 bool operator!=(const mask_t& g, int i);
@@ -303,19 +289,14 @@ bool operator||(bool b, const mask_t& g);
 bool operator&&(const mask_t& g, bool b);
 bool operator&&(bool b, const mask_t& g);
 #else
-typedef int mask_t;
+using mask_t = int;
 #endif
 
-
-/*
- * typedefs
- */
-typedef Se3<Real> Se3r;
+using Se3r = Se3<Real>;
 
 /*
  * Serialization of math classes
  */
-
 
 #include<boost/serialization/nvp.hpp>
 #include<boost/serialization/is_bitwise_serializable.hpp>
@@ -421,10 +402,3 @@ void serialize(Archive & ar, mask_t& v, const unsigned int version){
 
 } // namespace serialization
 } // namespace boost
-
-#if 0
-// revert optimization options back
-#if defined(__GNUG__) && __GNUC__ >= 4 && __GNUC_MINOR__ >=4
-	#pragma GCC pop_options
-#endif
-#endif
