@@ -293,7 +293,7 @@ bool Ig2_Sphere_Polyhedra_ScGeom::go(const shared_ptr<Shape>& shape1,const share
 	const std::vector<int> faceTri = B->GetSurfaceTriangulation();
 	// get vertices in global coordinate system
 	std::vector<Vector3r> pts(B->v);
-	for (int i=0; i<pts.size(); i++) pts[i] = se32.position + se32.orientation*pts[i];
+	for (unsigned int i=0; i<pts.size(); i++) pts[i] = se32.position + se32.orientation*pts[i];
 
 	//******************************************************************************
 	// find the closest point of polyhedron to the sphere center, see following paper for notation
@@ -305,17 +305,18 @@ bool Ig2_Sphere_Polyhedra_ScGeom::go(const shared_ptr<Shape>& shape1,const share
 	Real dst2min = DBL_MAX; // minimal squared distance (large number initially)
 	// auxiliary value
 	Vector3r p1,p2,p3,e1,e2,e3,e,n,p0a,p10,p20,p30,v1,v2,v3,pa,pb,r,p0aa,pp,ppp;
-	Real dst,f1,f2,f3,t,e1n,e2n,e3n,en,p10n,p20n,p30n,o1,o2,o3,dst2,edst2,edst2min;
-	PointTriangleRelation rel=none,relTemp,relTemp2;
-	for (int i=0; i<faceTri.size()/3; i++) { // iterate over all triangles...
+  pp = Vector3r::Zero();
+	Real dst,t,en,o1,o2,o3,dst2,edst2,edst2min;
+	PointTriangleRelation rel=none,relTemp=none,relTemp2;
+	for (unsigned int i=0; i<faceTri.size()/3; i++) { // iterate over all triangles...
 		// triangle vertices
 		p1 = pts[faceTri[3*i+0]];
 		p2 = pts[faceTri[3*i+1]];
 		p3 = pts[faceTri[3*i+2]];
 		// triangle edges vectors
-		e1 = p2-p1; e1n = e1.norm();
-		e2 = p3-p2; e2n = e2.norm();
-		e3 = p1-p3; e3n = e3.norm();
+		e1 = p2-p1;
+		e2 = p3-p2;
+		e3 = p1-p3;
 		n = (e1.cross(-e3)).normalized(); // tirangle outer normal
 		dst = (p0-p1).dot(n); // oriented distance of p0 to triangle plane
 		if (dst>0) isInside = false; // p0 lies in positive halfspace of triangle, cannot be inside

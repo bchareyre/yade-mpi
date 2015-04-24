@@ -30,8 +30,6 @@
 	#include<gl2ps.h>
 #endif
 
-static int last(-1);
-
 void GLViewer::useDisplayParameters(size_t n){
 	LOG_DEBUG("Loading display parameters from #"<<n);
 	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;

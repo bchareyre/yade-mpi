@@ -618,7 +618,7 @@ void HydrodynamicsLawLBM::action()
         /*------------------------------------------------------------------*/
         /*                  GENERAL REINITIALIZATION                        */
         /*------------------------------------------------------------------*/
-        Vector3r WallBottomVel=Vector3r::Zero();//m s-1
+        // Vector3r WallBottomVel=Vector3r::Zero();//m s-1
         FmoyCur=0.;
         VmeanFluidC=0.; VmaxC=-1000000.;    VminC=1000000.;
         RhomaxC=-1000000.;  RhominC=1000000.;RhoTot=0.;

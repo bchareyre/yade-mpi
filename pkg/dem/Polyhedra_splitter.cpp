@@ -102,8 +102,8 @@ void PolyhedraSplitter::action()
 			if (I_valu(max_i,max_i) < I_valu(2,2)) max_i = 2;
 			
 			//division of stress by volume
-			double comp_stress = I_valu(min_i,min_i)/p->GetVolume();
-			double tens_stress = I_valu(max_i,max_i)/p->GetVolume();			
+			// double comp_stress = I_valu(min_i,min_i)/p->GetVolume();
+			// double tens_stress = I_valu(max_i,max_i)/p->GetVolume();			
 			Vector3r dirC = I_vect.col(max_i);
 			Vector3r dirT = I_vect.col(min_i);
 			Vector3r dir1  = dirC.normalized() + dirT.normalized();	

@@ -167,7 +167,6 @@ void HydroForceEngine::action(){
 
 void HydroForceEngine::averageProfile(){
 	//Initialization
-	int Np;
 	int minZ;
 	int maxZ;
 	int numLayer;

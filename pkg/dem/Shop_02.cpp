@@ -375,10 +375,10 @@ Matrix3r Shop::getStress(Real volume){
 
 
 vector<Matrix3r> Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ){
-	int minZ;
-	int maxZ;
-	Real minPosZ;
-	Real maxPosZ;
+	int minZ=0;
+	int maxZ=0;
+	Real minPosZ=0.;
+	Real maxPosZ=0.;
 	Scene* scene=Omega::instance().getScene().get();
 	vector<Matrix3r> stressTensorProfile(nCell,Matrix3r::Zero());
 	const bool isPeriodic = scene->isPeriodic;

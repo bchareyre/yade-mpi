@@ -87,8 +87,6 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			
 			unsigned int id1 = interaction->getId1();
 			unsigned int id2 = interaction->getId2();
-			Body* b1 = (*bodies)[id1].get();
-			Body* b2 = (*bodies)[id2].get();
 
 			/// interaction geometry search (this test is to compute capillarity only between spheres (probably a better way to do that)
 			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!
