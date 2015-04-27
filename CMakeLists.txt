@@ -60,9 +60,14 @@ ENDIF()
 #===========================================================
 
 IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
-  ADD_DEFINITIONS("-ftemplate-depth-512 -fstack-protector")
+  ADD_DEFINITIONS("-ftemplate-depth-512 -fstack-protector ")
 ELSE()
-  ADD_DEFINITIONS("-fstack-protector-strong")
+  IF (GCC_VERSION VERSION_GREATER 4.9 OR GCC_VERSION VERSION_EQUAL 4.9)
+    MESSAGE(STATUS "GCC Version >= 4.9. Adding -fstack-protector-strong")
+    ADD_DEFINITIONS("-fstack-protector-strong")
+  ELSE()
+    ADD_DEFINITIONS("-fstack-protector")
+  ENDIF()
 ENDIF()
 
 SET(CMAKE_CXX_FLAGS  ${CMAKE_CXX_FLAGS} " -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++0x")
