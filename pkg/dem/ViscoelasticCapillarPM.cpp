@@ -18,11 +18,16 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
   // no updates of an existing contact 
   if(interaction->phys) return;
   
+  TIMING_DELTAS_START();
+  TIMING_DELTAS_CHECKPOINT("setup");
+  
   shared_ptr<ViscElCapPhys> phys (new ViscElCapPhys());
   Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction, phys);
   
   ViscElCapMat* mat1 = static_cast<ViscElCapMat*>(b1.get());
   ViscElCapMat* mat2 = static_cast<ViscElCapMat*>(b2.get());
+  
+  TIMING_DELTAS_CHECKPOINT("collide_materials");
   
   if (mat1->Capillar and mat2->Capillar)  {
     if (mat1->Vb == mat2->Vb) {
@@ -65,6 +70,9 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
 
 /* Law2_ScGeom_ViscElCapPhys_Basic */
 bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I) {
+  TIMING_DELTAS_START();
+  TIMING_DELTAS_CHECKPOINT("setup");
+  
   Vector3r force = Vector3r::Zero();
   
   const id_t id1 = I->getId1();
@@ -81,8 +89,10 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
    * There is only the determination of critical distance between spheres, 
    * after that the liquid bridge will be broken.
    */ 
-   
-  if (not(phys.liqBridgeCreated) and phys.Capillar and geom.penetrationDepth>=0) {
+  
+  TIMING_DELTAS_CHECKPOINT("create_liq_bridge");
+
+  if (phys.Capillar and not(phys.liqBridgeCreated) and geom.penetrationDepth>=0) {
     phys.liqBridgeCreated = true;
     phys.liqBridgeActive = false;
     #ifdef YADE_LIQMIGRATION
@@ -101,8 +111,11 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     }
   }
   
+  TIMING_DELTAS_CHECKPOINT("calculate_scrit");
+
   phys.sCrit = this->critDist(phys.Vb, phys.R, phys.theta);
   
+  TIMING_DELTAS_CHECKPOINT("force_calculation_liquid");
   if (geom.penetrationDepth<0) {
     if (phys.liqBridgeCreated and -geom.penetrationDepth<phys.sCrit and phys.Capillar) {
       if (not(phys.liqBridgeActive)) {
@@ -146,6 +159,7 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
     Vector3r torque1 = Vector3r::Zero();
     Vector3r torque2 = Vector3r::Zero();
     
+    TIMING_DELTAS_CHECKPOINT("force_calculation_penetr");
     if (computeForceTorqueViscEl(_geom, _phys, I, force, torque1, torque2)) {
       addForce (id1,-force,scene);
       addForce (id2, force,scene);

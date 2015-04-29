@@ -10,6 +10,7 @@
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/common/MatchMaker.hpp>
+#include<pkg/common/InteractionLoop.hpp>
 
 #ifdef YADE_SPH
 #include<pkg/common/SPHEngine.hpp>
