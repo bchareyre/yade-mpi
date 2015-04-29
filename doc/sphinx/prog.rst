@@ -1158,7 +1158,7 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 		   YADE_CLASS_BASE_DOC_ATTRS_CTOR(Law2_ScGeom_CpmPhys_Cpm,LawFunctor,"docstring",
 		      /* attrs */,
 		      /* constructor */
-		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas); // timingDeltas object is automatically initialized when using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option
+		      timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas); // timingDeltas object is automatically initialized when using -DENABLE_PROFILING=1 cmake option
 		   );
 		   // ...
 		};
@@ -1186,7 +1186,7 @@ Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It 
 		   timingDeltas->checkpoint("rest");
 		}
 
-#. Alternatively, you can compile Yade using -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" cmake option and use predefined macros TIMING_DELTAS_START and TIMING_DELTAS_CHECKPOINT. Without -DUSE_TIMING_DELTAS options, those macros are empty and do nothing.
+#. Alternatively, you can compile Yade using -DENABLE_PROFILING=1 cmake option and use predefined macros TIMING_DELTAS_START and TIMING_DELTAS_CHECKPOINT. Without -DENABLE_PROFILING options, those macros are empty and do nothing.
 	.. code-block:: c++
 
 		void Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom,

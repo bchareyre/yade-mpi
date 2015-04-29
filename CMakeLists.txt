@@ -18,6 +18,7 @@
 #  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default, experimental)
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
+#  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
@@ -125,6 +126,7 @@ OPTION(ENABLE_SPH "Enable SPH" OFF)
 OPTION(ENABLE_LBMFLOW "Enable LBM engine (very experimental)" ON)
 OPTION(ENABLE_LIQMIGRATION "Enable liquid control (very experimental), see [Mani2013] for details" OFF)
 OPTION(ENABLE_MASK_ARBITRARY "Enable arbitrary precision of bitmask variables (only Body::groupMask yet implemented) (experimental). Use -DMASK_ARBITRARY_SIZE=int to set number of used bits (256 by default)" OFF)
+OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -365,6 +367,15 @@ IF(ENABLE_MASK_ARBITRARY)
 ELSE(ENABLE_MASK_ARBITRARY)
   SET(DISABLED_FEATS "${DISABLED_FEATS} MASK_ARBITRARY")
 ENDIF(ENABLE_MASK_ARBITRARY)
+
+#===========================================================
+
+IF(ENABLE_PROFILING)
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PROFILING")
+  ADD_DEFINITIONS("-DUSE_TIMING_DELTAS")
+ELSE(ENABLE_PROFILING)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} PROFILING")
+ENDIF(ENABLE_PROFILING)
 
 #===========================================================
 

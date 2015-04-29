@@ -86,7 +86,7 @@ def stats():
 		TOTAL                                                             10733564us              100.00%
 
 
-	sample output (compiled with -DCMAKE_CXX_FLAGS="-DUSE_TIMING_DELTAS" option):
+	sample output (compiled with -DENABLE_PROFILING=1 option):
 
 	.. code-block:: none
 
