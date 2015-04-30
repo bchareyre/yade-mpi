@@ -130,7 +130,7 @@ void InteractionContainer::requestErase(Interaction* I){
 }
 
 void InteractionContainer::eraseNonReal(){
-	FOREACH(const shared_ptr<Interaction>& i, *this) if(!i->isReal()) this->erase(i->getId1(),i->getId2());
+	FOREACH(const shared_ptr<Interaction>& i, *this) if(!i->isReal()) this->erase(i->getId1(),i->getId2(),i->linIx);
 }
 
 // compare interaction based on their first id
