@@ -66,8 +66,8 @@ class CohFrictPhys : public FrictPhys
 		((bool,initCohesion,false,,"Initialize the cohesive behaviour with current state as equilibrium state (same as :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow` but acting on only one interaction)"))
 		((Real,creep_viscosity,-1,,"creep viscosity [Pa.s/m]."))
 		// internal attributes
-		((Vector3r,moment_twist,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Twist moment"))
-		((Vector3r,moment_bending,Vector3r(0,0,0),(Attr::noSave | Attr::readonly),"Bending moment"))
+		((Vector3r,moment_twist,Vector3r(0,0,0),,"Twist moment"))
+		((Vector3r,moment_bending,Vector3r(0,0,0),,"Bending moment"))
 		,
 		createIndex();
 	);
