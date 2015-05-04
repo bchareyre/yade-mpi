@@ -1,5 +1,5 @@
 # The YADE has the following parameters to configure:
-#  INSTALL_PREFIX: path, where Yade will be installed (/usr/local by default)
+#  CMAKE_INSTALL_PREFIX: path, where Yade will be installed (/usr/local by default)
 #  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 #  DEBUG: compile in debug-mode (OFF by default)
 #  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
@@ -15,12 +15,12 @@
 #  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
 #  ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 #  ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (ON by default)
-#  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default, experimental)
+#  ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default)
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
-#  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
+#  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 
 project(Yade C CXX)
@@ -379,13 +379,16 @@ ENDIF(ENABLE_PROFILING)
 
 #===========================================================
 
-IF (NOT INSTALL_PREFIX)
- SET(CMAKE_INSTALL_PREFIX "/usr/local")
- MESSAGE("Yade will be installed to default path ${CMAKE_INSTALL_PREFIX}, if you want to override it use -DINSTALL_PREFIX option.")
-ELSE (NOT INSTALL_PREFIX)
-	GET_FILENAME_COMPONENT(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} ABSOLUTE)
-	MESSAGE("Yade will be installed to ${CMAKE_INSTALL_PREFIX}")
-ENDIF (NOT INSTALL_PREFIX)
+IF (INSTALL_PREFIX)
+  SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
+  MESSAGE(WARNING "Use CMAKE_INSTALL_PREFIX option instead of INSTALL_PREFIX! It will be removed soon.")
+ENDIF (INSTALL_PREFIX)
+
+IF (CMAKE_INSTALL_PREFIX)
+  MESSAGE("Yade will be installed to ${CMAKE_INSTALL_PREFIX}")
+ELSE (CMAKE_INSTALL_PREFIX)
+  MESSAGE("Yade will be installed to default path ${CMAKE_INSTALL_PREFIX}, if you want to override it use -DCMAKE_INSTALL_PREFIX option.")
+ENDIF (CMAKE_INSTALL_PREFIX)
 
 IF (NOT SUFFIX)
   SET (SUFFIX "-${YADE_VERSION}")

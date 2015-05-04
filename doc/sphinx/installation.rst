@@ -188,11 +188,11 @@ and where the source code will be compiled. Here is an example for a folder stru
 
 Then inside this build-directory you should start cmake to configure the compilation process::
 
-	cmake -DINSTALL_PREFIX=/path/to/installfolder /path/to/sources
+	cmake -DCMAKE_INSTALL_PREFIX=/path/to/installfolder /path/to/sources
 
 For the folder structure given above call the following command in folder "build":
 
-	cmake -DINSTALL_PREFIX=../install ../trunk
+	cmake -DCMAKE_INSTALL_PREFIX=../install ../trunk
 
 Additional options can be configured in the same line with the following 
 syntax::
@@ -201,7 +201,7 @@ syntax::
 	
 The following options are available:
 	
-	* INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
+	* CMAKE_INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 	* DEBUG: compile in debug-mode (OFF by default)
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
@@ -216,8 +216,14 @@ The following options are available:
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
 	* ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
 	* ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
+	* ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (ON by default)
+	* ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default)
+	* ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
+	* ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
+	* ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
-	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default).
+	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
+	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 
 For using an extended parameters of cmake, please, follow the corresponding
 documentation on cmake-webpage. 
