@@ -98,7 +98,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 
 		void imposeFlux(Vector3r pos, Real flux);
 		unsigned int imposePressure(Vector3r pos, Real p);
-		unsigned int imposePressureFromId(long id, Real p);
+		unsigned int imposePressureFromId(unsigned long id, Real p);
 		void setImposedPressure(unsigned int cond, Real p);
 		void clearImposedPressure();
 		void clearImposedFlux();
@@ -167,7 +167,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Real volumeCell (Cellhandle cell);
 		template<class Cellhandle>
 		Vector3r cellBarycenterFromHandle (Cellhandle cell) {return makeVector3r(solver->cellBarycenter(cell));}
-		Vector3r cellBarycenterFromId (long id) {
+		Vector3r cellBarycenterFromId (unsigned long id) {
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return Vector3r(0,0,0);}
 			else return cellBarycenterFromHandle(solver->T[solver->currentTes].cellHandles[id]);}
 		void Oedometer_Boundary_Conditions();

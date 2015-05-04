@@ -140,7 +140,7 @@ class CpmPhys: public NormShearPhys {
 		static long cummBetaIter, cummBetaCount;
 		/*! auxiliary variable for visualization, recalculated in Law2_ScGeom_CpmPhys_Cpm at every iteration */
 		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormShearPhys 
-		Real omega, Fn, sigmaN, epsN, relResidualStrength, kappaD, epsNPl;
+		Real omega = 0, Fn = 0, sigmaN, epsN = 0, relResidualStrength, kappaD = 0, epsNPl = 0;
 		Vector3r sigmaT, Fs, epsTPl, epsT;
 
 		static Real solveBeta(const Real c, const Real N);
@@ -181,7 +181,7 @@ class CpmPhys: public NormShearPhys {
 			((bool,isCohesive,false,,"if not cohesive, interaction is deleted when distance is greater than zero."))
 			, // ctors
 			createIndex();
-			Fn = omega = kappaD = epsN = kappaD = epsNPl = 0;
+			epsN = 0;
 			_ZERO_VECTOR3R(epsT); _ZERO_VECTOR3R(Fs); _ZERO_VECTOR3R(epsTPl);
 			,
 			.def_readonly("omega",&CpmPhys::omega,"Damage internal variable |yupdate|")

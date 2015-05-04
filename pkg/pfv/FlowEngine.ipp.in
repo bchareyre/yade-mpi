@@ -31,9 +31,9 @@ unsigned int TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tess
 }
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
-unsigned int TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::imposePressureFromId(long id, Real p)
+unsigned int TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::imposePressureFromId(unsigned long id, Real p)
 {
-	imposePressure(cellBarycenterFromId(id),p);
+	return imposePressure(cellBarycenterFromId(id),p);
 }
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >

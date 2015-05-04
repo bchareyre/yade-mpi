@@ -29,29 +29,11 @@ struct Predicate{
 		Vector3r dim() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return (mx-mn).eval(); }
 		Vector3r center() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return .5*(mn+mx); }
 };
-// make the pad parameter optional
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PredicateCall_overloads,operator(),1,2);
 
-/* Since we want to make Predicate::operator() and Predicate::aabb() callable from c++ on py::object
-with the right virtual method resolution, we have to wrap the class in the following way. See 
-http://www.boost.org/doc/libs/1_38_0/libs/python/doc/tutorial/doc/html/python/exposing.html for documentation
-on exposing virtual methods.
-
-This makes it possible to derive a python class from Predicate, override its aabb() method, for instance,
-and use it in PredicateUnion, which will call the python implementation of aabb() as it should. This
-approach is used in the inGtsSurface class defined in pack.py.
-
-See scripts/test/gts-operators.py for an example.
-
-NOTE: you still have to call base class ctor in your class' ctor derived in python, e.g.
-super(inGtsSurface,self).__init__() so that virtual methods work as expected.
-*/
 struct PredicateWrap: Predicate, py::wrapper<Predicate>{
 	bool operator()(const Vector3r& pt, Real pad=0.) const { return this->get_override("__call__")(pt,pad);}
 	py::tuple aabb() const { return this->get_override("aabb")(); }
 };
-// make the pad parameter optional
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PredicateWrapCall_overloads,operator(),1,2);
 
 /*********************************************************************************
 ****************** Boolean operations on predicates ******************************
