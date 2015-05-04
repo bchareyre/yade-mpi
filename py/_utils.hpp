@@ -19,8 +19,6 @@ bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax);
 
 py::tuple negPosExtremeIds(int axis, Real distFactor=1.1);
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2);
-
 py::tuple coordsAndDisplacements(int axis,py::tuple Aabb=py::tuple());
 
 void setRefSe3();
@@ -29,10 +27,8 @@ Real PWaveTimeStep();
 Real RayleighWaveTimeStep();
 
 py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::tuple aabb=py::tuple(), bool sphSph=0, Real minProjLen=1e-6);
-BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,5);
 
 py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple());
-BOOST_PYTHON_FUNCTION_OVERLOADS(bodyNumInteractionsHistogram_overloads,bodyNumInteractionsHistogram,0,1);
 
 Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
 py::dict getViscoelasticFromSpheresInteraction(Real tc, Real en, Real es);
