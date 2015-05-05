@@ -101,10 +101,15 @@ int  Gl1_Sphere::glutSlices;
 int  Gl1_Sphere::glutStacks;
 Real  Gl1_Sphere::quality;
 bool  Gl1_Sphere::localSpecView;
+bool Gl1_Sphere::circleView;
+Real Gl1_Sphere::circleRelThickness;
 vector<Vector3r> Gl1_Sphere::vertices, Gl1_Sphere::faces;
 int Gl1_Sphere::glStripedSphereList=-1;
 int Gl1_Sphere::glGlutSphereList=-1;
 Real  Gl1_Sphere::prevQuality=0;
+string Gl1_Sphere::prevDisplayMode="";
+char Gl1_Sphere::circleAllowedRotationAxis;
+char  Gl1_Sphere::prevCircleAllowedRotationAxis='z';
 
 void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
 {
@@ -113,11 +118,32 @@ void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool 
 
 	Real r=(static_cast<Sphere*>(cm.get()))->radius;
 	glColor3v(cm->color);
-	if (wire || wire2) glutWireSphere(r,quality*glutSlices,quality*glutStacks);
+	if (circleView) {
+			bool somethingChanged = (std::abs(quality-prevQuality)>0.001 || prevDisplayMode!="torus" || prevCircleAllowedRotationAxis!=circleAllowedRotationAxis);
+			if (somethingChanged) {
+				prevCircleAllowedRotationAxis=circleAllowedRotationAxis;
+				prevDisplayMode="torus";
+				glDeleteLists(glGlutSphereList,1);
+				glGlutSphereList = glGenLists(1);
+				  glNewList(glGlutSphereList,GL_COMPILE);
+				    glEnable(GL_LIGHTING);
+				    glShadeModel(GL_SMOOTH);
+ 				    switch (tolower(circleAllowedRotationAxis)) { //rotate the torus according to the axis from which we want to look at it.
+					  case 'z':break; //Initial torus axis is z, nothing to do
+					  case 'x':glRotatef(90,0,1,0);break;
+					  case 'y':glRotatef(90,1,0,0);break;
+					  default:cerr<<"Error in Gl1_Sphere::go, circleAllowedRotationAxis should be \"x\", \"y\" or \"z\"."<<endl;
+				    }
+				    glutSolidTorus(0.5*circleRelThickness*r,r*(1.0-circleRelThickness/2.),quality*glutStacks,quality*glutSlices); //generate torus
+				  glEndList();
+			}
+			glCallList(glGlutSphereList);
+	}
+	else if (wire || wire2) glutWireSphere(r,quality*glutSlices,quality*glutStacks);
 	else {
 		//Check if quality has been modified or if previous lists are invalidated (e.g. by creating a new qt view), then regenerate lists
-		bool somethingChanged = (std::abs(quality-prevQuality)>0.001 || glIsList(glStripedSphereList)!=GL_TRUE);
-		if (somethingChanged) {initStripedGlList(); initGlutGlList(); prevQuality=quality;}
+		bool somethingChanged = (std::abs(quality-prevQuality)>0.001 || glIsList(glStripedSphereList)!=GL_TRUE || prevDisplayMode!="sphere");
+		if (somethingChanged) {initStripedGlList(); initGlutGlList(); prevQuality=quality;prevDisplayMode="sphere";}
 		glScalef(r,r,r);
 		if(stripes) glCallList(glStripedSphereList);
 		else glCallList(glGlutSphereList);
