@@ -109,8 +109,8 @@ class Peri3dController: public BoundaryController{
 		((Vector6i,ps,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
 		((Vector6i,pathSizes,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
 		((Vector6i,pathsCounter,Vector6i::Zero(),Attr::readonly,"Peri3dController internal variable"))
-		((int,lenPe,NaN,Attr::readonly,"Peri3dController internal variable"))
-		((int,lenPs,NaN,Attr::readonly,"Peri3dController internal variable"))
+		((int,lenPe,0,Attr::readonly,"Peri3dController internal variable"))
+		((int,lenPs,0,Attr::readonly,"Peri3dController internal variable"))
 		,
 		/*ctor*/
 		,
