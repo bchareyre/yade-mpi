@@ -322,7 +322,7 @@ bool PeriodicTesselation<Tesselation>::redirect ( void )
 			maxId = max(maxId, (int) vIt->info().id());
 		}
 		if ( (unsigned int)maxId+1 != vertexHandles.size() ) vertexHandles.resize ( maxId+1 );
-		bool redirected = true;
+		redirected = true;
 	} else return false;
 	return true;
 }

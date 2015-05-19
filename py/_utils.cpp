@@ -317,8 +317,8 @@ shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id
 
 Real Shop__unbalancedForce(bool useMaxForce /*false by default*/){return Shop::unbalancedForce(useMaxForce);}
 py::tuple Shop__totalForceInVolume(){Real stiff; Vector3r ret=Shop::totalForceInVolume(stiff); return py::make_tuple(ret,stiff); }
-Real Shop__getSpheresVolume(int mask){ return Shop::getSpheresVolume(Omega::instance().getScene(), mask=mask);}
-Real Shop__getSpheresMass(int mask){ return Shop::getSpheresMass(Omega::instance().getScene(), mask=mask);}
+Real Shop__getSpheresVolume(int mask){ return Shop::getSpheresVolume(Omega::instance().getScene(), mask);}
+Real Shop__getSpheresMass(int mask){ return Shop::getSpheresMass(Omega::instance().getScene(), mask);}
 py::object Shop__kineticEnergy(bool findMaxId){
 	if(!findMaxId) return py::object(Shop::kineticEnergy());
 	Body::id_t maxId;
@@ -363,7 +363,7 @@ Real shiftBodies(py::list ids, const Vector3r& shift){
 	return 1;
 }
 
-void Shop__calm(int mask){ return Shop::calm(Omega::instance().getScene(), mask=mask);}
+void Shop__calm(int mask){ return Shop::calm(Omega::instance().getScene(), mask);}
 
 void setNewVerticesOfFacet(const shared_ptr<Body>& b, const Vector3r& v1, const Vector3r& v2, const Vector3r& v3) {
 	Vector3r center = inscribedCircleCenter(v1,v2,v3);
@@ -410,7 +410,7 @@ py::list numIntrsOfEachBody() {
 	return ret;
 }
 
-Real Shop__getSpheresVolume2D(int mask=-1){ return Shop::getSpheresVolume2D(Omega::instance().getScene(), mask=mask);}
+Real Shop__getSpheresVolume2D(int mask=-1){ return Shop::getSpheresVolume2D(Omega::instance().getScene(), mask);}
 Real Shop__getVoidRatio2D(Real zlen=1){ return Shop::getVoidRatio2D(Omega::instance().getScene(),zlen);}
 py::tuple Shop__getStressAndTangent(Real volume=0, bool symmetry=true){return Shop::getStressAndTangent(volume,symmetry);}
 

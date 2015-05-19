@@ -52,7 +52,6 @@ class ForceContainer{
 		vvector _force, _torque, _move, _rot, _permForce, _permTorque;
 		std::vector<size_t> sizeOfThreads;
 		size_t size;
-		size_t permSize;
 		bool syncedSizes;
 		int nThreads;
 		bool synced,moveRotUsed,permForceUsed;
@@ -74,7 +73,7 @@ class ForceContainer{
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), permSize(0),syncedSizes(true),synced(true),moveRotUsed(false),permForceUsed(false),_zero(Vector3r::Zero()),syncCount(0),lastReset(0){
+		ForceContainer(): size(0), syncedSizes(true),synced(true),moveRotUsed(false),permForceUsed(false),_zero(Vector3r::Zero()),syncCount(0),lastReset(0){
 			nThreads=omp_get_max_threads();
 			for(int i=0; i<nThreads; i++){
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
@@ -175,7 +174,6 @@ class ForceContainer{
 		void resizePerm(size_t newSize){
 			_permForce.resize(newSize,Vector3r::Zero());
 			_permTorque.resize(newSize,Vector3r::Zero());
-			permSize = newSize;
 			if (size<newSize) size=newSize;
 			syncedSizes=false;
 		}
@@ -224,7 +222,7 @@ class ForceContainer {
 		std::vector<Vector3r> _permForce, _permTorque;
 		Body::id_t _maxId;
 		size_t size;
-		size_t permSize;
+		bool moveRotUsed, permForceUsed;
 		inline void ensureSize(Body::id_t id){ 
 			const Body::id_t idMaxTmp = max(id, _maxId);
 			_maxId = 0;
@@ -234,11 +232,10 @@ class ForceContainer {
 			const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
 			const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
 		#endif
-		bool moveRotUsed, permForceUsed;
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), permSize(0), moveRotUsed(false), permForceUsed(false), syncCount(0), lastReset(0), _maxId(0){}
+		ForceContainer(): _maxId(0), size(0), moveRotUsed(false), permForceUsed(false), syncCount(0), lastReset(0){}
 		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}
 		void  addForce(Body::id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(Body::id_t id){ensureSize(id); return _torque[id];}
