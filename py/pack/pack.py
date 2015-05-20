@@ -271,18 +271,18 @@ def regularHexa(predicate,radius,gap,**kw):
 	Created spheres will have given radius and will be separated by gap space."""
 	ret=[]
 	a=2*radius+gap
-	# thanks to Nasibeh Moradi for finding bug here:
-	# http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01424.html
 	hy,hz=a*sqrt(3)/2.,a*sqrt(6)/3.
 	mn,mx=predicate.aabb()
 	dim=[mx[i]-mn[i] for i in 0,1,2]
 	if(max(dim)==float('inf')): raise ValueError("Aabb of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
 	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/hy)+1),range(0,int(dim[2]/hz)+1)]
 	for i,j,k in itertools.product(ii,jj,kk):
-		x,y,z=mn[0]+radius+i*a,mn[1]+radius+j*hy,mn[2]+radius+k*hz
-		if j%2==0: x+= a/2. if k%2==0 else -a/2.
-		if k%2!=0: x+=a/2.; y+=hy/2.
-		if predicate((x,y,z),radius): ret+=[utils.sphere((x,y,z),radius=radius,**kw)]
+		#Simple HCP-lattice packing
+		#http://en.wikipedia.org/wiki/Close-packing_of_equal_spheres#Simple_hcp_lattice
+		coordSph = Vector3((2*i + ((j + k) % 2 ) ),
+											(sqrt(3.)*(j + 1./3.*(k % 2))),
+											(2.*sqrt(6.)/3.*k))*(a/2.0) + mn
+		if predicate(coordSph,radius): ret+=[utils.sphere(coordSph,radius=radius,**kw)]
 	if (len(ret)==0):
 		warnings.warn('No spheres are produced by regularHexa-function',category=RuntimeWarning)
 	return ret
