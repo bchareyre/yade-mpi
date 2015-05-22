@@ -188,7 +188,7 @@ class InsertionSortCollider: public Collider{
 	vector<Body::id_t> probeBoundingVolume(const Bound&);
 
 	virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(InsertionSortCollider,Collider,"\
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InsertionSortCollider,Collider,"\
 		Collider with O(n log(n)) complexity, using :yref:`Aabb` for bounds.\
 		\n\n\
 		At the initial step, Bodies' bounds (along :yref:`sortAxis<InsertionSortCollider.sortAxis>`) are first std::sort'ed along this (sortAxis) axis, then collided. The initial sort has :math:`O(n^2)` complexity, see `Colliders' performance <https://yade-dem.org/index.php/Colliders_performace>`_ for some information (There are scripts in examples/collider-perf for measurements). \
@@ -220,17 +220,7 @@ class InsertionSortCollider: public Collider{
 		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
 		((Real,useless,,,"for compatibility of scripts defining the old collider's attributes - see deprecated attributes")) 
 		((bool,doSort,false,,"Do forced resorting of interactions."))
-		, /*deprec*/
-		((sweepLength,verletDist,"conform to usual DEM terminology"))
-		((nBins,useless,"DEPRECATED - remove this useless attribute from scripts"))
-		((binCoeff,useless,"DEPRECATED - remove this useless attribute from scripts"))
-		((binOverlap,useless,"DEPRECATED - remove this useless attribute from scripts"))
-		((maxRefRelStep,useless,"DEPRECATED - remove this useless attribute from scripts"))
-		((histInterval,useless,"DEPRECATED - remove this useless attribute from scripts"))
-		((sweepFactor,useless,"DEPRECATED - remove this useless attribute from scripts"))
-		, /* init */
-		,
-		/* ctor */
+		, /* ctor */
 			#ifdef ISC_TIMING
 				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 			#endif 

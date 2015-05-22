@@ -89,7 +89,7 @@ class OpenGLRenderer : public Serializable
 		void renderShape();
 		void renderAllInteractionsWire();
 
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
 		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),,"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
 		((Real,rotScale,((void)"disable scaling",1.),,"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))
 		((Vector3r,lightPos,Vector3r(75,130,0),,"Position of OpenGL light source in the scene."))
@@ -115,9 +115,6 @@ class OpenGLRenderer : public Serializable
 		((vector<bool>,clipPlaneActive,vector<bool>(numClipPlanes,false),,"Activate/deactivate respective clipping planes"))
 		((vector<shared_ptr<GlExtraDrawer> >,extraDrawers,,,"Additional rendering components (:yref:`GlExtraDrawer`)."))
 		((bool,intrAllWire,false,,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
-		/*deprec*/
-		,
-		/*init*/,
 		/*ctor*/,
 		/*py*/
 		.def("setRefSe3",&OpenGLRenderer::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.")

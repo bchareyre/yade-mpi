@@ -74,7 +74,7 @@ class TriaxialStressController : public BoundaryController
 		Vector3r getStress(int boundId);
 		Vector3r getStrainRate();
 
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TriaxialStressController,BoundaryController,
 		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. The sign conventions of continuum mechanics are used for strains and stresses (positive traction)."
 		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
@@ -117,12 +117,6 @@ class TriaxialStressController : public BoundaryController
 		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`).|yupdate|"))
 		((Real,externalWork,0,Attr::readonly,"Energy provided by boundaries.|yupdate|"))
 		((bool,updatePorosity,false,,"If true porosity calculation will be updated once (will automatically reset to false after one calculation step). Can be used, when volume of particles changes during the simulation (e.g. when particles are erased or when clumps are created)."))
-		,
-		/* deprecated */
-		((sigma1,goal1,"renamed 'goal1', it can now also be a strain depending on stressMask"))
-		((sigma2,goal2,"renamed 'goal2', it can now also be a strain depending on stressMask"))
-		((sigma3,goal3,"renamed 'goal3', it can now also be a strain depending on stressMask"))
-		((wallDamping,stressDamping,"renamed to make the distinction with strain damping"))
 		,
 		/* extra initializers */
 		,

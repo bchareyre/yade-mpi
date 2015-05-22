@@ -17,7 +17,7 @@ class CapillaryPhys : public FrictPhys
 		
 		virtual ~CapillaryPhys() {};
 
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(CapillaryPhys,FrictPhys,"Physics (of interaction) for :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`.",
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(CapillaryPhys,FrictPhys,"Physics (of interaction) for :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`.",
 				 ((bool,meniscus,false,Attr::readonly,"True when a meniscus with a non-zero liquid volume (:yref:`vMeniscus<CapillaryPhys.vMeniscus>`) has been computed for this interaction"))
 				 ((bool,isBroken,false,,"Might be set to true by the user to make liquid bridge inactive (capillary force is zero)"))
 				 ((Real,capillaryPressure,0.,,"Value of the capillary pressure Uc. Defined as Ugas-Uliquid, obtained from :yref:`corresponding Law2 parameter<Law2_ScGeom_CapillaryPhys_Capillarity.capillaryPressure>`"))
@@ -26,9 +26,6 @@ class CapillaryPhys : public FrictPhys
 				 ((Real,Delta2,0.,,"Defines the surface area wetted by the meniscus on the biggest grains of radius R2 (R1<R2)"))
 				 ((Vector3r,fCap,Vector3r::Zero(),,"Capillary force produced by the presence of the meniscus. This is the force acting on particle #2"))
 				 ((short int,fusionNumber,0.,,"Indicates the number of meniscii that overlap with this one"))
-				 ,/*deprec*/
-				 ((Fcap,fCap,"naming convention"))
-				 ((CapillaryPressure,capillaryPressure,"naming convention"))
 				 ,,
 				 createIndex();currentIndexes[0]=currentIndexes[1]=currentIndexes[2]=currentIndexes[3]=0;
 				 ,

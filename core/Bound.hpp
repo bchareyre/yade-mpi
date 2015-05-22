@@ -21,7 +21,7 @@
 
 class Bound: public Serializable, public Indexable{
 	public:
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
 		((int,lastUpdateIter,0,Attr::readonly,"record iteration of last reference position update |yupdate|"))
 		((Vector3r,refPos,Vector3r(NaN,NaN,NaN),Attr::readonly,"Reference position, updated at current body position each time the bound dispatcher update bounds |yupdate|"))
 // 		((bool,isBounding,false,Attr::readonly,"A flag used to tell when the body moves out of bounds - only used if oriVerlet striding is active :yref:`BoundDispatcher::updatingDispFactor`>0 |yupdate|"))
@@ -30,8 +30,6 @@ class Bound: public Serializable, public Indexable{
 		((Vector3r,min,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::readonly),"Lower corner of box containing this bound (and the :yref:`Body` as well)"))
 		((Vector3r,max,Vector3r(NaN,NaN,NaN),(Attr::noSave | Attr::readonly),"Upper corner of box containing this bound (and the :yref:`Body` as well)"))
 		,
-		/*deprec*/,
-		/* init */,
 		/* ctor*/,
 		/*py*/
 		YADE_PY_TOPINDEXABLE(Bound)

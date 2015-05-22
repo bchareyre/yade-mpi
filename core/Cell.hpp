@@ -147,7 +147,7 @@ class Cell: public Serializable{
 	//Matrix3r getCauchyStress() { Matrix3r s=getStress(); return .5*(s+s.transpose()); }
 
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		/* overridden below to be modified by getters/setters because of intended side-effects */
 		((Matrix3r,trsf,Matrix3r::Identity(),,"[overridden]")) //"Current transformation matrix of the cell, which defines how far is the current cell geometry (:yref:`hSize<Cell.hSize>`) from the reference configuration. Changing trsf will not change :yref:`hSize<Cell.hSize>`, it serves only as accumulator for transformations applied via :yref:`velGrad<Cell.velGrad>`."))
 		((Matrix3r,refHSize,Matrix3r::Identity(),,"Reference cell configuration, only used with :yref:`OpenGLRenderer.dispScale`. Updated automatically when :yref:`hSize<Cell.hSize>` or :yref:`trsf<Cell.trsf>` is assigned directly; also modified by :yref:`yade.utils.setRefSe3` (called e.g. by the ``Reference`` button in the UI)."))
@@ -159,9 +159,6 @@ class Cell: public Serializable{
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
 		((bool,homoDeform,true,,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions and velocities of bodies. The velocity change is obtained by deriving the expression v=∇v.x, where ∇v is the macroscopic velocity gradient, giving in an incremental form: Δv=Δ ∇v x + ∇v Δx. As a result, velocities are modified as soon as ``velGrad`` changes, according to the first term: Δv(t)=Δ ∇v x(t), while the 2nd term reflects a convective term: Δv'= ∇v v(t-dt/2)."))
 		((bool,velGradChanged,false,Attr::readonly,"true when velGrad has been changed manually (see also :yref:`Cell.nextVelGrad`)")),
-		/*deprec*/
-		((Hsize,hSize,"conform to Yade's names convention.")),
-		/*init*/ ,
 		/*ctor*/ _invTrsf=Matrix3r::Identity(); integrateAndUpdate(0),
 		/*py*/
 		// override some attributes above

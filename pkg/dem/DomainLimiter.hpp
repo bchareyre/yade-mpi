@@ -27,7 +27,7 @@ class LawTester: public PartialEngine{
 		Vector3r get_ptOurs(){ warnDeprec("ptOurs","uTest.head()"); return uTest.head<3>(); } Vector3r get_ptGeom(){ warnDeprec("ptGeom","uGeom.head()"); return uGeom.head<3>(); }
 		Vector3r get_rotOurs(){ warnDeprec("rotOurs","uTest.tail()"); return uTest.tail<3>(); }  Vector3r get_rotGeom(){ warnDeprec("rotGeom","uGeom.tail()"); return uGeom.tail<3>(); }
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of local normal and shear displacements and rotations (using either :yref:`disPpath<LawTester.disPath>` and :yref:`rotPath<LawTester.rotPath>` [or :yref:`path<LawTester.path>` in the future]). Supported :yref:`IGeom` types are :yref:`ScGeom`, :yref:`L3Geom` and :yref:`L6Geom`. \n\nSee :ysrc:`scripts/test/law-test.py` for an example.",
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(LawTester,PartialEngine,"Prescribe and apply deformations of an interaction in terms of local normal and shear displacements and rotations (using either :yref:`disPpath<LawTester.disPath>` and :yref:`rotPath<LawTester.rotPath>` [or :yref:`path<LawTester.path>` in the future]). Supported :yref:`IGeom` types are :yref:`ScGeom`, :yref:`L3Geom` and :yref:`L6Geom`. \n\nSee :ysrc:`scripts/test/law-test.py` for an example.",
 		((vector<Vector3r>,disPath,,Attr::triggerPostLoad,"Loading path, where each Vector3 contains desired normal displacement and two components of the shear displacement (in local coordinate system, which is being tracked automatically. If shorter than :yref:`rotPath<LawTester.rotPath>`, the last value is repeated."))
 		((vector<Vector3r>,rotPath,,Attr::triggerPostLoad,"Rotational components of the loading path, where each item contains torsion and two bending rotations in local coordinates. If shorter than :yref:`path<LawTester.path>`, the last value is repeated."))
 		((vector<string>,hooks,,,"Python commands to be run when the corresponding point in path is reached, before doing other things in that particular step. See also :yref:`doneHook<LawTester.doneHook>`. "))
@@ -58,7 +58,6 @@ class LawTester: public PartialEngine{
 		((Real,idWeight,1,,"Float, usually ∈〈0,1〉, determining on how are displacements distributed between particles (0 for id1, 1 for id2); intermediate values will apply respective part to each of them. This parameter is ignored with 6-DoFs :yref:`IGeom`."))
 		((Real,rotWeight,1,,"Float ∈〈0,1〉 determining whether shear displacement is applied as rotation or displacement on arc (0 is displacement-only, 1 is rotation-only). Not effective when mutual rotation is specified."))
 		// reset force components along individual axes, instead of blocking DOFs which have no specific direction (for the force control)
-		, /* deprec */ ((path,disPath,"LawTester.path will be used for generalized displacement (6-component) loading path in the future."))
 		, /* init */
 		, /* ctor */
 		, /* py */ .add_property("ptOurs",&LawTester::get_ptOurs,"first 3 components of uTest |ydeprecated|") .add_property("ptGeom",&LawTester::get_ptGeom,"first 3 components of uGeom |ydeprecated|") .add_property("rotOurs",&LawTester::get_rotOurs,"last 3 components of uTest |ydeprecated|") .add_property("rotGeom",&LawTester::get_rotGeom,"last 3 components of uGeom |ydeprecated|")

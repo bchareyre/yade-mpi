@@ -79,7 +79,7 @@ class ZECollider: public Collider{
 // 	vector<Body::id_t> probeBoundingVolume(const Bound&);
 
 	virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(ZECollider,Collider,"\
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ZECollider,Collider,"\
 		Collider with O(n log(n)) complexity, using a CGAL algorithm from Zomorodian and Edelsbrunner [Kettner2011]_ (http://www.cgal.org/Manual/beta/doc_html/cgal_manual/Box_intersection_d/Chapter_main.html)",
 		((int,sortAxis,0,,"Axis for the initial contact detection."))
 		((bool,sortThenCollide,false,,"Separate sorting and colliding phase; it is MUCH slower, but all interactions are processed at every step; this effectively makes the collider non-persistent, not remembering last state. (The default behavior relies on the fact that inversions during insertion sort are overlaps of bounding boxes that just started/ceased to exist, and only processes those; this makes the collider much more efficient.)"))
@@ -88,10 +88,7 @@ class ZECollider: public Collider{
 		((Real,updatingDispFactor,-1,,"(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated."))
 		((Real,verletDist,((void)"Automatically initialized",-.15),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be *verletDist* × minimum spherical particle radius; if there are no spherical particles, it will be disabled."))
 		((Real,fastestBodyMaxDist,-1,,"Maximum displacement of the fastest body since last run; if >= verletDist, we could get out of bboxes and will trigger full run. DEPRECATED, was only used without bins. |yupdate|"))
-		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
-		, /*deprec*/ ((sweepLength,verletDist,"conform to usual DEM terminology"))
-		, /* init */
-		,
+		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization.")),
 		/* ctor */
 			#ifdef ISC_TIMING
 				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);

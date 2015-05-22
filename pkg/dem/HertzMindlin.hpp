@@ -144,7 +144,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 		Real ratioSlidingContacts();
 
 		FUNCTOR2D(ScGeom,MindlinPhys);
-		YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Law2_ScGeom_MindlinPhys_Mindlin,LawFunctor,"Constitutive law for the Hertz-Mindlin formulation. It includes non linear elasticity in the normal direction as predicted by Hertz for two non-conforming elastic contact bodies. In the shear direction, instead, it reseambles the simplified case without slip discussed in Mindlin's paper, where a linear relationship between shear force and tangential displacement is provided. Finally, the Mohr-Coulomb criterion is employed to established the maximum friction force which can be developed at the contact. Moreover, it is also possible to include the effect of linear viscous damping through the definition of the parameters $\\beta_{n}$ and $\\beta_{s}$.",
 			((bool,preventGranularRatcheting,true,,"bool to avoid granular ratcheting"))
 			((bool,includeAdhesion,false,,"bool to include the adhesion force following the DMT formulation. If true, also the normal elastic energy takes into account the adhesion effect."))
 			((bool,calcEnergy,false,,"bool to calculate energy terms (shear potential energy, dissipation of energy due to friction and dissipation of energy due to normal and tangential damping)"))
@@ -155,9 +155,7 @@ class Law2_ScGeom_MindlinPhys_Mindlin: public LawFunctor{
 			((OpenMPAccumulator<Real>,frictionDissipation,,Attr::noSave,"Energy dissipation due to sliding"))		
 			((OpenMPAccumulator<Real>,shearEnergy,,Attr::noSave,"Shear elastic potential energy"))
 			((OpenMPAccumulator<Real>,normDampDissip,,Attr::noSave,"Energy dissipated by normal damping"))
-			((OpenMPAccumulator<Real>,shearDampDissip,,Attr::noSave,"Energy dissipated by tangential damping"))						
-			
-			, /*deprec*/
+			((OpenMPAccumulator<Real>,shearDampDissip,,Attr::noSave,"Energy dissipated by tangential damping"))
 			, /* init */
 			, /* ctor */
 			, /* py */
@@ -178,7 +176,7 @@ class MindlinCapillaryPhys : public MindlinPhys
 		
 		virtual ~MindlinCapillaryPhys() {};
 
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(MindlinCapillaryPhys,MindlinPhys,"Adds capillary physics to Mindlin's interaction physics.",
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(MindlinCapillaryPhys,MindlinPhys,"Adds capillary physics to Mindlin's interaction physics.",
 				((bool,meniscus,false,Attr::readonly,"True when a meniscus with a non-zero liquid volume (:yref:`vMeniscus<MindlinPhys.vMeniscus>`) has been computed for this interaction"))
 				((bool,isBroken,false,,"Might be set to true by the user to make liquid bridge inactive (capillary force is zero)"))
 				((Real,capillaryPressure,0.,,"Value of the capillary pressure Uc. Defined as Ugas-Uliquid, obtained from :yref:`corresponding Law2 parameter<Law2_ScGeom_CapillaryPhys_Capillarity.capillaryPressure>`"))
@@ -187,9 +185,6 @@ class MindlinCapillaryPhys : public MindlinPhys
 				((Real,Delta2,0.,,"Defines the surface area wetted by the meniscus on the biggest grains of radius R2 (R1<R2)"))
 				((Vector3r,fCap,Vector3r::Zero(),,"Capillary Force produces by the presence of the meniscus. This is the force acting on particle #2"))
 				((short int,fusionNumber,0.,,"Indicates the number of meniscii that overlap with this one"))
-				,/*deprec*/
-				((Fcap,fCap,"naming convention"))
-				((CapillaryPressure,capillaryPressure,"naming convention"))
 				,,createIndex();currentIndexes[0]=currentIndexes[1]=currentIndexes[2]=currentIndexes[3]=0;
 				,
 				);
