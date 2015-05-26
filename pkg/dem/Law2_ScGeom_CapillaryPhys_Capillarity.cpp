@@ -65,7 +65,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			if (I->isReal()) {
 				if (CapillaryPhys::getClassIndexStatic()==I->phys->getClassIndex()) hertzOn=false;
 				else if (MindlinCapillaryPhys::getClassIndexStatic()==I->phys->getClassIndex()) hertzOn=true;
-				else LOG_ERROR("The capillary law is not implemented for interactions using"<<I->phys->getClassName());
+				else LOG_ERROR("The capillary law is not implemented for interactions using "<<I->phys->getClassName());
 				bodiesMenisciiList.initialized = false;//must be re-initialized after creation of first real contact in the model
 				hertzInitialized = true;
 				break;
