@@ -7,7 +7,6 @@
 *************************************************************************/
 #include"STLImporter.hpp"
 #include<pkg/dem/Shop.hpp>
-#include<lib/import/STLReader.hpp>
 
 CREATE_LOGGER(STLImporter);
 
