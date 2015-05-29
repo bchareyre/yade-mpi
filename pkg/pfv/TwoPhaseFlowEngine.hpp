@@ -33,7 +33,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	double poreBodyRadius;
 	double poreBodyVolume;
 	int windowsID;//a temp cell info for experiment comparison(used by chao)
-	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sumLines in the facet(used by chao).
+	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for facet "i" and sphere (facetVertices)"[i][j]". Last component [i][3] for 1/sumLines in the facet "i" (used by chao).
 	
 	TwoPhaseCellInfo (void)
 	{
@@ -45,7 +45,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 		poreBodyRadius = 0;
 		poreBodyVolume = 0;
 		windowsID = 0;
-		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidLine[k][l]=0;
+		for (int k=0; k<4;k++) for (int l=0; l<4;l++) solidLine[k][l]=0;
 	}
 	
 };
@@ -112,7 +112,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	CELL_SCALAR_SETTER(bool,.isNWRes,setCellIsNWRes)
 	CELL_SCALAR_GETTER(Real,.saturation,cellSaturation)
 	CELL_SCALAR_SETTER(Real,.saturation,setCellSaturation)
-	CELL_SCALAR_GETTER(int,.isFictious,cellIsFictious) //Temporary function to allow for simulations in Python
+	CELL_SCALAR_GETTER(bool,.isFictious,cellIsFictious) //Temporary function to allow for simulations in Python
 	CELL_SCALAR_GETTER(bool,.hasInterface,cellHasInterface) //Temporary function to allow for simulations in Python
 	CELL_SCALAR_GETTER(Real,.poreBodyRadius,cellInSphereRadius) //Temporary function to allow for simulations in Python	
 	CELL_SCALAR_GETTER(Real,.poreBodyVolume,cellVoidVolume) //Temporary function to allow for simulations in Python	
@@ -127,7 +127,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 
 	,/*TwoPhaseFlowEngineT()*/,
 	,
-	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"get an integer to indicate which boundary this is allocated to")
+	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"Check the connection between pore and boundary. If true, pore throat connects the boundary.")
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
 	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	.def("getCellIsWRes",&TwoPhaseFlowEngine::cellIsWRes,"get status wrt 'wetting reservoir' state")

@@ -60,6 +60,19 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		double getCuboidSubdomainPorosity(Vector3r pos1, Vector3r pos2, bool isSideBoundaryIncluded);
 
 		void printSomething();
+		boost::python::list getPotentialPendularSpheresPair() {
+			RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+			boost::python::list bridgeIds;
+			FiniteEdgesIterator ed_it = Tri.finite_edges_begin();
+			for ( ; ed_it!=Tri.finite_edges_end(); ed_it++ ) {
+			  if (detectBridge(ed_it)==true) {
+			    const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
+			    const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
+			    const int& id1 = vi1.id();
+			    const int& id2 = vi2.id();
+			    bridgeIds.append(boost::python::make_tuple(id1,id2));}}
+			    return bridgeIds;}
+  		bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
 				
 		virtual ~UnsaturatedEngine();
 
@@ -89,6 +102,7 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(boost::python::arg("windowsID"),boost::python::arg("isSideBoundaryIncluded")), "get saturation of subdomain with windowsID. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
 		.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temporary function for comparison with experiments, will delete soon")
 		.def("printSomething",&UnsaturatedEngine::printSomething,"print debug.")
+		.def("getPotentialPendularSpheresPair",&UnsaturatedEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
 		)
 		DECLARE_LOGGER;
 };
@@ -180,6 +194,7 @@ void UnsaturatedEngine::updatePressure()
       if (isPhaseTrapped) {
 	if ( cell->info().isTrapW ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
 	if ( cell->info().isTrapNW) {cell->info().p()=bndCondValue[2]+cell->info().trapCapP;}
+	//here, in !isInvadeBoundary case, the pressure of bnd[0,1,4,5] cells is equal to the W-Res pressure, in order to calculate forces.  
 	if ( !cell->info().isWRes && !cell->info().isNWRes && !cell->info().isTrapW && !cell->info().isTrapNW ) {cell->info().p()=bndCondValue[2]; if (isInvadeBoundary) cerr<<"Something wrong in updatePressure.(isInvadeBoundary)";}
       }
     } 
@@ -274,11 +289,11 @@ void UnsaturatedEngine::invasion1()
     updateReservoirs1();
     if(solver->debugOut) {cout<<"----invasion1.update W, NW reservoirInfo----"<<endl;}
     
-    ///search new trapped W-phase/NW-phase, assign trapCapP for trapped phases
+    ///search new trapped W-phase/NW-phase, assign trapCapP, isTrapW/isTrapNW flag for new trapped phases. But at this moment, the new trapped W/NW cells.P= W/NW-Res.P. They will be updated in next updatePressure() func.
     checkTrap(bndCondValue[3]-bndCondValue[2]);
     if(solver->debugOut) {cout<<"----invasion1.checkWTrap----"<<endl;}
 
-    ///update trapped W-phase/NW-phase Pressure
+    ///update trapped W-phase/NW-phase Pressure //FIXME: is this necessary?
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
  	if ( cell->info().isTrapW ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
 	if ( cell->info().isTrapNW) {cell->info().p()=bndCondValue[2]+cell->info().trapCapP;}
@@ -574,34 +589,33 @@ void UnsaturatedEngine::checkLatticeNodeY(double y)
         file.close();}
 }
 
-// void UnsaturatedEngine::printSomething()
-// {
-//       RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-//     FiniteCellsIterator cellEnd = tri.finite_cells_end();
-//     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-//         if ((cell->info().isFictious==true)&&(cell->info().Pcondition==false)) {
-// cerr<<cell->info().saturation<<endl;        }
-//     }
-// 
-// }
 void UnsaturatedEngine::printSomething()
 {
-    ofstream file;
-    file.open("cellPoreRadius.txt");
-//     file<<"cellID	"<<"j	"<<"rmin	"<<"r	"<<"rmax	"<<endl;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-//         for (int facet=0; facet<4; facet++) {
-	CellHandle nCell = cell->neighbor(0);
-//         file << cell->info().index << "	" <<nCell->info().index<<"	"<<facet<< "	"<<cell->info().poreThroatRadius[facet]<<"	"<<nCell->info().poreThroatRadius[facet]<< endl;
-        file<<cell->info().poreThroatRadius[0]<<"	"<<nCell->info().poreThroatRadius[0]<< endl;
-        file<<cell->info().poreThroatRadius[1]<<"	"<<nCell->info().poreThroatRadius[1]<< endl;
-        file<<cell->info().poreThroatRadius[2]<<"	"<<nCell->info().poreThroatRadius[2]<< endl;
-        file<<cell->info().poreThroatRadius[3]<<"	"<<nCell->info().poreThroatRadius[3]<< endl;
-//         }
-    }
-    file.close();
+
+    RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+    FiniteEdgesIterator ed_it;
+    for ( FiniteEdgesIterator ed_it = Tri.finite_edges_begin(); ed_it!=Tri.finite_edges_end();ed_it++ )
+    {
+      const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
+      const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
+      const int& id1 = vi1.id();
+      const int& id2 = vi2.id();
+      cerr<<id1<<" "<<id2<<endl;}
+}
+
+bool UnsaturatedEngine::detectBridge(RTriangulation::Finite_edges_iterator& edge)
+{
+	bool dryBridgeExist=true;
+	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+	RTriangulation::Cell_circulator cell1 = Tri.incident_cells(*edge);
+	RTriangulation::Cell_circulator cell0 = cell1++;
+	if(cell0->info().saturation==1) {dryBridgeExist=false; return dryBridgeExist;}
+	else {
+	while (cell1!=cell0) {
+	  if(cell1->info().saturation==1) {dryBridgeExist=false;break;}
+	  else cell1++;}
+	  return dryBridgeExist;
+	}
 }
 
 //----------temporary functions for comparison with experiment-----------------------
@@ -680,7 +694,6 @@ double UnsaturatedEngine::getCuboidSubdomainPorosity(Vector3r pos1, Vector3r pos
 
 double UnsaturatedEngine::getInvadeDepth()
 {
-    double depth=0.0;
     double yPosMax=-1e50;
     double yPosMin=1e50;
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -719,19 +732,6 @@ double UnsaturatedEngine::getSphericalSubdomainSaturation(Vector3r pos, double r
 //--------------end of comparison with experiment----------------------------
 
 ///compute forces
-/*
-void UnsaturatedEngine::computeSolidLine()
-{
-    RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = Tri.finite_cells_end();
-    for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
-        for(int j=0; j<4; j++) {
-            solver->lineSolidPore(cell, j);
-        }
-    }
-    if(solver->debugOut) {cout<<"----computeSolidLine-----."<<endl;}
-}*/
-
 void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 {
     RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
