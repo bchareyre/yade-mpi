@@ -43,6 +43,10 @@ CREATE_LOGGER(VTKRecorder);
 #define GET_MASK(b) b->groupMask
 #endif
 
+#include <boost/unordered_map.hpp>
+#include <boost/fusion/support/pair.hpp>
+#include <boost/fusion/include/pair.hpp>
+
 void VTKRecorder::action(){
 	vector<bool> recActive(REC_SENTINEL,false);
 	FOREACH(string& rec, recorders){
@@ -388,18 +392,21 @@ void VTKRecorder::action(){
 		// holds information about cell distance between spatial and displayed position of each particle
 		vector<Vector3i> wrapCellDist; if (scene->isPeriodic){ wrapCellDist.resize(scene->bodies->size()); }
 		// save body positions, referenced by ids by vtkLine
+		
+		// map to keep real body ids and their number in a vector (intrBodyPos)
+		boost::unordered_map<Body::id_t,Body::id_t> bIdVector;
+		Body::id_t curId = 0;
 		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-			if (!b) {
-				/* must keep ids contiguous, so that position in the array corresponds to Body::id */
-				intrBodyPos->InsertNextPoint(NaN,NaN,NaN);
-				continue;
+			if (b) {
+				if(!scene->isPeriodic) {
+					intrBodyPos->InsertNextPoint(b->state->pos[0],b->state->pos[1],b->state->pos[2]);
+				} else {
+					Vector3r pos=scene->cell->wrapShearedPt(b->state->pos,wrapCellDist[b->id]);
+					intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
+				}
+				bIdVector.insert (std::pair<Body::id_t,Body::id_t>(b->id,curId));
+				curId++;
 			}
-			if(!scene->isPeriodic){ intrBodyPos->InsertNextPoint(b->state->pos[0],b->state->pos[1],b->state->pos[2]); }
-			else {
-				Vector3r pos=scene->cell->wrapShearedPt(b->state->pos,wrapCellDist[b->id]);
-				intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
-			}
-			assert(intrBodyPos->GetNumberOfPoints()==b->id+1);
 		}
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			if(!I->isReal()) continue;
@@ -409,6 +416,15 @@ void VTKRecorder::action(){
 				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId1())->shape.get()))) continue;
 				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId2())->shape.get()))) continue;
 			}
+			
+			const auto iterId1 = bIdVector.find (I->getId1());
+			const auto iterId2 = bIdVector.find (I->getId2());
+			
+			if (iterId2 == bIdVector.end() || iterId2 == bIdVector.end()) continue;
+			
+			const auto setId1Line = iterId1->second;
+			const auto setId2Line = iterId2->second;
+			
 			/* For the periodic boundary conditions,
 				find out whether the interaction crosses the boundary of the periodic cell;
 				if it does, display the interaction on both sides of the cell, with one of the
@@ -423,8 +439,8 @@ void VTKRecorder::action(){
 			// aperiodic boundary, or interaction is inside the cell
 			if(!scene->isPeriodic || (scene->isPeriodic && (I->cellDist==wrapCellDist[I->getId2()]-wrapCellDist[I->getId1()]))){
 				vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
-				line->GetPointIds()->SetId(0,I->getId1());
-				line->GetPointIds()->SetId(1,I->getId2());
+				line->GetPointIds()->SetId(0,setId1Line);
+				line->GetPointIds()->SetId(1,setId2Line);
 				intrCells->InsertNextCell(line);
 			} else {
 				assert(scene->isPeriodic);
@@ -434,10 +450,18 @@ void VTKRecorder::action(){
 				// A,B are the "fake" bodies outside the cell for id1 and id2 respectively, p1,p2 are the displayed points
 				// distance in cell units for shifting A away from p1; negated value is shift of B away from p2
 				Vector3r ptA(p01+scene->cell->hSize*(wrapCellDist[I->getId2()]-I->cellDist).cast<Real>());
+				const vtkIdType idPtA=intrBodyPos->InsertNextPoint(ptA[0],ptA[1],ptA[2]); 
+				
 				Vector3r ptB(p02+scene->cell->hSize*(wrapCellDist[I->getId1()]-I->cellDist).cast<Real>());
-				vtkIdType idPtA=intrBodyPos->InsertNextPoint(ptA[0],ptA[1],ptA[2]), idPtB=intrBodyPos->InsertNextPoint(ptB[0],ptB[1],ptB[2]);
-				vtkSmartPointer<vtkLine> line1B(vtkSmartPointer<vtkLine>::New()); line1B->GetPointIds()->SetId(0,I->getId1()); line1B->GetPointIds()->SetId(1,idPtB);
-				vtkSmartPointer<vtkLine> lineA2(vtkSmartPointer<vtkLine>::New()); lineA2->GetPointIds()->SetId(0,idPtA); lineA2->GetPointIds()->SetId(1,I->getId2());
+				const vtkIdType idPtB=intrBodyPos->InsertNextPoint(ptB[0],ptB[1],ptB[2]);
+				
+				vtkSmartPointer<vtkLine> line1B(vtkSmartPointer<vtkLine>::New());
+				line1B->GetPointIds()->SetId(0,setId2Line);
+				line1B->GetPointIds()->SetId(1,idPtB);
+				
+				vtkSmartPointer<vtkLine> lineA2(vtkSmartPointer<vtkLine>::New());
+				lineA2->GetPointIds()->SetId(0,idPtA);
+				lineA2->GetPointIds()->SetId(1,setId2Line);
 				numAddValues=2;
 			}
 			const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->phys.get());
