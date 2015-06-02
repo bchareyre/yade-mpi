@@ -373,14 +373,17 @@ Matrix3r Shop::getStress(Real volume){
 }
 
 
-
-vector<Matrix3r> Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ){
+py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ){
 	int minZ=0;
 	int maxZ=0;
 	Real minPosZ=0.;
 	Real maxPosZ=0.;
 	Scene* scene=Omega::instance().getScene().get();
 	vector<Matrix3r> stressTensorProfile(nCell,Matrix3r::Zero());
+	vector<Matrix3r> kineticStressTensorProfile(nCell,Matrix3r::Zero());
+	vector<Real> granularTemperatureProfile(nCell,0.0);
+	vector<Real> numPart(nCell,0.0);
+
 	const bool isPeriodic = scene->isPeriodic;
 
 	//
@@ -393,7 +396,13 @@ vector<Matrix3r> Shop::getStressProfile(Real volume, int nCell, Real dz, Real zR
 			Vector3r vFluct = b->state->vel - Vector3r(vPartAverageX[Np],vPartAverageY[Np],vPartAverageZ[Np]); 
 			//Classical dynamical expression of the stress tensor
 			stressTensorProfile[Np]+= -1/volume*b->state->mass*vFluct*vFluct.transpose(); 
+			kineticStressTensorProfile[Np]+= -1/volume*b->state->mass*vFluct*vFluct.transpose(); 
+			granularTemperatureProfile[Np] += 1/3.*(pow(vFluct[0],2) + pow(vFluct[1],2) + pow(vFluct[2],2));
+			numPart[Np]+=1.;
 		}
+	}
+	for(int n=0;n<nCell;n++) {
+		if (numPart[n]>0) granularTemperatureProfile[n]/=numPart[n];
 	}
 	
 	//
@@ -467,7 +476,7 @@ vector<Matrix3r> Shop::getStressProfile(Real volume, int nCell, Real dz, Real zR
 			}
 		}
 	}
-	return stressTensorProfile;
+	return py::make_tuple(stressTensorProfile,kineticStressTensorProfile,granularTemperatureProfile);
 }
 
 
