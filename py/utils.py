@@ -534,7 +534,7 @@ def plotNumInteractionsHistogram(cutoff=0.):
 
 def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False,sphSph=False):
 	"""Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes and
-	(optional but default) histogram of number of interactions per body. If sphSph only sphere-sphere interactions are considered.
+	(optional but default) histogram of number of interactions per body. If sphSph only sphere-sphere interactions are considered for the 3 directions histograms.
 
 	:returns: If *noShow* is ``False``, displays the figure and returns nothing. If *noShow*, the figure object is returned without being displayed (works the same way as :yref:`yade.plot.plot`).
 	"""
