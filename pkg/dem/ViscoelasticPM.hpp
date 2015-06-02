@@ -76,6 +76,7 @@ REGISTER_SERIALIZABLE(ViscElPhys);
 // Uses the rule of consecutively connection.
 class Ip2_ViscElMat_ViscElMat_ViscElPhys: public IPhysFunctor {
 	public :
+		static Real epsilon;
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
@@ -104,3 +105,6 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 
 Real contactParameterCalculation(const Real& l1,const Real& l2);
 bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force, Vector3r & torque1, Vector3r & torque2);
+
+Real get_en_from_cn(const Real& cn, const Real& m, const Real& kn);
+Real find_cn_from_en(const Real& en, const Real& m, const Real& kn, const shared_ptr<Interaction>& interaction);

@@ -19,6 +19,8 @@ ViscElMat::~ViscElMat(){}
 /* ViscElPhys */
 ViscElPhys::~ViscElPhys(){}
 
+Real Ip2_ViscElMat_ViscElMat_ViscElPhys::epsilon = 1.0e-15;
+
 /* Ip2_ViscElMat_ViscElMat_ViscElPhys */
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
 	// no updates of an existing contact 
@@ -227,6 +229,11 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 			cs1 = mat1->cs;
 			cs2 = mat2->cs;
 		}
+		else if( isfinite(mat1->en) and isfinite(mat1->et)) {
+			const Real En = (en) ? (*en)(mat1->id,mat2->id) : (mat1->en+mat2->en)/2.0;
+			cn1 = cn2 = 2.0*find_cn_from_en(En, massR,contactParameterCalculation(kn1,kn2),interaction);
+			cs1 = cs2 = 0;
+		}
 	}
 	
 	const Real mR1 = mat1->mR;      const Real mR2 = mat2->mR; 
@@ -274,5 +281,42 @@ Real contactParameterCalculation(const Real& l1, const Real& l2){
   Real a = (l1?1/l1:0) + (l2?1/l2:0);
   if (a) return 1/a;
   else return 0;
+}
+
+Real find_cn_from_en(const Real& en, const Real& m, const Real& kn, const shared_ptr<Interaction>& interaction){
+	Real eps = Ip2_ViscElMat_ViscElMat_ViscElPhys::epsilon;
+	Real cn = eps ; //initial small value
+	Real en_temp=get_en_from_cn(cn,m ,kn);
+	int i =0;
+	Real error = 1.0/eps;
+	while (error > 1.0e-2){
+		if(i>15){
+			cerr<<"Warning in ViscoelasticPM.cpp : Newton-Raphson algorithm did not converged within 15 iterations for contact between "<<interaction->id1<<" and "<<interaction->id2<<". Continue with values : cn="<<cn<<" en="<<en_temp<<endl;
+			break;
+		}
+		i++;
+		Real deriv=(get_en_from_cn(cn-eps,m ,kn)-get_en_from_cn(cn+eps,m ,kn))/(-2.*eps);
+		cn = cn - (en_temp-en)/deriv;
+		en_temp=get_en_from_cn(cn,m ,kn);
+		error = fabs(en_temp-en)/en;
+	}
+// 	cout<<"i="<<i<<" error="<<error<<endl;
+	return cn;
+}
+
+Real get_en_from_cn(const Real& cn, const Real& m, const Real& kn){
+	Real beta = 0.5*cn/m;
+	Real omega0 = sqrt(kn/m);
+	Real omega = sqrt(omega0*omega0-beta*beta);
+	Real Omega = sqrt(beta*beta-omega0*omega0);
+	if ( beta < omega0/sqrt(2.) )
+		return exp(-beta/omega*(Mathr::PI-atan(2.*beta*omega/(omega*omega-beta*beta))));
+	else if ( beta > omega0/sqrt(2.) and  beta < omega0)
+		return exp(-beta/omega*atan(-2.*beta*omega/(omega*omega-beta*beta)));
+	else if ( beta > omega0 )
+		return exp(-beta/Omega*log((beta+Omega)/(beta-Omega)));
+	else if ( beta == omega0/sqrt(2.) or beta == omega0 )
+		return get_en_from_cn(cn + Ip2_ViscElMat_ViscElMat_ViscElPhys::epsilon, m, kn);
+	else return 0;
 }
 
