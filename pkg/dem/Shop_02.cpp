@@ -480,6 +480,70 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 }
 
 
+py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef){
+	//Initialization
+	int minZ;
+	int maxZ;
+	int numLayer;
+	Real deltaCenter;
+	Real zInf;
+	Real zSup;
+	Real volPart;
+
+	vector<Real> velAverageX(nCell,0.0);
+        vector<Real> velAverageY(nCell,0.0);
+        vector<Real> velAverageZ(nCell,0.0);
+	vector<Real> phiAverage(nCell,0.0);
+
+	//Loop over the particles
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		const Real zPos = b->state->pos[2]-zRef;
+		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
+
+		minZ= floor((zPos-s->radius)/dz);
+		maxZ= floor((zPos+s->radius)/dz);
+		deltaCenter = zPos - Np*dz;
+	
+		// Loop over the cell in which the particle is contained
+		numLayer = minZ;
+		while (numLayer<=maxZ){
+			if ((numLayer>=0)&&(numLayer<nCell)){ //average under zRef does not interest us, avoid also negative values not compatible with the evaluation of volPart
+				zInf=(numLayer-Np-1)*dz + deltaCenter;
+				zSup=(numLayer-Np)*dz + deltaCenter;
+				if (zInf<-s->radius) zInf = -s->radius;
+				if (zSup>s->radius) zSup = s->radius;
+
+				//Analytical formulation of the volume of a slice of sphere
+				volPart = Mathr::PI*pow(s->radius,2)*(zSup - zInf +(pow(zInf,3)-pow(zSup,3))/(3*pow(s->radius,2)));
+
+				phiAverage[numLayer]+=volPart;
+				velAverageX[numLayer]+=volPart*b->state->vel[0];
+                                velAverageY[numLayer]+=volPart*b->state->vel[1];
+                                velAverageZ[numLayer]+=volPart*b->state->vel[2];
+			}
+			numLayer+=1;
+		}
+	}
+	//Normalized the weighted velocity by the volume of particles contained inside the cell
+	for(int n=0;n<nCell;n++){
+		if (phiAverage[n]!=0){
+			velAverageX[n]/=phiAverage[n];
+                        velAverageY[n]/=phiAverage[n];
+                        velAverageZ[n]/=phiAverage[n];
+			//Normalize the concentration after
+			phiAverage[n]/=vCell;
+		}
+		else {
+			velAverageX[n] = 0.0;
+                        velAverageY[n] = 0.0;
+                        velAverageZ[n] = 0.0;
+		}
+	}
+	return py::make_tuple(phiAverage,velAverageX,velAverageY,velAverageZ);
+}
+
+
 
 Matrix3r Shop::getCapillaryStress(Real volume, bool mindlin){
 	Scene* scene=Omega::instance().getScene().get();

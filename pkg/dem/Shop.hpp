@@ -122,7 +122,11 @@ class Shop{
 		static Matrix3r getCapillaryStress(Real volume=0, bool mindlin=false);
 		static Matrix3r stressTensorOfPeriodicCell() { LOG_WARN("Shop::stressTensorOfPeriodicCelli is DEPRECATED: use getStress instead"); return Shop::getStress(); }
 
+		//! Compute the stress tensor in each defined cell, return a stress tensor depth profile
 		static py::tuple getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ);
+
+		//! Compute average depth profile of particle velocity (x,y,z) and solid volume fraction
+		static py::tuple getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef);
 
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
