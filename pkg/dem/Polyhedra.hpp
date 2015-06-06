@@ -69,6 +69,7 @@ class Polyhedra: public Shape{
 		Quaternionr GetOri(){Initialize(); return orientation;}
 		Polyhedron GetPolyhedron(){return P;};
 		void Clear(){v.clear(); P.clear(); init = 0; size = Vector3r(1.,1.,1.); faceTri.clear();};
+		void setVertices(const std::vector<Vector3r>& v) { init=false; this->v=v; Initialize(); }
 
 	protected:	
 		//triangulation of facets for plotting
@@ -102,6 +103,7 @@ class Polyhedra: public Shape{
 			.def("GetCentroid",&Polyhedra::GetCentroid,"return polyhedra's centroid")
 			.def("GetSurfaceTriangulation",&Polyhedra::GetSurfaceTriangulation,"triangulation of facets (for plotting)")
 			.def("GetSurfaces",&Polyhedra::GetSurfaces,"get indices of surfaces' vertices (for postprocessing)")
+			.def("setVertices",&Polyhedra::setVertices,"set vertices and update receiver")
 		);		
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };
