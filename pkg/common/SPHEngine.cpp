@@ -21,35 +21,35 @@ void SPHEngine::calculateSPHRho(const shared_ptr<Body>& b) {
   if (b->state->rho0<0) {
     b->state->rho0 = rho0;
   }
-  Real rho = 0;
-  
-  // Pointer to kernel function
-  KernelFunction kernelFunctionCurDensity = returnKernelFunction (KernFunctionDensity, Norm);
-  
-  // Calculate rho for every particle
-  for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
-    const shared_ptr<Body> b2 = Body::byId((*it).first,scene);
-    Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
-    if(!s) continue;
+  if (not b->isClump()) {
+    Real rho = 0;
     
-    if (((*it).second)->geom and ((*it).second)->phys) {
-      const ScGeom geom = *(YADE_PTR_CAST<ScGeom>(((*it).second)->geom));
-      const ViscElPhys phys=*(YADE_PTR_CAST<ViscElPhys>(((*it).second)->phys));
+    // Pointer to kernel function
+    KernelFunction kernelFunctionCurDensity = returnKernelFunction (KernFunctionDensity, Norm);
+    
+    // Calculate rho for every particle
+    for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {
+      const shared_ptr<Body> b2 = Body::byId((*it).first,scene);
+      Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
+      if(!s) continue;
       
-      if((b2->groupMask & mask)==0)  continue;
-      
-      Real Mass = b2->state->mass;
-      if (Mass == 0) Mass = b->state->mass;
-      
-      const Real SmoothDist = (b2->state->pos - b->state->pos).norm();
-     
-      // [Monaghan1992], (2.7) (3.8) 
-      rho += b2->state->mass*kernelFunctionCurDensity(SmoothDist, h);
+      if (((*it).second)->geom and ((*it).second)->phys) {
+        const ScGeom geom = *(YADE_PTR_CAST<ScGeom>(((*it).second)->geom));
+        const ViscElPhys phys=*(YADE_PTR_CAST<ViscElPhys>(((*it).second)->phys));
+        
+        Real Mass = b2->state->mass;
+        if (Mass == 0) Mass = b->state->mass;
+        
+        const Real SmoothDist = (b2->state->pos - b->state->pos).norm();
+       
+        // [Monaghan1992], (2.7) (3.8) 
+        rho += b2->state->mass*kernelFunctionCurDensity(SmoothDist, h);
+      }
     }
+    // Self mass contribution
+    rho += b->state->mass*kernelFunctionCurDensity(0.0, h);
+    b->state->rho = rho;
   }
-  // Self mass contribution
-  rho += b->state->mass*kernelFunctionCurDensity(0.0, h);
-  b->state->rho = rho;
 }
 
 Real smoothkernelLucy(const double & r, const double & h) {

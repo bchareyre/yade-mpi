@@ -16,7 +16,13 @@ bool Collider::mayCollide(const Body* b1, const Body* b2){
 		// might be called with deleted bodies, i.e. NULL pointers
 		(b1!=NULL && b2!=NULL) &&
 		// only collide if at least one particle is standalone or they belong to different clumps
-		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) &&
+		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId 
+		#ifdef YADE_SPH
+		// If SPH-mode enabled, we do not skip interactions between clump-members
+		// to get the correct calculation of density b->rho
+		|| true
+		#endif
+		) &&
 		 // do not collide clumps, since they are just containers, never interact
 		!b1->isClump() && !b2->isClump() &&
 		// masks must have at least 1 bit in common
