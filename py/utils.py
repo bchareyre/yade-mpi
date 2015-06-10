@@ -1084,7 +1084,12 @@ class UnstructuredGrid:
 			e.state.pos = Vector3(0,0,0)
 			e.state.ori = Quaternion((1,0,0),0)
 			if isinstance(e.shape,Facet):
-				e.shape.vertices = [self.vertices[j] for j in c]
+				#e.shape.vertices = [self.vertices[j] for j in c]
+				vs = [Vector3(self.vertices[j]) for j in c]
+				cc = sum(vs,Vector3.Zero)/3.
+				for v in vs: v -= cc
+				e.state.pos = cc
+				e.shape.setVertices(vs)
 			elif isinstance(e.shape,Tetra):
 				e.shape.v = [self.vertices[j] for j in c]
 			else:
