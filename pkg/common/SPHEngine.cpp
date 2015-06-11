@@ -225,7 +225,14 @@ bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interac
   const int id1 = I->getId1();
   const int id2 = I->getId2();
   
+  
   const BodyContainer& bodies = *scene->bodies;
+  
+  if (bodies[id1]->clumpId!=bodies[id2]->clumpId) {
+    //If 2 bodies belong to the same clump, do not calculate forces
+    force = Vector3r::Zero();
+    return true;
+  } 
   
   //////////////////////////////////////////////////////////////////
   // Copy-paste
