@@ -25,7 +25,7 @@ To install daily-version one needs to add this repository to your
 	sudo apt-get install yadedaily
 
 If you have another distribution, not Ubuntu Trusty (Version 14.04 LTS), be sure to use the
-correct name in the first line (for instance, precise, jessie or wheezy). For the list
+correct name in the first line (for instance, trusty, jessie or wheezy). For the list
 of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
 After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
@@ -33,7 +33,7 @@ yadedaily on older distributions can have some disabled features due to older li
 versions, shipped with particular distribution. 
 
 Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
-Each branch corresponds to one distribution e.g. precise, jessie etc.
+Each branch corresponds to one distribution e.g. trusty, jessie etc.
 The scripts for building all of this stuff is `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`_. 
 It uses pbuilder to build packages, so all packages are building in a clean environment.
 

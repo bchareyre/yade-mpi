@@ -338,16 +338,6 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 
 #===========================================================
-# floating_point_utilities_v3 are already in Boost included
-# Use embedded copy only if Boost older than 1.47.0
-
-IF((Boost_MINOR_VERSION LESS 47) AND (Boost_MAJOR_VERSION EQUAL 1))
-  MESSAGE(STATUS "Boost version is less than 1.47, using embedded version of floating_point_utilities_v3")
-  MESSAGE(STATUS "Consider updating boost or system, as this embedded library will be removed soon")
-  INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/extra/floating_point_utilities_v3)
-ENDIF((Boost_MINOR_VERSION LESS 47) AND (Boost_MAJOR_VERSION EQUAL 1))
-
-#===========================================================
 IF(ENABLE_LBMFLOW)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLBM_ENGINE")
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LBMFLOW")
