@@ -141,9 +141,9 @@ void GeneralIntegratorInsertionSortCollider::action(){
 					// coordinate is min/max if has bounding volume, otherwise both are the position. Add periodic shift so that we are inside the cell
 					// watch out for the parentheses around ?: within ?: (there was unwanted conversion of the Reals to bools!)
 					
-					BBj[i].coord=((BBj[i].flags.hasBB=((bool)bv)) ? (BBj[i].flags.isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
+					BBj[i].coord=((BBj[i].hasBB=((bool)bv)) ? (BBj[i].isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
 					
-				} else { BBj[i].flags.hasBB=false; /* for vanished body, keep the coordinate as-is, to minimize inversions. */ }
+				} else { BBj[i].hasBB=false; /* for vanished body, keep the coordinate as-is, to minimize inversions. */ }
 				// if initializing periodic, shift coords & record the period into BBj[i].period
 				if(doInitSort && periodic) {
 					BBj[i].coord=cellWrap(BBj[i].coord,0,BBj.cellDim,BBj[i].period);
@@ -195,13 +195,13 @@ void GeneralIntegratorInsertionSortCollider::action(){
 				for(long i=0; i<2*nBodies; i++){
 					// start from the lower bound (i.e. skipping upper bounds)
 					// skip bodies without bbox, because they don't collide
-					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
+					if(!(V[i].isMin && V[i].hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					// go up until we meet the upper bound
 					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
 						const Body::id_t& jid=V[j].id;
 						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
-						if(!V[j].flags.isMin) continue;
+						if(!V[j].isMin) continue;
 						/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 						handleBoundInversion(iid,jid,interactions,scene);
 						assert(j<2*nBodies-1);
@@ -209,13 +209,13 @@ void GeneralIntegratorInsertionSortCollider::action(){
 				}
 			} else { // periodic case: see comments above
 				for(long i=0; i<2*nBodies; i++){
-					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
+					if(!(V[i].isMin && V[i].hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					long cnt=0;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
 					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
 						const Body::id_t& jid=V[j].id;
-						if(!V[j].flags.isMin) continue;
+						if(!V[j].isMin) continue;
 						handleBoundInversionPeri(iid,jid,interactions,scene);
 						if(cnt++>2*(long)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
 					}
