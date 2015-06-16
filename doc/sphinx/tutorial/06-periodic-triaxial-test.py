@@ -66,10 +66,10 @@ O.engines=[
 	NewtonIntegrator(damping=.2),
 	PyRunner(command='addPlotData()',iterPeriod=100),
 ]
-O.dt=.5*utils.PWaveTimeStep()
+O.dt=.5*PWaveTimeStep()
 
 def addPlotData():
-	plot.addData(unbalanced=utils.unbalancedForce(),i=O.iter,
+	plot.addData(unbalanced=unbalancedForce(),i=O.iter,
 		sxx=triax.stress[0],syy=triax.stress[1],szz=triax.stress[2],
 		exx=triax.strain[0],eyy=triax.strain[1],ezz=triax.strain[2],
 		# save all available energy data

@@ -6,7 +6,7 @@
 from yade import pack, plot
 
 # create rectangular box from facets
-O.bodies.append(utils.geom.facetBox((.5,.5,.5),(.5,.5,.5),wallMask=31))
+O.bodies.append(geom.facetBox((.5,.5,.5),(.5,.5,.5),wallMask=31))
 
 # create empty sphere packing
 # sphere packing is not equivalent to particles in simulation, it contains only the pure geometry
@@ -25,14 +25,13 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_L3Geom_FrictPhys_ElPerfPl()]
 	),
-	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonIntegrator(damping=0.4),
+	NewtonIntegrator(gravity=(0,0,-9.81),damping=0.4),
 	# call the checkUnbalanced function (defined below) every 2 seconds
 	PyRunner(command='checkUnbalanced()',realPeriod=2),
 	# call the addPlotData function every 200 steps
 	PyRunner(command='addPlotData()',iterPeriod=100)
 ]
-O.dt=.5*utils.PWaveTimeStep()
+O.dt=.5*PWaveTimeStep()
 
 # enable energy tracking; any simulation parts supporting it
 # can create and update arbitrary energy types, which can be
@@ -43,7 +42,7 @@ O.trackEnergy=True
 # is considered stabilized, therefore we stop collected
 # data history and stop
 def checkUnbalanced():
-	if utils.unbalancedForce()<.05:
+	if unbalancedForce()<.05:
 		O.pause()
 		plot.saveDataTxt('bbb.txt.bz2')
 		# plot.saveGnuplot('bbb') is also possible
@@ -52,7 +51,7 @@ def checkUnbalanced():
 def addPlotData():
 	# each item is given a names, by which it can be the unsed in plot.plots
 	# the **O.energy converts dictionary-like O.energy to plot.addData arguments
-	plot.addData(i=O.iter,unbalanced=utils.unbalancedForce(),**O.energy)
+	plot.addData(i=O.iter,unbalanced=unbalancedForce(),**O.energy)
 
 # define how to plot data: 'i' (step number) on the x-axis, unbalanced force
 # on the left y-axis, all energies on the right y-axis

@@ -1,7 +1,7 @@
 # demonstrate 3d postprocessing with yade
 #
 # 1. qt.SnapshotEngine saves images of the 3d view as it appears on the screen periodically
-#    utils.makeVideo is then used to make real movie from those images
+#    makeVideo is then used to make real movie from those images
 # 2. VTKRecorder saves data in files which can be opened with Paraview
 #    see the User's manual for an intro to Paraview
 
@@ -28,7 +28,7 @@ O.engines=[
 	# this engine will be called after 20000 steps, only once
 	PyRunner(command='finish()',iterPeriod=20000)
 ]
-O.dt=.5*utils.PWaveTimeStep()
+O.dt=.5*PWaveTimeStep()
 
 # prescribe constant-strain deformation of the cell
 O.cell.velGrad=Matrix3(-.1,0,0, 0,-.1,0, 0,0,-.1)
@@ -40,7 +40,7 @@ qt.View()
 def finish():
 	# snapshot is label of qt.SnapshotEngine
 	# the 'snapshots' attribute contains list of all saved files
-	utils.makeVideo(snapshot.snapshots,'3d.mpeg',fps=10,bps=10000)
+	makeVideo(snapshot.snapshots,'3d.mpeg',fps=10,bps=10000)
 	O.pause()
 
 # set parameters of the renderer, to show network chains rather than particles

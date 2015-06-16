@@ -7,9 +7,9 @@
 # they the default material (utils.defaultMat)
 O.bodies.append([
 	# fixed: particle's position in space will not change (support)
-	utils.sphere(center=(0,0,0),radius=.5,fixed=True),
+	sphere(center=(0,0,0),radius=.5,fixed=True),
 	# this particles is free, subject to dynamics
-	utils.sphere((0,0,2),.5)
+	sphere((0,0,2),.5)
 ])
 
 # FUNCTIONAL COMPONENTS
@@ -23,16 +23,14 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()], # collision "physics"
 		[Law2_L3Geom_FrictPhys_ElPerfPl()]   # contact law -- apply forces
 	),
-	# apply gravity force to particles
-	GravityEngine(gravity=(0,0,-9.81)),
-	# damping: numerical dissipation of energy
-	NewtonIntegrator(damping=0.1)
+	# Apply gravity force to particles. damping: numerical dissipation of energy.
+	NewtonIntegrator(gravity=(0,0,-9.81),damping=0.1)
 ]
 
 # set timestep to a fraction of the critical timestep
 # the fraction is very small, so that the simulation is not too fast
 # and the motion can be observed
-O.dt=.5e-4*utils.PWaveTimeStep()
+O.dt=.5e-4*PWaveTimeStep()
 
 # save the simulation, so that it can be reloaded later, for experimentation
 O.saveTmp()
