@@ -135,20 +135,6 @@ The following commands have to be executed in command line of corresponding
 distributions. Just copy&paste to the terminal. To perform commands you 
 should have root privileges
  
-.. warning:: If you have Ubuntu 14.04 Trusty, you need to install libqcgal-dev 
- from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
- Otherwise the following error occurs on AMD64 architectures::
- 
-		terminate called after throwing an instance of 'CGAL::Assertion_exception'
-		what():  CGAL ERROR: assertion violation!
-		Expr: -CGAL_IA_MUL(-1.1, 10.1) != CGAL_IA_MUL(1.1, 10.1)
-		File: /usr/include/CGAL/Interval_nt.h
-		Line: 209
-		Explanation: Wrong rounding: did you forget the  -frounding-math  option if you use GCC (or  -fp-model strict  for Intel)?
-		Aborted
-
-
- 
 * **Ubuntu**, **Debian** and their derivatives::
 
 		sudo apt-get install cmake git freeglut3-dev libloki-dev \
@@ -183,6 +169,22 @@ If not installed the related features will be disabled automatically.
 If you are using other distribution, than Debian or its derivatives, you should
 install the softwares listed above. Their names can differ from the 
 names of Debian-packages.
+
+ 
+.. warning:: If you have Ubuntu 14.04 Trusty, you need to add -DCMAKE_CXX_FLAGS="-frounding-math"
+ during the configuration step of compilation (see below) or to install libqcgal-dev 
+ from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
+ Otherwise the following error occurs on AMD64 architectures::
+ 
+    terminate called after throwing an instance of 'CGAL::Assertion_exception'
+    what():  CGAL ERROR: assertion violation!
+    Expr: -CGAL_IA_MUL(-1.1, 10.1) != CGAL_IA_MUL(1.1, 10.1)
+    File: /usr/include/CGAL/Interval_nt.h
+    Line: 209
+    Explanation: Wrong rounding: did you forget the  -frounding-math  option if you use GCC (or  -fp-model strict  for Intel)?
+    Aborted
+
+
 
 
 Compilation
