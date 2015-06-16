@@ -92,25 +92,7 @@ class pyBodyContainer{
 		return proxee->insert(b);
 	}
 	vector<Body::id_t> appendList(vector<shared_ptr<Body> > bb){
-		/* prevent crash when adding lots of bodies (not clear why it happens exactly, bt is like this:
-
-			#3  <signal handler called>
-			#4  0x000000000052483f in boost::detail::atomic_increment (pw=0x8089) at /usr/include/boost/detail/sp_counted_base_gcc_x86.hpp:66
-			#5  0x00000000005248b3 in boost::detail::sp_counted_base::add_ref_copy (this=0x8081) at /usr/include/boost/detail/sp_counted_base_gcc_x86.hpp:133
-			#6  0x00000000005249ca in shared_count (this=0x7fff2e44db48, r=@0x7f08ffd692b8) at /usr/include/boost/detail/shared_count.hpp:227
-			#7  0x00000000005258e3 in shared_ptr (this=0x7fff2e44db40) at /usr/include/boost/shared_ptr.hpp:165
-			#8  0x0000000000505cff in BodyRedirectionVectorIterator::getValue (this=0x846f040) at /home/vaclav/yade/trunk/core/containers/BodyRedirectionVector.cpp:47
-			#9  0x00007f0908af41ce in BodyContainerIteratorPointer::operator* (this=0x7fff2e44db60) at /home/vaclav/yade/build-trunk/include/yade-trunk/yade/core/BodyContainer.hpp:63
-			#10 0x00007f0908af420a in boost::foreach_detail_::deref<BodyContainer, mpl_::bool_<false> > (cur=@0x7fff2e44db60) at /usr/include/boost/foreach.hpp:750
-			#11 0x00007f0908adc5a9 in OpenGLRenderer::renderGeometricalModel (this=0x77f1240, scene=@0x1f49220) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:441
-			#12 0x00007f0908adfb84 in OpenGLRenderer::render (this=0x77f1240, scene=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderer/OpenGLRenderer.cpp:232
-
-		*/
-		#if BOOST_VERSION<103500
-			boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,true); // acquire lock on the mutex (true)
-		#else
-			boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
-		#endif
+		boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
 		vector<Body::id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
 	}
 	Body::id_t clump(vector<Body::id_t> ids, unsigned int discretization){

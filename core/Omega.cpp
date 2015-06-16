@@ -23,19 +23,11 @@
 
 #include<cxxabi.h>
 
-#if BOOST_VERSION<103500
-class RenderMutexLock: public boost::try_mutex::scoped_try_lock{
-	public:
-	RenderMutexLock(): boost::try_mutex::scoped_try_lock(Omega::instance().renderMutex,true){/*cerr<<"Lock renderMutex"<<endl;*/}
-	~RenderMutexLock(){/* cerr<<"Unlock renderMutex"<<endl; */}
-};
-#else
 class RenderMutexLock: public boost::mutex::scoped_lock{
 	public:
 	RenderMutexLock(): boost::mutex::scoped_lock(Omega::instance().renderMutex){/* cerr<<"Lock renderMutex"<<endl; */}
 	~RenderMutexLock(){/* cerr<<"Unlock renderMutex"<<endl;*/ }
 };
-#endif
 
 CREATE_LOGGER(Omega);
 SINGLETON_SELF(Omega);
@@ -65,8 +57,13 @@ void Omega::switchToScene(int i) {
 
 
 
-Real Omega::getRealTime(){ return (boost::posix_time::microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3; }
-boost::posix_time::time_duration Omega::getRealTime_duration(){return boost::posix_time::microsec_clock::local_time()-startupLocalTime;}
+Real Omega::getRealTime(){
+	return (boost::posix_time::microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3;
+}
+
+boost::posix_time::time_duration Omega::getRealTime_duration(){
+	return boost::posix_time::microsec_clock::local_time()-startupLocalTime;
+}
 
 
 void Omega::initTemps(){
@@ -76,8 +73,8 @@ void Omega::initTemps(){
 }
 
 void Omega::cleanupTemps(){
-  boost::filesystem::path tmpPath(tmpFileDir);
-  boost::filesystem::remove_all(tmpPath);
+	boost::filesystem::path tmpPath(tmpFileDir);
+	boost::filesystem::remove_all(tmpPath);
 }
 
 std::string Omega::tmpFilename(){
@@ -93,7 +90,6 @@ void Omega::reset(){
 
 void Omega::init(){
 	sceneFile="";
-	//resetScene();
 	resetAllScenes();
 	sceneAnother=shared_ptr<Scene>(new Scene);
 	timeInit();
@@ -104,8 +100,14 @@ void Omega::timeInit(){
 	startupLocalTime=boost::posix_time::microsec_clock::local_time();
 }
 
-void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
-void Omega::stop(){ LOG_DEBUG("");  if (simulationLoop&&simulationLoop->looping())simulationLoop->stop(); if (simulationLoop) simulationLoop=shared_ptr<ThreadRunner>(); }
+void Omega::createSimulationLoop(){
+	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));
+}
+void Omega::stop(){
+	LOG_DEBUG("");
+	if (simulationLoop&&simulationLoop->looping())simulationLoop->stop();
+	if (simulationLoop) simulationLoop=shared_ptr<ThreadRunner>();
+}
 
 /* WARNING: even a single simulation step is run asynchronously; the call will return before the iteration is finished. */
 void Omega::step(){
@@ -115,7 +117,7 @@ void Omega::step(){
 }
 
 void Omega::run(){
-	if(!simulationLoop){ LOG_ERROR("No Omega::simulationLoop? Creating one (please report bug)."); createSimulationLoop(); }
+	if(!simulationLoop){LOG_ERROR("No Omega::simulationLoop? Creating one (please report bug)."); createSimulationLoop(); }
 	if (simulationLoop && !simulationLoop->looping()){
 		simulationLoop->start();
 	}
