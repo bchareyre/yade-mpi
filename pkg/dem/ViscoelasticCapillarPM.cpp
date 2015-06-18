@@ -48,6 +48,13 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
       throw runtime_error("Theta should be equal for both particles!.");
     }
     
+  
+    if (mat1->dcap == mat2->dcap) {
+      phys->dcap = mat1->dcap;
+    } else {
+      throw runtime_error("Theta should be equal for both particles!.");
+    }
+    
     if (mat1->CapillarType == mat2->CapillarType and mat2->CapillarType != ""){
       
       if      (mat1->CapillarType == "Willett_numeric")  {phys->CapillarType = Willett_numeric;  phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Willett_numeric_f;}
@@ -123,7 +130,32 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
         VLiqBridg += phys.Vb;
         NLiqBridg += 1;
       }
-      phys.normalForce = -phys.CapFunct(geom, phys)*geom.normal;
+      
+      const auto normalCapForceScalar = phys.CapFunct(geom, phys);
+      Real dampCapForceScalar = 0.0;
+      
+      if (phys.dcap) {
+        const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
+        const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
+      
+        Vector3r& shearForce = phys.shearForce;
+        if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
+        shearForce = geom.rotate(shearForce);
+        
+        const Vector3r shift2 = scene->isPeriodic ? scene->cell->intrShiftPos(I->cellDist): Vector3r::Zero(); 
+        const Vector3r shiftVel = scene->isPeriodic ? scene->cell->intrShiftVel(I->cellDist): Vector3r::Zero(); 
+      
+        const Vector3r c1x = (geom.contactPoint - de1.pos);
+        const Vector3r c2x = (geom.contactPoint - de2.pos - shift2);
+        
+        const Vector3r relativeVelocity = (de1.vel+de1.angVel.cross(c1x)) - (de2.vel+de2.angVel.cross(c2x)) + shiftVel;
+        const auto normalVelocity	= geom.normal.dot(relativeVelocity);
+        
+        dampCapForceScalar = -phys.dcap * normalVelocity;
+      }
+      
+      phys.normalForce = -(normalCapForceScalar + dampCapForceScalar)*geom.normal;
+      
       if (I->isActive) {
         addForce (id1,-phys.normalForce,scene);
         addForce (id2, phys.normalForce,scene);

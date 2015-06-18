@@ -14,6 +14,7 @@ class ViscElCapMat : public ViscElMat {
 		((Real,Vb,0.0,,"Liquid bridge volume [m^3]"))
 		((Real,gamma,0.0,,"Surface tension [N/m]"))
 		((Real,theta,0.0,,"Contact angle [°]"))
+		((Real,dcap,0.0,,"Damping coefficient for the capillary phase [-]"))
 		((std::string,CapillarType,"",,"Different types of capillar interaction: Willett_numeric, Willett_analytic [Willett2000]_ , Weigert [Weigert1999]_ , Rabinovich [Rabinov2005]_ , Lambert (simplified, corrected Rabinovich model) [Lambert2008]_ ")),
 		createIndex();
 	);
@@ -38,6 +39,7 @@ class ViscElCapPhys : public ViscElPhys{
 		((Real,gamma,0.0,,"Surface tension [N/m]"))
 		((Real,theta,0.0,,"Contact angle [rad]"))
 		((CapType,CapillarType,None_Capillar,,"Different types of capillar interaction: Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert, Soulie"))
+		((Real,dcap,0.0,,"Damping coefficient for the capillary phase [-]"))
 #ifdef YADE_LIQMIGRATION
 		((bool,LiqMigrEnabled,,,"True, if liquid migration mechanism is needed."))
 		((Real,Vmax,0.0,,"Maximal liquid bridge volume [m^3]"))
