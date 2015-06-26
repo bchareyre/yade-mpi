@@ -466,8 +466,11 @@ void GLViewer::initFromDOMElement(const QDomElement& element){
 
 boost::posix_time::ptime GLViewer::getLastUserEvent(){return last_user_event;};
 
-
+#if QGLVIEWER_VERSION>=0x020603
+qreal YadeCamera::zNear() const
+#else
 float YadeCamera::zNear() const
+#endif
 {
   float z = distanceToSceneCenter() - zClippingCoefficient()*sceneRadius()*(1.f-2*cuttingDistance);
 

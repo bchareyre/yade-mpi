@@ -82,7 +82,11 @@ void GLViewer::draw()
 		int selection = selectedName();
 		if(selection!=-1 && (*(Omega::instance().getScene()->bodies)).exists(selection) && isMoving){
 			static Real lastTimeMoved(0);
+#if QGLVIEWER_VERSION>=0x020603
+			qreal v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);
+#else
 			float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);
+#endif
 			if(last == selection) // delay by one redraw, so the body will not jump into 0,0,0 coords
 			{
 				Quaternionr& q = (*(Omega::instance().getScene()->bodies))[selection]->state->ori;
@@ -100,7 +104,11 @@ void GLViewer::draw()
 		}
 		if(manipulatedClipPlane>=0){
 			assert(manipulatedClipPlane<renderer->numClipPlanes);
+#if QGLVIEWER_VERSION>=0x020603
+			qreal v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);
+#else
 			float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);
+#endif
 			double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);
 			Se3r newSe3(Vector3r(v0,v1,v2),Quaternionr(q0,q1,q2,q3)); newSe3.orientation.normalize();
 			const Se3r& oldSe3=renderer->clipPlaneSe3[manipulatedClipPlane];

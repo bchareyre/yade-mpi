@@ -151,7 +151,11 @@ class YadeCamera : public qglviewer::Camera
 		float cuttingDistance;
         public :
 		YadeCamera():cuttingDistance(0){};
+#if QGLVIEWER_VERSION>=0x020603
+		virtual qreal zNear() const;
+#else
 		virtual float zNear() const;
+#endif
 		virtual void setCuttingDistance(float s){cuttingDistance=s;};
 };
 
