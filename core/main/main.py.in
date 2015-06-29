@@ -171,7 +171,7 @@ def userSession(qt4=False,qapp=None):
 	#	IPython.appstart_qt4(qapp)
 	if len(sys.argv)>0:
 		arg0=sys.argv[0]
-		if qt4: yade.qt.Controller();
+		if (qt4 or qt5): yade.qt.Controller();
 		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
 			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
 			sys.stderr.write("Running simulation "+arg0+'\n')
@@ -245,6 +245,7 @@ def userSession(qt4=False,qapp=None):
 gui=None
 yade.runtime.hasDisplay=False # this is the default initialized in the module, anyway
 if 'GUI' in features: gui='qt4'
+if 'GUI-Qt5' in features: gui='qt5'
 if opts.nogui: gui=None
 if gui:
 	import Xlib.display
@@ -278,6 +279,13 @@ elif gui=='qt4':
 	import yade.qt # this yade.qt is different from the one that comes with qt3
 	qapp=QtGui.QApplication(sys.argv)
 	userSession(qt4=True,qapp=qapp)
+elif gui=='qt5':
+	import PyQt5
+	from PyQt5 import QtGui
+	from PyQt5.QtCore import *
+	import yade.qt # this yade.qt is different from the one that comes with qt3
+	qapp=QtGui.QApplication(sys.argv)
+	userSession(qt5=True,qapp=qapp)
 
 if __name__ == "__main__":
 	O.exitNoBacktrace()
