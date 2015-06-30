@@ -437,6 +437,21 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 	}
 	vtkfile.end_data();
 }
+void TwoPhaseFlowEngine::computePoreThroatRadiusTricky()
+{
+  computePoreThroatRadius();
+  RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+  FiniteCellsIterator cellEnd = tri.finite_cells_end();
+  CellHandle neighbourCell;
+  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+      for (int j=0; j<4; j++) {
+          neighbourCell = cell->neighbor(j);
+	  if(cell->info().isFictious && neighbourCell->info().isFictious)
+	  {cell->info().poreThroatRadius[j]=-1.0;
+	  neighbourCell->info().poreThroatRadius[tri.mirror_index(cell, j)]= cell->info().poreThroatRadius[j];}
+      }
+  }
+}
 
 void TwoPhaseFlowEngine::initialization()
 {
@@ -444,7 +459,8 @@ void TwoPhaseFlowEngine::initialization()
 		setPositionsBuffer(true);//copy sphere positions in a buffer...
 		buildTriangulation(0.0,*solver);//create a triangulation and initialize pressure in the elements (connecting with W-reservoir), everything will be contained in "solver"
 // 		initializeCellIndex();//initialize cell index
-		computePoreThroatRadius();//save pore throat radius before drainage. Thomas, here you can also revert this to computePoreThroatCircleRadius().
+		if(isInvadeBoundary) {computePoreThroatRadius();}
+		else {computePoreThroatRadiusTricky();}//save pore throat radius before drainage. Thomas, here you can also revert this to computePoreThroatCircleRadius().
 		computePoreBodyRadius();//save pore body radius before imbibition
 		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
 		computeSolidLine();//save cell->info().solidLine[j][y]

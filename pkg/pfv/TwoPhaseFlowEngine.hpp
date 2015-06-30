@@ -76,6 +76,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreCapillaryPressure(CellHandle cell);
 	void savePhaseVtk(const char* folder);
 	void computePoreThroatRadius();
+	void computePoreThroatRadiusTricky();//set the radius of pore throat between side pores negative.
+	
 	double computeEffPoreThroatRadius(CellHandle cell, int j);
 	double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
 	double bisection(CellHandle cell, int j, double a, double b);
@@ -122,6 +124,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 	((bool,initialWetting,true,,"Initial wetting saturated (=true) or non-wetting saturated (=false)"))
 	((bool, isPhaseTrapped,true,,"If True, both phases can be entrapped by the other, which would correspond to snap-off. If false, both phases are always connected to their reservoirs, thus no snap-off."))
+	((bool, isInvadeBoundary, true,,"Invasion side boundary condition. If True, pores of side boundary can be invaded; if False, the pore throats connecting side boundary are closed, those pores are excluded in saturation calculation."))	
 	((bool, drainageFirst, true,,"If true, activate drainage first (initial saturated), then imbibition; if false, activate imbibition first (initial unsaturated), then drainage."))
 	((double,dtDynTPF,0.0,,"Parameter which stores the smallest time step, based on the residence time"))
 

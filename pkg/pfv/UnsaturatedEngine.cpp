@@ -20,7 +20,6 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 // 		void initialization();		
 
 	public :
-		void computeTotalPoresVolume();
 		double computeCellInterfacialArea(CellHandle cell, int j, double rC);
 
 // 		void computeSolidLine();
@@ -81,7 +80,6 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,TwoPhaseFlowEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.",
 
 		((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
-		((bool, isInvadeBoundary, true,,"Invasion side boundary condition. If True, pores of side boundary can be invaded; if False, the pore throats connecting side boundary are closed, those pores are excluded in saturation calculation."))
 		((int, windowsNo, 10,, "Number of genrated windows(or zoomed samples)."))
 		((bool, isDrainageActivated, true,, "Activates drainage."))
 		((bool, isImbibitionActivated, false,, "Activates imbibition."))
@@ -163,24 +161,6 @@ void UnsaturatedEngine::action()
         scene->forces.addForce ( V_it->info().id(), force); }}
 */}
 
-void UnsaturatedEngine::computeTotalPoresVolume()
-{
-    initializeVolumes(*solver);
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    totalCellVolume=0;
-    
-    if(isInvadeBoundary==true) {
-        for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-            if (cell->info().Pcondition) continue;//NOTE:reservoirs cells should not be included in totalCellVolume
-            totalCellVolume = totalCellVolume + std::abs( cell->info().volume() );}}
-    else {
-        for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-            if (cell->info().Pcondition) continue;//NOTE:reservoirs cells should not be included in totalCellVolume
-            if (cell->info().isFictious) continue;
-            totalCellVolume = totalCellVolume + std::abs( cell->info().volume() );}}
-}
-
 void UnsaturatedEngine::updatePressure()
 {
     boundaryConditions(*solver);
@@ -194,8 +174,9 @@ void UnsaturatedEngine::updatePressure()
       if (isPhaseTrapped) {
 	if ( cell->info().isTrapW ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
 	if ( cell->info().isTrapNW) {cell->info().p()=bndCondValue[2]+cell->info().trapCapP;}
-	//here, in !isInvadeBoundary case, the pressure of bnd[0,1,4,5] cells is equal to the W-Res pressure, in order to calculate forces.  
-	if ( !cell->info().isWRes && !cell->info().isNWRes && !cell->info().isTrapW && !cell->info().isTrapNW ) {cell->info().p()=bndCondValue[2]; if (isInvadeBoundary) cerr<<"Something wrong in updatePressure.(isInvadeBoundary)";}
+	//check cell reservoir info.
+	if ( !cell->info().isWRes && !cell->info().isNWRes && !cell->info().isTrapW && !cell->info().isTrapNW ) {cerr<<"ERROR! NOT FIND Cell Info!";}
+// 	{cell->info().p()=bndCondValue[2]; if (isInvadeBoundary) cerr<<"Something wrong in updatePressure.(isInvadeBoundary)";}
       }
     } 
 }
@@ -215,7 +196,8 @@ void UnsaturatedEngine::invasionSingleCell(CellHandle cell)
         CellHandle nCell = cell->neighbor(facet);
         if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
         if (nCell->info().Pcondition) continue;//FIXME:defensive
-        if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+	if (cell->info().poreThroatRadius[facet]<0) continue;
 
 	if ( (nCell->info().saturation==localSaturation) && (nCell->info().p() != localPressure) && ((nCell->info().isTrapNW)||(nCell->info().isTrapW)) ) {
 	  nCell->info().p() = localPressure;
@@ -307,7 +289,7 @@ void UnsaturatedEngine::checkTrap(double pressure)
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if( (cell->info().isFictious) && (!cell->info().Pcondition) && (!isInvadeBoundary) ) continue;
+//       if( (cell->info().isFictious) && (!cell->info().Pcondition) && (!isInvadeBoundary) ) continue;
       if( (cell->info().isWRes) || (cell->info().isNWRes) || (cell->info().isTrapW) || (cell->info().isTrapNW) ) continue;
       cell->info().trapCapP=pressure;
       if(cell->info().saturation==1.0) cell->info().isTrapW=true;
@@ -342,7 +324,7 @@ void UnsaturatedEngine::WResRecursion(CellHandle cell)
         CellHandle nCell = cell->neighbor(facet);
         if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
         if (nCell->info().Pcondition) continue;
-        if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (nCell->info().saturation != 1.0) continue;
         if (nCell->info().isWRes==true) continue;
         nCell->info().isWRes = true;
@@ -359,7 +341,7 @@ void UnsaturatedEngine::NWResRecursion(CellHandle cell)
         CellHandle nCell = cell->neighbor(facet);
         if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
         if (nCell->info().Pcondition) continue;
-        if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         if (nCell->info().saturation != 0.0) continue;
         if (nCell->info().isNWRes==true) continue;
         nCell->info().isNWRes = true;
@@ -426,8 +408,8 @@ double UnsaturatedEngine::getMinDrainagePc()
 	      CellHandle nCell = cell->neighbor(facet);
 	      if (tri.is_infinite(nCell)) continue;
                 if (nCell->info().Pcondition) continue;
-                if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-                if ( nCell->info().isWRes == true ) {
+//                 if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+                if ( nCell->info().isWRes == true && cell->info().poreThroatRadius[facet]>0) {
                     double nCellP = std::max( (surfaceTension/cell->info().poreThroatRadius[facet]),(surfaceTension/nCell->info().poreBodyRadius) );
 //                     double nCellP = surfaceTension/cell->info().poreThroatRadius[facet];
                     nextEntry = std::min(nextEntry,nCellP);}}}}
@@ -450,8 +432,8 @@ double UnsaturatedEngine::getMaxImbibitionPc()
  	      CellHandle nCell = cell->neighbor(facet);
                if (tri.is_infinite(nCell)) continue;
                 if (nCell->info().Pcondition) continue;
-                if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-                if ( nCell->info().isNWRes == true ) {
+//                 if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+                if ( nCell->info().isNWRes == true && cell->info().poreThroatRadius[facet]>0) {
                     double nCellP = std::min( (surfaceTension/nCell->info().poreBodyRadius), (surfaceTension/cell->info().poreThroatRadius[facet]));
                     nextEntry = std::max(nextEntry,nCellP);}}}}
                     
