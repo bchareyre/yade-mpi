@@ -22,7 +22,6 @@ class CohFrictMat : public FrictMat
 {
 	public :
 		virtual ~CohFrictMat () {};
-
 /// Serialization
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictMat,FrictMat,"",
 		((bool,isCohesive,true,,""))
@@ -49,6 +48,7 @@ class CohFrictPhys : public FrictPhys
 	public :
 		virtual ~CohFrictPhys() {};
 		void SetBreakingState() {cohesionBroken = true; normalAdhesion = 0; shearAdhesion = 0;};
+		virtual Vector3r getRotStiffness();
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohFrictPhys,FrictPhys,"",
 		((bool,cohesionDisablesFriction,false,,"is shear strength the sum of friction and adhesion or only adhesion?"))

@@ -177,13 +177,16 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 				std::pow(normal.x(),2)+std::pow(normal.z(),2),
 				std::pow(normal.x(),2)+std::pow(normal.y(),2));
 		diag_Rstiffness *= ks;
+		
+		// If contact moments are present, add the diagonal of (n⊗n*k_twist + (I-n⊗n)*k_roll = (k_twist-k_roll)*n⊗n + I*k_roll ) :
+		Vector3r kr = (static_cast<NormShearPhys *> (contact->phys.get()))->getRotStiffness(); //get the vector (k_twist,k_roll,k_roll)
+		Vector3r nn (std::pow(normal.x(),2),std::pow(normal.y(),2),std::pow(normal.z(),2));//n⊗n 
+		Vector3r diag_Mstiffness= (kr[0]-kr[1])*nn + Vector3r(1,1,1)*kr[1];
 
-
-		//NOTE : contact laws with moments would be handled correctly by summing directly bending+twisting stiffness to diag_Rstiffness. The fact that there is no problem currently with e.g. cohesiveFrict law is probably because final computed dt is constrained by translational motion, not rotations.
 		stiffnesses [contact->getId1()]+=diag_stiffness;
-		Rstiffnesses[contact->getId1()]+=diag_Rstiffness*pow(radius1,2);
+		Rstiffnesses[contact->getId1()]+=diag_Rstiffness*pow(radius1,2)+ diag_Mstiffness;
 		stiffnesses [contact->getId2()]+=diag_stiffness;
-		Rstiffnesses[contact->getId2()]+=diag_Rstiffness*pow(radius2,2);	
+		Rstiffnesses[contact->getId2()]+=diag_Rstiffness*pow(radius2,2)+ diag_Mstiffness;
 
 		//Same for the Viscous part, if required
 		if (viscEl == true){

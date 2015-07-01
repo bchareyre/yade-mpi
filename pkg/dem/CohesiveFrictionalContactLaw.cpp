@@ -17,6 +17,9 @@ CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::getPlasticDissipation() {return (Real) plasticDissipation;}
 void Law2_ScGeom6D_CohFrictPhys_CohesionMoment::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
 
+Vector3r CohFrictPhys::getRotStiffness() {return Vector3r(ktw,kr,kr);}
+
+
 Real Law2_ScGeom6D_CohFrictPhys_CohesionMoment::normElastEnergy()
 {
 	Real normEnergy=0;
@@ -256,8 +259,9 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 
 			// harmonic average of alphas parameters
-			Real AlphaKr = 2.0*sdec1->alphaKr*sdec2->alphaKr/(sdec1->alphaKr+sdec2->alphaKr);
-			Real AlphaKtw;
+			Real AlphaKr, AlphaKtw;
+			if (sdec1->alphaKr && sdec2->alphaKr) AlphaKr = 2.0*sdec1->alphaKr*sdec2->alphaKr/(sdec1->alphaKr+sdec2->alphaKr);
+			else AlphaKr = 0;
 			if (sdec1->alphaKtw && sdec2->alphaKtw) AlphaKtw = 2.0*sdec1->alphaKtw*sdec2->alphaKtw/(sdec1->alphaKtw+sdec2->alphaKtw);
 			else AlphaKtw=0;
 
