@@ -7,6 +7,7 @@
 class NormPhys:public IPhys {
 	public:
 		virtual ~NormPhys() {};
+		virtual Vector3r getRotStiffness() {return Vector3r::Zero();}
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormPhys,IPhys,"Abstract class for interactions that have normal stiffness.",
 		((Real,kn,0,,"Normal stiffness"))
 		((Vector3r,normalForce,Vector3r::Zero(),,"Normal force after previous step (in global coordinates).")),
