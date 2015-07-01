@@ -40,11 +40,12 @@ class NewtonIntegrator : public FieldApplier{
 	#endif
 	// whether the cell has changed from the previous step
 	bool cellChanged;
-	bool homoDeform;
+	int homoDeform;
 	
 	// wether a body has been selected in Qt view
 	bool bodySelected;
 	Matrix3r dVelGrad;
+	Vector3r dSpin;
 
 	public:
 		bool densityScaling;// internal for density scaling

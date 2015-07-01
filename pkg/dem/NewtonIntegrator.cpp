@@ -96,6 +96,8 @@ void NewtonIntegrator::action()
 		scene->cell->velGradChanged=0; scene->cell->nextVelGrad=Matrix3r::Zero();}
 	homoDeform=scene->cell->homoDeform;
 	dVelGrad=scene->cell->velGrad-prevVelGrad;
+	Matrix3r R=.5*(dVelGrad-dVelGrad.transpose());
+	dSpin=Vector3r(-R(1,2),R(0,2),-R(0,1));
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
@@ -165,7 +167,7 @@ void NewtonIntegrator::action()
 				if (densityScaling) linAccel*=state->densityScaling;
 				if(state->isDamped) cundallDamp2nd(dt,fluctVel,linAccel);
 				//This is the convective term, appearing in the time derivation of Cundall/Thornton expression (dx/dt=velGrad*pos -> d²x/dt²=dvelGrad/dt*pos+velGrad*vel), negligible in many cases but not for high speed large deformations (gaz or turbulent flow).
-				if (isPeriodic && homoDeform) linAccel+=prevVelGrad*state->vel;
+				if (isPeriodic && homoDeform>1) linAccel+=prevVelGrad*state->vel;
 				//finally update velocity
 				state->vel+=dt*linAccel;
 				// angular acceleration
@@ -179,7 +181,7 @@ void NewtonIntegrator::action()
 					if(state->isDamped) cundallDamp1st(m,state->angVel);
 				}
 			// reflect macro-deformation even for non-dynamic bodies
-			} else if (isPeriodic && homoDeform) state->vel+=dt*prevVelGrad*state->vel;
+			} else if (isPeriodic && homoDeform>1) state->vel+=dt*prevVelGrad*state->vel;
 
 			// update positions from velocities (or torque, for the aspherical integrator)
 			leapfrogTranslate(state,id,dt);
@@ -219,6 +221,7 @@ void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, con
 
 void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
 {
+ 	if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
 	Real angle2=state->angVel.squaredNorm();
 	if (angle2!=0 and ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) )) {//If we have an angular velocity, we make a rotation
 		Real angle=sqrt(angle2);
@@ -236,6 +239,8 @@ void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& i
 }
 
 void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& id, const Real& dt, const Vector3r& M){
+	//FIXME: where to increment angular velocity like this? Only done for spherical rotations at the moment
+	//if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
 	Matrix3r A=state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2. * M; // global angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n

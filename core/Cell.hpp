@@ -141,6 +141,7 @@ class Cell: public Serializable{
 	Matrix3r getRotation() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return R; }
 	Matrix3r getLeftStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return U; }
 	Matrix3r getRightStretch() { Matrix3r R,U; computePolarDecOfDefGrad(R,U); return trsf*R.transpose(); }
+	Vector3r getSpin() {Matrix3r R=.5*(velGrad-velGrad.transpose()); return Vector3r(-R(1,2),R(0,2),-R(0,1));}
 
 	// stress measures
 	//Matrix3r getStress() { return Shop::getStress(); }
@@ -157,7 +158,7 @@ class Cell: public Serializable{
 		((Matrix3r,velGrad,Matrix3r::Zero(),,"[overridden below]"))
 		((Matrix3r,nextVelGrad,Matrix3r::Zero(),Attr::readonly,"see :yref:`Cell.velGrad`."))
 		((Matrix3r,prevVelGrad,Matrix3r::Zero(),Attr::readonly,"Velocity gradient in the previous step."))
-		((bool,homoDeform,true,,"Deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically, by adjusting positions and velocities of bodies. The velocity change is obtained by deriving the expression v=∇v.x, where ∇v is the macroscopic velocity gradient, giving in an incremental form: Δv=Δ ∇v x + ∇v Δx. As a result, velocities are modified as soon as ``velGrad`` changes, according to the first term: Δv(t)=Δ ∇v x(t), while the 2nd term reflects a convective term: Δv'= ∇v v(t-dt/2)."))
+		((int,homoDeform,2,,"If >0, deform (:yref:`velGrad<Cell.velGrad>`) the cell homothetically by adjusting positions and velocities of bodies. The velocity change is obtained by deriving the expression v=∇v.x, where ∇v is the macroscopic velocity gradient, giving in an incremental form: Δv=Δ ∇v x + ∇v Δx. As a result, velocities are modified as soon as ``velGrad`` changes, according to the first term: Δv(t)=Δ ∇v x(t), while the 2nd term reflects a convective term: Δv'= ∇v v(t-dt/2). The second term is neglected if homoDeform=1. All terms are included if homoDeform=2 (default)"))
 		((bool,velGradChanged,false,Attr::readonly,"true when velGrad has been changed manually (see also :yref:`Cell.nextVelGrad`)")),
 		/*ctor*/ _invTrsf=Matrix3r::Identity(); integrateAndUpdate(0),
 		/*py*/
@@ -188,6 +189,7 @@ class Cell: public Serializable{
 		.def("getRotation",&Cell::getRotation,"Returns rotation of the cell (orthogonal matrix $\\mat{R}$ from polar decomposition $\\mat{F}=\\mat{RU}$ )")
 		.def("getLeftStretch",&Cell::getLeftStretch,"Returns left (spatial) stretch tensor of the cell (matrix $\\mat{U}$ from polar decomposition $\\mat{F}=\\mat{RU}$ )")
 		.def("getRightStretch",&Cell::getRightStretch,"Returns right (material) stretch tensor of the cell (matrix $\\mat{V}$ from polar decomposition $\\mat{F}=\\mat{RU}=\\mat{VR}\\ \\rightarrow\\ \\mat{V}=\\mat{FR}^T$ )")
+		.def("getSpin",&Cell::getSpin,"Returns the spin defined by the skew symmetric part of :yref:`velGrad<Cell.velGrad>`") 
 		.def_readonly("shearTrsf",&Cell::_shearTrsf,"Current skew+rot transformation (no resize)")
 		.def_readonly("unshearTrsf",&Cell::_unshearTrsf,"Inverse of the current skew+rot transformation (no resize)")
 		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell::trsf>` (computed as :yref:`trsf<Cell::trsf>` ⁻¹ × :yref:`hSize<Cell::hSize>`.")
