@@ -97,7 +97,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->geom.get());
 
 			/// Capillary components definition:
-			Real liquidTension = 0.073; 	// superficial water tension N/m (0.073 is water tension at 20 Celsius degrees)
+			Real liquidTension = surfaceTension;
 
 			/// Interacting Grains:
 			// If you want to define a ratio between YADE sphere size and real sphere size

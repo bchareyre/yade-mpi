@@ -48,7 +48,7 @@ public :
 /// R = ratio(RadiusParticle1 on RadiusParticle2). Here, 10 R values from interpolation files (yade/extra/capillaryFiles), R = 1, 1.1, 1.25, 1.5, 1.75, 2, 3, 4, 5, 10
 const int NB_R_VALUES = 10;
 
-class capillarylaw; // fait appel a la classe def plus bas //TODO: translate this in english
+class capillarylaw; // the class defined below (end of file)
 class Interaction;
 
 ///This container class is used to check if meniscii overlap. Wet interactions are put in a series of lists, with one list per body.
@@ -93,6 +93,7 @@ class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 	((bool,fusionDetection,false,,"If true potential menisci overlaps are checked, computing :yref:`fusionNumber<CapillaryPhys.fusionNumber>` for each capillary interaction, and reducing :yref:`fCap<CapillaryPhys.fCap>` according to :yref:`binaryFusion<Law2_ScGeom_CapillaryPhys_Capillarity.binaryFusion>`"))
 	((bool,binaryFusion,true,,"If true, capillary forces are set to zero as soon as, at least, 1 overlap (menisci fusion) is detected. Otherwise :yref:`fCap<CapillaryPhys.fCap>` = :yref:`fCap<CapillaryPhys.fCap>` / (:yref:`fusionNumber<CapillaryPhys.fusionNumber>` + 1 )"))
 	((bool,createDistantMeniscii,false,,"Generate meniscii between distant spheres? Else only maintain the existing ones. For modeling a wetting path this flag should always be false. For a drying path it should be true for one step (initialization) then false, as in the logic of [Scholtes2009c]_"))
+        ((Real,surfaceTension,0.073,,"Value of considered surface tension")) // (0.073 N/m is water tension at 20 Celsius degrees)
 	,,/*constructor*/
 	hertzInitialized = false;
 	hertzOn = false;
@@ -101,10 +102,10 @@ class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 	 );
 };
 
-class TableauD
+class TableauD // Laplace solutions for a given r, and a given D (and a given contact angle): pieces of one capillary file
 {
 	public:
-		Real D;
+		Real D; // one cst D value in each TableauD (the one appearing last line of corresponding group D=cst in the capillary file)
 		std::vector<std::vector<Real> > data;
 		MeniscusParameters Interpolate3(Real P, int& index);
 		TableauD();
@@ -116,11 +117,11 @@ class TableauD
 class Tableau;
 std::ostream& operator<<(std::ostream& os, Tableau& T);
 
-class Tableau
+class Tableau // Laplace solutions for a given r (and a given contact angle): one capillary file
 {	
 	public: 
 		Real R;
-		std::vector<TableauD> full_data; // full_data contains a lot of TableauD, for different D. that are the Laplace solutions for a given r, and a given D
+		std::vector<TableauD> full_data; // members of full_data are the different TableauD, for different D.
 		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2);		
 		std::ifstream& operator<< (std::ifstream& file);		
 		Tableau();
@@ -128,11 +129,11 @@ class Tableau
     		~Tableau();
 };
 
-class capillarylaw
+class capillarylaw // the whole set of capillary files M(r=..)
 {
 	public:
 		capillarylaw();
-		std::vector<Tableau> data_complete; // each Tableau of data_complete corresponds to one capillary file M(r=..), in ascending order of r
+		std::vector<Tableau> data_complete; // data_complete includes, in ascending order of r, all capillary files: each Tableau of data_complete is one capillary file
 		MeniscusParameters interpolate(Real R1, Real R2, Real D, Real P, int* index);		
 		void fill (const char* filename);
 };
