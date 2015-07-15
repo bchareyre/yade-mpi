@@ -126,7 +126,7 @@ Some of them are only optional. The last ones are only relevant for using the fl
 
 Most of the list above is very likely already packaged for your distribution. In case you are confronted
 with some errors concerning not available packages (e.g. Package libmetis-dev is not available) it may be necessary 
-to add yade external ppa from https://launchpad.net/~yade-users/+archive/external::
+to add yade external ppa from https://launchpad.net/~yade-users/+archive/external (see below) as well as http://www.yade-dem.org/packages (see the top of this page)::
 
 	sudo add-apt-repository ppa:yade-users/external 
 	sudo apt-get update 
