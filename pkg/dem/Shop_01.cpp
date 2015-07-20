@@ -182,6 +182,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 	Scene* scene=_scene ? _scene : Omega::instance().getScene().get();
 	Real ret=0.;
 	Real maxE=0; if(maxId) *maxId=Body::ID_NONE;
+	Vector3r spin = scene->cell->getSpin();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->isDynamic()) continue;
 		const State* state(b->state.get());
@@ -189,19 +190,25 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 		Real E=0;
 		if(scene->isPeriodic){
 			/* Only take in account the fluctuation velocity, not the mean velocity of homothetic resize. */
-			E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos,state->vel,scene->cell->velGrad).squaredNorm();
+			E=.5*state->mass*scene->cell->bodyFluctuationVel(state->pos-state->vel*scene->dt,state->vel,scene->cell->velGrad).squaredNorm();
 		} else {
 			E=.5*(state->mass*state->vel.squaredNorm());
 		}
+		Vector3r angVel = state->angVel;
+		if (scene->isPeriodic) angVel=angVel-spin;
 		if(b->isAspherical()){
 			Matrix3r T(state->ori);
 			// the tensorial expression http://en.wikipedia.org/wiki/Moment_of_inertia#Moment_of_inertia_tensor
 			// inertia tensor rotation from http://www.kwon3d.com/theory/moi/triten.html
 			Matrix3r mI; mI<<state->inertia[0],0,0, 0,state->inertia[1],0, 0,0,state->inertia[2];
 			//E+=.5*state->angVel.transpose().dot((T.transpose()*mI*T)*state->angVel);
-			E+=.5*state->angVel.transpose().dot((T*mI*T.transpose())*state->angVel);
+			E+=.5*angVel.transpose().dot((T*mI*T.transpose())*angVel);
 		}
-		else { E+=0.5*state->angVel.dot(state->inertia.cwiseProduct(state->angVel));}
+		else {
+			
+			E+=0.5*angVel.dot(state->inertia.cwiseProduct(angVel));
+			
+		}
 		if(maxId && E>maxE) { *maxId=b->getId(); maxE=E; }
 		ret+=E;
 	}
