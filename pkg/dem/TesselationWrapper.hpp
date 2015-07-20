@@ -67,11 +67,11 @@ public:
 	/// Add axis aligned bounding planes (modelised as spheres with (almost) infinite radius)
   	void 	addBoundingPlanes (void);
 	/// Force boudaries at positions not equal to precomputed ones
- 	void	addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
+ 	void	addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz);
 	void 	RemoveBoundingPlanes (void);
 	///compute voronoi centers then stop (don't compute anything else)
  	void	computeTesselation (void);
- 	void	computeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
+ 	void	computeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz);
 
 	///compute Voronoi vertices + volumes of all cells
 	///use computeTesselation to force update, e.g. after spheres positions have been updated
@@ -113,6 +113,7 @@ public:
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities (see also the `dedicated section in user manual <https://yade-dem.org/doc/user.html#micro-stress-and-micro-strain>`_). The calculation of microstrain is explained in [Catalano2014a]_ \n\nSee example usage in script example/tesselationWrapper/tesselationWrapper.py.\n\nBelow is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` function visualized with paraview (in this case Yade's TesselationWrapper was used to process experimental data obtained on sand by Edward Ando at Grenoble University, 3SR lab.)\n\n.. figure:: fig/localstrain.*",
 	((unsigned int,n_spheres,0,,"|ycomp|"))
+	((Real,far,10000.,,"Defines the radius of the large virtual spheres used to define nearly flat boundaries around the assembly. The radius will be the (scene's) bounding box size multiplied by 'far'. Higher values will minimize the error theoretically (since the infinite sphere really defines a plane), but it may increase numerical errors at some point. The default should give a resonable compromize."))
 	,/*ctor*/
   	Tes = new Tesselation;
 	clear();

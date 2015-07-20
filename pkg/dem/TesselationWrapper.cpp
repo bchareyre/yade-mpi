@@ -67,7 +67,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	Body::id_t Ng = 0;
 	Body::id_t& MaxId=Tes.maxId;
 	TW.mean_radius = 0;
-
+	int nonSpheres =0;
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();
 	for (; bi!=biEnd ; ++bi) {
@@ -83,12 +83,12 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			TW.Pmax = CGT::Point(max(TW.Pmax.x(),pos.x()+rad),max(TW.Pmax.y(),pos.y()+rad),max(TW.Pmax.z(),pos.z()+rad));
 			Ng++; TW.mean_radius += rad;
 			MaxId = max(MaxId,(*bi)->getId());
-		}
+		} else ++nonSpheres;
 	}
 	TW.mean_radius /= Ng; TW.rad_divided = true;
 	spheres.resize(Ng);
 	pointsPtrs.resize(Ng);
-	Tes.vertexHandles.resize(MaxId+1);
+	Tes.vertexHandles.resize(MaxId+1+max(0,6-nonSpheres),NULL);//+6 extra slots max for adding boundaries latter
 	Tes.redirected = 1;
 	std::random_shuffle(pointsPtrs.begin(), pointsPtrs.end());
 	spatial_sort(pointsPtrs.begin(),pointsPtrs.end(), RTraits_for_spatial_sort()/*, CGT::RTriangulation::Weighted_point*/);
@@ -194,9 +194,9 @@ void TesselationWrapper::computeTesselation(void)
 	Tes->compute();
 }
 
-void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
+void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz)
 {
-	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
+	(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz);
 	computeTesselation();
 }
 
@@ -228,46 +228,51 @@ bool TesselationWrapper::nextFacet(std::pair<unsigned int,unsigned int>& facet)
 	return true;
 }
 
-void TesselationWrapper::addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz,double dt)
+void TesselationWrapper::addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz)
 {
-	//Not sure this hack form JFJ works in all cases (?)
-	if (dt == 0) {
-		thickness = -1*pminx;
-	}
 	if (!bounded) {
 		if (!rad_divided) {
 			mean_radius /= n_spheres;
 			rad_divided = true;
 		}
-		double FAR = 10000;
-		Tes->vertexHandles[0]=Tes->insert(0.5*(pminx+pmaxx),pminy-FAR*(pmaxx-pminx),0.5*(pmaxz+pminz),FAR*(pmaxx-pminx)+thickness,0,true);
-		Tes->vertexHandles[1]=Tes->insert(0.5*(pminx+pmaxx), pmaxy+FAR*(pmaxx-pminx),0.5*(pmaxz+pminz),FAR*(pmaxx-pminx)+thickness, 1, true);
-		Tes->vertexHandles[2]=Tes->insert(pminx-FAR*(pmaxy-pminy), 0.5*(pmaxy+pminy), 0.5*(pmaxz+pminz), FAR*(pmaxy-pminy)+thickness, 2, true);
-		Tes->vertexHandles[3]=Tes->insert(pmaxx+FAR*(pmaxx-pminy), 0.5*(pmaxy+pminy), 0.5*(pmaxz+pminz), FAR*(pmaxy-pminy)+thickness, 3, true);
-		Tes->vertexHandles[4]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy+pminy), pminz-FAR*(pmaxy-pminy), FAR*(pmaxy-pminy)+thickness, 4, true);
-		Tes->vertexHandles[5]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy+pminy), pmaxz+FAR*(pmaxy-pminy), FAR*(pmaxy-pminy)+thickness, 5, true);
+		// Insert the 6 additional vertices in the right place (usually they will be ids 0 to 5 when walls/facets/boxes are used, but not always)
+		// append them at the end if the initial list is full
+		int freeIds [6];
+		int i=0;
+		for (int k=0; k<6; k++) {
+			while (Tes->vertexHandles[i]!=NULL) ++i;
+			freeIds[k] = i;}
+		// now insert
+		Tes->vertexHandles[freeIds[0]]=Tes->insert(0.5*(pminx+pmaxx),pminy-far*(pmaxx-pminx),0.5*(pmaxz+pminz),far*(pmaxx-pminx)+thickness,freeIds[0],true);
+		Tes->vertexHandles[freeIds[1]]=Tes->insert(0.5*(pminx+pmaxx), pmaxy+far*(pmaxx-pminx),0.5*(pmaxz+pminz),far*(pmaxx-pminx)+thickness, freeIds[1], true);
+		Tes->vertexHandles[freeIds[2]]=Tes->insert(pminx-far*(pmaxy-pminy), 0.5*(pmaxy+pminy), 0.5*(pmaxz+pminz), far*(pmaxy-pminy)+thickness, freeIds[2], true);
+		Tes->vertexHandles[freeIds[3]]=Tes->insert(pmaxx+far*(pmaxx-pminy), 0.5*(pmaxy+pminy), 0.5*(pmaxz+pminz), far*(pmaxy-pminy)+thickness, freeIds[3], true);
+		Tes->vertexHandles[freeIds[4]]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy+pminy), pminz-far*(pmaxy-pminy), far*(pmaxy-pminy)+thickness, freeIds[4], true);
+		Tes->vertexHandles[freeIds[5]]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy+pminy), pmaxz+far*(pmaxy-pminy), far*(pmaxy-pminy)+thickness, freeIds[5], true);
+		
 		bounded = true;
 	}
+	
 }
 
-void  TesselationWrapper::addBoundingPlanes(void)
-{
-	if (!bounded) {
-		if (!rad_divided) {
-			mean_radius /= n_spheres;
-			rad_divided = true;
-		}
-		double FAR = 10000;
-		//Add big bounding spheres with isFictious=true
-		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 0, true);
-		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 1, true);
-		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),2, true);
-		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),3,true);
-		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),4,true);
-		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),5, true);
-		bounded = true;
-	}
-}
+void  TesselationWrapper::addBoundingPlanes(void) {addBoundingPlanes(Pmin.x(),Pmax.x(),Pmin.y(),Pmax.y(),Pmin.z(),Pmax.z());}
+// {
+// 	if (!bounded) {
+// 		if (!rad_divided) {
+// 			mean_radius /= n_spheres;
+// 			rad_divided = true;
+// 		}
+// 		double FAR = 10000;
+// 		//Add big bounding spheres with isFictious=true
+// 		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 0, true);
+// 		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 1, true);
+// 		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),2, true);
+// 		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),3,true);
+// 		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),4,true);
+// 		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),5, true);
+// 		bounded = true;
+// 	}
+// }
 
 void  TesselationWrapper::RemoveBoundingPlanes(void)
 {
