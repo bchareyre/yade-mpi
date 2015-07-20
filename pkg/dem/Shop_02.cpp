@@ -480,7 +480,7 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 }
 
 
-py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef){
+py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy){
 	//Initialization
 	int minZ;
 	int maxZ;
@@ -498,6 +498,10 @@ py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef){
 	//Loop over the particles
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		if (activateCond==true){
+			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+			if (sphere->radius!=radiusPy) continue;
+		} //select diameters asked
 		const Real zPos = b->state->pos[2]-zRef;
 		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 

@@ -126,7 +126,7 @@ class Shop{
 		static py::tuple getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ);
 
 		//! Compute average depth profile of particle velocity (x,y,z) and solid volume fraction
-		static py::tuple getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef);
+		static py::tuple getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond=false, Real radiusPy=0);
 
 		//! Compute overall ("macroscopic") stress of periodic cell, returning 2 tensors
 		//! (contribution of normal and shear forces)
