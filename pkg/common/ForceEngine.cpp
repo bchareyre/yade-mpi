@@ -131,7 +131,7 @@ void HydroForceEngine::action(){
 	}
 	
 	/* Application of hydrodynamical forces */
-	if (activateAverage==true) averageProfile(); //Calculate the average fluid and velocity profile
+	if (activateAverage==true) averageProfile(); //Calculate the average solid profiles
 	
 	FOREACH(Body::id_t id, ids){
 		Body* b=Body::byId(id,scene).get();
@@ -183,6 +183,10 @@ void HydroForceEngine::averageProfile(){
         vector<Real> velAverageZ(nMax,0.0);
 	vector<Real> phiAverage(nMax,0.0);
 	vector<Real> dragAverage(nMax,0.0);
+	vector<Real> phiAverage1(nMax,0.0);
+	vector<Real> dragAverage1(nMax,0.0);
+	vector<Real> phiAverage2(nMax,0.0);
+	vector<Real> dragAverage2(nMax,0.0);
 
 	//Loop over the particles
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
@@ -219,6 +223,16 @@ void HydroForceEngine::averageProfile(){
                                 velAverageY[numLayer]+=volPart*b->state->vel[1];
                                 velAverageZ[numLayer]+=volPart*b->state->vel[2];
 				dragAverage[numLayer]+=volPart*fDrag[0];
+				if (twoSize==true){
+					if (s->radius==radiusPart1){
+						phiAverage1[numLayer]+=volPart; 
+						dragAverage1[numLayer]+=volPart*fDrag[0];
+					}
+					if (s->radius==radiusPart2){
+						phiAverage2[numLayer]+=volPart;
+						dragAverage2[numLayer]+=volPart*fDrag[0];
+					}
+				}
 			}
 			numLayer+=1;
 		}
@@ -232,12 +246,24 @@ void HydroForceEngine::averageProfile(){
 			dragAverage[n]/=phiAverage[n];
 			//Normalize the concentration after
 			phiAverage[n]/=vCell;
+			if (twoSize==true){
+				if (phiAverage1[n]!=0) dragAverage1[n]/=phiAverage1[n];
+				else dragAverage1[n]=0.0;
+				if (phiAverage2[n]!=0) dragAverage2[n]/=phiAverage2[n];
+				else dragAverage2[n]=0.0;
+				phiAverage1[n]/=vCell;
+				phiAverage2[n]/=vCell;
+			 }
 		}
 		else {
 			velAverageX[n] = 0.0;
                         velAverageY[n] = 0.0;
                         velAverageZ[n] = 0.0;
 			dragAverage[n] = 0.0;
+			if (twoSize==true){
+				dragAverage1[n] = 0.0;
+				dragAverage2[n] = 0.0;
+			}
 		}
 	}
 	//Assign the results to the global/public variables of HydroForceEngine
@@ -246,6 +272,10 @@ void HydroForceEngine::averageProfile(){
 	vyPart = velAverageY;
         vzPart = velAverageZ;
 	averageDrag = dragAverage;
+	phiPart1 = phiAverage1;	//Initialize everything to zero if the twoSize option is not activated
+	phiPart2 = phiAverage2;
+	averageDrag1 = dragAverage1;
+	averageDrag2 = dragAverage2;
 
 	//desactivate the average to avoid calculating at each step, only when asked by the user
 	activateAverage=false; 
