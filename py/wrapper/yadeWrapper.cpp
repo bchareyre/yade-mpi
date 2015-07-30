@@ -423,6 +423,7 @@ class pyInteractionContainer{
 		const shared_ptr<InteractionContainer> proxee;
 		pyInteractionContainer(const shared_ptr<InteractionContainer>& _proxee): proxee(_proxee){}
 		pyInteractionIterator pyIter(){return pyInteractionIterator(proxee);}
+		bool has(Body::id_t id1, Body::id_t id2){return proxee->found(id1,id2);}
 		shared_ptr<Interaction> pyGetitem(vector<Body::id_t> id12){
 			//if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
 			//if(py::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
@@ -444,6 +445,7 @@ class pyInteractionContainer{
 		void clear(){proxee->clear();}
 		py::list withBody(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(I);} return ret;}
 		py::list withBodyAll(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(I);} return ret; }
+		py::list getAll(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ret.append(I);} return ret;}
 		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
@@ -820,7 +822,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("_nextEngines",&pyOmega::nextEngines_get,"Engines for the next step, if different from the current ones, otherwise empty; debugging only!")
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (Scene::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
-		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
+		.add_property("interactions",&pyOmega::interactions_get,"Access to :yref:`interactions<Interaction>` of simulation, by using \n\n#. id's of both :yref:`Bodies<Body>` of the interactions, e.g. ``O.interactions[23,65]``\n#. iteraction over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. note::\n\tIteration silently skips interactions that are not :yref:`real<Interaction.isReal>`.")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")
 		.add_property("forces",&pyOmega::forces_get,":yref:`ForceContainer` (forces, torques, displacements) in the current simulation.")
 		.add_property("energy",&pyOmega::energy_get,":yref:`EnergyTracker` of the current simulation. (meaningful only with :yref:`O.trackEnergy<Omega.trackEnergy>`)")
@@ -866,10 +868,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
+		.def("has",&pyInteractionContainer::has,"Tell if a pair of ids corresponds to an existing interaction (real or not)")
 		.def("countReal",&pyInteractionContainer::countReal,"Return number of interactions that are \"real\", i.e. they have phys and geom.")
 		.def("nth",&pyInteractionContainer::pyNth,"Return n-th interaction from the container (usable for picking random interaction).")
 		.def("withBody",&pyInteractionContainer::withBody,"Return list of real interactions of given body.")
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll,"Return list of all (real as well as non-real) interactions of given body.")
+		.def("all",&pyInteractionContainer::getAll,"Return list of all (real as well as non-real) interactions.")
 		.def("eraseNonReal",&pyInteractionContainer::eraseNonReal,"Erase all interactions that are not :yref:`real <InteractionContainer.isReal>`.")
 		.def("erase",&pyInteractionContainer::erase,"Erase one interaction, given by id1, id2 (internally, ``requestErase`` is called -- the interaction might still exist as potential, if the :yref:`Collider` decides so).")
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
