@@ -76,7 +76,9 @@ class InteractionContainer: public Serializable{
 		const shared_ptr<Interaction>& find(Body::id_t id1,Body::id_t id2);
 // 		bool found(Body::id_t id1,Body::id_t id2);
 		inline bool found(const Body::id_t& id1,const Body::id_t& id2){
-			assert(bodies); return (id1>id2)?(*bodies)[id2]->intrs.count(id1):(*bodies)[id1]->intrs.count(id2);}
+			assert(bodies);
+			if(id2>=(Body::id_t)bodies->size()) return false;
+			return (id1>id2)?(*bodies)[id2]->intrs.count(id1):(*bodies)[id1]->intrs.count(id2);}
 		// index access
 		shared_ptr<Interaction>& operator[](size_t id){return linIntrs[id];}
 		const shared_ptr<Interaction>& operator[](size_t id) const { return linIntrs[id];}
