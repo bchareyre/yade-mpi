@@ -445,7 +445,9 @@ class pyInteractionContainer{
 		void clear(){proxee->clear();}
 		py::list withBody(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(I);} return ret;}
 		py::list withBodyAll(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(I);} return ret; }
-		py::list getAll(long id){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ret.append(I);} return ret;}
+		py::list getAll(bool onlyReal){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){
+			if(onlyReal && !I->isReal()) continue; ret.append(I);}
+			return ret;}
 		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
@@ -873,7 +875,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("nth",&pyInteractionContainer::pyNth,"Return n-th interaction from the container (usable for picking random interaction).")
 		.def("withBody",&pyInteractionContainer::withBody,"Return list of real interactions of given body.")
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll,"Return list of all (real as well as non-real) interactions of given body.")
-		.def("all",&pyInteractionContainer::getAll,"Return list of all (real as well as non-real) interactions.")
+		.def("all",&pyInteractionContainer::getAll,(py::arg("onlyReal")=false),"Return list of all interactions. Virtual interaction are filtered out if onlyReal=True, else (default) it dumps the full content.")
 		.def("eraseNonReal",&pyInteractionContainer::eraseNonReal,"Erase all interactions that are not :yref:`real <InteractionContainer.isReal>`.")
 		.def("erase",&pyInteractionContainer::erase,"Erase one interaction, given by id1, id2 (internally, ``requestErase`` is called -- the interaction might still exist as potential, if the :yref:`Collider` decides so).")
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
