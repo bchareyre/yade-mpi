@@ -61,16 +61,18 @@ O.engines=[
   PyRunner(command = 'check()',iterPeriod = int(0.05/O.dt)-1)
 ]
 
-
-################################################################################
-# RUN
-O.saveTmp()
-O.run(int(0.05/O.dt))
 ################################################################################
 def check():
+	global resultStatus
 	# Compare imposed restitution coefficient and obtained one
 	enMeasured = (O.bodies[1].state.vel[2]-O.bodies[0].state.vel[2])/(2*v)
 	tolerance = 1e-2
-	if (abs(enMeasured -en)/en)<tolerance:
+	if (abs(enMeasured -en)/en)>tolerance:
 		resultStatus+=1
+################################################################################
+# RUN
+O.run(int(0.05/O.dt))
+O.wait()
+################################################################################
+
 
