@@ -18,7 +18,7 @@ IF(${ENABLE_GUI})
     
     EXECUTE_PROCESS(
           COMMAND "pyrcc5" "-o" "${CMAKE_BINARY_DIR}/img_rc.py" "img.qrc"
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qt4
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qt5
           RESULT_VARIABLE rv
           )
     
