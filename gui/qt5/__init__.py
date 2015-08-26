@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 import yade.runtime
 if not yade.runtime.hasDisplay:
 	msg = "Connecting to DISPLAY at Yade startup failed, unable to activate the qt5 interface."
@@ -9,14 +10,16 @@ if not yade.runtime.hasDisplay:
 
 from PyQt5.QtGui import *
 from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 from yade.qt.ui_controller import Ui_Controller
 
 from yade.qt.Inspector import *
+from yade.qt._GLViewer import *
 from yade import *
 import yade.system, yade.config
-
-from yade.qt._GLViewer import *
 
 maxWebWindows=1
 "Number of webkit windows that will be cycled to show help on clickable objects"

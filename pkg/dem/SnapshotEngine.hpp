@@ -3,8 +3,12 @@
 #include<lib/opengl/OpenGLWrapper.hpp>
 #include<core/Scene.hpp>
 #include<pkg/common/PeriodicEngines.hpp>
-#include<gui/qt4/OpenGLManager.hpp>
 
+#ifdef YADE_QT5
+#include<gui/qt5/OpenGLManager.hpp>
+#elif YADE_QT4
+#include<gui/qt5/OpenGLManager.hpp>
+#endif
 
 class SnapshotEngine: public PeriodicEngine {
 	public:
