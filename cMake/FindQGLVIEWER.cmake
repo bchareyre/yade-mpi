@@ -11,7 +11,7 @@ find_path(QGLVIEWER_INCLUDE_DIR
          )
 
 find_library(QGLVIEWER_LIBRARIES
-             NAMES QGLViewer
+             NAMES QGLViewer QGLViewer-qt4
 )
 
 IF(QGLVIEWER_INCLUDE_DIR AND QGLVIEWER_LIBRARIES)

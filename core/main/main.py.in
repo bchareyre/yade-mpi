@@ -265,7 +265,9 @@ if gui:
 # run remote access things, before actually starting the user session (not while imported by other python application)
 if __name__ == "__main__":
 	from yade import remote
-	yade.remote.useQThread=(gui=='qt4')
+	if (gui=='qt4' or gui=='qt5'):
+		yade.remote.useQThread=True
+		yade.remote.gui=gui
 	yade.remote.runServers()
 
 if gui==None:

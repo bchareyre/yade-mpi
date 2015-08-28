@@ -13,6 +13,7 @@ from yade import *
 import yade.runtime
 
 useQThread=False
+gui=''
 "Set before using any of our classes to use QThread for background execution instead of the standard thread module. Mixing the two (in case the qt4 UI is running, for instance) does not work well."
 
 plotImgFormat,plotImgMimetype='png','image/png'
@@ -117,6 +118,11 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 
 def _runInBackground(func):
 	if useQThread:
+		if (gui=='qt4'):
+			from PyQt4.QtCore import QThread
+		elif (gui=='qt5'):
+			from PyQt5.QtCore import QThread
+		
 		class WorkerThread(QThread):
 			def __init__(self,func_): QThread.__init__(self); self.func=func_
 			def run(self): self.func()
@@ -167,20 +173,20 @@ def runServers():
 	yade.runtime.cookie=srv.server.cookie
 	#info=GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 	## XMPRPC server for general information:
-	if 1:
-		from SimpleXMLRPCServer import SimpleXMLRPCServer
-		port,maxPort=21000,65535 # minimum port number
-		while port<maxPort:
-			try:
-				info=SimpleXMLRPCServer(('',port),logRequests=False,allow_none=True); break
-			except socket.error: port+=1
-		if port==maxPort: raise RuntimeError("No free port to listen on in range 21000-%d"%maxPort)
-		# register methods, as per http://docs.python.org/library/simplexmlrpcserver.html#simplexmlrpcserver-example
-		info.register_instance(InfoProvider()) # gets all defined methods by introspection
-		#prov=InfoProvider()
-		#for m in prov.exposedMethods(): info.register_function(m)
-		_runInBackground(info.serve_forever)
-		print 'XMLRPC info provider on http://localhost:%d'%port
+	
+	from SimpleXMLRPCServer import SimpleXMLRPCServer
+	port,maxPort=21000,65535 # minimum port number
+	while port<maxPort:
+		try:
+			info=SimpleXMLRPCServer(('',port),logRequests=False,allow_none=True); break
+		except socket.error: port+=1
+	if port==maxPort: raise RuntimeError("No free port to listen on in range 21000-%d"%maxPort)
+	# register methods, as per http://docs.python.org/library/simplexmlrpcserver.html#simplexmlrpcserver-example
+	info.register_instance(InfoProvider()) # gets all defined methods by introspection
+	#prov=InfoProvider()
+	#for m in prov.exposedMethods(): info.register_function(m)
+	_runInBackground(info.serve_forever)
+	print 'XMLRPC info provider on http://localhost:%d'%port
 	sys.stdout.flush()
 
 
