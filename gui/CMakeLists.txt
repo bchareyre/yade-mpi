@@ -4,6 +4,7 @@ IF(${ENABLE_GUI})
     SET(CMAKE_AUTOMOC ON)
     SET(_GLViewer_SOURCE_FILES qt5/GLViewer.cpp;qt5/_GLViewer.cpp;qt5/OpenGLManager.cpp;qt5/GLViewerDisplay.cpp;qt5/GLViewerMouse.cpp)
     ADD_LIBRARY(_GLViewer SHARED ${_GLViewer_SOURCE_FILES})
+    SET_TARGET_PROPERTIES(_GLViewer PROPERTIES PREFIX "")
     TARGET_LINK_LIBRARIES(_GLViewer Qt5::Widgets Qt5::Xml Qt5::OpenGL
                                     ${GLUT_LIBRARY} ${OPENGL_LIBRARY}
                                     ${QGLVIEWER_LIBRARIES}
