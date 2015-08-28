@@ -2,6 +2,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 
 import re,itertools
@@ -85,7 +86,7 @@ class AttrEditor_Bool(AttrEditor,QFrame):
 		AttrEditor.__init__(self,getter,setter)
 		QFrame.__init__(self,parent)
 		self.checkBox=QCheckBox(self)
-		lay=QVBoxLayout(self); lay.setSpacing(0); lay.setMargin(0); lay.addStretch(1); lay.addWidget(self.checkBox); lay.addStretch(1)
+		lay=QVBoxLayout(self); lay.setSpacing(0); lay.addStretch(1); lay.addWidget(self.checkBox); lay.addStretch(1)
 		self.checkBox.clicked.connect(self.update)
 	def refresh(self): self.checkBox.setChecked(self.getter())
 	def update(self): self.trySetter(self.checkBox.isChecked())
@@ -203,7 +204,7 @@ class AttrEditor_Se3(AttrEditor,QFrame):
 	def __init__(self,parent,getter,setter):
 		AttrEditor.__init__(self,getter,setter)
 		QFrame.__init__(self,parent)
-		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		self.grid=QGridLayout(self); self.grid.setSpacing(0);
 		for row,col in itertools.product(range(2),range(5)): # one additional column for vertical line in quaternion
 			if (row,col)==(0,3): continue
 			if (row,col)==(0,4): self.grid.addWidget(QLabel(u'←<i>pos</i> ↙<i>ori</i>',self),row,col); continue
@@ -249,7 +250,7 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 		self.setContentsMargins(0,0,0,0)
 		self.first=True
 		val=self.getter()
-		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		self.grid=QGridLayout(self); self.grid.setSpacing(0);
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
 			w=QLineEdit('')
 			self.grid.addWidget(w,row,col);
@@ -364,7 +365,7 @@ class SerializableEditor(QFrame):
 			self.lineNo,self.widget=None,None
 	def __init__(self,ser,parent=None,ignoredAttrs=set(),showType=False,path=None):
 		"Construct window, *ser* is the object we want to show."
-		QtGui.QFrame.__init__(self,parent)
+		QtWidgets.QFrame.__init__(self,parent)
 		self.ser=ser
 		self.path=(ser.label if (hasattr(ser,'label') and ser.label) else path)
 		self.showType=showType

@@ -117,7 +117,6 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 
 def _runInBackground(func):
 	if useQThread:
-		from PyQt5.QtCore import QThread
 		class WorkerThread(QThread):
 			def __init__(self,func_): QThread.__init__(self); self.func=func_
 			def run(self): self.func()
