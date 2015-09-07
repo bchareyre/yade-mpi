@@ -109,12 +109,12 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `cmake <http://www.cmake.org/>`_ build system
 * `gcc <http://www.gcc.gnu.org>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
 * `boost <http://www.boost.org/>`_ 1.35 or later
-* `qt4 <http://www.qt.nokia.com>`_ library
+* `Qt <http://www.qt.io/>`_ library
 * `freeglut3 <http://freeglut.sourceforge.net>`_
 * `libQGLViewer <http://www.libqglviewer.com>`_
 * `python <http://www.python.org>`_, `numpy <http://numpy.scipy.org>`_, `ipython <http://ipython.scipy.org>`_
 * `matplotlib <http://matplotlib.sf.net>`_
-* `eigen3 <http://eigen.tuxfamily.org>`_ algebra library (minimal required version 3.2.1)
+* `eigen <http://eigen.tuxfamily.org>`_ algebra library (minimal required version 3.2.1)
 * `gdb <http://www.gnu.org/software/gdb>`_ debugger
 * `sqlite3 <http://www.sqlite.org>`_ database engine
 * `Loki <http://loki-lib.sf.net>`_ library
@@ -236,9 +236,20 @@ The following options are available:
 	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
+	* USE_QT5: use QT5 for GUI, experimental (OFF by default)
 
 For using an extended parameters of cmake, please, follow the corresponding
 documentation on cmake-webpage. 
+
+.. warning:: To provide Qt4->Qt5 migration one needed to provide an additional option USE_QT5.
+ This option should be On or Off according to the Qt version, which was used
+ to compile libQGLViewer. On Debian/Ubuntu operating systems libQGLViewer
+ of version 2.6.3 and higher are compiled against Qt5 (for other operating systems
+ refer to the package archive of your distribution), so if you are using
+ such version, please switch on this option. Otherwise, if you mix Qt-versions
+ ``Segmentation fault`` will appear just after Yade is started. To provide
+ necessary build dependencies for Qt5, install ``python-pyqt5 pyqt5-dev-tools ``
+ instead of ``python-qt4 pyqt4-dev-tools``, which is needed for Qt4.
 
 If the compilation is finished without errors, you will see all enabled 
 and disabled options. Then start the standard the compilation process::
