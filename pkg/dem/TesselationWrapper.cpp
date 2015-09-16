@@ -196,7 +196,7 @@ void TesselationWrapper::computeTesselation(void)
 
 void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz)
 {
-	(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz);
+	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz);
 	computeTesselation();
 }
 
