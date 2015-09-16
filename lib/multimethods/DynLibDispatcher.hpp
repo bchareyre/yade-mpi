@@ -12,12 +12,11 @@
 #include "Indexable.hpp"
 
 
-#include<lib/factory/ClassFactory.hpp>
-#include<lib/serialization/Serializable.hpp>
+#include <lib/factory/ClassFactory.hpp>
+#include <lib/serialization/Serializable.hpp>
 
 #include<loki/Functor.h>
 #include<loki/Typelist.h>
-#include<loki/TypeManip.h>
 #include<loki/NullType.h>
 // compat with former yade's local Loki
 #define TYPELIST_1 LOKI_TYPELIST_1
@@ -25,15 +24,12 @@
 #define TYPELIST_3 LOKI_TYPELIST_3
 #define TYPELIST_4 LOKI_TYPELIST_4
 #define TYPELIST_5 LOKI_TYPELIST_5
-#define TYPELIST_6 LOKI_TYPELIST_6
 #define TYPELIST_7 LOKI_TYPELIST_7
-#define TYPELIST_8 LOKI_TYPELIST_8
-#define TYPELIST_9 LOKI_TYPELIST_9
 
-#include<vector>
-#include<list>
-#include<string>
-#include<ostream>
+#include <vector>
+#include <list>
+#include <string>
+#include <ostream>
 
 struct DynLibDispatcher_Item2D{ int ix1, ix2; std::string functorName; DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){}; };
 struct DynLibDispatcher_Item1D{ int ix1     ; std::string functorName; DynLibDispatcher_Item1D(int a,        std::string c):ix1(a),       functorName(c){}; };
