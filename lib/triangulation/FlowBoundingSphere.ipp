@@ -25,7 +25,7 @@
 
 #ifdef YADE_OPENMP
   #include <omp.h>
-  #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
+  // #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
 #endif
 
 // #define USE_FAST_MATH 1

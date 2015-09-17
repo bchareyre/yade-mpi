@@ -26,7 +26,7 @@
 
 #ifdef YADE_OPENMP
   #include <omp.h>
-  #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
+  // #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
 #endif
 
 // #define PARDISO //comment this if pardiso lib is not available
