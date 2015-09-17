@@ -18,8 +18,10 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <omp.h>
 
+#ifdef YADE_OPENMP
+  #include <omp.h>
+#endif
 
 namespace CGT
 {

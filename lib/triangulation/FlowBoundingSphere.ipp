@@ -18,14 +18,14 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <omp.h>
 
 #ifdef XVIEW
 // #include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
 #ifdef YADE_OPENMP
-//   #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
+  #include <omp.h>
+  #define GS_OPEN_MP //It should never be defined if Yade is not using openmp
 #endif
 
 // #define USE_FAST_MATH 1
