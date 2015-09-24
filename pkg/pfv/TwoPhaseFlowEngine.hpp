@@ -13,9 +13,8 @@
 
 //keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
-// #define TWOPHASEFLOW
+//#define TWOPHASEFLOW
 #ifdef TWOPHASEFLOW
-
 #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
 
 /// We can add data to the Info types by inheritance
@@ -68,15 +67,14 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	
 	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine
 	//if it is useful for everyone
-	void initializeCellIndex();
 	void computePoreBodyVolume();	
-	void computePoreBodyRadius();
-	void computePoreThroatCircleRadius();
+ 	void computePoreBodyRadius();
+// 	void computePoreThroatCircleRadius();
 	double computePoreSatAtInterface(int ID);
 	void computePoreCapillaryPressure(CellHandle cell);
 	void savePhaseVtk(const char* folder);
-	void computePoreThroatRadius();
-	void computePoreThroatRadiusTricky();//set the radius of pore throat between side pores negative.
+// 	void computePoreThroatRadius();
+// 	void computePoreThroatRadiusTricky();//set the radius of pore throat between side pores negative.
 	
 	double computeEffPoreThroatRadius(CellHandle cell, int j);
 	double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
@@ -86,6 +84,13 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void initialization();
 	void computeSolidLine();
 	void initializeReservoirs();
+	
+	void computePoreThroatRadiusMethod1();
+	void computePoreThroatRadiusTrickyMethod1();//set the radius of pore throat between side pores negative.
+	void computePoreThroatRadiusMethod2();
+	void computePoreThroatRadiusMethod3();
+	void savePoreNetwork();
+	
 	
 	
 	boost::python::list cellporeThroatRadius(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
@@ -127,6 +132,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((bool, isInvadeBoundary, true,,"Invasion side boundary condition. If True, pores of side boundary can be invaded; if False, the pore throats connecting side boundary are closed, those pores are excluded in saturation calculation."))	
 	((bool, drainageFirst, true,,"If true, activate drainage first (initial saturated), then imbibition; if false, activate imbibition first (initial unsaturated), then drainage."))
 	((double,dtDynTPF,0.0,,"Parameter which stores the smallest time step, based on the residence time"))
+	((int,entryPressureMethod,1,,"integer to define the method used to determine the pore throat radii and the according entry pressures. 1)radius of entry pore throat based on MS-P method; 2) radius of the inscribed circle; 3) radius of the circle with equivalent surface area of the pore throat."))
+	((double,partiallySaturatedPores,false,,"Include partially saturated pores or not?"))
 
 	,/*TwoPhaseFlowEngineT()*/,
 	,
@@ -148,6 +155,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getCellInSphereRadius",&TwoPhaseFlowEngine::cellInSphereRadius,"get the radius of the inscribed sphere in a pore unit")
 	.def("getCellVoidVolume",&TwoPhaseFlowEngine::cellVoidVolume,"get the volume of pore space in each pore unit")
 	.def("setCellHasInterface",&TwoPhaseFlowEngine::setCellHasInterface,"change wheter a cell has a NW-W interface")
+	.def("savePoreNetwork",&TwoPhaseFlowEngine::savePoreNetwork,"Extract the pore network of the granular material")
+	
 	)
 	DECLARE_LOGGER;
 };

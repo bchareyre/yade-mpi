@@ -16,18 +16,37 @@
 
 #include "TwoPhaseFlowEngine.hpp"
 #ifdef TWOPHASEFLOW
-
 YADE_PLUGIN((TwoPhaseFlowEngineT));
 YADE_PLUGIN((TwoPhaseFlowEngine));
 
-void TwoPhaseFlowEngine::initializeCellIndex()
+void TwoPhaseFlowEngine::initialization()
 {
-    int k=0;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        cell->info().index=k++;}
+		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
+		setPositionsBuffer(true);//copy sphere positions in a buffer...
+		buildTriangulation(0.0,*solver);//create a triangulation and initialize pressure in the elements (connecting with W-reservoir), everything will be contained in "solver"
+// 		initializeCellIndex();//initialize cell index
+// 		if(isInvadeBoundary) {computePoreThroatRadius();}
+// 		else {computePoreThroatRadiusTrickyMethod1();}//save pore throat radius before drainage. Thomas, here you can also revert this to computePoreThroatCircleRadius().
+		
+		// Determine the entry-pressure
+		if(entryPressureMethod == 1 && isInvadeBoundary){computePoreThroatRadiusMethod1();} //MS-P method
+		else if(entryPressureMethod == 1 && isInvadeBoundary == false){computePoreThroatRadiusTrickyMethod1();} //MS-P method
+		else if(entryPressureMethod == 2){computePoreThroatRadiusMethod2();} //Inscribed circle}
+		else if(entryPressureMethod == 3){computePoreThroatRadiusMethod3();} //Area equivalent circle}
+		else if(entryPressureMethod > 3){cout << endl << "ERROR - Method for determining the entry pressure does not exist";}
+		
+		computePoreBodyRadius();//save pore body radius before imbibition
+		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
+		computeSolidLine();//save cell->info().solidLine[j][y]
+		initializeReservoirs();//initial pressure, reservoir flags and local pore saturation
+		solver->noCache = true;
 }
+
+
+
+
+
+
 
 void TwoPhaseFlowEngine::computePoreBodyVolume()
 {
@@ -39,68 +58,9 @@ void TwoPhaseFlowEngine::computePoreBodyVolume()
     }
 }
 
-double TwoPhaseFlowEngine:: computePoreSatAtInterface(int ID)
-{
-    //This function calculates the new saturation of pore at the interface between wetting/nonwetting 
-    //filled pores. It substracts the outgoing flux from the water volume  
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-      if(cell->info().id == ID){
-    
-    double qout = 0.0, Vw = 0.0, dt = 0.0;
-    
-    for(unsigned int ngb = 0; ngb < 4; ngb++)
-    {
-      //find out/influx of water
-       if((cell->neighbor(ngb)->info().isWRes) && (cell->neighbor(ngb)->info().isFictious == 0)){
-	qout= qout + std::abs(cell->info().kNorm() [ngb])*(cell->info().p()-cell->neighbor ( ngb )->info().p()); 
-       }
-    }
-   
-    Vw = (cell->info().saturation * cell->info().poreBodyVolume) - (qout * scene->dt); 
-    
-    //Functionality to calculate the smallest time step
-    if((1e-16 < Vw) && (Vw < 1e16)){
-      if((1e-16 < qout) && (qout < 1e16)){
-	dt = (Vw / qout);
-	if(dt!=0.0){dtDynTPF = std::min(dt,dtDynTPF);}
-      }
-    }
-    cell->info().saturation = Vw / cell->info().poreBodyVolume;
-      
-   // The following constrains check the value of saturation
-    if(std::abs(cell->info().saturation) < 1e-6){cell->info().saturation = 0.0;} // To prevent dt going to 0
-    if(cell->info().saturation < 0.0){
-      cout << endl << "dt was too large!, negative saturation in cell "<< cell->info().id;
-      cell->info().saturation = 0.0;    
-      }
-    if(cell->info().saturation > 1.0){
-      cout << endl <<"dt was too large!,saturation larger than 1 in cell " << cell->info().id;
-      cell->info().saturation = 1.0;}
-      return cell->info().saturation;
-      }  
-}
-}
 
 
-void TwoPhaseFlowEngine:: computePoreCapillaryPressure(CellHandle cell)
-{
-  //This formula relates the pore-saturation to the capillary-pressure, and the water-pressure
-  //based on Joekar-Niasar, for cubic pores. NOTE: Needs to be changed into a proper set of equations 
-
-  double Re = 0.0, Pc = 0.0, Pg = 0.0;  
-  
-  for(unsigned int i = 0; i<4;i++)
-  {
-    Re = max(Re,cell->info().poreThroatRadius[i]);
-  }
-  Pc = surfaceTension / (Re * (1.0-exp(-6.83 * cell->info().saturation)));
-  Pg = std::max(bndCondValue[2],bndCondValue[3]);
-  cell->info().p() = Pg - Pc; 
-}
-
-void TwoPhaseFlowEngine::computePoreThroatCircleRadius()
+void TwoPhaseFlowEngine::computePoreThroatRadiusMethod2()
 {
   //Calculate the porethroat radii of the inscribed sphere in each pore-body. 
   RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
@@ -111,6 +71,20 @@ void TwoPhaseFlowEngine::computePoreThroatCircleRadius()
     }
   }
 }
+
+void TwoPhaseFlowEngine::computePoreThroatRadiusMethod3()
+{
+  //Calculate the porethroat radii of the surface equal circle of a throat
+  RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+  FiniteCellsIterator cellEnd = tri.finite_cells_end();
+  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+    for(unsigned int i = 0; i<4;i++){
+    cell->info().poreThroatRadius[i] = solver->computeEquivalentRadius(cell,i); 
+    }
+  }
+}
+
+
 
 void TwoPhaseFlowEngine::computePoreBodyRadius()
 {
@@ -256,7 +230,7 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
    }
 }
 
-void TwoPhaseFlowEngine::computePoreThroatRadius()
+void TwoPhaseFlowEngine::computePoreThroatRadiusMethod1()
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
@@ -437,9 +411,9 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 	}
 	vtkfile.end_data();
 }
-void TwoPhaseFlowEngine::computePoreThroatRadiusTricky()
+void TwoPhaseFlowEngine::computePoreThroatRadiusTrickyMethod1()
 {
-  computePoreThroatRadius();
+  computePoreThroatRadiusMethod1();
   RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
   FiniteCellsIterator cellEnd = tri.finite_cells_end();
   CellHandle neighbourCell;
@@ -453,20 +427,7 @@ void TwoPhaseFlowEngine::computePoreThroatRadiusTricky()
   }
 }
 
-void TwoPhaseFlowEngine::initialization()
-{
-		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
-		setPositionsBuffer(true);//copy sphere positions in a buffer...
-		buildTriangulation(0.0,*solver);//create a triangulation and initialize pressure in the elements (connecting with W-reservoir), everything will be contained in "solver"
-// 		initializeCellIndex();//initialize cell index
-		if(isInvadeBoundary) {computePoreThroatRadius();}
-		else {computePoreThroatRadiusTricky();}//save pore throat radius before drainage. Thomas, here you can also revert this to computePoreThroatCircleRadius().
-		computePoreBodyRadius();//save pore body radius before imbibition
-		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
-		computeSolidLine();//save cell->info().solidLine[j][y]
-		initializeReservoirs();//initial pressure, reservoir flags and local pore saturation
-		solver->noCache = true;
-}
+
 
 void TwoPhaseFlowEngine::computeSolidLine()
 {
@@ -525,6 +486,173 @@ void TwoPhaseFlowEngine::initializeReservoirs()
     if(solver->debugOut) {cout<<"----initializeReservoirs----"<<endl;}    
 }
 
+
+void TwoPhaseFlowEngine::savePoreNetwork()
+{
+    std::ofstream filePoreBodyRadius;
+    std::cout << "Opening File: " << "PoreBodyRadius" << std::endl;
+    filePoreBodyRadius.open("PoreBodyRadius.txt", std::ios::trunc);
+    if(!filePoreBodyRadius.is_open()){
+        std::cerr<< "Error opening file [" << "PoreBodyRadius" << ']' << std::endl;
+        return;
+    }
+    
+    std::ofstream filePoreBoundary;
+    std::cout << "Opening File: " << "PoreBoundary" << std::endl;
+    filePoreBoundary.open("PoreBoundary.txt" , std::ios::trunc);
+    if(!filePoreBoundary.is_open()){
+        std::cerr<< "Error opening file [" << "PoreBoundary" << ']' << std::endl;
+        return;
+    }
+    
+    std::ofstream filePoreBodyVolume;
+    std::cout << "Opening File: " << "PoreBodyVolume" << std::endl;
+    filePoreBodyVolume.open("PoreBodyVolume.txt", std::ios::trunc);
+    if(!filePoreBodyVolume.is_open()){
+        std::cerr<< "Error opening file [" << "PoreBodyVolume" << ']' << std::endl;
+        return;
+    }
+    std::ofstream fileLocation;
+    std::cout << "Opening File: " << "Location" << std::endl;
+    fileLocation.open("Location.txt", std::ios::trunc);
+    if(!fileLocation.is_open()){
+        std::cerr<< "Error opening file [" << "fileLocation" << ']' << std::endl;
+        return;
+    }
+    
+    std::ofstream fileNeighbor;
+    std::cout << "Opening File: " << "fileNeighbor" << std::endl;
+    fileNeighbor.open("neighbor.txt", std::ios::trunc);
+    if(!filePoreBoundary.is_open()){
+        std::cerr<< "Error opening file [" << "fileNeighbor" << ']' << std::endl;
+        return;
+    }
+    
+    std::ofstream fileThroatRadius;
+    std::cout << "Opening File: " << "fileThroatRadius" << std::endl;
+    fileThroatRadius.open("throatRadius.txt", std::ios::trunc);
+    if(!filePoreBoundary.is_open()){
+        std::cerr<< "Error opening file [" << "fileThroatRadius" << ']' << std::endl;
+        return;
+    }
+    std::ofstream fileThroats;
+    std::cout << "Opening File: " << "fileThroats" << std::endl;
+    fileThroats.open("Throats.txt", std::ios::trunc);
+    if(!filePoreBoundary.is_open()){
+        std::cerr<< "Error opening file [" << "fileThroats" << ']' << std::endl;
+        return;
+    }
+    
+    
+    cout << solver->T[solver->currentTes].cellHandles.size();
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+      if(cell->info().isGhost == false && cell->info().id < solver->T[solver->currentTes].cellHandles.size()){
+      filePoreBodyRadius << cell->info().poreBodyRadius << '\n';
+       filePoreBodyVolume << cell->info().poreBodyRadius << '\n';
+    	CVector center ( 0,0,0 );
+	for ( int k=0;k<4;k++ ){ center= center + 0.25* (cell->vertex(k)->point()-CGAL::ORIGIN);}
+
+ 	fileLocation  << center<< '\n';
+	for (unsigned int i=0;i<4;i++){
+	 if(cell->neighbor(i)->info().isGhost == false && cell->neighbor(i)->info().id < solver->T[solver->currentTes].cellHandles.size() && (cell->info().id < cell->neighbor(i)->info().id)){
+	   fileNeighbor << cell->neighbor(i)->info().id << '\n';
+	   fileThroatRadius << cell->info().poreThroatRadius[i] << '\n';
+	   fileThroats << cell->info().id << " " << cell->neighbor(i)->info().id << '\n';
+	 }
+	}
+
+      }
+      
+      if(cell->info().isFictious == 1 && cell->info().isGhost == false && cell->info().id < solver->T[solver->currentTes].cellHandles.size()){
+	//add boundary condition
+	 if(cell->info().isFictious == 1 &&(cell->vertex(0)->info().id() == 3 || cell->vertex(1)->info().id() == 3  || cell->vertex(2)->info().id() == 3  || cell->vertex(3)->info().id() == 3)){
+	   filePoreBoundary << "3" << '\n';
+	}
+	 else if(cell->info().isFictious == 1 &&(cell->vertex(0)->info().id() == 2 || cell->vertex(1)->info().id() == 2  || cell->vertex(2)->info().id() == 2  || cell->vertex(3)->info().id() == 2)){
+	   filePoreBoundary << "2" << '\n';
+	}
+	  else{filePoreBoundary << "2" << '\n';}
+      }
+      if(cell->info().isFictious == 0 && cell->info().isGhost == false && cell->info().id < solver->T[solver->currentTes].cellHandles.size()){
+	filePoreBoundary << "0" << '\n';       
+      }
+}
+
+
+    filePoreBodyRadius.close();
+    filePoreBoundary.close();
+    filePoreBodyVolume.close();
+    fileLocation.close();
+    fileNeighbor.close();
+    fileThroatRadius.close();
+
+
+}
+
+
+double TwoPhaseFlowEngine:: computePoreSatAtInterface(int ID)
+{
+//     //This function calculates the new saturation of pore at the interface between wetting/nonwetting 
+//     //filled pores. It substracts the outgoing flux from the water volume  
+//     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+//     FiniteCellsIterator cellEnd = tri.finite_cells_end();
+//     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+//       if(cell->info().id == ID){
+//     
+//     double qout = 0.0, Vw = 0.0, dt = 0.0;
+//     
+//     for(unsigned int ngb = 0; ngb < 4; ngb++)
+//     {
+//       //find out/influx of water
+//        if((cell->neighbor(ngb)->info().isWRes) && (cell->neighbor(ngb)->info().isFictious == 0)){
+// 	qout= qout + std::abs(cell->info().kNorm() [ngb])*(cell->info().p()-cell->neighbor ( ngb )->info().p()); 
+//        }
+//     }
+//    
+//     Vw = (cell->info().saturation * cell->info().poreBodyVolume) - (qout * scene->dt); 
+//     
+//     //Functionality to calculate the smallest time step
+//     if((1e-16 < Vw) && (Vw < 1e16)){
+//       if((1e-16 < qout) && (qout < 1e16)){
+// 	dt = (Vw / qout);
+// 	if(dt!=0.0){dtDynTPF = std::min(dt,dtDynTPF);}
+//       }
+//     }
+//     cell->info().saturation = Vw / cell->info().poreBodyVolume;
+//       
+//    // The following constrains check the value of saturation
+//     if(std::abs(cell->info().saturation) < 1e-6){cell->info().saturation = 0.0;} // To prevent dt going to 0
+//     if(cell->info().saturation < 0.0){
+//       cout << endl << "dt was too large!, negative saturation in cell "<< cell->info().id;
+//       cell->info().saturation = 0.0;    
+//       }
+//     if(cell->info().saturation > 1.0){
+//       cout << endl <<"dt was too large!,saturation larger than 1 in cell " << cell->info().id;
+//       cell->info().saturation = 1.0;}
+//       return cell->info().saturation;
+//       }  
+// }
+  return 0;
+}
+
+
+void TwoPhaseFlowEngine:: computePoreCapillaryPressure(CellHandle cell)
+{
+  //This formula relates the pore-saturation to the capillary-pressure, and the water-pressure
+  //based on Joekar-Niasar, for cubic pores. NOTE: Needs to be changed into a proper set of equations 
+/*
+  double Re = 0.0, Pc = 0.0, Pg = 0.0;  
+  
+  for(unsigned int i = 0; i<4;i++)
+  {
+    Re = max(Re,cell->info().poreThroatRadius[i]);
+  }
+  Pc = surfaceTension / (Re * (1.0-exp(-6.83 * cell->info().saturation)));
+  Pg = std::max(bndCondValue[2],bndCondValue[3]);
+  cell->info().p() = Pg - Pc; */
+}
 
 #endif //TwoPhaseFLOW
  
