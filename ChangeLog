@@ -1,4 +1,127 @@
 ==================================================
+yade-1.20.0
+Fri, Oct 9 21:20:00 2015 +0200
+
+Anton Gladky (57):
+      Remove RELEASE file.
+      Simplify definition of build flags
+      Fix some warnings during compilation.
+      For clang use -fstack-protector instead of -fstack-protector-strong
+      Ignore project files of idea IDE
+      Refactoring of Math.hpp
+      Make minieigen external package mandatory.
+      Add -fstack-protector-strong only for gcc >=4.9
+      Some warning fixes.
+      Add ENABLE_PROFILING option
+      Set some metric-measures in ViscElCap.
+      Revert adding frounding-math flag
+      Replace INSTALL_PREFIX by CMAKE_INSTALL_PREFIX
+      Remove deprecated in Yade BOOST_PYTHON_FUNCTION_OVERLOADS macros.
+      Fix some more compilation warnings.
+      Fix some more compilation warnings.
+      Minor fix in CMakeLists.txt
+      Fix hexagonal packing, should not be undesired overlap any more.
+      Make Serializable.hpp more readable.
+      Remove deprecated parameters.
+      Move STLReader into STLImporter
+      +1 master thesis at TU Freiberg.
+      Fix crash by export-VTK of interactions after body removal.
+      Split description of ViscoelasticPM to make it more readable.
+      Let exist interactions between clumpMembers of the same clump.
+      Skip force calculation in SPH-clump
+      Add warning about CGAL in Ubuntu 14.04 Trusty
+      Add ISC_TIMING pre preprocessor directive.
+      Drop support of Ubuntu 12.04 Precise
+      Merge pull request #46 from timpovall/master
+      Non invasive refactoring of InsertionSortCollider
+      Revert previous commit.
+      Add a second option to fix the compilation with CGAL on 14.04
+      Remove deprecated code with very old boost.
+      Implement viscous damping for capillary phase.
+      Fix SPH force calculation between clump members.
+      Fix compilation with QGLViewer>=2.6.3
+      Prepare Qt5-build.
+      Fix compilation against gqlviewer-qt4.
+      Fix check-script
+      +1 conference
+      First steps in Qt5.
+      Prepare Qt5 build.
+      Update python files due to Qt5.
+      Some more updates toward Qt5.
+      Qt5-migration is alsmot finished.
+      Fix Qt5 compilation.
+      Fix crash in Qt5.
+      Fix QThread issue.
+      Add information about compilation against Qt5.
+      Add missing function in TesselationWrapper
+      Remove some unused headers and defs.
+      Fix compilation if openmp is disabled
+      Fix compilation introduced in last commit.
+      Add talk, hold in Particles 2015
+      Add hourglass example
+      Add RELEASE file.
+
+Bruno Chareyre (15):
+      Save relative rotations in ScGeom6D (unmark "nosave") since it is required for reloading correctly.
+      CohesiveFrictionalInteractions: removed "nosave" flags for contact moments
+      +1 journal paper
+      +1 journal paper
+      add a virtual function returning rotational stiffness of the interactions - returning zero if not overloaded
+      account for the rotational stiffness of interactions in GlobalStiffnessTimeStepper
+      apply the spin of the velocity gradient on particles in periodic BCs
+      small typo
+      Added book chapter
+      Installation: http://www.yade-dem.org/packages is required for an external library (eigen or cgal? not sure now)
+      more accurate defintion of fluctuational velocity/spin for kinetic energy in periodic BCs
+      correct value of volume for id<6 in TesselationWrapper when O.bodies does not have bounding objects
+      fix segfault when InteractionContainer::found() access out of bounds
+      add function has() to O.interactions to check if (id1,id2) exists + fix doc of O.interactions
+      remove useless int parameter of O.interactions.all(), instead filter non-real interactions optionaly based on bool
+
+Chao Yuan (3):
+      -add getPotentialPendularSpheresPair() function.
+      -set pore throat radius between two fictious cells negative in invadeBoundary=true mode.
+      add a new version of capillary law. (pushed by Caroline)
+
+Francois Kneib (2):
+      New viewer feature : display tori instead of spheres for 2D simulations.     So if the viewer looks toward the right axis, on can see circles instead of disks.     Modifications in pkg/common/Gl1_Primitives.*pp     3 new parameters in Gl1_Sphere : circleView, circleRelThickness, circleAllowedRotationAxis.     A new condition to enable circleView. The code is based on initGlutGlList() method for spheres.
+      Add an example script for the tori DISPLAY feature.
+
+Jan Stránský (4):
+      fixed compilation warning
+      added Polyhedra.setVertices function, which also updates internal variables (shape.v=... does not)
+      Added Facet.setVertices function to prevent memory leaks (see bug 1041084, #8)
+      corrected bug in utils.UnstructuredGrid.updateElements (question #267761)
+
+Janek Kozicki (2):
+      Fix bug in InteractionContainer::eraseNonReal
+      Fix: CGAL ERROR: assertion violation!
+
+Jerome Duriez (5):
+      Add missing space in error message
+      Doc of sphSph attribute of plotDirections precized
+      Introduction of surface tension as an attribute, and comments about code objects related to capillary files
+      Addition in doc of Omega.engines to state it is = to O.engines in python
+      Removal of python O.engines reference
+
+Raphael Maurin (9):
+      getStressProfile: output format modification + add calculation of granular temperature and kinetic stress tensor
+      Law2_ScGeom_ViscElPhys_Basic: add a new formulation + check     Add a new formulation of the law when imposing in the material young, poisson, and normal restitution coefficient.     The effective spring constants ks and kn are evaluated "classically" with the young modulus and the poisson's ratio.     The specificity of the formulation stands in the fact that it is the restitution coefficient of the contact (en = 2*en1*en2/(en1+en2)) that is imposed, and not the damping constant. To achieve this, the damping constant of the contact is evaluated resolving numerically the analytical expression 21 of [Schwager2007] (with a minus sign, there is a mistake in the article) with a Newton-Raphson algorithm (This was made by Francois Kneib). This does not seem to affect the calculation time.     With this formulation, there is no tangential viscous damping, and it is usually not possible to access value of normal restitution coefficient lower than 0.1 (in that case the numerical resolution does not converged in the maximum 15 iteration allowed in the code)     Together with the new formulation, add a short check script to verify that the imposed restitution coefficient is the one obtained.
+      Law2_ScGeom_ViscElPhys_Basic: complete the documentation     Add a more precise documentation of the law integrating the last commit.     I didn't complete the formulation associated with Pournin2001 (precising en,es,tc) as I am not using it and I do not know it much.
+      Fix compilation error in the documentation of Law2_ScGeom_ViscElPhys_Basic     Error inserted in commit d47b8574e8fcc2dc09b926404f08081f2194cfde
+      Add a function in shop to evaluate average depth profiles     of particle velocity (x,y,z components), and solid volume fraction.
+      HydroForceEngine: switch averageProfile function into a method     + modify documentation
+      Tutorial examples: remove all deprecated 'utils.' and GravityEngine in the example scripts
+      Modify getDepthProfile to possibly average on spheres of selected radius only
+      HydroForceEngine: modify averageProfile function to handle bi-disperse sample     Add evaluation of the average solid volume fraction and drag force depth profiles considering the two particle size (taken as input) as independent.
+
+Timothy Povall (1):
+      Removed line calling FindVTK.cmake, as this file no longer exists
+
+thomassweijen (1):
+      Updates towards merging of both capillarity codes
+
+==================================================
 yade-1.14.0
 Tue, 21 Apr 2015 22:36:55 +0200
 
