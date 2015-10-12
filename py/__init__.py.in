@@ -93,13 +93,14 @@ __builtin__.__dict__['Omega'] = wrapper.Omega
 # define a default list of engine
 O.engines=[
 		ForceResetter(),
-		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()]),
+		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()],label="collider"),
 		InteractionLoop(
 			[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 			[Ip2_FrictMat_FrictMat_FrictPhys()],	#for linear model only
-			[Law2_ScGeom_FrictPhys_CundallStrack()],	#for linear model only
+			[Law2_ScGeom_FrictPhys_CundallStrack(label="law")],	#for linear model only
+			label="interactionLoop"
 		),
-		GlobalStiffnessTimeStepper(timeStepUpdateInterval=10),
-		NewtonIntegrator()
+		GlobalStiffnessTimeStepper(timeStepUpdateInterval=10,label="timeStepper"),
+		NewtonIntegrator(label="newton")
 	]
 
