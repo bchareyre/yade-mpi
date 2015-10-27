@@ -727,7 +727,7 @@ V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, J
 \text{\sffamily\bfseries\Large Jan Str\'{a}nsk\'{y}}\\
 \text{\sffamily\Large CVUT Prague}\\
 \\
-\text{\sffamily\bfseries\Large Klaus Thoeni}
+\text{\sffamily\bfseries\Large Klaus Thoeni}\\
 \text{\sffamily\Large The University of Newcastle (Australia)}\\
 
 \text{\sffamily\bfseries\large Citing this document}\\

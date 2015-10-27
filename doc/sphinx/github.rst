@@ -33,6 +33,9 @@ Setup
 
   git config --global user.name "Firstname Lastname"
   git config --global user.email "your_email@youremail.com"
+  
+ You can check these settings with ``git config --list``.
+  
 
 4. `Fork a repo <https://help.github.com/articles/fork-a-repo>`_:
 
@@ -87,7 +90,7 @@ Changes will be pushed to your personal "fork", If you have tested your changes 
 
  git format-patch origin  #create patch file in current folder)
 
-and send to the developers maililng list (yade-dev@lists.launchpad.net) as attachment. In either way, after reviewing your changes they will be added to the main trunk.
+and send to the developers mailing list (yade-dev@lists.launchpad.net) as attachment. In either way, after reviewing your changes they will be added to the main trunk.
 
 When the pull request has been reviewed and accepted, your changes are integrated in the main trunk. Everyone will get them via ``git fetch``.
 
@@ -176,6 +179,12 @@ General guidelines for pushing to yade/trunk
  ::
 
   git diff file1
+  
+ Or using your preferred difftool, such as kdiff3:
+  
+ ::
+  
+  git difftool -t kdiff3 file1
 
  Or, alternatively, any GUI for git: gitg, git-cola... 
 
@@ -192,7 +201,7 @@ General guidelines for pushing to yade/trunk
 
   git pull
 
-5. Make sure it compiles and that regression tests pass: try "yade --test" and "yade --check".
+5. Make sure it compiles and that regression tests pass: try ``yade --test`` and ``yade --check``.
 
 6. You can finally let all Yade-users enjoy your work:
 

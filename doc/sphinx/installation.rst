@@ -11,13 +11,13 @@ Packages
 ----------
 
 Pre-built packages are provided for all currently supported Debian and Ubuntu 
-versions of distributions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>`_ . 
+versions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>`_ . 
 
-These are ``daily`` versions of packages and are updating regularly and include 
+These are "daily" versions of the packages which are being updated regularly and, hence, include 
 all the newly added features.
 
-To install daily-version one needs to add this repository to your 
-/etc/apt/sources.list, add a PGP-key AA915EEB as a trusted and install yadedaily ::
+To install the daily-version you need to add the repository to your
+/etc/apt/sources.list, add the PGP-key AA915EEB as trusted and install ``yadedaily``::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trusty/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
@@ -28,16 +28,16 @@ If you have another distribution, not Ubuntu Trusty (Version 14.04 LTS), be sure
 correct name in the first line (for instance, trusty, jessie or wheezy). For the list
 of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
-After that you can normally start Yade using "yadedaily" or "yadedaily-batch" command.
-yadedaily on older distributions can have some disabled features due to older library
+After that you can normally start Yade using the command ``yadedaily`` or ``yadedaily-batch``.
+``yadedaily`` on older distributions can have some disabled features due to older library
 versions, shipped with particular distribution. 
 
-Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
-Each branch corresponds to one distribution e.g. trusty, jessie etc.
-The scripts for building all of this stuff is `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`_. 
-It uses pbuilder to build packages, so all packages are building in a clean environment.
+The Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
+Each branch corresponds to one distribution, e.g., trusty, jessie etc.
+The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`_. 
+It uses "pbuilder" to build packages, so all packages are built in a clean environment.
 
-If you do not need yadedaily-package any more, just remove the
+If you do not need ``yadedaily``-package any more, just remove the
 corresponding line in /etc/apt/sources.list and the package itself::
 
 	sudo apt-get remove yadedaily
@@ -46,26 +46,29 @@ To remove our key from keyring, execute the following command::
 
 	sudo apt-key remove AA915EEB
 
-Since 2011 all Ubuntu versions (starting from 11.10, Oneiric) and Debian (starting from Wheezy) 
-are having already Yade in their main repositories. There are only stable releases are placed.
-To install the program, run the following::
+Since 2011, all Ubuntu (starting from 11.10, Oneiric) and Debian (starting from Wheezy) versions 
+have Yade in their main repositories. There are only stable releases in place.
+To install Yade, run the following::
 
 	sudo apt-get install yade
+	
+After that you can normally start Yade using the command ``yade`` or ``yade-batch``.
 
-To check, what version of Yade is in specific distribution, visit the links
-for `Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ and 
+To check, what version of Yade is included in your specific distribution, visit
+`Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ or 
 `Debian <http://packages.qa.debian.org/y/yade.html>`_. 
-`Debian-Backports <http://backports.debian.org/Instructions>`_ 
-repository is updating regularly to bring the newest Yade to a users of stable 
+The `Debian-Backports <http://backports.debian.org/Instructions>`_ 
+repository is updated regularly to bring the newest Yade version to the users of stable 
 Debians.
 
-Daily and stable Yade versions can coexist without any conflicts.
+Daily and stable Yade versions can coexist without any conflicts, i.e., you can use `yade`` and ``yadedaily``
+at the same time.
 
 Source code
 ------------
 
 Installation from source code is reasonable, when you want to add or 
-modify constitutive laws, engines or functions... Installing the latest 
+modify constitutive laws, engines, functions etc. Installing the latest 
 trunk version allows one to use newly added features, which are not yet 
 available in packaged versions. 
 
@@ -77,28 +80,28 @@ If you want to install from source, you can install either a release
 (updated by the developers frequently). You should download the development 
 version (called ``trunk``) if you want to modify the source code, as you 
 might encounter problems that will be fixed by the developers. Release 
-version will not be modified (except for updates due to critical and 
-easy-to-fix bugs), but they are in a more stabilized state that trunk 
-generally.
+versions will not be updated (except for updates due to critical and 
+easy-to-fix bugs), but generally they are more stable than the trunk.
 
 #. Releases can be downloaded from the `download page <https://launchpad.net/yade/+download>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
-#. developement version (trunk) can be obtained from the `code repository <https://github.com/yade/>`_ at github.
+#. The development version (``trunk``) can be obtained from the `code repository <https://github.com/yade/>`_ at GitHub.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
-management (install the ``git`` package in your distribution and create a GitHub account)::
+management (install the ``git`` package on your system and create a `GitHub account <https://github.com/join/>`_)::
 
 		git clone git@github.com:yade/trunk.git
 
-will download the whole code repository of ``trunk``. Check out :ref:`yade-github-label` for more.
+will download the whole code repository of the ``trunk``. Check out :ref:`yade-github-label`
+for more details on how to collaborate using ``git``.
 
-Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the main Yade branch)::
+Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the trunk version)::
 
 		git clone https://github.com/yade/trunk.git
    
-For those behind firewall, you can download the sources from our `GitHub <https://github.com/yade>`_ repository as compressed archive.
+For those behind a firewall, you can download the sources from our `GitHub <https://github.com/yade>`_ repository as compressed archive.
 
-Release and trunk sources are compiled in the same way. To be notified about new commits
-into the trunk, use `watch option on GitHub <https://help.github.com/articles/watching-repositories/>`_.
+Release and trunk sources are compiled in exactly the same way. In order to get notifications about changes
+to the truck (i.e., ``commits``), use `watch option on GitHub <https://help.github.com/articles/watching-repositories/>`_.
 
 Prerequisites
 ^^^^^^^^^^^^^
@@ -125,15 +128,15 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `Metis <http://glaros.dtc.umn.edu/gkhome/metis/metis/overview/>`_ matrix preconditioning (fluid coupling, optional)
 
 Most of the list above is very likely already packaged for your distribution. In case you are confronted
-with some errors concerning not available packages (e.g. Package libmetis-dev is not available) it may be necessary 
+with some errors concerning not available packages (e.g., package libmetis-dev is not available) it may be necessary 
 to add yade external ppa from https://launchpad.net/~yade-users/+archive/external (see below) as well as http://www.yade-dem.org/packages (see the top of this page)::
 
 	sudo add-apt-repository ppa:yade-users/external 
 	sudo apt-get update 
 
-The following commands have to be executed in command line of corresponding 
-distributions. Just copy&paste to the terminal. To perform commands you 
-should have root privileges
+The following commands have to be executed in the command line of your corresponding 
+distribution. Just copy&paste to the terminal. Note, to execute these commands you 
+need root privileges.
  
 * **Ubuntu**, **Debian** and their derivatives::
 
@@ -146,10 +149,10 @@ should have root privileges
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
 		
 
-Some of packages (for example, cmake, eigen3) are mandatory, some of them
+Some of the packages (for example, cmake, eigen3) are mandatory, some of them
 are optional. Watch for notes and warnings/errors, which are shown
-by cmake during configuration step. If the missing package is optional,
-some of Yade features will be disabled (see the messages at the end of configuration).
+by ``cmake`` during the configuration step. If the missing package is optional,
+some of Yade features will be disabled (see the messages at the end of the configuration).
 		
 Additional packages, which can become mandatory later::
 
@@ -166,9 +169,9 @@ installed from `yade-dem.org/packages <http://yade-dem.org/packages/>`_ or
 from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
 If not installed the related features will be disabled automatically.
 
-If you are using other distribution, than Debian or its derivatives, you should
-install the softwares listed above. Their names can differ from the 
-names of Debian-packages.
+If you are using other distributions than Debian or its derivatives you should
+install the software packages listed above. Their names in other distributions can differ from the 
+names of the Debian-packages.
 
  
 .. warning:: If you have Ubuntu 14.04 Trusty, you need to add -DCMAKE_CXX_FLAGS="-frounding-math"
@@ -194,15 +197,15 @@ You should create a separate build-place-folder, where Yade will be configured
 and where the source code will be compiled. Here is an example for a folder structure::
 
 	myYade/       		## base directory
-		trunk/		## folder for sourcecode in which you use github
-		build/		## folder in which sources will be compiled; build-directory; use cmake here
-		install/	## install folder
+		trunk/		## folder for source code in which you use github
+		build/		## folder in which the sources will be compiled; build-directory; use cmake here
+		install/	## install folder; contains the executables
 
-Then inside this build-directory you should start cmake to configure the compilation process::
+Then, inside this build-directory you should call ``cmake`` to configure the compilation process::
 
 	cmake -DCMAKE_INSTALL_PREFIX=/path/to/installfolder /path/to/sources
 
-For the folder structure given above call the following command in folder "build":
+For the folder structure given above call the following command in the folder "build"::
 
 	cmake -DCMAKE_INSTALL_PREFIX=../install ../trunk
 
@@ -219,7 +222,7 @@ The following options are available:
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 	* SUFFIX: suffix, added after binary-names (version number by default)
 	* NOSUFFIX: do not add a suffix after binary-name (OFF by default)
-	* YADE_VERSION: explicitely set version number (is defined from git-directory by default)
+	* YADE_VERSION: explicitly set version number (is defined from git-directory by default)
 	* ENABLE_GUI: enable GUI option (ON by default)
 	* ENABLE_CGAL: enable CGAL option (ON by default)
 	* ENABLE_VTK: enable VTK-export option (ON by default)
@@ -230,59 +233,59 @@ The following options are available:
 	* ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
 	* ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (ON by default)
 	* ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default)
-	* ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
+	* ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013]_ for details (OFF by default)
 	* ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
-	* ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
-	* runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
-	* CHUNKSIZE: used, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
+	* ENABLE_PROFILING: enable profiling, e.g., shows some more metrics, which can define bottlenecks of the code (OFF by default)
+	* runtimePREFIX: used for packaging, when install directory is not the same as runtime directory (/usr/local by default)
+	* CHUNKSIZE: specifiy the chunk size if you want several sources to be compiled at once. Increases compilation speed but RAM-consumption during compilation as well (1 by default)
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 	* USE_QT5: use QT5 for GUI, experimental (OFF by default)
 
-For using an extended parameters of cmake, please, follow the corresponding
-documentation on cmake-webpage. 
+For using more extended parameters of cmake, please follow the corresponding
+documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_. 
 
-.. warning:: To provide Qt4->Qt5 migration one needed to provide an additional option USE_QT5.
- This option should be On or Off according to the Qt version, which was used
+.. warning:: To provide Qt4->Qt5 migration one needs to provide an additional option USE_QT5.
+ This option should be ON or OFF according to the Qt version, which was used
  to compile libQGLViewer. On Debian/Ubuntu operating systems libQGLViewer
  of version 2.6.3 and higher are compiled against Qt5 (for other operating systems
  refer to the package archive of your distribution), so if you are using
- such version, please switch on this option. Otherwise, if you mix Qt-versions
+ such version, please switch this option ON. Otherwise, if you mix Qt-versions a
  ``Segmentation fault`` will appear just after Yade is started. To provide
- necessary build dependencies for Qt5, install ``python-pyqt5 pyqt5-dev-tools ``
+ necessary build dependencies for Qt5, install ``python-pyqt5 pyqt5-dev-tools``
  instead of ``python-qt4 pyqt4-dev-tools``, which is needed for Qt4.
 
-If the compilation is finished without errors, you will see all enabled 
-and disabled options. Then start the standard the compilation process::
+If cmake finishes without errors, you will see all enabled 
+and disabled options at the end. Then start the actual compilation process with::
 
 	make
 
-The compilation process can take a long time, be patient. An additional
-parameter on many cores systems ``-j`` can be added to decrease compilation time
-and split the compilation on many cores. For example, on 4-core machines
-it would be reasonable to set the parameter ``-j4``. Note, the Yade requires
-approximately 2GB/core for compilation, otherwise the swap-file will be used
-and a compilation time dramatically increases.
+The compilation process can take a considerable amount of time, be patient.
+If you are using a multi-core systems you can use the parameter ``-j`` to speed-up the compilation
+and split the compilation onto many cores. For example, on 4-core machines
+it would be reasonable to set the parameter ``-j4``. Note, Yade requires
+approximately 2GB RAM per core for compilation, otherwise the swap-file will be used
+and compilation time dramatically increases.
 
-Installing performs with the following command::
+The installation is performed with the following command::
 
 	make install
 
-The "install" command will in fact also recompile if source files have been modified. 
-Hence there is no absolute need to type the two commands separately. You may receive make errors if you don't permission to write into the target folder.
+The ``install`` command will in fact also recompile if source files have been modified. 
+Hence there is no absolute need to type the two commands separately. You may receive make errors if you don't have permission to write into the target folder.
 These errors are not critical but without writing permissions Yade won't be installed in /usr/local/bin/.
 
-After compilation finished successfully
+After the compilation finished successfully,
 the new built can be started by navigating to /path/to/installfolder/bin and calling yade via (based on version yade-2014-02-20.git-a7048f4)::
     
     cd /path/to/installfolder/bin 
     ./yade-2014-02-20.git-a7048f4
 
-For building the documentation you should at first execute the command "make install"
-and then "make doc" to build it. The generated files will be stored in your current
-build directory/doc/sphinx/_build. Once again writing permissions are necessary for installing into /usr/local/share/doc/.
+For building the documentation you should at first execute the command ``make install``
+and then ``make doc`` to build it. The generated files will be stored in your current
+install directory /path/to/installfolder/share/doc/yade-your-version. Once again writing permissions are necessary for installing into /usr/local/share/doc/. To open your local documentation go into the folder html and open the file index.html with a browser.
 
-"make manpage" command generates and moves manpages in a standard place.
-"make check" command executes standard test to check the functionality of compiled program.
+``make manpage`` command generates and moves manpages in a standard place.
+``make check`` command executes standard test to check the functionality of the compiled program.
 
 Yade can be compiled not only by GCC-compiler, but also by `CLANG <http://clang.llvm.org/>`_ 
 front-end for the LLVM compiler. For that you set the environment variables CC and CXX 
