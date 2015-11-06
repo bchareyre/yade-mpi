@@ -93,12 +93,9 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 	}
 	else{
 		// Real hPeriodStart=(periodStart-theta0)*dH_dTheta;
-		//TRVAR4(hPeriodStart,periodStart,theta0,theta);
 		//Real h=Shop::periodicWrap(pt[axis]-hRef,hPeriodStart,hPeriodStart+2*Mathr::PI*dH_dTheta,&period);
 		theta=Shop::periodicWrap(theta,periodStart,periodStart+2*Mathr::PI,&period);
 		Real h=pt[axis]-hRef+period*2*Mathr::PI*dH_dTheta;
-		//TRVAR3(pt[axis],pt[axis]-hRef,period);
-		//TRVAR2(h,theta);
 		return boost::make_tuple(r,h,theta);
 	}
 }

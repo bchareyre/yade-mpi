@@ -83,8 +83,6 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		if(flip(i,j)!=double(int(flip(i,j)))) LOG_WARN("Flip matrix entry "<<flip(i,j)<<" at ["<<i<<","<<j<<"] not integer?! (will be rounded)");
 		trsfInc(i,j)=int(flip(i,j))*size[j]/size[i];
 	}
-	TRWM3MAT(cell->trsf);
-	TRWM3MAT(trsfInc);
 	cell->trsf+=trsfInc;
 	cell->postLoad(*cell);
 

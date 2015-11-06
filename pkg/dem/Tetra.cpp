@@ -688,12 +688,10 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	Vector3r Sg(0,0,0); // static moment of intersection
 
 	Vector3r tt[4]; for(int i=0; i<4; i++) tt[i]=tA.v[i];
-	//DEBUG TRWM3VEC(tt[0]); TRWM3VEC(tt[1]); TRWM3VEC(tt[2]); TRWM3VEC(tt[3]); TRVAR1(TetrahedronVolume(tA.v)); TRVAR1(TetrahedronVolume(tt)); TRWM3MAT(TetrahedronInertiaTensor(tA.v));
 
 	for(list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		Real dV=TetrahedronVolume(II->v);
 		V+=dV;
-		//DEBUG TRVAR1(dV); TRWM3VEC(II->v[0]); TRWM3VEC(II->v[1]); TRWM3VEC(II->v[2]); TRWM3VEC(II->v[3]); LOG_TRACE("====")
 		Sg+=dV*(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25;
 	}
 	Vector3r centroid=Sg/V;
@@ -742,8 +740,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 	 *
 	 * In our case, the greatest inertia is along ixxx, the other coordinates are ixx and ix. equivalentPenetrationDepth means what was z.
 	 */
-	//DEBUG
-	TRWM3MAT(Ip); TRWM3MAT(I);
+
 	Real equivalentPenetrationDepth=sqrt(6.*(Ip(ix,ix)+Ip(ixx,ixx)-Ip(ixxx,ixxx))/V);
 	Real equivalentCrossSection=V/equivalentPenetrationDepth;
 	TRVAR3(V,equivalentPenetrationDepth,equivalentCrossSection);
@@ -804,7 +801,6 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, 
 		const Vector3r& P(B.v[i]); // reference point on the plane
 		normal=(B.v[i1]-P).cross(B.v[i2]-P); normal.normalize(); // normal
 		if((B.v[i3]-P).dot(normal)>0) normal*=-1; // outer normal
-		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
 		for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
 			list<Tetra> splitDecomposition=TetraClipByPlane(*I,P,normal);
 			// replace current list element by the result of decomposition;
@@ -852,8 +848,6 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const V
 	// scaling factor for Mathr::EPSILON: average edge length
 	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).norm();
 
-	/* TRWM3VEC(P); TRWM3VEC(normal); T.dump(); */
-
 	vector<size_t> pos, neg, zer; Real dist[4];
 	for(size_t i=0; i<4; i++){
 		dist[i]=(T.v[i]-P).dot(normal);
@@ -879,7 +873,7 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const V
 		for(size_t i=0; i<NEG; i++) v[i+  0+  0]=T.v[neg[i]];
 		for(size_t i=0; i<POS; i++) v[i+  0+NEG]=T.v[pos[i]];
 		for(size_t i=0; i<ZER; i++) v[i+POS+NEG]=T.v[zer[i]];
-		/* LOG_TRACE("NEG(in)="<<NEG<<", POS(out)="<<POS<<", ZER(boundary)="<<ZER); TRWM3VEC(v[0]); TRWM3VEC(v[1]); TRWM3VEC(v[2]); TRWM3VEC(v[3]); */
+
 		#define _A v[0]
 		#define _B v[1]
 		#define _C v[2]
@@ -978,9 +972,6 @@ void TetraVolumetricLaw::action()
 		// F=σA=εEA
 		// this is unused; should it?: contactPhys->kn
 		Vector3r F=contactGeom->normal*averageStrain*young*contactGeom->equivalentCrossSection;
-		TRWM3VEC(contactGeom->normal);
-		TRWM3VEC(F);
-		TRWM3VEC((A->state->pos-contactGeom->contactPoint).cross(F));
 
 		scene->forces.addForce (idA,-F);
 		scene->forces.addForce (idB, F);
