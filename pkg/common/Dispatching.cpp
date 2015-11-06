@@ -25,13 +25,10 @@ void BoundDispatcher::action()
 		const shared_ptr<Body>& b=(*bodies)[id];
 		processBody(b);
 	}
-// 	With -j4, this update takes more time that the dispatching in itslef, and it is quite useless: commented out
-// 	scene->updateBound();
 }
 
 void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 {
-// 	const shared_ptr<Body>& b=(*bodies)[id];
 		shared_ptr<Shape>& shape=b->shape;
 		if(!b->isBounded() || !shape) return;
 		if(b->bound) {
@@ -74,7 +71,6 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 	scene=Omega::instance().getScene().get(); // to make sure if called from outside of the loop
 	Vector3i cellDist=Vector3i::Zero();
 	if(scene->isPeriodic) {
-		//throw logic_error("IGeomDispatcher::explicitAction does not support periodic boundary conditions (O.periodic==True)");
 		for(int i=0; i<3; i++) cellDist[i]=-(int)((b2->state->pos[i]-b1->state->pos[i])/scene->cell->getSize()[i]+.5);
 	}
 	Vector3r shift2=scene->cell->hSize*cellDist.cast<Real>();

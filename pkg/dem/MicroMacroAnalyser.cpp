@@ -10,16 +10,17 @@
 #include<pkg/common/ElastMat.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
-#include<core/Omega.hpp>
-#include<core/Scene.hpp>
+#include <core/Omega.hpp>
+#include <core/Scene.hpp>
 #include <pkg/common/Sphere.hpp>
-#include<lib/triangulation/KinematicLocalisationAnalyser.hpp>
-#include<lib/triangulation/TriaxialState.h>
+#include <lib/triangulation/KinematicLocalisationAnalyser.hpp>
+#include <lib/triangulation/TriaxialState.h>
 #include <lib/triangulation/Tenseur3.h>
-#include<boost/iostreams/filtering_stream.hpp>
-#include<boost/iostreams/filter/bzip2.hpp>
-#include<boost/iostreams/device/file.hpp>
-#include<pkg/dem/TriaxialCompressionEngine.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/filesystem.hpp>
+#include <pkg/dem/TriaxialCompressionEngine.hpp>
 #include "MicroMacroAnalyser.hpp"
 
 YADE_PLUGIN((MicroMacroAnalyser));

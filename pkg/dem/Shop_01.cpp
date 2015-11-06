@@ -42,6 +42,7 @@
 	#include"pkg/common/Gl1_NormPhys.hpp"
 #endif
 
+#include <boost/filesystem.hpp>
 #include "py/_utils.hpp"
 
 

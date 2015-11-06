@@ -13,6 +13,7 @@
 #include<core/Scene.hpp>
 #include<lib/base/Math.hpp>
 
+#include <boost/filesystem.hpp>
 
 YADE_PLUGIN((Disp2DPropLoadEngine));
 

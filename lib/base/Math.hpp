@@ -55,8 +55,6 @@ using std::make_pair;
 #include <boost/lexical_cast.hpp>
 #include <boost/python.hpp>
 #include <boost/python/object.hpp>
-#include <boost/version.hpp>
-#include <boost/any.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/preprocessor.hpp>
 #include <boost/python/module.hpp>
@@ -64,10 +62,6 @@ using std::make_pair;
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <boost/filesystem/convenience.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 
 using boost::shared_ptr;
@@ -96,9 +90,6 @@ using boost::shared_ptr;
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <Eigen/QR>
-#include <Eigen/LU>
-#include <Eigen/SVD>
 #include <Eigen/Eigenvalues>
 #include <float.h>
 

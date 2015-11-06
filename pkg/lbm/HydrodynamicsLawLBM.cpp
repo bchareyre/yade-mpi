@@ -29,7 +29,7 @@
 #include<pkg/common/Box.hpp>
 #include<pkg/common/Sphere.hpp>
 #include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
-
+#include <boost/filesystem.hpp>
 
 namespace bfs=boost::filesystem;
 

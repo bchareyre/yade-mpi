@@ -18,6 +18,8 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
 
+#include <boost/filesystem.hpp>
+
 #include<lib/serialization/ObjectIO.hpp>
 
 

@@ -24,6 +24,8 @@
 #include<lib/pyutil/gil.hpp>
 #include<QtGui/qevent.h>
 
+#include <boost/filesystem.hpp>
+
 #ifdef YADE_GL2PS
 	#include<gl2ps.h>
 #endif
