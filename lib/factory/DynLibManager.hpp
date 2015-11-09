@@ -40,5 +40,3 @@ class DynLibManager
 		bool error();
     std::string lastError_;
 };
-
-

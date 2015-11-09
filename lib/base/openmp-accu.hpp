@@ -1,11 +1,8 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
 
-// for ZeroInitializer template
 #include <lib/base/Math.hpp>
-
 #include <boost/serialization/split_free.hpp>
-#include <cstdlib>
 #include <unistd.h>
 
 #ifdef YADE_OPENMP

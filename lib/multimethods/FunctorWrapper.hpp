@@ -149,10 +149,5 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		return (string(#class1)+" "+string(#class2));					\
 	}											\
 
-#define DEFINE_FUNCTOR_ORDER_3D(class1,class2,class3)						\
-	public : virtual std::string checkOrder() const						\
-	{											\
-		return (string(#class1)+" "+string(#class2)+" "+string(#class3));		\
-	}											\
 
 

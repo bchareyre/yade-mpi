@@ -83,7 +83,7 @@ ENDIF (DEBUG)
 # Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
 IF ( NOT LocalBoost )
-  SET(LocalBoost "1.35.0") # Minimal required Boost version
+  SET(LocalBoost "1.47.0") # Minimal required Boost version
 ENDIF ( NOT LocalBoost )
 FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system date_time REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})

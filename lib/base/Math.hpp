@@ -8,7 +8,6 @@
 	using Real = double;
 #endif
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -22,7 +21,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <typeinfo>
 #include <utility>
 #include <vector>
 

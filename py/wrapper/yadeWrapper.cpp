@@ -24,22 +24,18 @@
 #include<pkg/dem/STLImporter.hpp>
 
 #include<pkg/common/Dispatching.hpp>
-#include<core/GlobalEngine.hpp>
-#include<core/PartialEngine.hpp>
-#include<core/Functor.hpp>
-#include<pkg/common/ParallelEngine.hpp>
-#include<pkg/common/Collider.hpp>
+#include <core/GlobalEngine.hpp>
+#include <core/PartialEngine.hpp>
+#include <core/Functor.hpp>
+#include <pkg/common/ParallelEngine.hpp>
+#include <pkg/common/Collider.hpp>
 
-#include<pkg/common/InteractionLoop.hpp>
+#include <pkg/common/InteractionLoop.hpp>
 
 #include <core/Clump.hpp>
 #include <pkg/common/Sphere.hpp>
 
-#if BOOST_VERSION>=104700
-	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
-#else
-	#include<boost/math/nonfinite_num_facets.hpp>
-#endif
+#include <boost/math/special_functions/nonfinite_num_facets.hpp>
 
 #include <locale>
 #include <boost/random/linear_congruential.hpp>

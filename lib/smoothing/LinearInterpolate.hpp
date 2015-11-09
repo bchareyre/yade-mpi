@@ -30,19 +30,3 @@ T linearInterpolate(const Real t, const std::vector<timeT>& tt, const std::vecto
 	const Real& t0=tt[pos], t1=tt[pos+1]; const T& v0=values[pos], v1=values[pos+1];
 	return v0+(v1-v0)*((t-t0)/(t1-t0));
 }
-
-#if 0
-	// test program
-	int main(void){
-		Real t,v;
-		std::vector<Real> tt,vv;
-		while(std::cin){
-			std::cin>>t>>v;
-			tt.push_back(t); vv.push_back(v);	
-		}
-		size_t pos;
-		for(Real t=0; t<10; t+=0.1){
-			std::cout<<t<<" "<<linearInterpolate<Real,Real>(t,tt,vv,pos)<<std::endl;
-		}
-	}
-#endif 

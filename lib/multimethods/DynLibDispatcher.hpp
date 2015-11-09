@@ -121,19 +121,14 @@ class DynLibDispatcher
 	typedef typename Loki::TL::Append<  Loki::NullType , BaseClass >::Result BaseClassList;
 	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 0>::Result	BaseClass1;  // 1D
 	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 1>::Result	BaseClass2;  // 2D
-	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 2>::Result	BaseClass3;  // 3D
 		
 	typedef typename GetTail< BaseClassList >::Result			Tail2; // 2D
 	typedef typename GetTail< Tail2 >::Result				Tail3; // 3D
 	typedef typename GetTail< Tail3 >::Result				Tail4; // 4D ...
 		
 	typedef typename Matrix< BaseClassList >::ResultIterator 		Iterator2; // outer iterator 2D
-	typedef typename Matrix< Tail2 >::ResultIterator			Iterator3; // inner iterator 3D
-	typedef typename Matrix< Tail3 >::ResultIterator			Iterator4; // more inner iterator 4D
 		
 	typedef typename Matrix< BaseClassList >::ResultIteratorInt		IteratorInfo2;
-	typedef typename Matrix< Tail2 >::ResultIteratorInt			IteratorInfo3;
-	typedef typename Matrix< Tail3 >::ResultIteratorInt			IteratorInfo4;
 		
 	typedef typename Matrix< BaseClassList >::Result MatrixType;
 	typedef typename Matrix< BaseClassList >::ResultInt MatrixIntType;
@@ -156,12 +151,6 @@ class DynLibDispatcher
 	typedef typename Impl::Parm7 Parm7;
 	typedef typename Impl::Parm8 Parm8;
 	typedef typename Impl::Parm9 Parm9;
-	typedef typename Impl::Parm10 Parm10;
-	typedef typename Impl::Parm11 Parm11;
-	typedef typename Impl::Parm12 Parm12;
-	typedef typename Impl::Parm13 Parm13;
-	typedef typename Impl::Parm14 Parm14;
-	typedef typename Impl::Parm15 Parm15;
 	
  	public:
 		DynLibDispatcher()
@@ -222,8 +211,6 @@ class DynLibDispatcher
 			return out;
 		}
 
-
-
  	public:
 		void add1DEntry(string baseClassName, shared_ptr<Executor> executor){
 			// create base class, to access its index. (we can't access static variable, because
@@ -244,10 +231,6 @@ class DynLibDispatcher
 			callBacks.resize( maxCurrentIndex+1 );	// make sure that there is a place for new Functor
 
 			callBacks[index] = executor;
-						
-			#if 0
-				cerr <<" New class added to DynLibDispatcher 1D: " << libName << endl;
-			#endif
 		};
 
 		
@@ -311,11 +294,7 @@ class DynLibDispatcher
 				callBacks	[index1][index2] = executor;
 				callBacksInfo	[index1][index2] = 0;
 			}
-
-			#if 0
-				cerr <<"Added new 2d functor "<<executor->getClassName()<<", callBacks size is "<<callBacks.size()<<","<<(callBacks.size()>0?callBacks[0].size():0)<<endl;
-			#endif
-		  }
+		}
 		
 
 		bool locateMultivirtualFunctor1D(int& index, shared_ptr<BaseClass1>& base) {
@@ -712,7 +691,6 @@ class DynLibDispatcher
 			}
 			else	return ResultType();
 		}
-
 };
 
 

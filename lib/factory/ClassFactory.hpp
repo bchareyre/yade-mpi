@@ -138,7 +138,6 @@ class ClassFactory : public Singleton<ClassFactory>
 			\param tp type info of the type to test
 			\param fundamental is true if the given type is fundamental (Vector3,Quaternion ...)
 		*/
-		bool isFactorable(const type_info& tp,bool& fundamental);
 
 		bool load(const string& fullFileName);
 		std::string lastError();
@@ -158,24 +157,12 @@ class ClassFactory : public Singleton<ClassFactory>
  * be unique and avoids use of __COUNTER__ which didn't appear in gcc until 4.3.
  */
 
-#if BOOST_VERSION>=104200
-	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT_IMPLEMENT(z); BOOST_SERIALIZATION_FACTORY_0(z);
-#else
-	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z); BOOST_SERIALIZATION_FACTORY_0(z);
-#endif
+#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT_IMPLEMENT(z); BOOST_SERIALIZATION_FACTORY_0(z);
 
-// the __attribute__((constructor(priority))) construct not supported before gcc 4.3
-// it will only produce warning from log4cxx if not used
-#if __GNUC__ == 4 && __GNUC_MINOR__ >=3
-	#define YADE_CTOR_PRIORITY(p) (p)
-#else
-	#define YADE_CTOR_PRIORITY(p)
-#endif
 
-#define _PLUGIN_CHECK_REPEAT(x,y,z) void z::must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(){}
 #define _YADE_PLUGIN_REPEAT(x,y,z) BOOST_PP_STRINGIZE(z),
 
 // priority 500 is greater than priority for log4cxx initialization (in core/main/pyboot.cpp); therefore lo5cxx will be initialized before plugins are registered
 #define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor)) void BOOST_PP_CAT(registerThisPluginClasses_,BOOST_PP_SEQ_HEAD(plugins)) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
-// use later: BOOST_PP_SEQ_FOR_EACH(_PLUGIN_CHECK_REPEAT,~,plugins)
+
 

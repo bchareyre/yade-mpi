@@ -23,28 +23,11 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 {
 
 	bool tmp = map.insert( FactorableCreatorsMap::value_type( name , FactorableCreators(create,createShared, createPureCustom) )).second;
-
-	#if 0
-		if (tmp)
-			std::cout << "registering factorable: " << name << " OK\n";
-		else
-			std::cout << "registering factorable: " << name << " FAILED\n";
-	#endif
-
 	return tmp;
 }
 
 shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 {
-#if 0
-	cerr<<"Creating shared lib: "<<name<<"\n";
-	cerr<<"Available libs: ";
-		for(FactorableCreatorsMap::iterator i=map.begin(); i!=map.end(); i++){
-			cerr<<i->first<<" ";
-		}
-	cerr<<"\n";
-#endif
-
 	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
@@ -72,7 +55,6 @@ Factorable* ClassFactory::createPure( std::string name )
 	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
-		//cerr << "------------ going to load something" << endl;
 		dlm.load(name);
 		if (dlm.isLoaded(name))
 		{
@@ -103,7 +85,6 @@ string ClassFactory::lastError()
 {
         return dlm.lastError();
 }
-
 
 void ClassFactory::registerPluginClasses(const char* fileAndClasses[]){
 	assert(fileAndClasses[0]!=NULL); // must be file name

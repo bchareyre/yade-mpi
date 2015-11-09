@@ -2,19 +2,15 @@
 
 #pragma once
 
-#include<locale>
-#include<boost/archive/codecvt_null.hpp>
-#include<boost/iostreams/filtering_stream.hpp>
-#include<boost/iostreams/filter/bzip2.hpp>
-#include<boost/iostreams/filter/gzip.hpp>
-#include<boost/iostreams/device/file.hpp>
-#include<boost/algorithm/string.hpp>
+#include <locale>
+#include <boost/archive/codecvt_null.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/algorithm/string.hpp>
 
-#if BOOST_VERSION>=104700
-	#include<boost/math/special_functions/nonfinite_num_facets.hpp>
-#else
-	#include<boost/math/nonfinite_num_facets.hpp>
-#endif
+#include <boost/math/special_functions/nonfinite_num_facets.hpp>
 
 
 
