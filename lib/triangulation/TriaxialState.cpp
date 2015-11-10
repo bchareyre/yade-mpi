@@ -116,7 +116,7 @@ TriaxialState::Tesselation& TriaxialState::Tesselate (void)
 		Tes.Clear();
 		GrainIterator git = grains_begin();
 		GrainIterator last = grains_end();
-		Tes.vertexHandles.resize(grains.size()+ NO_ZERO_ID ? 1 : 0);
+		Tes.vertexHandles.resize(grains.size()+ (NO_ZERO_ID ? 1 : 0));
 		for (; git!=last; ++git) {
 			if (git->id != -1 /*&& git->isSphere*/)	Tes.vertexHandles[git->id] = Tes.insert(git->sphere.x(), git->sphere.y(), git->sphere.z(), git->sphere.weight(),git->id,!git->isSphere);
 			//vh->->info() = git->translation; FIXME : this could define displacements in the triangulation itself
