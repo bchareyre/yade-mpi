@@ -77,6 +77,8 @@ IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
   SET(CMAKE_BUILD_TYPE Debug)
   ADD_DEFINITIONS("-DYADE_DEBUG -g")
+ELSE (DEBUG)
+  ADD_DEFINITIONS(${CMAKE_CXX_FLAGS_RELEASE})
 ENDIF (DEBUG)
 
 #===========================================================
