@@ -18,9 +18,6 @@
 #include<lib/serialization/Serializable.hpp>
 #include<lib/multimethods/Indexable.hpp>
 
-
-
-
 class Scene;
 class Interaction;
 
@@ -39,7 +36,6 @@ class Body: public Serializable{
 		//! get Body pointer given its id. 
 		static const shared_ptr<Body>& byId(Body::id_t _id,Scene* rb=NULL);
 		static const shared_ptr<Body>& byId(Body::id_t _id,shared_ptr<Scene> rb);
-
 		
 		//! Whether this Body is a Clump.
 		//! @note The following is always true: \code (Body::isClump() XOR Body::isClumpMember() XOR Body::isStandalone()) \endcode

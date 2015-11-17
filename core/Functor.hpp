@@ -37,8 +37,6 @@ class Functor: public Serializable
 };
 REGISTER_SERIALIZABLE(Functor);
 
-
-
 template
 <
 	class _DispatchType1,
@@ -58,7 +56,6 @@ class Functor1D: public Functor,
 	REGISTER_CLASS_AND_BASE(Functor1D,Functor FunctorWrapper);
 	/* do not REGISTER_ATTRIBUTES here, since we are template; derived classes should call REGISTER_ATTRIBUTES(Functor,(their)(own)(attributes)), bypassing Functor1D */
 };
-
 
 template
 <

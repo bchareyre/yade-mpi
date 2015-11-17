@@ -56,9 +56,6 @@ class InteractionContainer: public Serializable{
 		// required by the class factory... :-|
 		InteractionContainer(): currSize(0),dirty(false),serializeSorted(false),iterColliderLastRun(-1){
 			bodies=NULL;
-// 			#ifdef YADE_OPENMP
-// 				threadsPendingErase.resize(omp_get_max_threads());
-// 			#endif
 		}
 		void clear();
 		// iterators
@@ -73,12 +70,20 @@ class InteractionContainer: public Serializable{
 		bool insert(const shared_ptr<Interaction>& i);
 		//3rd parameter is used to remove I from linIntrs (in conditionalyEraseNonReal()) when body b1 has been removed
 		bool erase(Body::id_t id1,Body::id_t id2,int linPos);
+		
 		const shared_ptr<Interaction>& find(Body::id_t id1,Body::id_t id2);
-// 		bool found(Body::id_t id1,Body::id_t id2);
 		inline bool found(const Body::id_t& id1,const Body::id_t& id2){
 			assert(bodies);
-			if(id2>=(Body::id_t)bodies->size()) return false;
-			return (id1>id2)?(*bodies)[id2]->intrs.count(id1):(*bodies)[id1]->intrs.count(id2);}
+			if(id2>=(Body::id_t)bodies->size() or (id1 == id2)) {
+				return false;
+			} else {
+				if (id1>id2) {
+					return (*bodies)[id2]->intrs.count(id1);
+				} else {
+					return (*bodies)[id1]->intrs.count(id2);
+				}
+			}
+		}
 		// index access
 		shared_ptr<Interaction>& operator[](size_t id){return linIntrs[id];}
 		const shared_ptr<Interaction>& operator[](size_t id) const { return linIntrs[id];}
@@ -135,7 +140,6 @@ class InteractionContainer: public Serializable{
 			}
 		#endif
 		}
-		
 	// we must call Scene's ctor (and from Scene::postLoad), since we depend on the existing BodyContainer at that point.
 	void postLoad__calledFromScene(const shared_ptr<BodyContainer>&);
 	void preLoad(InteractionContainer&);

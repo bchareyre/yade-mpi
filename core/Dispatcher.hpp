@@ -100,8 +100,6 @@ boost::python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, 
 	}
 }
 
-
-
 //! Return functors of this dispatcher, as list of functors of appropriate type
 template<typename DispatcherT>
 std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
@@ -125,13 +123,7 @@ shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typena
 	return instance;
 }
 
-
-
-template
-<
-	class FunctorType,
-	bool autoSymmetry=true
->
+template < class FunctorType, bool autoSymmetry=true>
 class Dispatcher1D : public Dispatcher,
 				public DynLibDispatcher
 				<	  TYPELIST_1(typename FunctorType::DispatchType1)		// base classes for dispatch
@@ -141,7 +133,6 @@ class Dispatcher1D : public Dispatcher,
 					, autoSymmetry
 				>
 {
-
 	public :
 		typedef typename FunctorType::DispatchType1 baseClass;
 		typedef baseClass argType1;
@@ -172,18 +163,13 @@ class Dispatcher1D : public Dispatcher,
 			else return "";
 		}
 
-
 	public:
 	REGISTER_ATTRIBUTES(Dispatcher,);
 	REGISTER_CLASS_AND_BASE(Dispatcher1D,Dispatcher DynLibDispatcher);
 };
 
 
-template
-<
-	class FunctorType,
-	bool autoSymmetry=true
->
+template < class FunctorType, bool autoSymmetry=true>
 class Dispatcher2D : public Dispatcher,
 				public DynLibDispatcher
 				<	  TYPELIST_2(typename FunctorType::DispatchType1,typename FunctorType::DispatchType2) // base classes for dispatch
@@ -226,4 +212,3 @@ class Dispatcher2D : public Dispatcher,
 	REGISTER_ATTRIBUTES(Dispatcher,);
 	REGISTER_CLASS_AND_BASE(Dispatcher2D,Dispatcher DynLibDispatcher);
 };
-

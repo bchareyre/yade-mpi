@@ -10,8 +10,7 @@
 
 #include "ThreadWorker.hpp"
 
-class SimulationFlow // FIXME ; bad name
-	: public ThreadWorker
+class SimulationFlow : public ThreadWorker
 {
 	public:
 		virtual void	singleAction();

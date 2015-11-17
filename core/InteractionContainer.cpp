@@ -38,28 +38,25 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	return true;
 }
 
-
 void InteractionContainer::clear(){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	FOREACH(const shared_ptr<Body>& b, *bodies) {
-		if (b) b->intrs.clear(); // delete interactions from bodies
+		if (b) b->intrs.clear();
 	}
-	linIntrs.clear(); // clear the linear container
+	linIntrs.clear();
 	currSize=0;
 	dirty=true;
 }
-
 
 bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
-	if(id2>=(Body::id_t)bodies->size()) return false; // no such interaction
+	if(id2>=(Body::id_t)bodies->size()) return false;
 	
 	const shared_ptr<Body>& b1((*bodies)[id1]);
 	const shared_ptr<Body>& b2((*bodies)[id2]);
-//	LOG_DEBUG("InteractionContainer erase intrs id1=" << id1 << " id2=" << id2);
 	int linIx=-1;
 	if(!b1) linIx=linPos;
 	else {
@@ -67,7 +64,6 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 		if(I==b1->intrs.end()) linIx=linPos;
 		else {
 			linIx=I->second->linIx;
-//			LOG_DEBUG("InteractionContainer linIx=" << linIx << " linPos=" << linPos);
 			assert(linIx==linPos);
 			//erase from body, we also erase from linIntrs below
 			b1->intrs.erase(I);
@@ -92,7 +88,6 @@ bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	return true;
 }
 
-
 const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::id_t id2){
 	assert(bodies);
 	if (id1>id2) swap(id1,id2); 
@@ -105,16 +100,11 @@ const shared_ptr<Interaction>& InteractionContainer::find(Body::id_t id1,Body::i
 	else { empty=shared_ptr<Interaction>(); return empty; }
 }
 
-// end internal functions
-
-// the rest uses internal functions to access data structures, and does not have to be modified if they change
-
 bool InteractionContainer::insert(Body::id_t id1,Body::id_t id2)
 {
 	shared_ptr<Interaction> i(new Interaction(id1,id2) );
 	return insert(i);	
 }
-
 
 void InteractionContainer::requestErase(Body::id_t id1, Body::id_t id2){
 	const shared_ptr<Interaction> I=find(id1,id2); if(!I) return;
@@ -141,7 +131,7 @@ struct compPtrInteraction{
 };
 
 void InteractionContainer::preSave(InteractionContainer&){
-	FOREACH(const shared_ptr<Interaction>& I, *this){
+	for(const shared_ptr<Interaction>& I : *this) {
 		if(I->geom || I->phys) interaction.push_back(I);
 		// since requestErase'd interactions have no interaction physics/geom, they are not saved
 	}
@@ -149,11 +139,10 @@ void InteractionContainer::preSave(InteractionContainer&){
 }
 void InteractionContainer::postSave(InteractionContainer&){ interaction.clear(); }
 
-
 void InteractionContainer::preLoad(InteractionContainer&){ interaction.clear(); }
 
 void InteractionContainer::postLoad__calledFromScene(const shared_ptr<BodyContainer>& bb){
-	bodies=&bb->body; // update the internal pointer
+	bodies=&bb->body;
 	clear();
 	FOREACH(const shared_ptr<Interaction>& I, interaction){ 
 		Body::id_t id1=I->getId1(), id2=I->getId2();
@@ -165,4 +154,3 @@ void InteractionContainer::postLoad__calledFromScene(const shared_ptr<BodyContai
 	}
 	interaction.clear();
 }
-

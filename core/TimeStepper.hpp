@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <list>
-#include <vector>
 #include "Interaction.hpp"
 #include "GlobalEngine.hpp"
 #include "Scene.hpp"

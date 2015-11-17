@@ -21,7 +21,6 @@
 #include <lib/factory/ClassFactory.hpp>
 
 #include <lib/base/Singleton.hpp>
-
 #include "SimulationFlow.hpp"
 
 
@@ -78,7 +77,6 @@ class Omega: public Singleton<Omega>{
 		* 2. other threads that wish to manipulate GL
 		* 3. Omega when substantial changes to the scene are being made (bodies being deleted, simulation loaded etc) so that GL doesn't access those and crash */
 		boost::try_mutex renderMutex;
-
 
 		void run();
 		void pause();

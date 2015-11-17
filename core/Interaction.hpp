@@ -36,10 +36,9 @@ class Interaction: public Serializable{
 			// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
 			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
 			bool geomExists;
-			// shared_ptr's are initialized to NULLs automagically
-			shared_ptr<IGeomFunctor> geom;
-			shared_ptr<IPhysFunctor> phys;
-			shared_ptr<LawFunctor> constLaw;
+			shared_ptr<IGeomFunctor> geom = nullptr;
+			shared_ptr<IPhysFunctor> phys = nullptr;
+			shared_ptr<LawFunctor> constLaw = nullptr;
 		} functorCache;
 
 		//! Reset interaction to the intial state (keep only body ids)

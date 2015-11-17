@@ -8,27 +8,23 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"Omega.hpp"
-#include"Scene.hpp"
-#include"TimeStepper.hpp"
-#include"ThreadRunner.hpp"
-#include<lib/base/Math.hpp>
-#include<lib/multimethods/FunctorWrapper.hpp>
-#include<lib/multimethods/Indexable.hpp>
-#include<boost/algorithm/string.hpp>
-#include<boost/thread/mutex.hpp>
+#include "Omega.hpp"
+#include "Scene.hpp"
+#include "TimeStepper.hpp"
+#include "ThreadRunner.hpp"
+#include <lib/base/Math.hpp>
+#include <lib/multimethods/FunctorWrapper.hpp>
+#include <lib/multimethods/Indexable.hpp>
+#include <lib/serialization/ObjectIO.hpp>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
-
-#include<lib/serialization/ObjectIO.hpp>
-
-
-#include<cxxabi.h>
 
 class RenderMutexLock: public boost::mutex::scoped_lock{
 	public:
-	RenderMutexLock(): boost::mutex::scoped_lock(Omega::instance().renderMutex){/* cerr<<"Lock renderMutex"<<endl; */}
-	~RenderMutexLock(){/* cerr<<"Unlock renderMutex"<<endl;*/ }
+	RenderMutexLock(): boost::mutex::scoped_lock(Omega::instance().renderMutex){}
+	~RenderMutexLock(){}
 };
 
 CREATE_LOGGER(Omega);
@@ -38,17 +34,19 @@ const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs
 
 const shared_ptr<Scene>& Omega::getScene(){return scenes.at(currentSceneNb);}
 void Omega::resetCurrentScene(){ RenderMutexLock lock; scenes.at(currentSceneNb) = shared_ptr<Scene>(new Scene);}
-void Omega::resetScene(){ resetCurrentScene(); }//RenderMutexLock lock; scene = shared_ptr<Scene>(new Scene);}
+void Omega::resetScene(){ resetCurrentScene(); }
 void Omega::resetAllScenes(){
 	RenderMutexLock lock;
 	scenes.resize(1);
 	scenes[0] = shared_ptr<Scene>(new Scene);
 	currentSceneNb=0;
 }
+
 int Omega::addScene(){
 	scenes.push_back(shared_ptr<Scene>(new Scene));
 	return scenes.size()-1;
 }
+
 void Omega::switchToScene(int i) {
 	if (i<0 || i>=int(scenes.size())) {
 		LOG_ERROR("Scene "<<i<<" has not been created yet, no switch.");
@@ -57,8 +55,6 @@ void Omega::switchToScene(int i) {
 	currentSceneNb=i;
 }
 
-
-
 Real Omega::getRealTime(){
 	return (boost::posix_time::microsec_clock::local_time()-startupLocalTime).total_milliseconds()/1e3;
 }
@@ -66,7 +62,6 @@ Real Omega::getRealTime(){
 boost::posix_time::time_duration Omega::getRealTime_duration(){
 	return boost::posix_time::microsec_clock::local_time()-startupLocalTime;
 }
-
 
 void Omega::initTemps(){
 	char dirTemplate[]="/tmp/yade-XXXXXX";
@@ -124,7 +119,6 @@ void Omega::run(){
 		simulationLoop->start();
 	}
 }
-
 
 void Omega::pause(){
 	if (simulationLoop && simulationLoop->looping()){
@@ -196,7 +190,6 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 	}
 }
 
-
 bool Omega::isInheritingFrom(const string& className, const string& baseClassName){
 	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
@@ -237,9 +230,7 @@ void Omega::loadSimulation(const string& f, bool quiet){
 	if(isMem && memSavedSimulations.count(f)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+f);
 	
 	if(!quiet) LOG_INFO("Loading file "+f);
-	//shared_ptr<Scene> scene = getScene();
 	shared_ptr<Scene>& scene = scenes[currentSceneNb];
-	//shared_ptr<Scene>& scene = getScene();
 	{
 		stop(); // stop current simulation if running
 		resetScene();
@@ -257,14 +248,10 @@ void Omega::loadSimulation(const string& f, bool quiet){
 	if(!quiet) LOG_DEBUG("Simulation loaded");
 }
 
-
-
 void Omega::saveSimulation(const string& f, bool quiet){
 	if(f.size()==0) throw runtime_error("f of file to save has zero length.");
 	if(!quiet) LOG_INFO("Saving file " << f);
-	//shared_ptr<Scene> scene = getScene();
 	shared_ptr<Scene>& scene = scenes[currentSceneNb];
-	//shared_ptr<Scene>& scene = getScene();
 	if(boost::algorithm::starts_with(f,":memory:")){
 		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
 		ostringstream oss;
@@ -272,12 +259,7 @@ void Omega::saveSimulation(const string& f, bool quiet){
 		memSavedSimulations[f]=oss.str();
 	}
 	else {
-		// handles automatically the XML/binary distinction as well as gz/bz2 compression
 		yade::ObjectIO::save(f,"scene",scene); 
 	}
 	sceneFile=f;
 }
-
-
-
-
