@@ -56,11 +56,14 @@ class BodyContainer: public Serializable{
 		Body::id_t insert(shared_ptr<Body>&);
 		void clear();
 		iterator begin() {
-			iterator temp(body.begin()); temp.end=body.end();
+			iterator temp(body.begin());
+			temp.end=body.end();
 			return (body.begin()==body.end() || *temp)?temp:++temp;}
-		iterator end() { iterator temp(body.end()); temp.end=body.end(); return temp;}
-		const_iterator begin() const { return begin();}
-		const_iterator end() const { return end();}
+		iterator end() {
+			iterator temp(body.end());
+			temp.end=body.end();
+			return temp;
+		}
 
 		size_t size() const { return body.size(); }
 		shared_ptr<Body>& operator[](unsigned int id){ return body[id];}

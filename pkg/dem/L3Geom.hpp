@@ -53,12 +53,7 @@ struct L3Geom: public GenericSpheresContact{
 		* Multiplication of vector with quaternion is internally done by converting to matrix first, anyway
 		* We need to extract local axes, and that is easier to be done from Matrix3r (columns)
 		*/
-		//#define L3_TRSF_QUATERNION
-		#ifdef L3_TRSF_QUATERNION
-			((Quaternionr,trsf,Quaternionr::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
-		#else
-			((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
-		#endif
+		((Matrix3r,trsf,Matrix3r::Identity(),,"Transformation (rotation) from global to local coordinates. (the translation part is in :yref:`GenericSpheresContact.contactPoint`)"))
 		((Vector3r,F,Vector3r::Zero(),,"Applied force in local coordinates [debugging only, will be removed]"))
 		,
 		/*init*/
@@ -66,8 +61,6 @@ struct L3Geom: public GenericSpheresContact{
 		,
 		/*ctor*/ createIndex();
 		, /*py*/
-		//.def_readonly("uN",&L3Geom::uN,"Normal component of *u*")
-		//.def_readonly("uT",&L3Geom::uT,"Shear component of *u*")
 	);
 	REGISTER_CLASS_INDEX(L3Geom,GenericSpheresContact);
 };

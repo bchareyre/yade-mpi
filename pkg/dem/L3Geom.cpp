@@ -21,20 +21,11 @@ L3Geom::~L3Geom(){}
 void L3Geom::applyLocalForceTorque(const Vector3r& localF, const Vector3r& localT, const Interaction* I, Scene* scene, NormShearPhys* nsp) const {
 
 	Vector2r foo; // avoid undefined ~Vector2r with clang?
-	#ifdef L3_TRSF_QUATERNION
-		Vector3r globF=trsf.conjugate()*localF;
-	#else
-		Vector3r globF=trsf.transpose()*localF; // trsf is orthonormal, therefore inverse==transpose
-	#endif
+	Vector3r globF=trsf.transpose()*localF; // trsf is orthonormal, therefore inverse==transpose
 	Vector3r x1c(normal*(refR1+.5*u[0])), x2c(-normal*(refR2+.5*u[0]));
 	if(nsp){ nsp->normalForce=normal*globF.dot(normal); nsp->shearForce=globF-nsp->normalForce; }
 	Vector3r globT=Vector3r::Zero();
-	// add torque, if any
-	#ifdef L3_TRSF_QUATERNION
-		if(localT!=Vector3r::Zero()){	globT=trsf.conjugate()*localT; }
-	#else
-		if(localT!=Vector3r::Zero()){	globT=trsf.transpose()*localT; }
-	#endif
+	if(localT!=Vector3r::Zero()){	globT=trsf.transpose()*localT; }
 	// apply force and torque
 	scene->forces.addForce(I->getId1(), globF); scene->forces.addTorque(I->getId1(),x1c.cross( globF)+globT);
 	scene->forces.addForce(I->getId2(),-globF); scene->forces.addTorque(I->getId2(),x2c.cross(-globF)-globT);
@@ -97,12 +88,7 @@ void Ig2_Sphere_Sphere_L3Geom::handleSpheresLikeContact(const shared_ptr<Interac
 		// initial local y-axis orientation, in the xz or xy plane, depending on which component is larger to avoid singularities
 		Vector3r locY=normal.cross(std::abs(normal[1])<std::abs(normal[2])?Vector3r::UnitY():Vector3r::UnitZ()); locY-=locX*locY.dot(locX); locY.normalize();
 		Vector3r locZ=normal.cross(locY);
-		#ifdef L3_TRSF_QUATERNION
-			Matrix3r trsf; trsf.row(0)=locX; trsf.row(1)=locY; trsf.row(2)=locZ;
-			g.trsf=Quaternionr(trsf); // from transformation matrix
-		#else
-			g.trsf.row(0)=locX; g.trsf.row(1)=locY; g.trsf.row(2)=locZ;
-		#endif
+		g.trsf.row(0)=locX; g.trsf.row(1)=locY; g.trsf.row(2)=locZ;
 		g.u=Vector3r(uN,0,0); // zero shear displacement
 		if(distFactor<0) g.u0[0]=uN;
 		// L6Geom::phi is initialized to Vector3r::Zero() automatically
@@ -150,39 +136,25 @@ void Ig2_Sphere_Sphere_L3Geom::handleSpheresLikeContact(const shared_ptr<Interac
 	// compute current transformation, by updating previous axes
 	// the X axis can be prescribed directly (copy of normal)
 	// the mutual motion on the contact does not change transformation
-	#ifdef L3_TRSF_QUATERNION
-		const Matrix3r prevTrsf(g.trsf.toRotationMatrix());
-		Quaternionr prevTrsfQ(g.trsf);
-	#else
-		const Matrix3r prevTrsf(g.trsf); // could be reference perhaps, but we need it to compute midTrsf (if applicable)
-	#endif
+	const Matrix3r prevTrsf(g.trsf); // could be reference perhaps, but we need it to compute midTrsf (if applicable)
 	Matrix3r currTrsf; currTrsf.row(0)=currNormal;
 	for(int i=1; i<3; i++){
 		currTrsf.row(i)=prevTrsf.row(i)-prevTrsf.row(i).cross(normRotVec)-prevTrsf.row(i).cross(normTwistVec);
 	}
-	#ifdef L3_TRSF_QUATERNION
-		Quaternionr currTrsfQ(currTrsf);
-		if((scene->iter % trsfRenorm)==0 && trsfRenorm>0) currTrsfQ.normalize();
-	#else
-		if((scene->iter % trsfRenorm)==0 && trsfRenorm>0){
-			#if 1
-				currTrsf.row(0).normalize();
-				currTrsf.row(1)-=currTrsf.row(0)*currTrsf.row(1).dot(currTrsf.row(0)); // take away y projected on x, to stabilize numerically
-				currTrsf.row(1).normalize();
-				currTrsf.row(2)=currTrsf.row(0).cross(currTrsf.row(1));
-				currTrsf.row(2).normalize();
-			#else
-				currTrsf=Matrix3r(Quaternionr(currTrsf).normalized());
-			#endif
-			#ifdef YADE_DEBUG
-				if(std::abs(currTrsf.determinant()-1)>.05){
-					LOG_ERROR("##"<<I->getId1()<<"+"<<I->getId2()<<", |trsf|="<<currTrsf.determinant());
-					g.trsf=currTrsf;
-					throw runtime_error("Transformation matrix far from orthonormal.");
-				}
-			#endif
-		}
-	#endif
+  if((scene->iter % trsfRenorm)==0 && trsfRenorm>0){
+      currTrsf.row(0).normalize();
+      currTrsf.row(1)-=currTrsf.row(0)*currTrsf.row(1).dot(currTrsf.row(0)); // take away y projected on x, to stabilize numerically
+      currTrsf.row(1).normalize();
+      currTrsf.row(2)=currTrsf.row(0).cross(currTrsf.row(1));
+      currTrsf.row(2).normalize();
+    #ifdef YADE_DEBUG
+      if(std::abs(currTrsf.determinant()-1)>.05){
+        LOG_ERROR("##"<<I->getId1()<<"+"<<I->getId2()<<", |trsf|="<<currTrsf.determinant());
+        g.trsf=currTrsf;
+        throw runtime_error("Transformation matrix far from orthonormal.");
+      }
+    #endif
+  }
 
 	/* Previous local trsf u'⁻ must be updated to current u'⁰. We have transformation T⁻ and T⁰,
 		δ(a) denotes increment of a as defined above.  Two possibilities:
@@ -196,12 +168,7 @@ void Ig2_Sphere_Sphere_L3Geom::handleSpheresLikeContact(const shared_ptr<Interac
 			but it would have to be verified somehow.
 	*/
 	// if requested via approxMask, just use prevTrsf
-	#ifdef L3_TRSF_QUATERNION
-		Quaternionr midTrsf=(approxMask&APPROX_NO_MID_TRSF) ? prevTrsfQ : prevTrsfQ.slerp(.5,currTrsfQ);
-	#else
-		Quaternionr midTrsf=(approxMask&APPROX_NO_MID_TRSF) ? Quaternionr(prevTrsf) : Quaternionr(prevTrsf).slerp(.5,Quaternionr(currTrsf));
-	#endif
-	//cerr<<"prevTrsf=\n"<<prevTrsf<<", currTrsf=\n"<<currTrsf<<", midTrsf=\n"<<Matrix3r(midTrsf)<<endl;
+	Quaternionr midTrsf=(approxMask&APPROX_NO_MID_TRSF) ? Quaternionr(prevTrsf) : Quaternionr(prevTrsf).slerp(.5,Quaternionr(currTrsf));
 	
 	// updates of geom here
 
@@ -209,11 +176,7 @@ void Ig2_Sphere_Sphere_L3Geom::handleSpheresLikeContact(const shared_ptr<Interac
 	g.u+=midTrsf*relShearDu;
 	//cerr<<"midTrsf=\n"<<midTrsf<<",relShearDu="<<relShearDu<<", transformed "<<midTrsf*relShearDu<<endl;
 	g.u[0]=uN; // this does not have to be computed incrementally
-	#ifdef L3_TRSF_QUATERNION
-		g.trsf=currTrsfQ;
-	#else
-		g.trsf=currTrsf;
-	#endif
+	g.trsf=currTrsf;
 
 	// GenericSpheresContact
 	g.refR1=r1; g.refR2=r2;
@@ -337,13 +300,7 @@ void Gl1_L6Geom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&,
 void Gl1_L3Geom::draw(const shared_ptr<IGeom>& ig, bool isL6Geom, const Real& phiScale){
 	const L3Geom& g(ig->cast<L3Geom>());
 	glTranslatev(g.contactPoint);
-	#ifdef L3_TRSF_QUATERNION
-		//glMultMatrixd(Eigen::Affine3d(Matrix3r(g.trsf).transpose()).data());
-		glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(Matrix3r(g.trsf).transpose()).data());
-	#else
-		//glMultMatrixd(Eigen::Affine3d(g.trsf.transpose()).data());
-		glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(g.trsf.transpose()).data());
-	#endif
+	glMultMatrix(Eigen::Transform<Real,3,Eigen::Affine>(g.trsf.transpose()).data());
 	Real rMin=g.refR1<=0?g.refR2:(g.refR2<=0?g.refR1:min(g.refR1,g.refR2));
 	if(axesWd>0){
 		glLineWidth(axesWd);
