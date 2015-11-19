@@ -20,6 +20,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
+#include <cxxabi.h>
+
 
 class RenderMutexLock: public boost::mutex::scoped_lock{
 	public:
