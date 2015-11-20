@@ -12,7 +12,7 @@ Citing the Yade Project as a whole (the lazy citation method)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 If it is not possible to choose the right chapter (but please try), you may cite the documentation [yade:doc]_ as a whole:
 
-	V. Šmilauer et al. (2015), Yade Documentation 2nd ed. The Yade Project. DOI 10.5281/zenodo.32409 (http://yade-dem.org/doc/)
+	V. Šmilauer et al. (2015), Yade Documentation 2nd ed. The Yade Project. DOI 10.5281/zenodo.34073 (http://yade-dem.org/doc/)
 
 Citing chapters of Yade Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
