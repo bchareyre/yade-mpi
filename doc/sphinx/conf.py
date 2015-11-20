@@ -447,7 +447,8 @@ my_latex_preamble=r'''
 
 % Metadata of the pdf output
 \hypersetup{pdftitle={Yade Documentation}}
-\hypersetup{pdfauthor={V. Smilauer, E. Catalano, B. Chareyre, S. Dorofeenko, J. Duriez, A. Gladky, J. Kozicki, C. Modenese, L. Scholtes, L. Sibille, J. Stransky, K. Thoeni}}
+\hypersetup{pdfauthor={Smilauer, V., et al.}}
+\hypersetup{pdfkeywords={Discrete element method, granular materials, contact law, hydromechanical coupling}}
 
 % symbols
 \let\mat\boldsymbol % matrix
@@ -760,7 +761,7 @@ latex_elements=dict(
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index-toctree', 'Yade.tex', u'Yade Documentation',
+   ('index-toctree', 'Yade.tex', u'Yade Documentation',
    u'Václav Šmilauer', 'manual'),
    ('index-toctree_manuals', 'YadeManuals.tex', u'Yade Tutorial and Manuals',
    u'Václav Šmilauer', 'manual'),
