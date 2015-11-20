@@ -25,3 +25,11 @@ It will be create/update $outDir/{html,latex}. The latex file (Yade.tex) is to b
 ====
 
 ipython_console_highlighting.py is copied from matplotlib's trunk/matplotlib/lib/matplotlib/sphinxext
+
+
+Generating yade documentation as a book (for the official chapter references)
+=============================================================================
+
+First run yadeSphinx.py as explained above. It will generate modules documentation and other things that we use for generating the book.
+Second run yadeBookSphinx.py (same command as above, adding 'Book' in the script name)
+

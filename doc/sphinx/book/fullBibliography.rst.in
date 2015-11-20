@@ -1,0 +1,6 @@
+.. This complete list of references is used for tex build, in which sectionning of the bibliography fails (see )
+
+@bib2rst.bib2rst('../yade-docref.bib')@
+@bib2rst.bib2rst('../yade-articles.bib')@
+@bib2rst.bib2rst('../yade-theses.bib')@
+@bib2rst.bib2rst('../references.bib')@
