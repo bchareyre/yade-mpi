@@ -102,12 +102,6 @@ def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 	else:
 		uri=(('%%yade.wrapper#yade.wrapper.%s'%target) if writer=='latex' else 'yade.wrapper.html#yade.wrapper.%s'%target)
 		#print writer,uri
-	if 0:
-		refnode=addnodes.pending_xref(rawtext,reftype=role,refexplicit=explicitText,reftarget=target)
-		#refnode.line=lineno
-		#refnode+=nodes.literal(rawtext,text,classes=['ref',role])
-		return [refnode],[]
-		#ret.rawtext,reftype=role,
 	else:
 		return nodes.reference(rawtext,docutils.utils.unescape(text),refuri=uri,**options)
 	#return [refnode],[]

@@ -604,16 +604,6 @@ def plot(noShow=False,subPlots=True):
 		# pylab.show() # this blocks for some reason; call show on figures directly
 		for f in figs:
 			f.show()
-			# should have fixed https://bugs.launchpad.net/yade/+bug/606220, but does not work apparently
-			if 0:
-				import matplotlib.backend_bases
-				if 'CloseEvent' in dir(matplotlib.backend_bases):
-					def closeFigureCallback(event):
-						ff=event.canvas.figure
-						# remove closed axes from our update list
-						global currLineRefs
-						currLineRefs=[l for l in currLineRefs if l.line.axes.get_figure()!=ff] 
-					f.canvas.mpl_connect('close_event',closeFigureCallback)
 	else:
 		figs=list(set([l.line.get_figure() for l in currLineRefs]))
 		if len(figs)==1: return figs[0]

@@ -56,15 +56,6 @@ def openUrl(url):
 		else: webWindows=webWindows[1:]+[webWindows[0]]
 	web=webWindows[-1]
 	web.load(QUrl(url)); web.setWindowTitle(url);
-	if 0:
-		def killSidebar(result):
-			frame=web.page().mainFrame()
-			frame.evaluateJavaScript("var bv=$('.bodywrapper'); bv.css('margin','0 0 0 0');")
-			frame.evaluateJavaScript("var sbw=$('.sphinxsidebarwrapper'); sbw.css('display','none');")
-			frame.evaluateJavaScript("var sb=$('.sphinxsidebar'); sb.css('display','none'); ")
-			frame.evaluateJavaScript("var sb=$('.sidebar'); sb.css('width','0px'); ")
-			web.loadFinished.disconnect(killSidebar)
-		web.loadFinished.connect(killSidebar)
 	web.show();	web.raise_()
 
 

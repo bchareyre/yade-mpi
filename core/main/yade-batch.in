@@ -115,13 +115,6 @@ finished: %s
 		ret+='<td>%d%s</td>'%(self.nCores,(' ('+','.join([str(c) for c in self.cores])+')') if self.cores and self.status=='RUNNING' else '')
 		# TODO: make clickable so that it can be served full-size
 		if os.path.exists(self.plotsFile):
-			if 0: pass
-				## all this mess to embed SVG; clicking on it does not work, though
-				## question posted at http://www.abclinuxu.cz/poradna/linux/show/314041
-				## see also http://www.w3schools.com/svg/svg_inhtml.asp and http://dutzend.blogspot.com/2010/04/svg-im-anklickbar-machen.html
-				#img='<object data="/jobs/%d/plots" type="%s" width="300px" alt="[plots]"/>'%(self.num,yade.remote.plotImgMimetype)
-				#img='<iframe src="/jobs/%d/plots" type="%s" width="300px" alt="[plots]"/>'%(self.num,yade.remote.plotImgMimetype)
-				#img='<embed src="/jobs/%d/plots" type="%s" width="300px" alt="[plots]"/>'%(self.num,yade.remote.plotImgMimetype)a
 			img='<img src="/jobs/%d/plots" width="300px" alt="[plots]">'%(self.num)
 			ret+='<td><a href="/jobs/%d/plots">%s</a></td>'%(self.num,img)
 		else: ret+='<td> (no plots) </td>'
