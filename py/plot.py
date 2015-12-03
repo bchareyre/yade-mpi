@@ -352,7 +352,7 @@ class LineRef:
 						#	dx,dy=[numpy.average(numpy.diff(dta[current-window:current])) for dta in self.xdata,self.ydata]
 						#except IndexError: pass
 						# there must be an easier way to find on-screen derivative angle, ask on the matplotlib mailing list
-						axes=self.line.get_axes()
+						axes=self.line.axes()
 						p=axes.patch; xx,yy=p.get_verts()[:,0],p.get_verts()[:,1]; size=max(xx)-min(xx),max(yy)-min(yy)
 						aspect=(size[1]/size[0])*(1./axes.get_data_ratio())
 						angle=math.atan(aspect*dy/dx)
@@ -435,7 +435,7 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 				# if current value is NaN, use zero instead
 				scatter=pylab.scatter(scatterPt[0] if not math.isnan(scatterPt[0]) else 0,scatterPt[1] if not math.isnan(scatterPt[1]) else 0,s=scatterSize,color=line.get_color(),**scatterMarkerKw)
 				currLineRefs.append(LineRef(line,scatter,line2,data[pStrip],data[d[0]]))
-			axes=line.get_axes()
+			axes=line.axes
 			labelLoc=(legendLoc[0 if isY1 else 1] if y2Exists>0 else 'best')
 			l=pylab.legend(loc=labelLoc)
 			if hasattr(l,'draggable'): l.draggable(True)
@@ -472,7 +472,7 @@ def liveUpdate(timestamp):
 		for l in currLineRefs:
 			l.update()
 			figs.add(l.line.get_figure())
-			axes.add(l.line.get_axes())
+			axes.add(l.line.axes)
 			linesData.add(id(l.ydata))
 		# find callables in y specifiers, create new lines if necessary
 		for ax in axes:
@@ -591,7 +591,7 @@ def plot(noShow=False,subPlots=True):
 	"""
 	createPlots(subPlots=subPlots)
 	global currLineRefs
-	figs=set([l.line.get_axes().get_figure() for l in currLineRefs])
+	figs=set([l.line.axes.get_figure() for l in currLineRefs])
 	if not hasattr(list(figs)[0],'show') and not noShow:
 		import warnings
 		warnings.warn('plot.plot not showing figure (matplotlib using headless backend?)')
@@ -612,10 +612,10 @@ def plot(noShow=False,subPlots=True):
 						ff=event.canvas.figure
 						# remove closed axes from our update list
 						global currLineRefs
-						currLineRefs=[l for l in currLineRefs if l.line.get_axes().get_figure()!=ff] 
+						currLineRefs=[l for l in currLineRefs if l.line.axes.get_figure()!=ff] 
 					f.canvas.mpl_connect('close_event',closeFigureCallback)
 	else:
-		figs=list(set([l.line.get_axes().get_figure() for l in currLineRefs]))
+		figs=list(set([l.line.get_figure() for l in currLineRefs]))
 		if len(figs)==1: return figs[0]
 		else: return figs
 
