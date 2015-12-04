@@ -110,8 +110,6 @@ struct Ig2_Sphere_Sphere_L3Geom: public IGeomFunctor{
 		// common code for {sphere,facet,wall}+sphere contacts
 		// facet&wall will get separated if L3Geom subclass with exact branch vector is created
 		void handleSpheresLikeContact(const shared_ptr<Interaction>& I, const State& state1, const State& state2, const Vector3r& shift2, bool is6Dof, const Vector3r& normal, const Vector3r& contPt, Real uN, Real r1, Real r2);
-		virtual void preStep(){ scene->setLocalCoords(true); }
-
 
 	enum { APPROX_NO_MID_TRSF=1, APPROX_NO_MID_NORMAL=2, APPROX_NO_RENORM_MID_NORMAL=4 };
 

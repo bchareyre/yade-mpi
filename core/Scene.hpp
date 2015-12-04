@@ -73,13 +73,6 @@ class Scene: public Serializable{
 
 		void postLoad(Scene&);
 
-		// bits for Scene::flags
-		enum { LOCAL_COORDS=1, COMPRESSION_NEGATIVE=2 }; /* add powers of 2 as needed */
-		// convenience accessors
-		bool usesLocalCoords() const { return flags & LOCAL_COORDS; }
-		void setLocalCoords(bool d){ if(d) flags|=LOCAL_COORDS; else flags&=~(LOCAL_COORDS); }
-		bool compressionNegative() const { return flags & COMPRESSION_NEGATIVE; }
-		void setCompressionNegative(bool d){ if(d) flags|=COMPRESSION_NEGATIVE; else flags&=~(COMPRESSION_NEGATIVE); }
 		boost::posix_time::ptime prevTime; //Time value on the previous step
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Scene,Serializable,"Object comprising the whole simulation.",
@@ -96,7 +89,6 @@ class Scene: public Serializable{
 		((bool,doSort,false,Attr::readonly,"Used, when new body is added to the scene."))
 		((bool,runInternalConsistencyChecks,true,Attr::hidden,"Run internal consistency check, right before the very first simulation step."))
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
-		((int,flags,0,Attr::readonly,"Various flags of the scene; 1 (Scene::LOCAL_COORDS): use local coordinate system rather than global one for per-interaction quantities (set automatically from the functor)."))
 
 		((list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
 		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))
@@ -118,8 +110,6 @@ class Scene: public Serializable{
 			SpeedElements.Zero();
 		,
 		/* py */
-		.add_property("localCoords",&Scene::usesLocalCoords,"Whether local coordianate system is used on interactions (set by :yref:`IGeomFunctor`).")
-		.add_property("compressionNegative",&Scene::usesLocalCoords,"Whether the convention is that compression has negative sign (set by :yref:`IGeomFunctor`).")
 	);
 	DECLARE_LOGGER;
 };

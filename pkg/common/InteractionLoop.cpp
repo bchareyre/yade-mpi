@@ -22,14 +22,14 @@ void InteractionLoop::pyHandleCustomCtorArgs(boost::python::tuple& t, boost::pyt
 
 void InteractionLoop::action(){
 	// update Scene* of the dispatchers
-	geomDispatcher->scene=physDispatcher->scene=lawDispatcher->scene=scene;
+	lawDispatcher->scene=scene;
+	physDispatcher->scene=scene;
+	geomDispatcher->scene=scene;
+	
 	// ask dispatchers to update Scene* of their functors
-	geomDispatcher->updateScenePtr(); physDispatcher->updateScenePtr(); lawDispatcher->updateScenePtr();
-
-	// call Ig2Functor::preStep
-	FOREACH(const shared_ptr<IGeomFunctor>& ig2, geomDispatcher->functors) ig2->preStep();
-	// call LawFunctor::preStep
-	FOREACH(const shared_ptr<LawFunctor>& law2, lawDispatcher->functors) law2->preStep();
+	geomDispatcher->updateScenePtr();
+	physDispatcher->updateScenePtr();
+	lawDispatcher->updateScenePtr();
 
 	/*
 		initialize callbacks; they return pointer (used only in this timestep) to the function to be called
@@ -42,14 +42,17 @@ void InteractionLoop::action(){
 		callbackPtrs.push_back(cb->stepInit());
 	}
 	assert(callbackPtrs.size()==callbacks.size());
-	size_t callbacksSize=callbacks.size();
+	const size_t callbacksSize=callbacks.size();
 
 	// cache transformed cell size
-	Matrix3r cellHsize; if(scene->isPeriodic) cellHsize=scene->cell->hSize;
+	Matrix3r cellHsize = Matrix3r::Zero();
+	if(scene->isPeriodic) {
+		cellHsize=scene->cell->hSize;
+	}
 
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
-	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
+	const bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
 
 	#ifdef YADE_OPENMP
 	const long size=scene->interactions->size();
@@ -59,8 +62,6 @@ void InteractionLoop::action(){
 	#else
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 	#endif
-		// keep the following newline, my (edx) preprocessor outputs garbage code otherwise!
-
 		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
@@ -69,12 +70,18 @@ void InteractionLoop::action(){
 		const shared_ptr<Body>& b1_=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
 
-		if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I); continue; }
+		if(!b1_ || !b2_){
+			LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!");
+			scene->interactions->requestErase(I);
+			continue;
+		}
     
     // Skip interaction with clumps
     if (b1_->isClump() || b2_->isClump()) { continue; }
+		
 		// we know there is no geometry functor already, take the short path
 		if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
+		
 		// no interaction geometry for either of bodies; no interaction possible
 		if(!b1_->shape || !b2_->shape) { assert(!I->isReal()); continue; }
 
@@ -83,8 +90,10 @@ void InteractionLoop::action(){
 		if(!I->functorCache.geom){
 			I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
 			// returns NULL ptr if no functor exists; remember that and shortcut
-			if(!I->functorCache.geom) {I->functorCache.geomExists=false; continue; }
-					
+			if(!I->functorCache.geom) {
+				I->functorCache.geomExists=false;
+				continue;
+			}
 		}
 		// arguments for the geom functor are in the reverse order (dispatcher would normally call goReverse).
 		// we don't remember the fact that is reverse, so we swap bodies within the interaction
@@ -95,11 +104,13 @@ void InteractionLoop::action(){
 		const shared_ptr<Body>& b2=swap?b1_:b2_;
 
 		assert(I->functorCache.geom);
+		
 		bool wasReal=I->isReal();
 		bool geomCreated;
 		if(!scene->isPeriodic){
 			geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
-		} else { // handle periodicity
+		} else {
+			// handle periodicity
 			Vector3r shift2=cellHsize*I->cellDist.cast<Real>();
 			// in sheared cell, apply shear on the mutual position as well
 			geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
@@ -115,7 +126,7 @@ void InteractionLoop::action(){
 			I->functorCache.phys=physDispatcher->getFunctor2D(b1->material,b2->material,swap);
 			assert(!swap); // InteractionPhysicsEngineUnits are symmetric
 		}
-		//assert(I->functorCache.phys);
+		
 		if(!I->functorCache.phys){
 			throw std::runtime_error("Undefined or ambiguous IPhys dispatch for types "+b1->material->getClassName()+" and "+b2->material->getClassName()+".");
 		}
@@ -131,12 +142,12 @@ void InteractionLoop::action(){
 			I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->geom,I->phys,swap);
 			if(!I->functorCache.constLaw){
 				LOG_FATAL("None of given Law2 functors can handle interaction #"<<I->getId1()<<"+"<<I->getId2()<<", types geom:"<<I->geom->getClassName()<<"="<<I->geom->getClassIndex()<<" and phys:"<<I->phys->getClassName()<<"="<<I->phys->getClassIndex()<<" (LawDispatcher::getFunctor2D returned empty functor)");
-				//abort();
 				exit(1);
 			}
 			assert(!swap); // reverse call would make no sense, as the arguments are of different types
 		}
 		assert(I->functorCache.constLaw);
+		
 		//If the functor return false, the interaction is reset
 		if (!I->functorCache.constLaw->go(I->geom,I->phys,I.get())) scene->interactions->requestErase(I);
 
