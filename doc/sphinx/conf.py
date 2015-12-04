@@ -102,8 +102,7 @@ def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 	else:
 		uri=(('%%yade.wrapper#yade.wrapper.%s'%target) if writer=='latex' else 'yade.wrapper.html#yade.wrapper.%s'%target)
 		#print writer,uri
-	else:
-		return nodes.reference(rawtext,docutils.utils.unescape(text),refuri=uri,**options)
+	return nodes.reference(rawtext,docutils.utils.unescape(text),refuri=uri,**options)
 	#return [refnode],[]
 
 def ydefault_role(role,rawtext,text,lineno,inliner,options={},content=[]):
