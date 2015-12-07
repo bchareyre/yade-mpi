@@ -174,7 +174,7 @@ install the software packages listed above. Their names in other distributions c
 names of the Debian-packages.
 
  
-.. warning:: If you have Ubuntu 14.04 Trusty, you need to add -DCMAKE_CXX_FLAGS="-frounding-math"
+.. warning:: If you have Ubuntu 14.04 Trusty, you need to add -DCMAKE_CXX_FLAGS=-frounding-math
  during the configuration step of compilation (see below) or to install libcgal-dev 
  from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
  Otherwise the following error occurs on AMD64 architectures::
