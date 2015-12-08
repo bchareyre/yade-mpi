@@ -57,8 +57,6 @@ void ZECollider::action(){
 		periodic=scene->isPeriodic;
 	}
 
-		findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
-
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();
 			FOREACH(const shared_ptr<Body>& b, *scene->bodies){

@@ -35,8 +35,6 @@ PersistentTriangulationCollider::~PersistentTriangulationCollider()
 
 void PersistentTriangulationCollider::action ()
 {
-	// compatibility func, can be removed later
-	findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
 	// update bounds
 	boundDispatcher->scene=scene; boundDispatcher->action();
 
