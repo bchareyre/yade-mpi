@@ -526,10 +526,8 @@ def hexaNet( radius, cornerCoord=[0,0,0], xLength=1., yLength=0.5, mos=0.08, a=0
 	:param isSymmetric: defines if the net is symmetric with respect to the y-axis
 
 	:return: set of spheres which defines the net (net) and exact dimensions of the net (lx,ly).
-	
-	note::
-	This packing works for the WireMatPM only. The particles at the corner are always generated first. For examples on how to use this packing see examples/WireMatPM. In order to create the proper interactions for the net the interaction radius has to be adapted in the simulation.
 
+	.. note:: This packing works for the WireMatPM only. The particles at the corner are always generated first. For examples on how to use this packing see examples/WireMatPM. In order to create the proper interactions for the net the interaction radius has to be adapted in the simulation.
 	"""
 	# check input dimension
 	if(xLength<mos): raise ValueError("xLength must be greater than mos!");
