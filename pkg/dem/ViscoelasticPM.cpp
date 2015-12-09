@@ -101,7 +101,9 @@ bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 		// Prevent appearing of attraction forces due to a viscous component
 		// [Radjai2011], page 3, equation [1.7]
 		// [Schwager2007]
-		const Real normForceReal = phys.kn * geom.penetrationDepth + phys.cn * normalVelocity;
+		phys.Fn = phys.kn * geom.penetrationDepth;
+		phys.Fv = phys.cn * normalVelocity;
+		const Real normForceReal = phys.Fn + phys.Fv;
 		if (normForceReal < 0) {
 			phys.normalForce = Vector3r::Zero();
 		} else {

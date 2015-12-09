@@ -55,6 +55,8 @@ class ViscElPhys : public FrictPhys{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"IPhys created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,,"Normal viscous constant"))
 		((Real,cs,NaN,,"Shear viscous constant"))
+		((Real,Fn,0.0,,"Normal force of the contact"))
+		((Real,Fv,0.0,,"Viscous force of the contact"))
 		((Real,mR,0.0,,"Rolling resistance, see [Zhou1999536]_."))
 #ifdef YADE_SPH
 		((bool,SPHmode,false,,"True, if SPH-mode is enabled."))
