@@ -35,10 +35,6 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 
 		while(j>=0 && v[j]>viInit){
 			v[j+1]=v[j];
-			#ifdef PISC_DEBUG
-				if(watchIds(v[j].id,viInit.id)) cerr<<"Swapping #"<<v[j].id<<"  with #"<<viInit.id<<" ("<<setprecision(80)<<v[j].coord<<">"<<setprecision(80)<<viInit.coord<<" along axis "<<v.axis<<")"<<endl;
-				if(v[j].id==viInit.id){ cerr<<"Inversion of body #"<<v[j].id<<" with itself, "<<v[j].flags.isMin<<" & "<<viInit.flags.isMin<<", isGreater "<<(v[j]>viInit)<<", "<<(v[j].coord>viInit.coord)<<endl; j--; continue; }
-			#endif
 			// no collisions without bounding boxes
 			// also, do not collide body with itself; it sometimes happens for facets aligned perpendicular to an axis, for reasons that are not very clear
 			// see https://bugs.launchpad.net/yade/+bug/669095
@@ -229,9 +225,6 @@ void InsertionSortCollider::action(){
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
 		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene);
-
-		// compatibility block, can be removed later
-		findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
 
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();
@@ -494,23 +487,9 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		// find body of which minimum when taken as period start will make the gap smaller
 		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
 		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
-		#ifdef PISC_DEBUG
-		if(watchIds(id1,id2)){
-			TRVAR4(id1,id2,axis,dim);
-			TRVAR4(minima[3*id1+axis],maxima[3*id1+axis],minima[3*id2+axis],maxima[3*id2+axis]);
-			TRVAR2(cellWrapRel(m1,m2,m2+dim),cellWrapRel(m2,m1,m1+dim));
-			TRVAR3(m1,m2,wMn);
-		}
-		#endif
 		int pmn1,pmx1,pmn2,pmx2;
 		Real mn1=cellWrap(m1,wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
 		Real mn2=cellWrap(m2,wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
-		#ifdef PISC_DEBUG
-			if(watchIds(id1,id2)){
-				TRVAR4(mn1,mx1,mn2,mx2);
-				TRVAR4(pmn1,pmx1,pmn2,pmx2);
-			}
-		#endif
 		if((pmn1!=pmx1) || (pmn2!=pmx2)){
 			if (allowBiggerThanPeriod) {
 				// If both bodies are bigger, we place them in the (0,0,0) period
@@ -531,9 +510,6 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 			periods[axis]=(int)(pmn1-pmn2);
 			if(!(mn1<=mx2 && mx1 >= mn2)) return false;}
 	}
-	#ifdef PISC_DEBUG
-		if(watchIds(id1,id2)) LOG_DEBUG("Overlap #"<<id1<<"+#"<<id2<<", periods "<<periods);
-	#endif
 	return true;
 }
 
@@ -553,4 +529,10 @@ boost::python::tuple InsertionSortCollider::dumpBounds(){
 		}
 	}
 	return boost::python::make_tuple(bl[0],bl[1],bl[2]);
+}
+
+void InsertionSortCollider::VecBounds::updatePeriodicity(Scene* scene) {
+	assert(scene->isPeriodic);
+	assert(axis>=0 && axis <=2);
+	cellDim=scene->cell->getSize()[axis];
 }

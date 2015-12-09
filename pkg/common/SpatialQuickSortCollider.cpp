@@ -17,8 +17,6 @@ void SpatialQuickSortCollider::action()
 {
 	if(scene->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }
 
-	// compatibility func, can be removed later
-	findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
 	// update bounds
 	boundDispatcher->scene=scene; boundDispatcher->action();
 

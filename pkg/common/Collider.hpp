@@ -33,9 +33,6 @@ class Collider: public GlobalEngine {
 
 		// ctor with functors for the integrated BoundDispatcher
 		virtual void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d);
-
-		// backwards-compatility func, can be removed later
-		void findBoundDispatcherInEnginesIfNoFunctorsAndWarn();
 		
 		int get_avoidSelfInteractionMask(){return avoidSelfInteractionMask;}
 		void set_avoidSelfInteractionMask(const int &v){avoidSelfInteractionMask = v;}
@@ -44,8 +41,6 @@ class Collider: public GlobalEngine {
 		((shared_ptr<BoundDispatcher>,boundDispatcher,new BoundDispatcher,Attr::readonly,":yref:`BoundDispatcher` object that is used for creating :yref:`bounds <Body.bound>` on collider's request as necessary.")),
 		/*ctor*/,
 		.add_property("avoidSelfInteractionMask",&Collider::get_avoidSelfInteractionMask,&Collider::set_avoidSelfInteractionMask,"This mask is used to avoid the interactions inside a group of particles. To do so, the particles must have the same mask and this mask have to be compatible with this one.")
-	
-		
 	);
 };
 REGISTER_SERIALIZABLE(Collider);
