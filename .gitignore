@@ -26,6 +26,7 @@ doc/sphinx/yade.utils.rst
 doc/sphinx/yade.wrapper.rst
 doc/sphinx/yade.ymport.rst
 doc/sphinx/yade.polyhedra_utils.rst
+doc/sphinx/yade.gridpfacet.rst
 .kdev4/
 *.kdev4
 *.pyc

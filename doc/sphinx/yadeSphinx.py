@@ -35,7 +35,7 @@ yade.%s module
 #
 # don't forget to put the module in index.rst as well!
 #
-mods={'export':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb'],'plot':[],'timing':[],'utils':['_utils'],'polyhedra_utils':['_polyhedra_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[]}
+mods={'export':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb'],'plot':[],'timing':[],'utils':['_utils'],'polyhedra_utils':['_polyhedra_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[],'gridpfacet':[]}
 #
 # generate documentation, in alphabetical order
 mm=mods.keys(); mm.sort()

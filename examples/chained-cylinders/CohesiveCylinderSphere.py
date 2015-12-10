@@ -1,5 +1,6 @@
 # encoding: utf-8
 from yade import qt
+from yade.gridpfacet import *
 
 qt.View()
 
