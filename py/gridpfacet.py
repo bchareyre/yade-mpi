@@ -34,6 +34,8 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	In order to build a correct chain, last point of element of rank N must correspond to first point of element of rank N+1 in the same chain (with some tolerance, since bounding boxes will be used to create connections.
 
 	:return: Body object with the :yref:`ChainedCylinder` :yref:`shape<Body.shape>`.
+
+	.. note:: :yref:`ChainedCylinder` is deprecated and might be removed in the future, use  :yref:`GridConnection` instead.
 	"""
 	segment=end-begin
 	b=Body()
@@ -61,13 +63,13 @@ def gridNode(center,radius,dynamic=None,fixed=False,wire=False,color=None,highli
 	"""
 	b=Body()
 	b.shape=GridNode(radius=radius,color=color if color else utils.randomColor(),wire=wire,highlight=highlight)
-	#V=(4./3)*math.pi*radius**3	# will be overriden by the connection
+	#V=(4./3)*math.pi*radius**3	# will be overwritten by the connection
 	V=0.
-	geomInert=(2./5.)*V*radius**2	# will be overriden by the connection
+	geomInert=(2./5.)*V*radius**2	# will be overwritten by the connection
 	utils._commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material,pos=center,dynamic=dynamic,fixed=fixed)
 	b.aspherical=False
 	b.bounded=False
-	b.mask=0	#avoid contact detection with the nodes. Manual interaction will be set for them in "gridConnection" below.
+	b.mask=0	# avoid contact detection with the nodes. Manual interaction will be set for them in "gridConnection" below.
 	return b
 
 
@@ -75,17 +77,15 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	"""
 	Create a :yref:`GridConnection` by connecting two :yref:`GridNodes<GridNode>`.
 
-	:param id1,id2: already with :yref:`GridConnections<GridConnection>` connected :yref:`GridNodes<GridNode>`
-	:param bool wire: if ``True``, top and bottom facet are shown as skeleton; otherwise facets are filled.
-	:param Vector3-or-None color: color of the PFacet; random color will be assigned if ``None``.
+	:param id1,id2: the two :yref:`GridNodes<GridNode>` forming the cylinder. 
+	:param float radius: radius of the cylinder. Note that the radius needs to be the same as the one for the :yref:`GridNodes<GridNode>`.
 	:param Vector3 cellDist: for periodic boundary conditions, see :yref:`Interaction.cellDist`. Note: periodic boundary conditions are not yet implemented! 
 
 	See documentation of :yref:`yade.utils.sphere` for meaning of other parameters.
 
-	:return: Body object with the :yref:`PFacet<PFacet>` :yref:`shape<Body.shape>`.
+	:return: Body object with the :yref:`GridConnection` :yref:`shape<Body.shape>`.
 
-	.. note:: :yref:`GridNodes<GridNode>` and :yref:`GridConnections<GridConnection>` need to have the same radius. This is also the radius used to create the :yref:`PFacet<PFacet>`
-
+	.. note:: The material of the :yref:`GridNodes<GridNode>` will be used to set the constitutive behaviour of the internal connection, i.e., the constitutive behaviour of the cylinder. The material of the :yref:`GridConnection` is used for interactions with other bodies.
 	"""
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else utils.randomColor(),wire=wire,highlight=highlight)
