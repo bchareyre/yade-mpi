@@ -252,7 +252,7 @@ documentation on `https://cmake.org/documentation <https://cmake.org/documentati
  such version, please switch this option ON. Otherwise, if you mix Qt-versions a
  ``Segmentation fault`` will appear just after Yade is started. To provide
  necessary build dependencies for Qt5, install ``python-pyqt5 pyqt5-dev-tools``
- instead of ``python-qt4 pyqt4-dev-tools``, which is needed for Qt4.
+ instead of ``python-qt4 pyqt4-dev-tools``, which is needed for Qt5.
 
 If cmake finishes without errors, you will see all enabled 
 and disabled options at the end. Then start the actual compilation process with::
