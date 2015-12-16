@@ -9,7 +9,7 @@
 class LudingMat : public Material {
   public:
     virtual ~LudingMat();
-  YADE_CLASS_BASE_DOC_ATTRS_CTOR(LudingMat,Material,"Material for simple Ludning`s model of contact.\n",
+  YADE_CLASS_BASE_DOC_ATTRS_CTOR(LudingMat,Material,"Material for simple Luding`s model of contact [Luding2008]_ ,[Singh2013]_ .\n",
     ((Real,k1,NaN,,"Slope of loading plastic branch"))
     ((Real,kp,NaN,,"Slope of unloading and reloading limit elastic branch"))
     ((Real,kc,NaN,,"Slope of irreversible, tensile adhesive branch"))
@@ -63,6 +63,6 @@ class Law2_ScGeom_LudingPhys_Basic: public LawFunctor {
   private:
     Real calculateCapillarForce(const ScGeom& geom, LudingPhys& phys);
   FUNCTOR2D(ScGeom,LudingPhys);
-  YADE_CLASS_BASE_DOC(Law2_ScGeom_LudingPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`LudingPhys`.");
+  YADE_CLASS_BASE_DOC(Law2_ScGeom_LudingPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`LudingPhys`. See [Luding2008]_ ,[Singh2013]_ for more details.");
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_LudingPhys_Basic);
