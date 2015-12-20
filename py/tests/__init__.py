@@ -7,8 +7,8 @@ import unittest,inspect,sys
 allTests=['wrapper','core','pbc','clump','cohesive-chain']
 
 # all yade modules (ugly...)
-import yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom
-allModules=(yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom)
+import yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet
+allModules=(yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet)
 try:
 	import yade.qt
 	allModules+=(yade.qt,)
@@ -24,7 +24,7 @@ def testModule(module):
 
 	@param module: fully-qualified module name, e.g. yade.tests.wrapper
 	"""
-	suite=unittest.defaultTestLoader().loadTestsFromName(module)
+	suite=unittest.defaultTestLoader.loadTestsFromName(module)
 	return unittest.TextTestRunner(stream=sys.stdout,verbosity=2).run(suite)
 
 def testAll():
