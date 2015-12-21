@@ -49,36 +49,7 @@ void GridConnection::addPFacet(shared_ptr<Body> PF){
 
 PFacet::~PFacet(){}
 YADE_PLUGIN((PFacet));
-void PFacet::postLoad(PFacet&)
-{	
-	vector<Vector3r> vertices;
-	vertices.push_back(node1->state->pos);
-	vertices.push_back(node2->state->pos);
-	vertices.push_back(node3->state->pos);
-	
-	Vector3r center;
-	center=vertices[0]+((vertices[2]-vertices[0])*(vertices[1]-vertices[0]).norm()+(vertices[1]-vertices[0])*(vertices[2]-vertices[0]).norm())/((vertices[1]-vertices[0]).norm()+(vertices[2]-vertices[1]).norm()+(vertices[0]-vertices[2]).norm());
-	
-	vertices[0]=vertices[0]-center;
-	vertices[1]=vertices[1]-center;
-	vertices[2]=vertices[2]-center;
-	if(vertices.size()!=3){ throw runtime_error(("Facet must have exactly 3 vertices (not "+boost::lexical_cast<string>(vertices.size())+")").c_str()); }
-	if(isnan(vertices[0][0])) return;  // not initialized, nothing to do
-	Vector3r e[3] = {vertices[1]-vertices[0] ,vertices[2]-vertices[1] ,vertices[0]-vertices[2]};
-	#define CHECK_EDGE(i) if(e[i].squaredNorm()==0){LOG_FATAL("Facet has coincident vertices "<<i<<" ("<<vertices[i]<<") and "<<(i+1)%3<<" ("<<vertices[(i+1)%3]<<")!");}
-		CHECK_EDGE(0); CHECK_EDGE(1);CHECK_EDGE(2);
-	#undef CHECK_EDGE
-	normal = e[0].cross(e[1]);
-	area = .5*normal.norm();
-	normal /= 2*area;
-	for(int i=0; i<3; ++i){
-		ne[i]=e[i].cross(normal); ne[i].normalize();
-		vl[i]=vertices[i].norm();
-		vu[i]=vertices[i]/vl[i];
-	}
-	Real p = e[0].norm()+e[1].norm()+e[2].norm();
-	icr = e[0].norm()*ne[0].dot(e[2])/p;
-}
+
 
 //!##################	IGeom Functors   #####################
 

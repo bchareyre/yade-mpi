@@ -83,11 +83,10 @@ class PFacet : public Shape {
 	Vector3r ne[3];
 	/// Inscribing cirle radius
 	Real icr;
-      /// Length of the vertice vectors 
+	/// Length of the vertice vectors 
 	Real vl[3];
 	/// Unit vertice vectors
 	Vector3r vu[3];
-	void postLoad(PFacet&);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PFacet,Shape,"PFacet (particle facet) geometry.",
 		((shared_ptr<Body> , node1 , ,,"First :yref:`Body` the Pfacet is connected to."))
@@ -100,10 +99,6 @@ class PFacet : public Shape {
 		((Real,radius,-1,,"PFacet's radius"))
 		((Real,area,NaN,(Attr::readonly | Attr::noSave),"PFacet's area"))
 		((Vector3i , cellDist , Vector3i(0,0,0),,"missing doc :("))
-		#ifdef FACET_TOPO
-		((vector<Body::id_t>,edgeAdjIds,vector<Body::id_t>(3,Body::ID_NONE),,"PFacet id's that are adjacent to respective edges [experimental]"))
-		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),,"half angle between normals of this facet and the adjacent facet [experimental]"))
-		#endif
 		,
 		/* ctor */ createIndex();
 	);
