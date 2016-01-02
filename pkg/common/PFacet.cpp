@@ -222,7 +222,7 @@ bool Ig2_Sphere_PFacet_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 									
 									if(intr && intr->isReal()){
 										shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
-										if(!intrGeom->isDuplicate==1){ //skip contact.
+										if(!(intrGeom->isDuplicate==1)){ //skip contact.
 											if (isNew) {SGr=false;}
 											else {scm->isDuplicate=1;}/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/
 										}
@@ -263,7 +263,7 @@ bool Ig2_Sphere_PFacet_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 									const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,GC->pfacetList[j]->getId());
 									if(intr && intr->isReal()){
 										shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
-										if(!intrGeom->isDuplicate==1){
+										if(!(intrGeom->isDuplicate==1)){
 											if (isNew) SGr=false;
 											else scm->isDuplicate=1;/*cout<<"Declare "<<c->id1<<"-"<<c->id2<<" as duplicated."<<endl;*/
 										}
@@ -395,7 +395,7 @@ bool Ig2_Sphere_PFacet_ScGridCoGeom::go(	const shared_ptr<Shape>& cm1,
 							const shared_ptr<Interaction> intr = scene->interactions->find(c->id1,GridNodeList[i]->pfacetList[j]->getId());
 							if(intr && intr->isReal()){
 								shared_ptr<ScGridCoGeom> intrGeom=YADE_PTR_CAST<ScGridCoGeom>(intr->geom);
-								if(!intrGeom->isDuplicate==1){ //skip contact.
+								if(!(intrGeom->isDuplicate==1)){ //skip contact.
 									if (isNew) {
 									  return false;}
 									else {
