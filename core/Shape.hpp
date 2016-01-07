@@ -16,12 +16,16 @@
 
 class BoundFunctor;
 
+class InternalForceFunctor;
+
 class Shape: public Serializable, public Indexable {
 	public:
-		~Shape() {}; // vtable
+		virtual ~Shape() {}; // vtable
 		#ifdef BV_FUNCTOR_CACHE
 			shared_ptr<BoundFunctor> boundFunctor;
 		#endif
+		//! cache functor that are called for this type of DeformableElement. Used by FEInternalForceEngine
+		shared_ptr<InternalForceFunctor> internalforcefunctor;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Shape,Serializable,"Geometry of a body",
 		((Vector3r,color,Vector3r(1,1,1),,"Color for rendering (normalized RGB)."))

@@ -110,7 +110,7 @@ def defaultMaterial():
 	"""
 	return FrictMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
 
-def _commonBodySetup(b,volume,geomInertia,material,pos,noBound=False,resetState=True,dynamic=None,fixed=False):
+def _commonBodySetup(b,volume,geomInertia,material,pos,noBound=False,resetState=True,dynamic=None,fixed=False,blockedDOFs='xyzXYZ'):
 	"""Assign common body parameters."""
 	if isinstance(material,int):
 		if material<0 and len(O.materials)==0: O.materials.append(defaultMaterial());
@@ -129,7 +129,7 @@ def _commonBodySetup(b,volume,geomInertia,material,pos,noBound=False,resetState=
 		import warnings
 		warnings.warn('dynamic=%s is deprecated, use fixed=%s instead'%(str(dynamic),str(not dynamic)),category=DeprecationWarning,stacklevel=2)
 		fixed=not dynamic
-	b.state.blockedDOFs=('xyzXYZ' if fixed else '')
+	b.state.blockedDOFs=(blockedDOFs if fixed else '')
 
 
 def sphere(center,radius,dynamic=None,fixed=False,wire=False,color=None,highlight=False,material=-1,mask=1):

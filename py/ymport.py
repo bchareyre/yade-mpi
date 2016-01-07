@@ -165,6 +165,7 @@ def gmsh(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quaternio
 	infile.close()
 
 	nodelistVector3=[]
+	elementlistVector3=[] # for deformable elements
 	findVerticesString=0
 	
 	while (lines[findVerticesString].split()[0]<>'Vertices'): #Find the string with the number of Vertices
