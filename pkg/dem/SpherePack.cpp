@@ -186,7 +186,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 				for(int axis=0; axis<3; axis++) {
 					c[axis]=rnd();//coordinates in [0,1]
 				}
-				c=mn + hSize*c; //coordinates in reference frame (inside the base cell)
+				c = hSize*c + mn; //coordinates in reference frame (inside the base cell)
 			}
 			
 			size_t packSize=pack.size();
