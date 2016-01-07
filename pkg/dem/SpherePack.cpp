@@ -89,9 +89,8 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real> > rnd(randGen, boost::uniform_real<Real>(0,1));
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution	
-	Vector3r size;
+	Vector3r size=mx-mn;
 	bool hSizeFound =(hSize!=Matrix3r::Zero());//is hSize passed to the function?
-	size=mx-mn;
 	if (!hSizeFound) {hSize=size.asDiagonal();}
 	if (hSizeFound && !periodic) LOG_WARN("hSize can be defined only for periodic cells.");
 	Real volume=hSize.determinant();
@@ -176,41 +175,81 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 					r=psdRadii[piece]+norm*(psdRadii[piece+1]-psdRadii[piece]);}
 		}
 		// try to put the sphere into a free spot
-		for(t=0; t<maxTry; ++t){
-			Vector3r c;
-			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+(size[axis]?(size[axis]-2*r)*rnd()+r:0);}//we handle 2D with the special case size[axis]==0
-			else { 	for(int axis=0; axis<3; axis++) c[axis]=rnd();//coordinates in [0,1]
-				c=mn+hSize*c;}//coordinates in reference frame (inside the base cell)
-			size_t packSize=pack.size(); bool overlap=false;
-			if(!periodic) for(size_t j=0;j<packSize;j++) {if(pow(pack[j].r+r,2)>=(pack[j].c-c).squaredNorm()) {overlap=true; break;}}
-			else {
-				for(size_t j=0; j<packSize; j++){
+		for(t=0; t<maxTry; ++t) {
+			Vector3r c = Vector3r::Zero();
+			if(!periodic) {
+				//we handle 2D with the special case size[axis]==0
+				for(int axis=0; axis<3; axis++) {
+					c[axis]=mn[axis]+(size[axis]?(size[axis]-2*r)*rnd()+r:0);
+				}
+			} else {
+				for(int axis=0; axis<3; axis++) {
+					c[axis]=rnd();//coordinates in [0,1]
+				}
+				c=mn + hSize*c; //coordinates in reference frame (inside the base cell)
+			}
+			
+			size_t packSize=pack.size();
+			bool overlap=false;
+			if(!periodic) {
+				for(size_t j=0;j<packSize;j++) {
+					if(pow(pack[j].r+r,2)>=(pack[j].c-c).squaredNorm()) {
+						overlap=true; 
+						break;
+					}
+				}
+			} else {
+				for(size_t j=0; j<packSize; j++) {
 					Vector3r dr=Vector3r::Zero();
 					if (!hSizeFound) {//The box is axis-aligned, use the wrap methods
-						for(int axis=0; axis<3; axis++) dr[axis]=size[axis]? min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis])) : 0;
+						for(int axis=0; axis<3; axis++) {
+							if (size[axis]) {
+								dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),
+														 cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
+							} else {
+								dr[axis]=0;
+							}
+						}
 					} else {//not aligned, find closest neighbor in a cube of size 1, then transform distance to cartesian coordinates
 						Vector3r c1c2=invHsize*(pack[j].c-c);
-						for(int axis=0; axis<3; axis++){
+						for(int axis=0; axis<3; axis++) {
 							if (std::abs(c1c2[axis])<std::abs(c1c2[axis] - Mathr::Sign(c1c2[axis]))) dr[axis]=c1c2[axis];
-							else dr[axis] = c1c2[axis] - Mathr::Sign(c1c2[axis]);}
+							else dr[axis] = c1c2[axis] - Mathr::Sign(c1c2[axis]);
+						}
 						dr=hSize*dr;//now in cartesian coordinates
 					}
-					if(pow(pack[j].r+r,2)>= dr.squaredNorm()){ overlap=true; break; }
+					if(pow(pack[j].r+r,2) >= dr.squaredNorm()) {
+						overlap=true;
+						break;
+					}
 				}
 			}
-			if(!overlap) { pack.push_back(Sph(c,r)); break; }
+			if(!overlap) {
+				pack.push_back(Sph(c,r));
+				break;
+			}
 		}
 		if (t==maxTry) {
 			if(num>0) {
 				if (mode!=RDIST_RMEAN) {
-					//if rMean is not imposed, then we call makeCloud recursively, scaling the PSD down until the target num is obtained
+					//if rMean is not imposed, then we call makeCloud recursively,
+					//scaling the PSD down until the target num is obtained
 					Real nextPoro = porosity+(1-porosity)/10.;
-					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<num<<". Trying again with porosity "<<nextPoro<<". The size distribution is being scaled down");
+					LOG_WARN("Exceeded "<<maxTry
+						<<" tries to insert non-overlapping sphere to packing. Only "
+						<<i<<" spheres were added, although you requested "<<num
+						<<". Trying again with porosity "<<nextPoro
+						<<". The size distribution is being scaled down");
 					pack.clear();
-					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro, psdSizes, psdCumm, distributeMass,seed,hSizeFound?hSize:Matrix3r::Zero());}
-				else LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres were added, although you requested "<<num<<".");
+					return makeCloud(mn, mx, -1., rRelFuzz, num, periodic, nextPoro,
+						psdSizes, psdCumm, distributeMass,seed,hSizeFound?hSize:Matrix3r::Zero());
+				} else {
+					LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "
+					<<i<<" spheres were added, although you requested "<<num<<".");
+				}
 			}
-			return i;}
+			return i;
+		}
 	}
 	if (appliedPsdScaling<1) LOG_WARN("The size distribution has been scaled down by a factor pack.appliedPsdScaling="<<appliedPsdScaling);
 	return pack.size();
