@@ -49,12 +49,14 @@ class Lin4NodeTetra: public DeformableElement {
 			   Vector3r pos2=i2->second.position-i0->second.position;
 			   Vector3r pos3=i3->second.position-i0->second.position;
 
+         /*
 			   Vector3r pos01=-pos1;
 			   Vector3r pos02=-pos2;
 			   Vector3r pos03=-pos3;
 			   Vector3r pos12= pos1-pos2;
 			   Vector3r pos13= pos1-pos3;
 			   Vector3r pos23= pos2-pos3;
+         */
 
 
 	 			  J.col(0)<<1,pos0;
@@ -62,7 +64,7 @@ class Lin4NodeTetra: public DeformableElement {
 	 			  J.col(2)<<1,pos2;
 	 			  J.col(3)<<1,pos3;
 
-
+          /*
 	   		   Real x12=pos01(0), x13=pos02(0), x14=pos03(0), x23= pos12(0), x24=pos13(0), x34= pos23(0);
 
 	   		   Real x21=-x12, x31=-x13, x41=-x14, x32=-x23, x42=-x24, x43=-x34;
@@ -74,7 +76,7 @@ class Lin4NodeTetra: public DeformableElement {
 	   		   Real z12=pos01(2),  z13=pos02(2),  z14=pos03(2),  z23= pos12(2),  z24=pos13(2),  z34= pos23(2);
 
 	  		   Real z21=-z12,  z31=-z13,  z41=-z14,  z32=-z23,  z42=-z24,  z43=-z34;
-
+          */
 	  		   Real V=fabs(((0.166666667)*J.determinant()));
 
 			   return V;
