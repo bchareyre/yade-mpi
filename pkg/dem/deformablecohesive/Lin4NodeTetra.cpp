@@ -73,15 +73,15 @@ Matrix Lin4NodeTetra::calculateStiffness(Real E, Real v,Vector3r pos0,Vector3r p
 
 	   Real x12=pos01(0), x13=pos02(0), x14=pos03(0), x23= pos12(0), x24=pos13(0), x34= pos23(0);
 
-	   Real x21=-x12, x31=-x13, x41=-x14, x32=-x23, x42=-x24, x43=-x34;
+	   Real x21=-x12, x31=-x13, /*x41=-x14,*/ x32=-x23, x42=-x24, x43=-x34;
 
 	   Real y12=pos01(1),  y13=pos02(1),  y14=pos03(1),  y23= pos12(1),  y24=pos13(1),  y34= pos23(1);
 
-	   Real y21=-y12,  y31=-y13,  y41=-y14,  y32=-y23,  y42=-y24,  y43=-y34;
+	   Real y21=-y12,  y31=-y13,  /*y41=-y14,*/  y32=-y23,  y42=-y24,  y43=-y34;
 
 	   Real z12=pos01(2),  z13=pos02(2),  z14=pos03(2),  z23= pos12(2),  z24=pos13(2),  z34= pos23(2);
 
-	   Real z21=-z12,  z31=-z13,  z41=-z14,  z32=-z23,  z42=-z24,  z43=-z34;
+	   Real z21=-z12,  z31=-z13,  /*z41=-z14,*/  z32=-z23,  z42=-z24,  z43=-z34;
 
 	   Real V=fabs(((0.166666667)*J.determinant()));
 		
