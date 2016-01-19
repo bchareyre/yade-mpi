@@ -1,26 +1,22 @@
 #pragma once
-#include<pkg/common/ElastMat.hpp>
-#include<pkg/common/Dispatching.hpp>
-#include<pkg/common/NormShearPhys.hpp>
-#include<pkg/dem/FrictPhys.hpp>
-#include<pkg/dem/ScGeom.hpp>
+#ifdef YADE_POTENTIAL_PARTICLES
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/common/Dispatching.hpp>
+#include <pkg/common/NormShearPhys.hpp>
+#include <pkg/dem/FrictPhys.hpp>
+#include <pkg/dem/ScGeom.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
 
 
 class KnKsPhys: public FrictPhys {
-	
-
-	
-		
 	public:
-		
-	virtual ~KnKsPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPhys,FrictPhys,"Simple phys",
-			((vector<double>,lambdaIPOPT,0.0,,"lagrane multiplier for equality constraints"))
-			((vector<int>,cstatCPLEX,,,"lagrane multiplier for equality constraints"))
-			((vector<int>,rstatCPLEX,,,"lagrane multiplier for equality constraints"))
+		virtual ~KnKsPhys();
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPhys,FrictPhys,"IPhys originally for potential particles",
+			((vector<double>,lambdaIPOPT,0.0,,"Lagrange multiplier for equality constraints"))
+			((vector<int>,cstatCPLEX,,,"Lagrange multiplier for equality constraints"))
+			((vector<int>,rstatCPLEX,,,"Lagrange multiplier for equality constraints"))
 			((Real,frictionAngle,0.0,,"fric angle"))
 			((Real,tanFrictionAngle,0.0,,"tangent of fric angle"))
 			((Vector3r,contactDetectionPt,Vector3r(0,0,0),,"contact detection result"))
@@ -121,44 +117,44 @@ class KnKsPhys: public FrictPhys {
 			((double, effective_phi, 0.0,, "friction angle in clay after displacement"))
 			((double, prevOverlap, 0.0,, "friction angle in clay after displacement"))
 			((Real, h, 0.0,,"cd")),
-			
+
 			//((Real, cumulativeRotation, 0.0,, "cumulative rotation"))
 			//((Quaternionr, initialOrientation1, Quaternionr(1.0,0.0,0.0,0.0),, "orientation1"))
 			//((Quaternionr, initialOrientation2, Quaternionr(1.0,0.0,0.0,0.0),, "orientation2")),
 			createIndex();
-			
-			);
 
-	REGISTER_CLASS_INDEX(KnKsPhys,FrictPhys);
-	DECLARE_LOGGER;
+		);
+
+		REGISTER_CLASS_INDEX(KnKsPhys,FrictPhys);
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(KnKsPhys);
 
 
 
 
-class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor{
+class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
-		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPhys,IPhysFunctor,"Calculation",
-		((Real,Knormal,0.0,,"allows user to input values directly from python scripts"))
-		((Real,Kshear,0.0,,"allows user to input values directly from python scripts"))
-		((Real, unitWidth2D, 1.0, ,"viscousDamping"))
-		((double, brittleLength, 3.0, ,"brittle rock"))
-		((double, kn_i, 0.002, ,"brittle rock"))
-		((double, ks_i, 0.002, ,"brittle rock"))
-		((double, u_peak, -1.0, ,"brittle rock"))
-		((double, maxClosure, 0.002, ,"brittle rock"))
-		((Real, viscousDamping, 0.8, ,"viscousDamping"))
-		((Real, cohesion, 0.0, ,"viscousDamping"))
-		((Real, tension, 0.0, ,"viscousDamping"))
-		((bool, cohesionBroken, true, ,"cohesion"))
-		((bool, tensionBroken, true, ,"tension"))
-		((Real, phi_b, 0.0, ,"viscousDamping"))
-		((bool, useOverlapVol, false,, "calculate overlap volume"))
-		((bool, useFaceProperties, false,,"boolean to get face properites"))
-		((bool, calJointLength, false,, "calculate joint length"))
-		((bool, twoDimension, false, ,"tension already broken"))
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPhys,IPhysFunctor,"Ip2 functor for :yref:`KnKsPhys`",
+			((Real,Knormal,0.0,,"allows user to input values directly from python scripts"))
+			((Real,Kshear,0.0,,"allows user to input values directly from python scripts"))
+			((Real, unitWidth2D, 1.0, ,"viscousDamping"))
+			((double, brittleLength, 3.0, ,"brittle rock"))
+			((double, kn_i, 0.002, ,"brittle rock"))
+			((double, ks_i, 0.002, ,"brittle rock"))
+			((double, u_peak, -1.0, ,"brittle rock"))
+			((double, maxClosure, 0.002, ,"brittle rock"))
+			((Real, viscousDamping, 0.8, ,"viscousDamping"))
+			((Real, cohesion, 0.0, ,"viscousDamping"))
+			((Real, tension, 0.0, ,"viscousDamping"))
+			((bool, cohesionBroken, true, ,"cohesion"))
+			((bool, tensionBroken, true, ,"tension"))
+			((Real, phi_b, 0.0, ,"viscousDamping"))
+			((bool, useOverlapVol, false,, "calculate overlap volume"))
+			((bool, useFaceProperties, false,,"boolean to get face properites"))
+			((bool, calJointLength, false,, "calculate joint length"))
+			((bool, twoDimension, false, ,"tension already broken"))
 		);
 		FUNCTOR2D(FrictMat,FrictMat);
 		DECLARE_LOGGER;
@@ -167,28 +163,27 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_KnKsPhys);
 
 
 
-class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor{
+class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor {
 	public:
-		
+
 		static Real Real0;
 		//OpenMPAccumulator<Real,&Law2_SCG_KnKsPhys_KnKsLaw::Real0> plasticDissipation;
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,KnKsPhys);
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SCG_KnKsPhys_KnKsLaw,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom` (sphere-box interactions are not implemented for the latest).",
-		((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
-		((bool,preventGranularRatcheting,false,,"bool to avoid granular ratcheting"))
-		((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts."))
-		((bool,Talesnick,false,,"Define the total energy dissipated in plastic slips at all contacts."))
-		((double,waterLevel,0.0,,"Define the total energy dissipated in plastic slips at all contacts."))
-		((bool, allowBreakage, false, ,"cohesion = 0, once broken"))
-		((double,initialOverlapDistance,0.0,,"initial overlap distance"))
-		,,
-		
+			((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
+			((bool,preventGranularRatcheting,false,,"bool to avoid granular ratcheting"))
+			((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts."))
+			((bool,Talesnick,false,,"Define the total energy dissipated in plastic slips at all contacts."))
+			((double,waterLevel,0.0,,"Define the total energy dissipated in plastic slips at all contacts."))
+			((bool, allowBreakage, false, ,"cohesion = 0, once broken"))
+			((double,initialOverlapDistance,0.0,,"initial overlap distance"))
+			,,
+
 		);
 
-		DECLARE_LOGGER;	
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_SCG_KnKsPhys_KnKsLaw);
 
-
-
+#endif // YADE_POTENTIAL_PARTICLES

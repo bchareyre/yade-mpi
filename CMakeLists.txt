@@ -19,6 +19,7 @@
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
+#  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
@@ -129,6 +130,7 @@ OPTION(ENABLE_LBMFLOW "Enable LBM engine (very experimental)" ON)
 OPTION(ENABLE_LIQMIGRATION "Enable liquid control (very experimental), see [Mani2013] for details" OFF)
 OPTION(ENABLE_MASK_ARBITRARY "Enable arbitrary precision of bitmask variables (only Body::groupMask yet implemented) (experimental). Use -DMASK_ARBITRARY_SIZE=int to set number of used bits (256 by default)" OFF)
 OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)" OFF)
+OPTION(ENABLE_POTENTIAL_PARTICLES "Enable potential particles" OFF)
 OPTION(USE_QT5 "USE Qt5 for GUI" OFF)
 
 #===========================================================
@@ -390,6 +392,25 @@ ELSE(ENABLE_PROFILING)
 ENDIF(ENABLE_PROFILING)
 
 #===========================================================
+IF(ENABLE_POTENTIAL_PARTICLES)
+  FIND_PACKAGE(OpenBlas)
+  INCLUDE(FindLAPACK)
+  FIND_PACKAGE(Lapack)
+  IF(OPENBLAS_FOUND AND LAPACK_FOUND)
+    ADD_DEFINITIONS("-DYADE_POTENTIAL_PARTICLES")
+    SET(LINKLIBS  "${LINKLIBS};${OPENBLAS_LIBRARY};${LAPACK_LIBRARY}")
+    MESSAGE(STATUS "Found OpenBlas")
+    MESSAGE(STATUS "Found Lapack")
+    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PotentialParticles")
+  ELSE(OPENBLAS_FOUND AND LAPACK_FOUND)
+    MESSAGE(STATUS "Missing dependency for PotentialParticles, disabled")
+    SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialParticles")
+    SET(ENABLE_POTENTIAL_PARTICLES OFF)
+  ENDIF(OPENBLAS_FOUND AND LAPACK_FOUND)
+ELSE(ENABLE_POTENTIAL_PARTICLES)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialParticles")
+ENDIF(ENABLE_POTENTIAL_PARTICLES)
+#===========================================================
 
 IF (INSTALL_PREFIX)
   SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
@@ -448,6 +469,9 @@ FILE(GLOB SRC_LIB  "lib/*.cpp")
 
 SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/factory/ClassFactory.cpp;lib/factory/DynLibManager.cpp")
 SET(SRC_LIB "${SRC_LIB};lib/serialization/Serializable.cpp;lib/pyutil/gil.cpp;core/main/pyboot.cpp;${GUI_SRC_LIB};${CGAL_SRC_LIB}")
+IF(ENABLE_POTENTIAL_PARTICLES)
+  SET(SRC_LIB "${SRC_LIB};lib/computational-geometry/MarchingCube.cpp")
+ENDIF(ENABLE_POTENTIAL_PARTICLES)
 
 #===========================================================
 
