@@ -13,7 +13,7 @@
 class KnKsPhys: public FrictPhys {
 	public:
 		virtual ~KnKsPhys();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPhys,FrictPhys,"IPhys originally for potential particles",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPhys,FrictPhys,"EXPERIMENTAL. IPhys originally for potential particles",
 			((vector<double>,lambdaIPOPT,0.0,,"Lagrange multiplier for equality constraints"))
 			((vector<int>,cstatCPLEX,,,"Lagrange multiplier for equality constraints"))
 			((vector<int>,rstatCPLEX,,,"Lagrange multiplier for equality constraints"))
@@ -136,7 +136,7 @@ REGISTER_SERIALIZABLE(KnKsPhys);
 class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
-		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPhys,IPhysFunctor,"Ip2 functor for :yref:`KnKsPhys`",
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPhys,IPhysFunctor,"EXPERIMENTAL. Ip2 functor for :yref:`KnKsPhys`",
 			((Real,Knormal,0.0,,"allows user to input values directly from python scripts"))
 			((Real,Kshear,0.0,,"allows user to input values directly from python scripts"))
 			((Real, unitWidth2D, 1.0, ,"viscousDamping"))

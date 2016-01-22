@@ -53,12 +53,11 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 	bool hasGeom = false;
 	Vector3r contactPt(0,0,0);
 	shared_ptr<ScGeom> scm;
-	shared_ptr<KnKsPhys> phys;
 
 
-	double stepBisection = 0.001*std::min(s1->R,s2->R);
+	Real stepBisection = 0.001*std::min(s1->R,s2->R);
 	if(stepBisection<pow(10,-6)) {
-		std::cout<<"R1: "<<s1->R<<", R2: "<<s2->R<<", stepBisection: "<<stepBisection<<", id1: "<<c->getId1()<<", id2: "<<c->getId2()<<endl;
+		//std::cout<<"R1: "<<s1->R<<", R2: "<<s2->R<<", stepBisection: "<<stepBisection<<", id1: "<<c->getId1()<<", id2: "<<c->getId2()<<endl;
 	}
 
 	bool contact = false;
@@ -80,7 +79,7 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 			stepBisection = 0.5*scm->penetrationDepth;
 		}
 		if(stepBisection<pow(10,-6)) {
-			std::cout<<"stepBisection: "<<stepBisection<<", penetrationDepth: "<<scm->penetrationDepth<<endl;
+			//std::cout<<"stepBisection: "<<stepBisection<<", penetrationDepth: "<<scm->penetrationDepth<<endl;
 		}
 		contactPt = scm->contactPoint;
 	} else {
@@ -89,13 +88,6 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 		contactPt = 0.5*(state1.pos+state2.pos);
 
 	}
-
-	bool hasPhys=false;
-	if(c->phys) {
-		phys=YADE_PTR_CAST<KnKsPhys>(c->phys);
-		hasPhys=true;
-	}
-
 
 	converge = true;
 	fA= evaluatePP(cm1,state1, contactPt);
@@ -126,7 +118,7 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 	fB = evaluatePP(cm2,state2, contactPt);
 
 	if (fA*fB<0.0) {
-		std::cout<<"fA: "<<fA<<", fB: "<<fB<<endl;
+		//std::cout<<"fA: "<<fA<<", fB: "<<fB<<endl;
 	}
 
 //std::cout<<"converge: "<<converge<<", fA: "<<fA<<", fB: "<<fB<<endl;
@@ -139,9 +131,9 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 		contact = false;
 		contactPt = 0.5*(state1.pos+state2.pos);
 	}
-	//////////////////////////////////////////////////////////* PASS VARIABLES TO ScGeom and Phys Functor */////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////* PASS VARIABLES TO ScGeom Functor */////////////////////////////////////////////////////////////
 	//* 1. Get overlap												 						 *//
-	//* 2. Get information on active planes.  If active planes are not the same as the previous, get new physical parameters.  Otherwise keep the same parameters 	 *//
+	//* 2. Get information on active planes.
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (contact == true || c->isReal() || force) {
 		if (contact == true) {
@@ -153,14 +145,6 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 			avgNormal = (normalP1 - normalP2);
 			avgNormal.normalize();
 
-			if(hasPhys == true) {
-				//bool calJointLength = phys->calJointLength;
-				//int smallerID = 1;
-				bool twoD = phys->twoDimension;
-				if (twoD == true) {
-					phys->jointLength = 1.0;
-				}
-			}
 			if(s1->fixedNormal==true) {
 				avgNormal = s1->boundaryNormal;
 			}
@@ -181,7 +165,7 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 			scm->contactPoint = contactPt;
 			scm->penetrationDepth=penetrationDepth;
 			if(isnan(avgNormal.norm())) {
-				std::cout<<"avgNormal: "<<avgNormal<<endl;
+				//std::cout<<"avgNormal: "<<avgNormal<<endl;
 			}
 			scm->normal = avgNormal;
 
@@ -227,7 +211,7 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 	Real fb = evaluatePP(cm1,state1, bracketB); //evaluateFNoSphere(cm1,state1, bracketB); //
 
 	if(fa*fb > 0.00001) {
-		std::cout<<"fa: "<<fa<<", fb: "<<fb<<endl;
+		//std::cout<<"fa: "<<fa<<", fb: "<<fb<<endl;
 	}
 	//if(fabs(fa)<fabs(fb)){bracketRange *= -1.0; Vector3r temp = bracketA; bracketA= bracketB; bracketB = temp;}
 	Real fc = 0.0;
@@ -323,7 +307,7 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 
 		counter++;
 		if(counter==10000) {
-			std::cout<<"counter: "<<counter<<", m.norm: "<<m<<", fb: "<<fb<<endl;
+			//std::cout<<"counter: "<<counter<<", m.norm: "<<m<<", fb: "<<fb<<endl;
 		}
 	} while(1);
 	//}while( m.norm() > tol && fabs(fb) > pow(10,-13) );
@@ -332,7 +316,7 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 
 
 /* Routine to get value of function (constraint) at a particular position */
-double Ig2_PP_PP_ScGeom::evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial) {
+Real Ig2_PP_PP_ScGeom::evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial) {
 
 	PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	///////////////////Transforming trial values to local frame of particles//////////////////
@@ -379,7 +363,7 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 
 ////////////////////////////// assembling potential planes particle 1//////////////////////////////
 	int planeNo = s1->a.size();
-	vector<double>p;
+	vector<Real>p;
 	Real pSum2 = 0.0;
 	for (int i=0; i<planeNo; i++) {
 		Real plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z -s1-> d[i];
@@ -441,7 +425,7 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 	Real Fdz = fdx * Q1(0,2) + fdy*Q1(1,2) + fdz*Q1(2,2);
 
 	if (isnan(Fdx) == true || isnan(Fdy) == true || isnan(Fdz)==true) {
-		std::cout<<"Q1(0,0): "<<Q1(0,0)<<","<<Q1(0,1)<<","<<Q1(0,2)<<","<<Q1(1,0)<<","<<Q1(1,1)<<","<<Q1(1,2)<<","<<Q1(2,0)<<","<<Q1(2,1)<<","<<Q1(2,2)<<", q:"<<q0<<","<<q1<<","<<q2<<","<<q3<<", fd: "<<fdx<<","<<fdy<<","<<fdz<<endl;
+		//std::cout<<"Q1(0,0): "<<Q1(0,0)<<","<<Q1(0,1)<<","<<Q1(0,2)<<","<<Q1(1,0)<<","<<Q1(1,1)<<","<<Q1(1,2)<<","<<Q1(2,0)<<","<<Q1(2,1)<<","<<Q1(2,2)<<", q:"<<q0<<","<<q1<<","<<q2<<","<<q3<<", fd: "<<fdx<<","<<fdy<<","<<fdz<<endl;
 	}
 
 	return Vector3r(Fdx,Fdy,Fdz);
@@ -458,20 +442,20 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 
 
 	/* Parameters for particles A and B */
-	double rA = s1->r;
-	double kA = s1->k;
-	double RA = s1->R;
-	double rB = s2->r;
-	double kB = s2->k;
-	double RB = s2->R;
+	Real rA = s1->r;
+	Real kA = s1->k;
+	Real RA = s1->R;
+	Real rB = s2->r;
+	Real kB = s2->k;
+	Real RB = s2->R;
 	int planeNoA = s1->a.size();
 	int planeNoB = s2->a.size();
 
 	/* Variables to keep things neat */
-	double ksA = RA/sqrt(kA);
-	double kpA = rA/sqrt(1.0 - kA);
-	double ksB = RB/sqrt(kB);
-	double kpB = rB/sqrt(1.0 - kB);
+	Real ksA = RA/sqrt(kA);
+	Real kpA = rA/sqrt(1.0 - kA);
+	Real ksB = RB/sqrt(kB);
+	Real kpB = rB/sqrt(1.0 - kB);
 	int NUMCON = 3  + 1+ planeNoA + planeNoB;
 	int NUMVAR = 6 + 2  + planeNoA + planeNoB;
 
@@ -485,7 +469,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 		bkc[4+i] = MSK_BK_UP;
 	};
 
-	double blc[NUMCON];
+	Real blc[NUMCON];
 	blc[0] = state2.pos.x() - state1.pos.x();
 	blc[1] = state2.pos.y() - state1.pos.y();
 	blc[2] = state2.pos.z() - state1.pos.z();
@@ -497,7 +481,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 		blc[4+planeNoA+i] = -MSK_INFINITY;
 	};
 
-	double buc[NUMCON];
+	Real buc[NUMCON];
 	buc[0] = state2.pos.x() - state1.pos.x();
 	buc[1] = state2.pos.y() - state1.pos.y();
 	buc[2] = state2.pos.z() - state1.pos.z();
@@ -524,7 +508,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 	};
 
 
-	double blx[NUMVAR];
+	Real blx[NUMVAR];
 	blx[0] = -MSK_INFINITY;
 	blx[1] = -MSK_INFINITY;
 	blx[2] = -MSK_INFINITY;
@@ -537,7 +521,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 		blx[8+i] = -MSK_INFINITY;
 	};
 
-	double bux[NUMVAR];
+	Real bux[NUMVAR];
 	bux[0] = +MSK_INFINITY;
 	bux[1] = +MSK_INFINITY;
 	bux[2] = +MSK_INFINITY;
@@ -550,7 +534,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 		bux[8+i] = +MSK_INFINITY;
 	};
 
-	double c[NUMVAR];
+	Real c[NUMVAR];
 	c[0] = 0.0;
 	c[1] = 0.0;
 	c[2] = 0.0;
@@ -563,7 +547,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 		c[8+i] = 0.0;
 	};
 
-	vector<double> aval;
+	vector<Real> aval;
 	vector<MSKintt> aptrb;
 	vector<MSKintt> aptre;
 	vector<MSKidxt> asub;
@@ -778,7 +762,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 	totalCount += planeNoB;
 
 	MSKidxt     i,j,csubA[1+ 3 + planeNoA], csubB[1+ 3  + planeNoB] ;
-	double      xx[NUMVAR];
+	Real      xx[NUMVAR];
 	MSKenv_t    & env=mosekEnv;
 	MSKtask_t   task;
 	MSKrescodee  & r=mosekTaskEnv;
@@ -974,12 +958,12 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 				}
 
 
-				double xlocalA = xx[0]*ksA;
-				double ylocalA = xx[1]*ksA;
-				double zlocalA = xx[2]*ksA;
-				double xlocalB = xx[3]*ksB;
-				double ylocalB = xx[4]*ksB;
-				double zlocalB = xx[5]*ksB;
+				Real xlocalA = xx[0]*ksA;
+				Real ylocalA = xx[1]*ksA;
+				Real zlocalA = xx[2]*ksA;
+				Real xlocalB = xx[3]*ksB;
+				Real ylocalB = xx[4]*ksB;
+				Real zlocalB = xx[5]*ksB;
 				Vector3r localA = Vector3r(xlocalA,ylocalA,zlocalA);
 				Vector3r localB = Vector3r(xlocalB,ylocalB,zlocalB);
 				xGlobal = state1.ori*localA + state1.pos;
@@ -989,7 +973,7 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 			}
 			else
 			{
-				printf("Error while optimizing.\n");
+				LOG_ERROR("Error while optimizing.\n");
 			}
 		}
 
@@ -999,11 +983,11 @@ bool Ig2_PP_PP_ScGeom::contactPtMosekF2(const shared_ptr<Shape>& cm1, const Stat
 			char symname[MSK_MAX_STR_LEN];
 			char desc[MSK_MAX_STR_LEN];
 
-			printf("An error occurred while optimizing.\n");
+			LOG_ERROR("An error occurred while optimizing.\n");
 			MSK_getcodedesc (r,
 			                 symname,
 			                 desc);
-			printf("Error %s - '%s'\n",symname,desc);
+			LOG_ERROR("Error %s - '%s'\n",symname,desc);
 		}
 	}
 	/* Delete the task and the associated data. */
@@ -1042,7 +1026,7 @@ void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const Stat
 		counter++;
 		if (counter == 50000 ) {
 			//LOG_WARN("Initial point searching exceeded 500 iterations!");
-			std::cout<<"ptonparticle2 search exceeded 50000 iterations! step:"<<step<<endl;
+			//std::cout<<"ptonparticle2 search exceeded 50000 iterations! step:"<<step<<endl;
 		}
 
 	} while(Mathr::Sign(fprevious)*Mathr::Sign(f)*1.0> 0.0 );
@@ -1065,12 +1049,12 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	int totalIter = 0;
 
 	/* Parameters for particles A and B */
-	double rA = s1->r;
-	double kA = s1->k;
-	double RA = s1->R;
-	double rB = s2->r;
-	double kB = s2->k;
-	double RB = s2->R;
+	Real rA = s1->r;
+	Real kA = s1->k;
+	Real RA = s1->R;
+	Real rB = s2->r;
+	Real kB = s2->k;
+	Real RB = s2->R;
 	int planeNoA = s1->a.size();
 	int planeNoB = s2->a.size();
 	int varNo = 3+1+planeNoA+planeNoB;
@@ -1090,16 +1074,16 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	int blas1planeNoA = std::max(1,planeNoA);
 	int blas1planeNoB = std::max(1,planeNoB);
 	int blas1planeNoAB = std::max(1,planeNoAB);
-	double blas0 = 0.0;
-	double blas1 = 1.0;
-	double blasNeg1 = -1.0;
+	Real blas0 = 0.0;
+	Real blas1 = 1.0;
+	Real blasNeg1 = -1.0;
 
-	double blasQA[9];
-	double blasQB[9];
-	double blasPosA[3];
-	double blasPosB[3];
-	double blasContactPt[3];
-	double blasC[varNo];
+	Real blasQA[9];
+	Real blasQB[9];
+	Real blasPosA[3];
+	Real blasPosB[3];
+	Real blasContactPt[3];
+	Real blasC[varNo];
 	for (int i=0; i<varNo; i++) {
 		blasC[i] = 0.0;
 	}
@@ -1122,16 +1106,16 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 //}
 
 	/* Variables to keep things neat */
-	double kAs = sqrt(kA)/RA;
-	double kAp = sqrt(1.0 - kA)/rA;
-	double kBs = sqrt(kB)/RB;
-	double kBp = sqrt(1.0 - kB)/rB;
+	Real kAs = sqrt(kA)/RA;
+	Real kAp = sqrt(1.0 - kA)/rA;
+	Real kBs = sqrt(kB)/RB;
+	Real kBp = sqrt(1.0 - kB)/rB;
 
 	/* penalty */
-	double t = 1.0;
-	double mu=10.0;
-	double planePert = 0.1*rA;
-	double sPert = 1.0; //+ 10.0*planePert*(planeNoA+planeNoB)/(rA*rA);
+	Real t = 1.0;
+	Real mu=10.0;
+	Real planePert = 0.1*rA;
+	Real sPert = 1.0; //+ 10.0*planePert*(planeNoA+planeNoB)/(rA*rA);
 	if (warmstart == true) {
 		t = 0.01;
 		mu= 50.0;
@@ -1139,22 +1123,22 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 		sPert = 0.01; ///* pow(10,-1)+ */ sqrt(planePert*planePert*(planeNoA+planeNoB)/(rA*rA));
 	}
 	/* s */
-	double s = 0.0;
-	double m=2.0;
-	double NTTOL = pow(10,-8);
-	double tol = accuracyTol/*pow(10,-4)* RA*pow(10,-6)*/;
-	double gap =0.0;
+	Real s = 0.0;
+	Real m=2.0;
+	Real NTTOL = pow(10,-8);
+	Real tol = accuracyTol/*pow(10,-4)* RA*pow(10,-6)*/;
+	Real gap =0.0;
 	/* x */
-	double blasX[varNo];
-	double blasNewX[varNo];
+	Real blasX[varNo];
+	Real blasNewX[varNo];
 	blasX[0] = contactPt[0];
 	blasX[1] = contactPt[1];
 	blasX[2] = contactPt[2];
 
 	//////////////////// evaluate fA and fB to initialize ////////////////////////////////
 	/* fA */
-	double blasTempP1[3];
-	double blasLocalP1[3];
+	Real blasTempP1[3];
+	Real blasLocalP1[3];
 	for(int i=0; i<3; i++) {
 		blasTempP1[i] = blasContactPt[i] - blasPosA[i];
 	}
@@ -1165,8 +1149,8 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	int  blasK = 3;
 	//int blasLDA = 3;
 	int  blasLDB = 3;
-	double blasAlpha = 1.0;
-	double blasBeta = 0.0;
+	Real blasAlpha = 1.0;
+	Real blasBeta = 0.0;
 	//int blasLDC = 3;
 	int incx=1;
 	int incy=1;
@@ -1178,13 +1162,13 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	/* P1Q */ //Eigen::MatrixXd P1 = Eigen::MatrixXd::Zero(planeNoA,3);
 	/*d1*/    //Eigen::MatrixXd d1 = Eigen::MatrixXd::Zero(planeNoA,1);
 
-	double blasP1[planeNoA*3];
-	double blasD1[planeNoA];
-	double blasP1Q[planeNoA*3];
-	double pertSumA2 = 0.0;
+	Real blasP1[planeNoA*3];
+	Real blasD1[planeNoA];
+	Real blasP1Q[planeNoA*3];
+	Real pertSumA2 = 0.0;
 
 	for (int i=0; i<planeNoA; i++) {
-		double plane = s1->a[i]*blasLocalP1[0] + s1->b[i]*blasLocalP1[1] + s1->c[i]*blasLocalP1[2] - s1->d[i];
+		Real plane = s1->a[i]*blasLocalP1[0] + s1->b[i]*blasLocalP1[1] + s1->c[i]*blasLocalP1[2] - s1->d[i];
 		if (plane<pow(10,-15)) {
 			plane = 0.0;
 			blasX[4+i] = plane + planePert;
@@ -1207,8 +1191,8 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	Real sA = (1.0-kA)*(pertSumA2/pow(rA,2) - 1.0)+kA*(sphereA -1.0);
 
 	/* fB */
-	double blasTempP2[3];
-	double blasLocalP2[3];
+	Real blasTempP2[3];
+	Real blasLocalP2[3];
 	for(int i=0; i<3; i++) {
 		blasTempP2[i] = blasContactPt[i] - blasPosB[i];
 	}
@@ -1220,12 +1204,12 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	// Vector3r localP2 = QB*tempP2;
 	/*P2Q*/ //Eigen::MatrixXd P2 = Eigen::MatrixXd::Zero(planeNoB,3);
 	/*d2*/  //Eigen::MatrixXd d2 = Eigen::MatrixXd::Zero(planeNoB,1);
-	double blasP2[planeNoB*3];
-	double blasD2[planeNoB];
-	double blasP2Q[planeNoB*3];
-	double pertSumB2 = 0.0;
+	Real blasP2[planeNoB*3];
+	Real blasD2[planeNoB];
+	Real blasP2Q[planeNoB*3];
+	Real pertSumB2 = 0.0;
 	for (int i=0; i<planeNoB; i++) {
-		double plane = s2->a[i]*blasLocalP2[0] + s2->b[i]*blasLocalP2[1] + s2->c[i]*blasLocalP2[2] - s2->d[i];
+		Real plane = s2->a[i]*blasLocalP2[0] + s2->b[i]*blasLocalP2[1] + s2->c[i]*blasLocalP2[2] - s2->d[i];
 		if (plane<pow(10,-15)) {
 			plane = 0.0;
 			blasX[4+planeNoA+i] = plane+ planePert;
@@ -1256,15 +1240,15 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 // Eigen::MatrixXd c=Eigen::MatrixXd::Zero(varNo,1);
 // c[3] = 1.0;
 
-	double blasA1[(3+planeNoA)*varNo];
-	double blasA2[(3+planeNoB)*varNo];
+	Real blasA1[(3+planeNoA)*varNo];
+	Real blasA2[(3+planeNoB)*varNo];
 	/* Second order cone constraints */
 	/* A1 */
 	//Eigen::MatrixXd A1(3+planeNoA,varNo);
 	//Matrix3r QAs=kAs*QA; //cwise()
-	double blasQAs[9];
+	Real blasQAs[9];
 	int noElements=9;
-	double scaleFactor = kAs;
+	Real scaleFactor = kAs;
 	dcopy_(&noElements, &blasQA[0], &incx, &blasQAs[0], &incx);
 	dscal_(&noElements, &scaleFactor, &blasQAs[0], &incx);
 
@@ -1284,7 +1268,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	/* A2 */
 	//Eigen::MatrixXd A2(3+planeNoB,varNo);
 	//Matrix3r QBs=kBs*QB; //cwise();
-	double blasQBs[9];
+	Real blasQBs[9];
 	noElements=9;
 	scaleFactor = kBs;
 	dcopy_(&noElements, &blasQB[0], &incx, &blasQBs[0], &incx);
@@ -1314,8 +1298,8 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	b1[2] = -b1temp[2];
 #endif
 
-	double blasB1[planeNoA3];
-	double blasB1temp[3];
+	Real blasB1[planeNoA3];
+	Real blasB1temp[3];
 	memset(blasB1,0.0,sizeof(blasB1));
 // blasM = 3;   blasN=3;
 //  blasLDA = 3;    blasAlpha = -1.0;  blasBeta=0.0;  blasLDC = 3;
@@ -1334,8 +1318,8 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	b2[2] = -b2temp[2];
 #endif
 
-	double blasB2[planeNoB3];
-	double blasB2temp[3];
+	Real blasB2[planeNoB3];
+	Real blasB2temp[3];
 	memset(blasB2,0.0,sizeof(blasB2));
 //  blasM = 3;   blasN=3; blasLDA = 3; blasAlpha=-1.0; blasBeta=0.0;
 // dgemv_(&transA, &blasM, &blasN, &blasAlpha, &blasQBs[0], &blasLDA, &blasPosB[0], &incx, &blasBeta, &blasB2temp[0], &incy);
@@ -1349,7 +1333,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 // AL<<P1Q, Eigen::MatrixXd::Zero(planeNoA,1), -1.0*Eigen::MatrixXd::Identity(planeNoA,planeNoA), Eigen::MatrixXd::Zero(planeNoA,planeNoB), //cwise()
 //	      P2Q, Eigen::MatrixXd::Zero(planeNoB,1), Eigen::MatrixXd::Zero(planeNoB,planeNoA), -1.0*Eigen::MatrixXd::Identity(planeNoB,planeNoB);
 
-	double blasAL[planeNoAB*varNo];
+	Real blasAL[planeNoAB*varNo];
 	memset(blasAL,0.0,sizeof(blasAL));
 	for (int i=0; i<planeNoA; i++) {
 		blasAL[i] = blasP1Q[i];
@@ -1382,9 +1366,9 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	bL<<btempU,btempL;
 #endif
 
-	double blasBL[planeNoAB];
-	double blasBTempU[planeNoA];
-	double blasBTempL[planeNoB];
+	Real blasBL[planeNoAB];
+	Real blasBTempU[planeNoA];
+	Real blasBTempL[planeNoB];
 	noElements = planeNoA;
 	dcopy_(&noElements, &blasD1[0], &incx, &blasBTempU[0], &incx);
 	//transA = 'N';	blasM = planeNoA;   blasN = 3;
@@ -1404,13 +1388,13 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 		blasBL[planeNoA+i]=blasBTempL[i];
 	}
 
-	double u1;
-	double u2;
-	double blasCCtranspose[varNo2];
+	Real u1;
+	Real u2;
+	Real blasCCtranspose[varNo2];
 	memset(blasCCtranspose,0.0,sizeof(blasCCtranspose));
 	blasCCtranspose[3+varNo*3]=1.0;
 
-	double blasCa1[varNo2];
+	Real blasCa1[varNo2];
 //#if 0
 #if 0
 	Eigen::MatrixXd ca1Transpose = ccTranspose - A1.transpose()*A1;
@@ -1430,7 +1414,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 
 	/* ca2Transpose */
-	double blasCa2[varNo2];
+	Real blasCa2[varNo2];
 	blasCount = 0;
 	dcopy_(&noElements, &blasCCtranspose[0], &incx, &blasCa2[0], &incy);
 
@@ -1441,48 +1425,48 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	dgemm_(&blasT, &blasNT, &varNo, &varNo, &planeNoB3, &blasNeg1, &blasA2[0], &planeNoB3, &blasA2[0], &planeNoB3, &blas1, &blasCa2[0], &varNo);
 
 	/* DL */
-	double blasDL[planeNoAB*planeNoAB];
+	Real blasDL[planeNoAB*planeNoAB];
 	blasCount = 0;
 	memset(blasDL,0.0,sizeof(blasDL));
 
 //#endif
 
 
-	double wLlogsum = 0.0;
-	double val = 0.0;
-	double newval = 0.0;
+	Real wLlogsum = 0.0;
+	Real val = 0.0;
+	Real newval = 0.0;
 	/*Linesearch */
-	double backtrack = 1.0;
-	double penalty = 1.0/t;
+	Real backtrack = 1.0;
+	Real penalty = 1.0/t;
 
 	/* LAPACK */
 	int info;
 	char UPLO ='L';
 	int KD = varNo-1;
 	int nrhs=1;
-	double HessianChol[varNo][varNo];
+	Real HessianChol[varNo][varNo];
 
 
-	double blasGA[varNo];
-	double blasGB[varNo];
-	double blasGL[varNo];
+	Real blasGA[varNo];
+	Real blasGB[varNo];
+	Real blasGL[varNo];
 
-	double blasW1[3+planeNoA];
-	double blasW2[3+planeNoB];
-	double blasWL[planeNoAB];
-	double blasVL[planeNoAB];
-	double minWL=0.0;
-	double blasHA[varNo*varNo];
-	double blasHB[varNo*varNo];
-	double blasHL[varNo*varNo];
-	double blasADAtemp[varNo*planeNoAB];
+	Real blasW1[3+planeNoA];
+	Real blasW2[3+planeNoB];
+	Real blasWL[planeNoAB];
+	Real blasVL[planeNoAB];
+	Real minWL=0.0;
+	Real blasHA[varNo*varNo];
+	Real blasHB[varNo*varNo];
+	Real blasHL[varNo*varNo];
+	Real blasADAtemp[varNo*planeNoAB];
 	noElements = varNo;
-	double blasW1dot=0.0;
-	double blasW2dot=0.0;
-	double blasGrad[varNo];
-	double blasHess[varNo*varNo];
-	double blasStep[varNo];
-	double blasFprime = 0.0;
+	Real blasW1dot=0.0;
+	Real blasW2dot=0.0;
+	Real blasGrad[varNo];
+	Real blasHess[varNo*varNo];
+	Real blasStep[varNo];
+	Real blasFprime = 0.0;
 
 #if 0
 //	MAKE SURE POINTS ARE FEASIBLE //
@@ -1657,7 +1641,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 #endif
 		dpbsv_( &UPLO, &varNo, &KD, &nrhs, &HessianChol[0][0], &varNo, blasStep, &varNo, &info );
 		if(info != 0) {
-			std::cout<<"chol error"<<", planeA: "<<planeNoA<<", planeB: "<<planeNoB<<endl;
+			//std::cout<<"chol error"<<", planeA: "<<planeNoA<<", planeB: "<<planeNoB<<endl;
 			//return false;
 			/* LU factorization */
 			for (int i=0; i<varNo; i++ ) {
@@ -1669,7 +1653,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 		}
 
 		if (info!=0) {
-			std::cout<<"linear algebra error"<<endl;
+			//std::cout<<"linear algebra error"<<endl;
 		}
 
 //timingDeltas->checkpoint("Cholesky");
@@ -1779,7 +1763,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 			count++;
 			//std::cout<<"count: "<<count<<", s : "<<s<<", u1: "<<u1<<", u2: "<<u2<<", wLmincoeff: "<<minWL<<endl;
 			if(count==200) {
-				std::cout<<"count: "<<count<<", totalIter: "<<totalIter<<", backtrack: "<<backtrack<<"s : "<<s<<", u1: "<<u1<<", u2: "<<u2<<", wLmincoeff: "<<minWL<<endl;
+				//std::cout<<"count: "<<count<<", totalIter: "<<totalIter<<", backtrack: "<<backtrack<<"s : "<<s<<", u1: "<<u1<<", u2: "<<u2<<", wLmincoeff: "<<minWL<<endl;
 				//std::cout<<"wL: "<<endl<<wL<<endl<<endl;
 			}
 		}
@@ -1838,7 +1822,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 			count++;
 			if(count==200) {
-				std::cout<<"count: "<<count<<", totalIter: "<<totalIter<<", backtrack: "<<backtrack<<"s : "<<s<<", u1: "<<u1<<", u2: "<<u2<<", wLmincoeff: "<<minWL<<endl;
+				//std::cout<<"count: "<<count<<", totalIter: "<<totalIter<<", backtrack: "<<backtrack<<"s : "<<s<<", u1: "<<u1<<", u2: "<<u2<<", wLmincoeff: "<<minWL<<endl;
 				//std::cout<<"wL: "<<endl<<wL<<endl<<endl;
 			}
 
@@ -1851,7 +1835,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 			count++;
 			if(backtrack<pow(10,-11) ) {
-				std::cout<<"iter: "<<iter<<", totalIter: "<<totalIter<<", backtrack: "<<backtrack<<", val: "<<val<<", newval: "<<newval<<", t: "<<t<<", fprime: "<<blasFprime<<endl;
+				//std::cout<<"iter: "<<iter<<", totalIter: "<<totalIter<<", backtrack: "<<backtrack<<", val: "<<val<<", newval: "<<newval<<", t: "<<t<<", fprime: "<<blasFprime<<endl;
 
 				break;
 			}
@@ -1863,7 +1847,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 
 		if(blasFprime >0.0) {
-			std::cout<<"count: "<<count<<", totalIter: "<<totalIter<<", blasFprime: "<<blasFprime<<endl;
+			//std::cout<<"count: "<<count<<", totalIter: "<<totalIter<<", blasFprime: "<<blasFprime<<endl;
 		}
 
 
@@ -1878,7 +1862,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 				Real fA = evaluatePP(cm1,state1,contactPt);
 				Real fB = evaluatePP(cm2,state2,contactPt);
 				if(fabs(fA-fB)>0.001 ) {
-					std::cout<<"inside fA-fB: "<<fA-fB<<endl;
+					//std::cout<<"inside fA-fB: "<<fA-fB<<endl;
 				}
 				//timingDeltas->checkpoint("newton");
 				return true;
@@ -1889,12 +1873,12 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 		}
 		if(totalIter>100) {
 
-			std::cout<<"totalIter: "<<totalIter<<", t: "<<t<<", gap: "<<2.0*m/t<<", blasFprime: "<<blasFprime<<endl;
+			//std::cout<<"totalIter: "<<totalIter<<", t: "<<t<<", gap: "<<2.0*m/t<<", blasFprime: "<<blasFprime<<endl;
 			for (int i=0; i<varNo; i++) {
-				std::cout<<"blasStep, i"<<i<<", value: "<<blasStep[i]<<endl;
+				//std::cout<<"blasStep, i"<<i<<", value: "<<blasStep[i]<<endl;
 			}
 			for (int i=0; i<varNo; i++) {
-				std::cout<<"blasGrad, i"<<i<<", value: "<<blasGrad[i]<<endl;
+				//std::cout<<"blasGrad, i"<<i<<", value: "<<blasGrad[i]<<endl;
 			}
 			return false;
 			//break;

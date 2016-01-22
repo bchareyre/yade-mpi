@@ -36,7 +36,7 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 
 
 
-		double evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial);
+		Real evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial);
 		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
 
 		bool contactPtMosekF2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPt);
@@ -56,9 +56,9 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 
 
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PP_PP_ScGeom,IGeomFunctor,"IGeom functor for PotentialParticle - PotentialParticle pair",
-			((double, accuracyTol, pow(10,-7),, "accuracy desired, tolerance criteria for SOCP"))
-			((double,interactionDetectionFactor,1.0,,"bool to avoid granular ratcheting")),
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PP_PP_ScGeom,IGeomFunctor,"EXPERIMENTAL. IGeom functor for PotentialParticle - PotentialParticle pair",
+			((Real, accuracyTol, pow(10,-7),, "accuracy desired, tolerance criteria for SOCP"))
+			((Real,interactionDetectionFactor,1.0,,"bool to avoid granular ratcheting")),
 			//((std::string,myfile,"./PotentialParticles"+"","string")),
 			//timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 			//mosekTaskEnv = MSK_makeenv(&mosekEnv,NULL,NULL,NULL,NULL);
@@ -83,35 +83,35 @@ extern "C" {
 #endif
 
 	/* LAPACK LU */
-	//int dgesv(int varNo, int varNo2, double *H, int varNo3, int *pivot, double* g, int varNo4, int info){
-	extern void dgesv_(const int *N, const int *nrhs, double *Hessian, const int *lda, int *ipiv, double *gradient, const int *ldb, int *info);
+	//int dgesv(int varNo, int varNo2, Real *H, int varNo3, int *pivot, Real* g, int varNo4, int info){
+	extern void dgesv_(const int *N, const int *nrhs, Real *Hessian, const int *lda, int *ipiv, Real *gradient, const int *ldb, int *info);
 	// int ans;
 	// dgesv_(&varNo, &varNo2, H, &varNo3, pivot,g, &varNo4, &ans);
 	// return ans;
 	//}
 
 	/* LAPACK Cholesky */
-	extern void dpbsv_(const char *uplo, const int *n, const int *kd, const int *nrhs, double *AB, const int *ldab, double *B, const int *ldb, int *info);
+	extern void dpbsv_(const char *uplo, const int *n, const int *kd, const int *nrhs, Real *AB, const int *ldab, Real *B, const int *ldb, int *info);
 
 	/* LAPACK QR */
-	extern void dgels_(const char *Trans, const int *m, const int *n, const int *nrhs, double *A, const int *lda, double *B, const int *ldb, const double *work, const int *lwork, int *info);
+	extern void dgels_(const char *Trans, const int *m, const int *n, const int *nrhs, Real *A, const int *lda, Real *B, const int *ldb, const Real *work, const int *lwork, int *info);
 
 
 	/*BLAS */
-	extern void dgemm_(const char *transA, const char *transB, const int *m, const int *n, const int *k, const double *alpha, double *A, const int *lda, double *B, const int *ldb, const double *beta, double *C, const int *ldc);
+	extern void dgemm_(const char *transA, const char *transB, const int *m, const int *n, const int *k, const Real *alpha, Real *A, const int *lda, Real *B, const int *ldb, const Real *beta, Real *C, const int *ldc);
 
-	extern void dgemv_(const char *trans, const int *m, const int *n, const double *alpha, double *A, const int *lda, double *x, const int *incx, const double *beta, double *y, const int *incy);
+	extern void dgemv_(const char *trans, const int *m, const int *n, const Real *alpha, Real *A, const int *lda, Real *x, const int *incx, const Real *beta, Real *y, const int *incy);
 
-	extern void dcopy_(const int *N, double *x, const int *incx, double *y, const int *incy);
+	extern void dcopy_(const int *N, Real *x, const int *incx, Real *y, const int *incy);
 
-	extern double ddot_(const int *N, double *x, const int *incx, double *y, const int *incy);
+	extern Real ddot_(const int *N, Real *x, const int *incx, Real *y, const int *incy);
 
-	extern void daxpy_(const int *N, const double *da, double *dx, const int *incx, double *dy, const int *incy);
+	extern void daxpy_(const int *N, const Real *da, Real *dx, const int *incx, Real *dy, const int *incy);
 
-	extern void dscal_(const int *N, const double *alpha, double *x, const int *incx);
+	extern void dscal_(const int *N, const Real *alpha, Real *x, const int *incx);
 
 
-	void dsyev_(const char *jobz, const char *uplo, const int *N, double *A, const int *lda, double *W, double *work, int *lwork, int *info);
+	void dsyev_(const char *jobz, const char *uplo, const int *N, Real *A, const int *lda, Real *W, Real *work, int *lwork, int *info);
 
 
 #ifdef __cplusplus

@@ -8,7 +8,7 @@
 
 #include "MarchingCube.hpp"
 
- 
+
 MarchingCube::MarchingCube( )
 {
 	nbTriangles = 0;
@@ -20,33 +20,32 @@ MarchingCube::~MarchingCube()
 }
 
 
-void  MarchingCube::init(int sx, int sy, int sz, const Vector3r& min, const Vector3r& max) 
+void MarchingCube::init(int sx, int sy, int sz, const Vector3r& min, const Vector3r& max)
 {
 	sizeX = sx;
 	sizeY = sy;
 	sizeZ = sz;
 	
-	alpha	= (max-min).cwiseProduct(Vector3r(1.0/(float)sx, 1.0/(float)sy, 1.0/(float)sz));
-	beta	= ((min-max).cwiseProduct(Vector3r(1.0/(Real)sx, 1.0/(Real)sy, 1.0/(Real)sz)))*.5+min;
+	Vector3r alpha = (max-min).cwiseProduct(Vector3r(1.0/(Real)(sx-1), 1.0/(Real)(sy-1), 1.0/(Real)(sz-1)));
 
 	triangles.resize(16*sx*sy*sz);
 	normals.resize(16*sx*sy*sz);
 
 	positions.resize(sizeX);
 	for(int i=0;i<sizeX;i++)
-		positions[i].resize(sizeY); 
+		positions[i].resize(sizeY);
 	for(int i=0;i<sizeX;i++)
 		for(int j=0;j<sizeY;j++)
-			positions[i][j].resize(sizeZ); 
+			positions[i][j].resize(sizeZ);
 
 	for(int i=0;i<sizeX;i++)
 		for(int j=0;j<sizeY;j++)
-			for(int k=0;k<sizeZ;k++) 
-				positions[i][j][k] = alpha.cwiseProduct(Vector3r(i,j,k))+beta;
+			for(int k=0;k<sizeZ;k++)
+				positions[i][j][k] = min + alpha.cwiseProduct(Vector3r(i,j,k));
 }
 
 
-void MarchingCube::resizeScalarField(vector<vector<vector<float> > >& scalarField, int sx, int sy, int sz)
+void MarchingCube::resizeScalarField(vector<vector<vector<Real> > >& scalarField, int sx, int sy, int sz)
 {
 	sizeX = sx;
 	sizeY = sy;
@@ -54,27 +53,27 @@ void MarchingCube::resizeScalarField(vector<vector<vector<float> > >& scalarFiel
 	
 	scalarField.resize(sx);
 	for(int i=0;i<sx;i++)
-			scalarField[i].resize(sy); 
+		scalarField[i].resize(sy);
 	for(int i=0;i<sx;i++)
 		for(int j=0;j<sy;j++)
-				scalarField[i][j].resize(sz,0); 
+			scalarField[i][j].resize(sz,0);
 }
 
 
-void MarchingCube::computeTriangulation(const vector<vector<vector<float> > >& scalarField, float iso)  
+void MarchingCube::computeTriangulation(const vector<vector<vector<Real> > >& scalarField, Real iso)
 {
 	isoValue = iso;
 	nbTriangles = 0;
 	for(int i=1;i<sizeX-2;i++)
 		for(int j=1;j<sizeY-2;j++)
-			for(int k=1;k<sizeZ-2;k++) 
+			for(int k=1;k<sizeZ-2;k++)
 				polygonize(scalarField,i,j,k);
 }
 
 
-void MarchingCube::polygonize(const vector<vector<vector<float> > >& scalarField, int x,int y,int z)
+void MarchingCube::polygonize(const vector<vector<vector<Real> > >& scalarField, int x,int y,int z)
 {
-	static vector<float> cellValues(8);
+	static vector<Real> cellValues(8);
 	static vector<Vector3r> cellPositions(8);
 	static vector<Vector3r> vertexList(12);
 	
@@ -88,7 +87,7 @@ void MarchingCube::polygonize(const vector<vector<vector<float> > >& scalarField
 	cellValues[7] = scalarField[x][y+1][z+1];
 	
 	cellPositions[0] = positions[x][y][z];
-	cellPositions[1] = positions[x+1][y][z];	
+	cellPositions[1] = positions[x+1][y][z];
 	cellPositions[2] = positions[x+1][y][z+1];
 	cellPositions[3] = positions[x][y][z+1];
 	cellPositions[4] = positions[x][y+1][z];
@@ -98,24 +97,24 @@ void MarchingCube::polygonize(const vector<vector<vector<float> > >& scalarField
 
 	/* compute index in edgeArray that tells how the surface intersect the cell */
 	int index = 0;
-	if (cellValues[0]>isoValue) 
+	if (cellValues[0]>isoValue)
 		index |= 1;
 	if (cellValues[1]>isoValue)
-		index |= 2; 
-	if (cellValues[2]>isoValue) 
-		index |= 4; 
+		index |= 2;
+	if (cellValues[2]>isoValue)
+		index |= 4;
 	if (cellValues[3]>isoValue)
-		index |= 8; 
-	if (cellValues[4]>isoValue) 
+		index |= 8;
+	if (cellValues[4]>isoValue)
 		index |= 16;
-	if (cellValues[5]>isoValue) 
+	if (cellValues[5]>isoValue)
 		index |= 32;
 	if (cellValues[6]>isoValue)
 		index |= 64;
 	if (cellValues[7]>isoValue)
-		index |= 128; 
+		index |= 128;
 		
-	/* compute position of vertices where the surface interesct the cell*/ 
+	/* compute position of vertices where the surface interesct the cell*/
 	int config = edgeArray[index];
 	if (config == 0) /* the cell is not intersected by surface */
 		return;
@@ -123,47 +122,47 @@ void MarchingCube::polygonize(const vector<vector<vector<float> > >& scalarField
 		interpolate(cellPositions[0], cellPositions[1], cellValues[0], cellValues[1], vertexList[0]);
 	if (config & 2)
 		interpolate(cellPositions[1], cellPositions[2], cellValues[1], cellValues[2], vertexList[1]);
-	if (config & 4) 
+	if (config & 4)
 		interpolate(cellPositions[2], cellPositions[3], cellValues[2], cellValues[3], vertexList[2]);
 	if (config & 8)
-		interpolate(cellPositions[3], cellPositions[0], cellValues[3], cellValues[0], vertexList[3]); 
+		interpolate(cellPositions[3], cellPositions[0], cellValues[3], cellValues[0], vertexList[3]);
 	if (config & 16)
 		interpolate(cellPositions[4], cellPositions[5], cellValues[4], cellValues[5], vertexList[4]);
-	if (config & 32) 
+	if (config & 32)
 		interpolate(cellPositions[5], cellPositions[6], cellValues[5], cellValues[6], vertexList[5]);
 	if (config & 64)
 		interpolate(cellPositions[6], cellPositions[7], cellValues[6], cellValues[7], vertexList[6]);
 	if (config & 128)
-		interpolate(cellPositions[7], cellPositions[4], cellValues[7], cellValues[4], vertexList[7]); 
+		interpolate(cellPositions[7], cellPositions[4], cellValues[7], cellValues[4], vertexList[7]);
 	if (config & 256)
 		interpolate(cellPositions[0], cellPositions[4], cellValues[0], cellValues[4], vertexList[8]);
-	if (config & 512) 
+	if (config & 512)
 		interpolate(cellPositions[1], cellPositions[5], cellValues[1], cellValues[5], vertexList[9]);
-	if (config & 1024) 
+	if (config & 1024)
 		interpolate(cellPositions[2], cellPositions[6], cellValues[2], cellValues[6], vertexList[10]);
 	if (config & 2048)
 		interpolate(cellPositions[3], cellPositions[7], cellValues[3], cellValues[7], vertexList[11]);
-				  
+
 	/* compute triangles and normals*/
 	int offset,i;
 	const int * tri = triTable[index];
 	
-	for (i=0; tri[i]!=-1; ++i) 
-	{ 
+	for (i=0; tri[i]!=-1; ++i)
+	{
 		offset = nbTriangles*3;
 		
 		index = tri[i];
-		triangles[offset]      = vertexList[index];
+		triangles[offset] = vertexList[index];
 		computeNormal(scalarField,x,y,z,offset,index);
 		
 		offset++;
 		index = tri[++i];
-		triangles[offset]    = vertexList[index]; 
+		triangles[offset] = vertexList[index];
 		computeNormal(scalarField,x,y,z,offset,index);
 		
 		offset++;
 		index = tri[++i];
-		triangles[offset]    = vertexList[index];
+		triangles[offset] = vertexList[index];
 		computeNormal(scalarField,x,y,z,offset,index);
 		
 		nbTriangles++;
@@ -171,95 +170,95 @@ void MarchingCube::polygonize(const vector<vector<vector<float> > >& scalarField
 }
 
 
-void MarchingCube::computeNormal(const vector<vector<vector<float> > >& scalarField, int x, int y, int z,int offset, int triangleNum)
-{ 
-	switch (triangleNum) 
-	{ 
+void MarchingCube::computeNormal(const vector<vector<vector<Real> > >& scalarField, int x, int y, int z,int offset, int triangleNum)
+{
+	switch (triangleNum)
+	{
 		case 0  : normals[offset] = computeNormalX(scalarField,x, y, z); break;
-		case 1  : normals[offset] = computeNormalZ(scalarField,x+1, y, z); break; 
-		case 2  : normals[offset] = computeNormalX(scalarField,x, y, z+1); break; 
+		case 1  : normals[offset] = computeNormalZ(scalarField,x+1, y, z); break;
+		case 2  : normals[offset] = computeNormalX(scalarField,x, y, z+1); break;
 		case 3  : normals[offset] = computeNormalZ(scalarField,x, y, z); break;
-		case 4  : normals[offset] = computeNormalX(scalarField,x, y+1, z); break; 
-		case 5  : normals[offset] = computeNormalZ(scalarField,x+1, y+1, z); break; 
-		case 6  : normals[offset] = computeNormalX(scalarField,x, y+1, z+1); break; 
-		case 7  : normals[offset] = computeNormalZ(scalarField,x, y+1, z); break; 
-		case 8  : normals[offset] = computeNormalY(scalarField,x, y, z); break; 
-		case 9  : normals[offset] = computeNormalY(scalarField,x+1, y, z); break; 
+		case 4  : normals[offset] = computeNormalX(scalarField,x, y+1, z); break;
+		case 5  : normals[offset] = computeNormalZ(scalarField,x+1, y+1, z); break;
+		case 6  : normals[offset] = computeNormalX(scalarField,x, y+1, z+1); break;
+		case 7  : normals[offset] = computeNormalZ(scalarField,x, y+1, z); break;
+		case 8  : normals[offset] = computeNormalY(scalarField,x, y, z); break;
+		case 9  : normals[offset] = computeNormalY(scalarField,x+1, y, z); break;
 		case 10 : normals[offset] = computeNormalY(scalarField,x+1, y, z+1); break;
 		case 11 : normals[offset] = computeNormalY(scalarField,x, y, z+1); break;
 	}
 }
 
 
-void MarchingCube::interpolate(const Vector3r& vect1, const Vector3r& vect2, float val1, float val2, Vector3r& vect) 
+void MarchingCube::interpolate(const Vector3r& vect1, const Vector3r& vect2, Real val1, Real val2, Vector3r& vect)
 {
-	vect[0] =  interpolateValue(val1, val2, vect1[0], vect2[0]);
-	vect[1] =  interpolateValue(val1, val2, vect1[1], vect2[1]);
-	vect[2] =  interpolateValue(val1, val2, vect1[2], vect2[2]);	
+	vect[0] = interpolateValue(val1, val2, vect1[0], vect2[0]);
+	vect[1] = interpolateValue(val1, val2, vect1[1], vect2[1]);
+	vect[2] = interpolateValue(val1, val2, vect1[2], vect2[2]);
 }
 
 
-float MarchingCube::interpolateValue( float val1, float val2, float val_cible1, float val_cible2) 
+Real MarchingCube::interpolateValue( Real val1, Real val2, Real val_cible1, Real val_cible2)
 {
-	float a = (val_cible2-val_cible1)/(val2-val1);
-	float b = val_cible1-a*val1;
+	Real a = (val_cible2-val_cible1)/(val2-val1);
+	Real b = val_cible1-a*val1;
 	return a*isoValue+b;
-} 
+}
 
-				   
-const Vector3r& MarchingCube::computeNormalX(const vector<vector<vector<float> > >& scalarField, int x, int y, int z)
+
+const Vector3r& MarchingCube::computeNormalX(const vector<vector<vector<Real> > >& scalarField, int x, int y, int z)
 {
 	static Vector3r normal;
 	
-	float xyz = scalarField[x][y][z];
-	float xp1yz = scalarField[x+1][y][z];
+	Real xyz = scalarField[x][y][z];
+	Real xp1yz = scalarField[x+1][y][z];
 	
-	normal[0] =	interpolateValue( xp1yz, xyz, scalarField[x+2][y][z]-xyz, xp1yz-scalarField[x-1][y][z] );
-	normal[1] =	interpolateValue( xyz, xp1yz, scalarField[x][y+1][z], scalarField[x+1][y+1][z] ) - 
-			interpolateValue( xyz, xp1yz, scalarField[x][y-1][z], scalarField[x+1][y-1][z] ); 
-	normal[2] =	interpolateValue( xyz, xp1yz, scalarField[x][y][z+1], scalarField[x+1][y][z+1] ) - 
-			interpolateValue( xyz, xp1yz, scalarField[x][y][z-1], scalarField[x+1][y][z-1] );
-			
+	normal[0] = interpolateValue( xp1yz, xyz, scalarField[x+2][y][z]-xyz, xp1yz-scalarField[x-1][y][z] );
+	normal[1] = interpolateValue( xyz, xp1yz, scalarField[x][y+1][z], scalarField[x+1][y+1][z] ) -
+		interpolateValue( xyz, xp1yz, scalarField[x][y-1][z], scalarField[x+1][y-1][z] );
+	normal[2] = interpolateValue( xyz, xp1yz, scalarField[x][y][z+1], scalarField[x+1][y][z+1] ) -
+		interpolateValue( xyz, xp1yz, scalarField[x][y][z-1], scalarField[x+1][y][z-1] );
+		
 	normal.normalize();
 	return normal;
 }
 
 
-const Vector3r& MarchingCube::computeNormalY(const vector<vector<vector<float> > >& scalarField, int x, int y, int z ) 
+const Vector3r& MarchingCube::computeNormalY(const vector<vector<vector<Real> > >& scalarField, int x, int y, int z )
 {
 	static Vector3r normal;
 	
-	float xyz = scalarField[x][y][z];
-	float xyp1z = scalarField[x][y+1][z];
+	Real xyz = scalarField[x][y][z];
+	Real xyp1z = scalarField[x][y+1][z];
 
-	normal[0] =	interpolateValue( xyz, xyp1z, scalarField[x+1][y][z], scalarField[x+1][y+1][z] ) - 
-			interpolateValue( xyz, xyp1z, scalarField[x-1][y][z], scalarField[x-1][y+1][z] ); 	
-	normal[1] =	interpolateValue( xyp1z, xyz, scalarField[x][y+2][z]-xyz, xyp1z-scalarField[x][y-1][z] ); 
-	normal[2] =	interpolateValue( xyz, xyp1z, scalarField[x][y][z+1], scalarField[x][y+1][z+1] ) - 
-			interpolateValue( xyz, xyp1z, scalarField[x][y][z-1], scalarField[x][y+1][z-1] );
+	normal[0] = interpolateValue( xyz, xyp1z, scalarField[x+1][y][z], scalarField[x+1][y+1][z] ) -
+		interpolateValue( xyz, xyp1z, scalarField[x-1][y][z], scalarField[x-1][y+1][z] );
+	normal[1] = interpolateValue( xyp1z, xyz, scalarField[x][y+2][z]-xyz, xyp1z-scalarField[x][y-1][z] );
+	normal[2] = interpolateValue( xyz, xyp1z, scalarField[x][y][z+1], scalarField[x][y+1][z+1] ) -
+		interpolateValue( xyz, xyp1z, scalarField[x][y][z-1], scalarField[x][y+1][z-1] );
 	
 	normal.normalize();
 	return normal;
-} 
+}
 
-              
-const Vector3r& MarchingCube::computeNormalZ(const vector<vector<vector<float> > >& scalarField, int x, int y, int z) 
+
+const Vector3r& MarchingCube::computeNormalZ(const vector<vector<vector<Real> > >& scalarField, int x, int y, int z)
 {
 	static Vector3r normal;
 
-	float xyz = scalarField[x][y][z];
-	float xyzp1 = scalarField[x][y][z+1];
+	Real xyz = scalarField[x][y][z];
+	Real xyzp1 = scalarField[x][y][z+1];
 	
-	normal[0] = 	interpolateValue( xyz, xyzp1, scalarField[x+1][y][z], scalarField[x+1][y][z+1] ) - 
-			interpolateValue( xyz, xyzp1, scalarField[x-1][y][z], scalarField[x-1][y][z+1] ); 
+	normal[0] = interpolateValue( xyz, xyzp1, scalarField[x+1][y][z], scalarField[x+1][y][z+1] ) -
+		interpolateValue( xyz, xyzp1, scalarField[x-1][y][z], scalarField[x-1][y][z+1] );
 
-	normal[1] = 	interpolateValue( xyz, xyzp1, scalarField[x][y+1][z], scalarField[x][y+1][z+1] ) - 
-			interpolateValue( xyz, xyzp1, scalarField[x][y-1][z], scalarField[x][y-1][z+1] ); 
-	normal[2] =	interpolateValue( xyzp1, xyz, scalarField[x][y][z+2]-xyz, xyzp1-scalarField[x][y][z-1] );
+	normal[1] = interpolateValue( xyz, xyzp1, scalarField[x][y+1][z], scalarField[x][y+1][z+1] ) -
+		interpolateValue( xyz, xyzp1, scalarField[x][y-1][z], scalarField[x][y-1][z+1] );
+	normal[2] = interpolateValue( xyzp1, xyz, scalarField[x][y][z+2]-xyz, xyzp1-scalarField[x][y][z-1] );
 	
 	normal.normalize();
 	return normal;
-} 
+}
 
 
 const int MarchingCube::edgeArray[256] = {
@@ -294,7 +293,7 @@ const int MarchingCube::edgeArray[256] = {
 	0xe90, 0xf99, 0xc93, 0xd9a, 0xa96, 0xb9f, 0x895, 0x99c,
 	0x69c, 0x795, 0x49f, 0x596, 0x29a, 0x393, 0x99 , 0x190,
 	0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c,
-	0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0   
+	0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0
 };
 
 

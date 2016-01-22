@@ -40,7 +40,7 @@ for s in sp:
 	wire=False
 	color=[0,0,255.0]
 	highlight=False
-	b.shape=PotentialParticle(k=0.2, r=0.05*meanSize, R=1.02*sphereRad, a=[1.0,-1.0,0.0,0.0,0.0,0.0], b=[0.0,0.0,1.0,-1.0,0.0,0.0], c=[0.0,0.0,0.0,0.0,1.0,-1.0], d=[distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP],isBoundary=False,color=color,wire=wire,highlight=highlight,minAabb=Vector3(sphereRad,sphereRad,sphereRad),maxAabb=Vector3(sphereRad,sphereRad,sphereRad),maxAabbRotated=Vector3(sphereRad,sphereRad,sphereRad),minAabbRotated=Vector3(sphereRad,sphereRad,sphereRad),AabbMinMax=False)
+	b.shape=PotentialParticle(k=0.2, r=0.05*meanSize, R=1.02*sphereRad, a=[1.0,-1.0,0.0,0.0,0.0,0.0], b=[0.0,0.0,1.0,-1.0,0.0,0.0], c=[0.0,0.0,0.0,0.0,1.0,-1.0], d=[distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP,distanceToCentre-rPP],isBoundary=False,color=color,wire=wire,highlight=highlight,minAabb=Vector3(sphereRad,sphereRad,sphereRad),maxAabb=Vector3(sphereRad,sphereRad,sphereRad),maxAabbRotated=Vector3(sphereRad,sphereRad,sphereRad),minAabbRotated=Vector3(sphereRad,sphereRad,sphereRad),AabbMinMax=False, id=count)
 	length=meanSize
   	V= 1.0
   	geomInert=(2./5.)*powderDensity*V*sphereRad**2

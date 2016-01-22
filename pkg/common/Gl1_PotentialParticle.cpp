@@ -55,43 +55,32 @@
 #include <vtkIntArray.h>
 
 #ifdef YADE_OPENGL
-void Gl1_PotentialParticle::calcMinMax(const shared_ptr<Shape>& cm) {
-	PotentialParticle* pp = static_cast<PotentialParticle*>(cm.get());
-	int planeNo = pp->d.size();
-	Real maxD = pp->d[0];
+void Gl1_PotentialParticle::calcMinMax(const PotentialParticle& pp) {
+	int planeNo = pp.d.size();
+	Real maxD = pp.d[0];
 
 	for (int i=0; i<planeNo; ++i) {
-		if (pp->d[i] > maxD) {
-			maxD = pp->d[i];
+		if (pp.d[i] > maxD) {
+			maxD = pp.d[i];
 		}
 	}
 
-	//Real R = pp->R;
-	min =-1.1*pp->minAabb; // 1.5*Vector3r(-maxTip,-maxTip,-maxTip);
-	max = 1.1*pp->maxAabb; //-1.0*min;
+	min = -aabbEnlargeFactor*pp.minAabb;
+	max =  aabbEnlargeFactor*pp.maxAabb;
 
-	float dx = (max[0]-min[0])/((float)(sizeX));
-	float dy = (max[1]-min[1])/((float)(sizeY));
-	float dz = (max[2]-min[2])/((float)(sizeZ));
+	Real dx = (max[0]-min[0])/((Real)(sizeX-1));
+	Real dy = (max[1]-min[1])/((Real)(sizeY-1));
+	Real dz = (max[2]-min[2])/((Real)(sizeZ-1));
 
 	isoStep=Vector3r(dx,dy,dz);
 }
 
 
-void Gl1_PotentialParticle::generateScalarField(const shared_ptr<Shape>& cm) {
-	for(int i=0; i<sizeX; i++) {
-		for(int j=0; j<sizeY; j++) {
-			for(int k=0; k<sizeZ; k++)
-			{
-				scalarField[i][j][k] = 0.0;
-			}
-		}
-	}
-
+void Gl1_PotentialParticle::generateScalarField(const PotentialParticle& pp) {
 	for(int i=0; i<sizeX; i++) {
 		for(int j=0; j<sizeY; j++) {
 			for(int k=0; k<sizeZ; k++) {
-				scalarField[i][j][k] = evaluateF(cm,  min[0]+ double(i)*isoStep[0],  min[1]+ double(j)*isoStep[1],  min[2]+double(k)*isoStep[2]);//
+				scalarField[i][j][k] = evaluateF(pp,  min[0]+ Real(i)*isoStep[0],  min[1]+ Real(j)*isoStep[1],  min[2]+Real(k)*isoStep[2]);//
 			}
 		}
 	}
@@ -101,12 +90,9 @@ void Gl1_PotentialParticle::generateScalarField(const shared_ptr<Shape>& cm) {
 
 vector<Gl1_PotentialParticle::scalarF> Gl1_PotentialParticle::SF;
 int Gl1_PotentialParticle::sizeX, Gl1_PotentialParticle::sizeY, Gl1_PotentialParticle::sizeZ;
+Real Gl1_PotentialParticle::aabbEnlargeFactor;
 bool Gl1_PotentialParticle::store;
 bool Gl1_PotentialParticle::initialized;
-
-void Gl1_PotentialParticle::clearMemory() {
-	SF.clear();
-}
 
 
 void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<State>& state ,bool wire2, const GLViewInfo&) {
@@ -125,12 +111,13 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 	if(initialized == false ) {
 		FOREACH(const shared_ptr<Body>& b, *scene->bodies) {
 			if (!b) continue;
-			const shared_ptr<Shape>&  cmbody=b->shape;
-			calcMinMax(cmbody);
+			PotentialParticle* cmbody = dynamic_cast<PotentialParticle*>(b->shape.get());
+			if (!cmbody) continue;
+			calcMinMax(*cmbody);
 			mc.init(sizeX,sizeY,sizeZ,min,max);
 			mc.resizeScalarField(scalarField,sizeX,sizeY,sizeZ);
 			SF.push_back(scalarF());
-			generateScalarField(cmbody);
+			generateScalarField(*cmbody);
 			mc.computeTriangulation(scalarField,0.0);
 			SF[b->id].triangles = mc.getTriangles();
 			SF[b->id].normals = mc.getNormals();
@@ -144,23 +131,14 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 		initialized = true;
 	}
 
-
-	//if(std::isnan(shapeId)==true){return;}
-
-	calcMinMax(cm);
-	mc.init(sizeX,sizeY,sizeZ,min,max);
-	mc.resizeScalarField(scalarField,sizeX,sizeY,sizeZ);
-
-
-
 	// FIXME : check that : one of those 2 lines are useless
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3r(cm->color[0],cm->color[1],cm->color[2]));
 	glColor3v(cm->color);
 
 
-	vector<Vector3r>& triangles 	= SF[shapeId].triangles; //mc.getTriangles();
-	int nbTriangles			= SF[shapeId].nbTriangles; // //mc.getNbTriangles();
-	vector<Vector3r>& normals 	= SF[shapeId].normals; //mc.getNormals();
+	const vector<Vector3r>& triangles = SF[shapeId].triangles; //mc.getTriangles();
+	int nbTriangles = SF[shapeId].nbTriangles; // //mc.getNbTriangles();
+	const vector<Vector3r>& normals = SF[shapeId].normals; //mc.getNormals();
 
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_LIGHTING); // 2D
@@ -182,27 +160,25 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 
 
 
-double Gl1_PotentialParticle::evaluateF(const shared_ptr<Shape>& cm, double x, double y, double z) {
-
-	PotentialParticle* pp = static_cast<PotentialParticle*>(cm.get());
-	Real k = pp->k;
-	Real r = pp->r;
-	Real R = pp->R;
+Real Gl1_PotentialParticle::evaluateF(const PotentialParticle& pp, Real x, Real y, Real z) {
+	Real k = pp.k;
+	Real r = pp.r;
+	Real R = pp.R;
 
 
-	int planeNo = pp->a.size();
+	int planeNo = pp.a.size();
 
-	vector<double>a;
-	vector<double>b;
-	vector<double>c;
-	vector<double>d;
-	vector<double>p;
+	vector<Real>a;
+	vector<Real>b;
+	vector<Real>c;
+	vector<Real>d;
+	vector<Real>p;
 	Real pSum3 = 0.0;
 	for (int i=0; i<planeNo; i++) {
-		a.push_back(pp->a[i]);
-		b.push_back(pp->b[i]);
-		c.push_back(pp->c[i]);
-		d.push_back(pp->d[i]);
+		a.push_back(pp.a[i]);
+		b.push_back(pp.b[i]);
+		c.push_back(pp.c[i]);
+		d.push_back(pp.d[i]);
 		Real plane = a[i]*x + b[i]*y + c[i]*z - d[i];
 		if (plane<pow(10,-15)) {
 			plane = 0.0;
@@ -236,10 +212,10 @@ ImpFunc::~ImpFunc() {
 }
 
 // Evaluate function
-double ImpFunc::FunctionValue(double x[3]) {
+Real ImpFunc::FunctionValue(Real x[3]) {
 	int planeNo = a.size();
-	vector<double>p;
-	double pSum2 = 0.0;
+	vector<Real>p;
+	Real pSum2 = 0.0;
 	if (!clump) {
 		Eigen::Vector3d xori(x[0],x[1],x[2]);
 		Eigen::Vector3d xlocal = rotationMatrix*xori;
@@ -250,14 +226,14 @@ double ImpFunc::FunctionValue(double x[3]) {
 		//x[0]=xlocal[0]; x[1]=xlocal[1]; x[2]=xlocal[2];
 
 		for (int i=0; i<planeNo; i++) {
-			double plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i];
+			Real plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i];
 			if (plane<pow(10,-15)) {
 				plane = 0.0;
 			}
 			p.push_back(plane);
 			pSum2 += pow(p[i],2);
 		}
-		double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
+		Real sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
 		Real f = (1.0-k)*(pSum2/pow(r,2) - 1.0)+k*(sphere/pow(R,2)-1.0);
 		return f;
 	} else {
@@ -272,14 +248,14 @@ double ImpFunc::FunctionValue(double x[3]) {
 		//x[0]=xlocal[0]; x[1]=xlocal[1]; x[2]=xlocal[2];
 
 		for (int i=0; i<planeNo; i++) {
-			double plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i];
+			Real plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i];
 			if (plane<pow(10,-15)) {
 				plane = 0.0;
 			}
 			p.push_back(plane);
 			pSum2 += pow(p[i],2);
 		}
-		double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
+		Real sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
 		Real f = (1.0-k)*(pSum2/pow(r,2) - 1.0)+k*(sphere/pow(R,2)-1.0);
 		return f;
 		// return 0;
@@ -392,14 +368,12 @@ void PotentialParticleVTKRecorder::action() {
 		vtkSmartPointer<vtkSampleFunction> sample = vtkSampleFunction::New();
 		sample->SetImplicitFunction(function);
 
-		//double xmin = -pb->halfSize.x(); double xmax = pb->halfSize.x(); double ymin = -pb->halfSize.y(); double ymax=pb->halfSize.y(); double zmin=-pb->halfSize.z(); double zmax=pb->halfSize.z();
-		//double xmin = -value; double xmax = value; double ymin = -value; double ymax=value; double zmin=-value; double zmax=value;
-		double xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x());
-		double xmax = -xmin;
-		double ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y());
-		double ymax=-ymin;
-		double zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z());
-		double zmax=-zmin;
+		Real xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x());
+		Real xmax = -xmin;
+		Real ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y());
+		Real ymax=-ymin;
+		Real zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z());
+		Real zmax=-zmin;
 		if(twoDimension==true) {
 			ymax = 0.0;
 			ymin = 0.0;
@@ -409,13 +383,13 @@ void PotentialParticleVTKRecorder::action() {
 		int sampleXno = sampleX;
 		int sampleYno = sampleY;
 		int sampleZno = sampleZ;
-		if(fabs(xmax-xmin)/static_cast<double>(sampleX) > maxDimension) {
+		if(fabs(xmax-xmin)/static_cast<Real>(sampleX) > maxDimension) {
 			sampleXno = static_cast<int>(fabs(xmax-xmin)/maxDimension);
 		}
-		if(fabs(ymax-ymin)/static_cast<double>(sampleY) > maxDimension) {
+		if(fabs(ymax-ymin)/static_cast<Real>(sampleY) > maxDimension) {
 			sampleYno = static_cast<int>(fabs(ymax-ymin)/maxDimension);
 		}
-		if(fabs(zmax-zmin)/static_cast<double>(sampleZ) > maxDimension) {
+		if(fabs(zmax-zmin)/static_cast<Real>(sampleZ) > maxDimension) {
 			sampleZno = static_cast<int>(fabs(zmax-zmin)/maxDimension);
 		}
 		if(twoDimension==true) {

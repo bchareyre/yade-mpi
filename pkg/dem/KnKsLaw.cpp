@@ -48,10 +48,10 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 		return true;
 	}
 
-	Vector3r shearForceBeforeRotate = shearForce;
+	//Vector3r shearForceBeforeRotate = shearForce;
 	Vector3r shiftVel = Vector3r(0,0,0); //scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
 	geom->rotate(shearForce); //AndGetShear(shearForce,phys->prevNormal,de1,de2,dt,shiftVel,/*avoid ratcheting*/false);
-	Vector3r shearForceAfterRotate = shearForce;
+	//Vector3r shearForceAfterRotate = shearForce;
 	//Linear elasticity giving "trial" shear force
 	Vector3r shift2(0,0,0);
 	Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shift2, shiftVel, /*preventGranularRatcheting*/false );
@@ -61,7 +61,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	phys->shearDir = shearIncrement;
 	phys->shearIncrementForCD += shearIncrement.norm();
 	double du = 0.0;
-	double debugFn = 0.0;
+	//double debugFn = 0.0;
 	//double u_prev = fabs(phys->u_cumulative);
 	if(phys->shearDir.norm() > pow(10,-15)) {
 		phys->shearDir.normalize();
@@ -229,7 +229,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	//we need to use correct branches in the periodic case, the following apply for spheres only
 	Vector3r force = -phys->normalForce-dampedShearForce;
 	if(isnan(force.norm())) {
-		std::cout<<"shearForce: "<<shearForce<<", normalForce: "<<phys->normalForce<<", debugFn: "<<debugFn<<", viscous: "<<phys->normalViscous<<", normal: "<<phys->normal<<", geom normal: "<<geom->normal<<", effective_phi: "<<phys->effective_phi<<", shearIncrement: "<<shearIncrement<<", id1: "<<id1<<", id2: "<<id2<<", shearForceBeforeRotate: "<<shearForceBeforeRotate<<", shearForceAfterRotate: " <<shearForceAfterRotate<<endl;
+		//std::cout<<"shearForce: "<<shearForce<<", normalForce: "<<phys->normalForce<<", debugFn: "<<debugFn<<", viscous: "<<phys->normalViscous<<", normal: "<<phys->normal<<", geom normal: "<<geom->normal<<", effective_phi: "<<phys->effective_phi<<", shearIncrement: "<<shearIncrement<<", id1: "<<id1<<", id2: "<<id2<<", shearForceBeforeRotate: "<<shearForceBeforeRotate<<", shearForceAfterRotate: " <<shearForceAfterRotate<<endl;
 	}
 	scene->forces.addForce(id1,force);
 	scene->forces.addForce(id2,-force);

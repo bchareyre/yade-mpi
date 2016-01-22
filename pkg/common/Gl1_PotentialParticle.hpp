@@ -50,27 +50,27 @@ class ImpFunc : public vtkImplicitFunction {
 		// Description
 		// Create a new function
 		static ImpFunc * New(void);
-		vector<double>a;
-		vector<double>b;
-		vector<double>c;
-		vector<double>d;
-		double k;
-		double r;
-		double R;
+		vector<Real>a;
+		vector<Real>b;
+		vector<Real>c;
+		vector<Real>d;
+		Real k;
+		Real r;
+		Real R;
 		Eigen::Matrix3d rotationMatrix;
 		bool clump;
-		double clumpMemberCentreX;
-		double clumpMemberCentreY;
-		double clumpMemberCentreZ;
+		Real clumpMemberCentreX;
+		Real clumpMemberCentreY;
+		Real clumpMemberCentreZ;
 		// Description
 		// Evaluate function
-		double FunctionValue(double x[3]);
-		double EvaluateFunction(double x[3]) {
+		Real FunctionValue(Real x[3]);
+		Real EvaluateFunction(Real x[3]) {
 			//return this->vtkImplicitFunction::EvaluateFunction(x);
 			return FunctionValue(x);
 		};
 
-		double EvaluateFunction(double x, double y, double z) {
+		Real EvaluateFunction(Real x, Real y, Real z) {
 			return this->vtkImplicitFunction::EvaluateFunction(x, y, z);
 		};
 
@@ -79,7 +79,7 @@ class ImpFunc : public vtkImplicitFunction {
 
 		// Description
 		// Evaluate gradient for function
-		void EvaluateGradient(double x[3], double n[3]) { };
+		void EvaluateGradient(Real x[3], Real n[3]) { };
 
 		// If you need to set parameters, add methods here
 
@@ -97,13 +97,11 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 	private :
 		MarchingCube mc;
 		Vector3r min,max;
-		vector<vector<vector<float > > > 	scalarField,weights;
-		void generateScalarField(const shared_ptr<Shape>& cm);
-		void calcMinMax(const shared_ptr<Shape>& cm);
-		float oldIsoValue,oldIsoSec,oldIsoThick;
+		vector<vector<vector<Real > > > scalarField,weights;
+		void generateScalarField(const PotentialParticle& pp);
+		void calcMinMax(const PotentialParticle& pp);
+		Real oldIsoValue,oldIsoSec,oldIsoThick;
 		Vector3r isoStep;
-
-	public :
 		struct Leaf {
 			Vector3r centre;
 			Leaf(Vector3r pos) {
@@ -114,21 +112,24 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 			}
 		};
 		struct scalarF {
-			vector<vector<vector<float > > > scalarField2;
+			vector<vector<vector<Real > > > scalarField2;
 			vector<Vector3r> triangles;
 			vector<Vector3r> normals;
 			int nbTriangles;
 		};
-		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-		double evaluateF(const shared_ptr<Shape>& cm, double x, double y, double z);
+		Real evaluateF(const PotentialParticle& pp, Real x, Real y, Real z);
 		static vector<scalarF> SF ;
-		void clearMemory();
+
+	public :
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+
 		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialParticle,GlShapeFunctor,"Renders :yref:`PotentialParticle` object",
 			((int,sizeX,10,,"Number of divisions in the x direction for triangulation"))
 			((int,sizeY,10,,"Number of divisions in the y direction for triangulation"))
 			((int,sizeZ,10,,"Number of divisions in the z direction for triangulation"))
 			((bool,store,false,,"store computed triangulation or not"))
 			((bool,initialized,false,,"if triangulation is initialized"))
+			((Real,aabbEnlargeFactor,1.3,,"some factor for displaying algorithm, try different value if you have problems with displaying"))
 		);
 		RENDERS(PotentialParticle);
 };
@@ -146,7 +147,7 @@ class PotentialParticleVTKRecorder: public PeriodicEngine {
 			((int,sampleX,30,,"Number of divisions in the x direction for triangulation"))
 			((int,sampleY,30,,"Number of divisions in the y direction for triangulation"))
 			((int,sampleZ,30,,"Number of divisions in the z direction for triangulation"))
-			((double,maxDimension,30,,"max dimension"))
+			((Real,maxDimension,30,,"max dimension"))
 			((bool,twoDimension,false,,"2D or not"))
 			((bool,REC_INTERACTION,false,,"contact point and forces"))
 			((bool,REC_COLORS,false,,"colors"))

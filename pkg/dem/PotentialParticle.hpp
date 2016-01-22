@@ -15,7 +15,7 @@ class PotentialParticle : public Shape {
 	public:
 		virtual ~PotentialParticle ();
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialParticle,Shape,"Geometry of PotentialParticle.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialParticle,Shape,"EXPERIMENTAL. Geometry of PotentialParticle.",
 			((int, id, 1,, "idNo"))
 			((bool, isBoundary, false,, "boundary"))
 			((bool, fixedNormal, false,, "use fixed normal"))
@@ -32,10 +32,10 @@ class PotentialParticle : public Shape {
 			((Real , k, 0.1,, "k "))
 			((vector<Vector3r>, vertices,,,"vertices"))
 			((vector<bool> , isBoundaryPlane, ,, "whether it is a boundaryPlane "))
-			((vector<double> , a, ,, "a "))
-			((vector<double> , b, ,, "b "))
-			((vector<double> , c, ,, "c "))
-			((vector<double> , d, ,, "d "))
+			((vector<Real> , a, ,, "a "))
+			((vector<Real> , b, ,, "b "))
+			((vector<Real> , c, ,, "c "))
+			((vector<Real> , d, ,, "d "))
 			,
 			createIndex(); /*ctor*/
 #if 0
@@ -61,8 +61,8 @@ REGISTER_SERIALIZABLE(PotentialParticle);
 #ifdef __cplusplus
 extern "C" {
 #endif
-void dgesv_(const int *N, const int *nrhs, double *Hessian, const int *lda, int *ipiv, double *gradient, const int *ldb, int *info);
-void dsyev_(const char *jobz, const char *uplo, const int *N, double *A, const int *lda, double *W, double *work, int *lwork, int *info);
+void dgesv_(const int *N, const int *nrhs, Real *Hessian, const int *lda, int *ipiv, Real *gradient, const int *ldb, int *info);
+void dsyev_(const char *jobz, const char *uplo, const int *N, Real *A, const int *lda, Real *W, Real *work, int *lwork, int *info);
 #ifdef __cplusplus
 };
 #endif
