@@ -1,0 +1,21 @@
+language: cpp
+compiler:
+  - gcc
+notifications:
+  email:
+    recipients:
+      - yade-dev@lists.launchpad.net
+      - gladk@debian.org
+    on_success: change
+    on_failure: always
+before_script:
+  - sudo apt-get update -qq
+  - sudo apt-get install cmake debhelper freeglut3-dev help2man ipython libboost-all-dev libbz2-dev libcgal-dev libeigen3-dev libgl1-mesa-dev libgts-dev libloki-dev libmetis-dev libopenblas-dev libqglviewer-dev libsuitesparse-dev libvtk5-dev libxi-dev libxmu-dev pyqt4-dev-tools python-all-dev python-argparse python-gts python-imaging python-matplotlib python-minieigen python-numpy python-qt4 python-support python-tk python-xlib zlib1g-dev dvipng graphviz libjs-jquery lmodern python-bibtex python-sphinx (>= 1.0.7+dfsg) texlive-fonts-recommended texlive-latex-extra texlive-latex-recommended texlive-pictures texlive-xetex tipa
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX=./../inst -DSUFFIX=-trunk ..
+script:
+  - make
+  - make install
+  - ./../inst/bin/yade-trunk --test
+  - ./../inst/bin/yade-trunk --check
