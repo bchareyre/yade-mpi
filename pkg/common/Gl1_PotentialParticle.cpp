@@ -399,8 +399,12 @@ void PotentialParticleVTKRecorder::action() {
 		sample->ComputeNormalsOff();
 		//sample->Update();
 		vtkSmartPointer<vtkContourFilter> contours = vtkContourFilter::New();
-		contours->SetInput(sample->GetOutput());
-		contours->SetNumberOfContours(1);
+    #ifdef YADE_VTK6
+		  contours->SetInputData(sample->GetOutput());
+    #else
+		  contours->SetInput(sample->GetOutput());
+		#endif
+    contours->SetNumberOfContours(1);
 		contours->SetValue(0,0.0);
 		vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
 		contours->Update();
@@ -434,7 +438,11 @@ void PotentialParticleVTKRecorder::action() {
 		AngleAxisr aa(orientation);
 		//Vector3r axis = aa.axis();
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-		transformFilter->SetInput( polydata );
+    #ifdef YADE_VTK6
+		  transformFilter->SetInputData( polydata );
+    #else
+		  transformFilter->SetInput( polydata );
+		#endif
 		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
 
 		transformFilter->SetTransform( transform );
@@ -488,7 +496,11 @@ void PotentialParticleVTKRecorder::action() {
 		writerA->SetDataModeToAscii();
 		string fv=fileName+"vel."+std::to_string(scene->iter)+".vtu";
 		writerA->SetFileName(fv.c_str());
-		writerA->SetInput(pbUg);
+    #ifdef YADE_VTK6
+		  writerA->SetInputData(pbUg);
+    #else
+		  writerA->SetInput(pbUg);
+		#endif
 		writerA->Write();
 		//writerA->Delete();
 		//pbUg->Delete();
@@ -504,7 +516,11 @@ void PotentialParticleVTKRecorder::action() {
 		writerA->SetDataModeToAscii();
 		string fv=fileName+"Id."+std::to_string(scene->iter)+".vtu";
 		writerA->SetFileName(fv.c_str());
-		writerA->SetInput(pbUg);
+    #ifdef YADE_VTK6
+		  writerA->SetInputData(pbUg);
+    #else
+		  writerA->SetInput(pbUg);
+		#endif
 		writerA->Write();
 		//writerA->Delete();
 		//pbUg->Delete();
@@ -542,7 +558,11 @@ void PotentialParticleVTKRecorder::action() {
 			writerB->SetDataModeToAscii();
 			string fcontact=fileName+"contactPoint."+std::to_string(scene->iter)+".vtu";
 			writerB->SetFileName(fcontact.c_str());
-			writerB->SetInput(pbUgCP);
+      #ifdef YADE_VTK6
+			  writerB->SetInputData(pbUgCP);
+      #else
+			  writerB->SetInput(pbUgCP);
+		  #endif
 			writerB->Write();
 			//writerB->Delete();
 			//pbUgCP->Delete();
