@@ -460,12 +460,14 @@ class pyForceContainer{
 		Vector3r torque_get(long id, bool sync){ checkId(id); if (!sync) return scene->forces.getTorqueSingle(id); scene->forces.sync(); return scene->forces.getTorque(id);}
 		Vector3r move_get(long id){ checkId(id); return scene->forces.getMoveSingle(id); }
 		Vector3r rot_get(long id){ checkId(id); return scene->forces.getRotSingle(id); }
-		void force_add(long id, const Vector3r& f, bool permanent){  checkId(id); if (!permanent) scene->forces.addForce (id,f); else scene->forces.addPermForce (id,f); }
-		void torque_add(long id, const Vector3r& t, bool permanent){ checkId(id); if (!permanent) scene->forces.addTorque(id,t); else scene->forces.addPermTorque(id,t);}
+		void force_add(long id, const Vector3r& f, bool permanent){  checkId(id); if (!permanent) scene->forces.addForce (id,f); else { LOG_WARN("O.forces.addF(...,permanent=True) is deprecated, use O.forces.setPermF(...) instead"); scene->forces.setPermForce (id,f); } }
+		void torque_add(long id, const Vector3r& t, bool permanent){ checkId(id); if (!permanent) scene->forces.addTorque(id,t); else { LOG_WARN("O.forces.addT(...,permanent=True) is deprecated, use O.forces.setPermT(...) instead"); scene->forces.setPermTorque(id,t); } }
 		void move_add(long id, const Vector3r& t){   checkId(id); scene->forces.addMove(id,t);}
 		void rot_add(long id, const Vector3r& t){    checkId(id); scene->forces.addRot(id,t);}
 		Vector3r permForce_get(long id){  checkId(id); return scene->forces.getPermForce(id);}
 		Vector3r permTorque_get(long id){  checkId(id); return scene->forces.getPermTorque(id);}
+		void permForce_set (long id, const Vector3r& f){ checkId(id); scene->forces.setPermForce (id,f); }
+		void permTorque_set(long id, const Vector3r& t){ checkId(id); scene->forces.setPermTorque(id,t); }
 		void reset(bool resetAll) {scene->forces.reset(scene->iter,resetAll);}
 		long syncCount_get(){ return scene->forces.syncCount;}
 		void syncCount_set(long count){ scene->forces.syncCount=count;}
@@ -886,10 +888,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("m",&pyForceContainer::torque_get,(py::arg("id"),py::arg("sync")=false),"Deprecated alias for t (torque).")
 		.def("move",&pyForceContainer::move_get,(py::arg("id")),"Displacement applied on body.")
 		.def("rot",&pyForceContainer::rot_get,(py::arg("id")),"Rotation applied on body.")
-		.def("addF",&pyForceContainer::force_add,(py::arg("id"),py::arg("f"),py::arg("permanent")=false),"Apply force on body (accumulates).\n\n # If permanent=false (default), the force applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addF(id,f,True) or removed by reset(resetAll=True). The permanent force on a body can be checked with permF(id).")
-		.def("addT",&pyForceContainer::torque_add,(py::arg("id"),py::arg("t"),py::arg("permanent")=false),"Apply torque on body (accumulates). \n\n # If permanent=false (default), the torque applies for one iteration, then it is reset by ForceResetter. \n # If permanent=true, it persists over iterations, until it is overwritten by another call to addT(id,f,True) or removed by reset(resetAll=True). The permanent torque on a body can be checked with permT(id).")
+		.def("addF",&pyForceContainer::force_add,(py::arg("id"),py::arg("f"),py::arg("permanent")=false),"Apply force on body (accumulates). The force applies for one iteration, then it is reset by ForceResetter. \n # permanent parameter is deprecated, instead of addF(...,permanent=True) use setPermF(...).")
+		.def("addT",&pyForceContainer::torque_add,(py::arg("id"),py::arg("t"),py::arg("permanent")=false),"Apply torque on body (accumulates). The torque applies for one iteration, then it is reset by ForceResetter. \n # permanent parameter is deprecated, instead of addT(...,permanent=True) use setPermT(...).")
 		.def("permF",&pyForceContainer::permForce_get,(py::arg("id")),"read the value of permanent force on body (set with setPermF()).")
 		.def("permT",&pyForceContainer::permTorque_get,(py::arg("id")),"read the value of permanent torque on body (set with setPermT()).")
+		.def("setPermF",&pyForceContainer::permForce_set, "set the value of permanent force on body.")
+		.def("setPermT",&pyForceContainer::permTorque_set,"set the value of permanent torque on body.")
 		.def("addMove",&pyForceContainer::move_add,(py::arg("id"),py::arg("m")),"Apply displacement on body (accumulates).")
 		.def("addRot",&pyForceContainer::rot_add,(py::arg("id"),py::arg("r")),"Apply rotation on body (accumulates).")
 		.def("reset",&pyForceContainer::reset,(py::arg("resetAll")=true),"Reset the force container, including user defined permanent forces/torques. resetAll=False will keep permanent forces/torques unchanged.")

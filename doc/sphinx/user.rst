@@ -773,13 +773,13 @@ Applying a force or a torque on a body is done via functions of the :yref:`Force
 
 	O.forces.addF(0,(1,0,0)) #applies for one step
   
-By default, the force applies for one time step only, and is resetted at the beginning of each step. For this reason, imposing a force at the begining of one step will have no effect at all, since it will be immediatly resetted. The only way is to place a :yref:`PyRunner` inside the simulation loop.
+This way, the force applies for one time step only, and is resetted at the beginning of each step. For this reason, imposing a force at the begining of one step will have no effect at all, since it will be immediatly resetted. The only way is to place a :yref:`PyRunner` inside the simulation loop.
 
-Applying the force permanently is possible with an optional argument (in this case it does not matter if the command comes at the begining of the time step)::
+Applying the force permanently is possible with another function (in this case it does not matter if the command comes at the begining of the time step)::
 
-	O.forces.addF(0,(1,0,0),permanent=True) #applies permanently
+	O.forces.setPermF(0,(1,0,0)) #applies permanently
 
-The force  will persist across iterations, until it is overwritten by another call to ``O.forces.addF(id,f,True)`` or erased by ``O.forces.reset(resetAll=True)``. The permanent force on a body can be checked with ``O.forces.permF(id)``.
+The force  will persist across iterations, until it is overwritten by another call to ``O.forces.setPermF(id,f)`` or erased by ``O.forces.reset(resetAll=True)``. The permanent force on a body can be checked with ``O.forces.permF(id)``.
 
 Boundary controllers
 --------------------

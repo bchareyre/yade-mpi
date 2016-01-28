@@ -1,4 +1,4 @@
-#!/usr/bin/python
+!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 '''	The script shows how to include the effect of buoyancy in a particle assembly 
@@ -93,7 +93,7 @@ def applyBuoyancy():
 			continue
 		if dh > 0:
 			F_buo = -1*(pi/3)*dh*dh*(3*rad - dh)*rho_f*integrator.gravity										# = -V*rho*g
-			O.forces.addF(b.id,F_buo,permanent=True)
+			O.forces.setPermF(b.id,F_buo)
 
 #STEP1: reduce overlaps from replaceByClumps() method:
 O.dt=1e-6 #small time step for preparation steps via calm()

@@ -92,8 +92,8 @@ class ForceContainer{
 		void  addRot(Body::id_t id, const Vector3r& r)  { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
 		void  addMaxId(Body::id_t id)                   { _maxId[omp_get_thread_num()]=id;}
 
-		void  addPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id,-1); synced=false;   _permForce[id]=f; permForceUsed=true;}
-		void addPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id,-1); synced=false;   _permTorque[id]=t; permForceUsed=true;}
+		void  setPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id,-1); synced=false;   _permForce[id]=f; permForceUsed=true;}
+		void setPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id,-1); synced=false;   _permTorque[id]=t; permForceUsed=true;}
 		const Vector3r& getPermForce(Body::id_t id) { ensureSynced(); return ((size_t)id<size)?_permForce[id]:_zero; }
 		const Vector3r& getPermTorque(Body::id_t id) { ensureSynced(); return ((size_t)id<size)?_permTorque[id]:_zero; }
 		
@@ -244,8 +244,8 @@ class ForceContainer {
 		void  addMove(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
 		const Vector3r& getRot(Body::id_t id){ensureSize(id); return _rot[id];}
 		void  addRot(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
-		void  addPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id);  _permForce[id]=f; permForceUsed=true;}
-		void addPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id);  _permTorque[id]=t; permForceUsed=true;}
+		void  setPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id);  _permForce[id]=f; permForceUsed=true;}
+		void setPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id);  _permTorque[id]=t; permForceUsed=true;}
 		void  addMaxId(Body::id_t id) { _maxId=id;}
 		const Vector3r& getPermForce(Body::id_t id) { ensureSize(id); return _permForce[id]; }
 		const Vector3r& getPermTorque(Body::id_t id) { ensureSize(id); return _permTorque[id]; }

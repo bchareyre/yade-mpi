@@ -26,7 +26,7 @@ s = O.bodies[clumpId].state
 s.mass = 5000
 s.inertia = 10000*Vector3(1,1,1)
 s.blockedDOFs = 'xyzXY'
-O.forces.addT(clumpId,(0,0,1e1),True)
+O.forces.setPermT(clumpId,(0,0,1e1))
 
 O.dt = 5e-5
 try:
