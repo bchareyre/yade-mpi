@@ -735,13 +735,13 @@ Concrete particle model
          K_N&=\frac{A_{\rm eq}E}{d_0}.
       \end{align*}
 
-   $d_0$ is the initial contact length, which will be, for interaction radius :eq:`eq-strain-interaction-radius` $R_I>1$, in average larger than $2R$. For $R_I=1.5$ (sect. :ref:`sect-calibration-elastic-properties`), we can roughly estimate $\overline{d}_0=1.25\cdot2R=\frac{5}{2}R$, getting
+   $d_0$ is the initial contact length, which will be, for interaction radius :eq:`eq-strain-interaction-radius` $R_I>1$, in average larger than $2R$. For $R_I=1.5$ ,we can roughly estimate $\overline{d}_0=1.25\cdot2R=\frac{5}{2}R$, getting
 
    .. math:: K_N=E\left(\frac{2}{5}\pi\right)R
 
    where $\frac{2}{5}\pi=\pi'$ by comparison with :eq:`eq-dt-kn`.
 
-   Interaction radius $R_I=1.5$ leads to average $N\approx12$ interactions per sphere for dense packing of spheres with the same radius $R$. $\xi=0.2$ is calibrated (sect. :ref:`sect-calibration-elastic-properties`) to match the desired macroscopic Poisson's ratio $\nu=0.2$.
+   Interaction radius $R_I=1.5$ leads to average $N\approx12$ interactions per sphere for dense packing of spheres with the same radius $R$. $\xi=0.2$ is calibrated to match the desired macroscopic Poisson's ratio $\nu=0.2$.
 
    Finally, we obtain the ratio
 

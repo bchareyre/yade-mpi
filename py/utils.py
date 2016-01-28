@@ -34,7 +34,7 @@ def saveVars(mark='',loadNow=True,**kw):
 		(1, 2, 3)
 
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
-	``loadVars('something')``and they will be defined in the yade.params.\ *mark* module. The *loadNow* parameter calls :yref:`yade.utils.loadVars`
+	``loadVars('something')`` and they will be defined in the yade.params.\ *mark* module. The *loadNow* parameter calls :yref:`yade.utils.loadVars`
 	after saving automatically. If 'something' already exists, given variables will be inserted.
 	"""
 	import cPickle

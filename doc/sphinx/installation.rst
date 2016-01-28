@@ -34,7 +34,7 @@ versions, shipped with particular distribution.
 
 The Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
 Each branch corresponds to one distribution, e.g., trusty, jessie etc.
-The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`_. 
+The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`__. 
 It uses "pbuilder" to build packages, so all packages are built in a clean environment.
 
 If you do not need ``yadedaily``-package any more, just remove the
@@ -87,7 +87,7 @@ easy-to-fix bugs), but generally they are more stable than the trunk.
 #. The development version (``trunk``) can be obtained from the `code repository <https://github.com/yade/>`_ at GitHub.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
-management (install the ``git`` package on your system and create a `GitHub account <https://github.com/join/>`_)::
+management (install the ``git`` package on your system and create a `GitHub account <https://github.com/join/>`__)::
 
 		git clone git@github.com:yade/trunk.git
 
@@ -98,7 +98,7 @@ Alternatively, a read-only checkout is possible via https without a GitHub accou
 
 		git clone https://github.com/yade/trunk.git
    
-For those behind a firewall, you can download the sources from our `GitHub <https://github.com/yade>`_ repository as compressed archive.
+For those behind a firewall, you can download the sources from our `GitHub <https://github.com/yade>`__ repository as compressed archive.
 
 Release and trunk sources are compiled in exactly the same way. In order to get notifications about changes
 to the truck (i.e., ``commits``), use `watch option on GitHub <https://help.github.com/articles/watching-repositories/>`_.
@@ -304,5 +304,5 @@ Yubuntu
 
 If you are not running Ubuntu nor Debian, there is a way to create a Yubuntu `live-usb <http://en.wikipedia.org/wiki/Live_USB>`_ on any usb mass-storage device (minimum recommended size is 5GB). It is a way to make a bootable usb-key with a preinstalled minimalist operating system (Xubuntu), including Yadedaily and Paraview.
 
-More informations about this alternative are available `here <http://geo.hmg.inpg.fr/~chareyre/pubs/yubuntu/>`_ (see the README file first).
+More informations about this alternative are available `here <http://geo.hmg.inpg.fr/~chareyre/pubs/yubuntu/>`__ (see the README file first).
 
