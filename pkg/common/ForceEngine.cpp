@@ -82,54 +82,7 @@ void LinearDragEngine::action(){
 	}
 }
 
-void HydroForceEngine::action(){
-	/* Velocity fluctuation determination (not usually done at each dt, that is why it not placed in the other loop) */
-	if (velFluct == true){
-		/* check size */
-		size_t size=vFluctX.size();
-		if(size<scene->bodies->size()){
-			size=scene->bodies->size();
-			vFluctX.resize(size);
-			vFluctZ.resize(size);
-		}
-		/* reset stored values to zero */
-		memset(& vFluctX[0],0,size);
-		memset(& vFluctZ[0],0,size);
-
-		/* Create a random number generator rnd() with a gaussian distribution of mean 0 and stdev 1.0 */
-		/* see http://www.boost.org/doc/libs/1_55_0/doc/html/boost_random/reference.html and the chapter 7 of Numerical Recipes in C, second edition (1992) for more details */
-		static boost::minstd_rand0 randGen((int)TimingInfo::getNow(true));
-		static boost::normal_distribution<Real> dist(0.0, 1.0);
-		static boost::variate_generator<boost::minstd_rand0&,boost::normal_distribution<Real> > rnd(randGen,dist);
-
-		double rand1 = 0.0;
-		double rand2 = 0.0;
-		/* Attribute a fluid velocity fluctuation to each body above the bed elevation */
-		FOREACH(Body::id_t id, ids){
-			Body* b=Body::byId(id,scene).get();
-			if (!b) continue;
-			if (!(scene->bodies->exists(id))) continue;
-			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
-			if (sphere){
-				Vector3r posSphere = b->state->pos;//position vector of the sphere
-				int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
-				// if the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
-				if ((p<nCell)&&(posSphere[2]-zRef>bedElevation)) { 
-					Real uStar2 = simplifiedReynoldStresses[p];
-					if (uStar2>0.0){
-						Real uStar = sqrt(uStar2);
-						rand1 = rnd();
-						rand2 = -rand1 + rnd();
-						vFluctZ[id] = rand1*uStar;
-						vFluctX[id] = rand2*uStar;
-					}
-				}
-			}
-			
-		}
-		velFluct = false;
-	}
-	
+void HydroForceEngine::action(){	
 	/* Application of hydrodynamical forces */
 	if (activateAverage==true) averageProfile(); //Calculate the average solid profiles
 	
@@ -177,7 +130,7 @@ void HydroForceEngine::averageProfile(){
 	Vector3r uRel = Vector3r::Zero();
 	Vector3r fDrag  = Vector3r::Zero();
 
-	int nMax = 2*nCell;
+	int nMax = nCell;
 	vector<Real> velAverageX(nMax,0.0);
         vector<Real> velAverageY(nMax,0.0);
         vector<Real> velAverageZ(nMax,0.0);
@@ -280,5 +233,93 @@ void HydroForceEngine::averageProfile(){
 	//desactivate the average to avoid calculating at each step, only when asked by the user
 	activateAverage=false; 
 }
+
+
+/* Velocity fluctuation determination.  To execute at a given (changing) period corresponding to the eddy turn over time*/
+/* Should be initialized before running HydroForceEngine */
+void HydroForceEngine::turbulentFluctuation(){
+	/* check size */
+	size_t size=vFluctX.size();
+	if(size<scene->bodies->size()){
+		size=scene->bodies->size();
+		vFluctX.resize(size);
+		vFluctZ.resize(size);
+	}
+	/* reset stored values to zero */
+	memset(& vFluctX[0],0,size);
+	memset(& vFluctZ[0],0,size);
+
+	/* Create a random number generator rnd() with a gaussian distribution of mean 0 and stdev 1.0 */
+	/* see http://www.boost.org/doc/libs/1_55_0/doc/html/boost_random/reference.html and the chapter 7 of Numerical Recipes in C, second edition (1992) for more details */
+	static boost::minstd_rand0 randGen((int)TimingInfo::getNow(true));
+	static boost::normal_distribution<Real> dist(0.0, 1.0);
+	static boost::variate_generator<boost::minstd_rand0&,boost::normal_distribution<Real> > rnd(randGen,dist);
+
+	double rand1 = 0.0;
+	double rand2 = 0.0;
+	/* Attribute a fluid velocity fluctuation to each body above the bed elevation */
+	FOREACH(Body::id_t id, ids){
+		Body* b=Body::byId(id,scene).get();
+		if (!b) continue;
+		if (!(scene->bodies->exists(id))) continue;
+		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+		if (sphere){
+			Vector3r posSphere = b->state->pos;//position vector of the sphere
+			int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+			// if the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
+			if ((p<nCell)&&(posSphere[2]-zRef>bedElevation)) { 
+				Real uStar2 = simplifiedReynoldStresses[p];
+				if (uStar2>0.0){
+					Real uStar = sqrt(uStar2);
+					rand1 = rnd();
+					rand2 = -rand1 + rnd();
+					vFluctZ[id] = rand1*uStar;
+					vFluctX[id] = rand2*uStar;
+				}
+			}
+		}
+	}
+}
+
+/* Alternative Velocity fluctuation determination, fluctuation time step depend on z. Should be executed at a period dtFluct corresponding to the smallest fluctTime */
+/* Should be initialized before running HydroForceEngine */
+void HydroForceEngine::turbulentFluctuationBIS(){
+        int idPartMax = vFluctX.size();
+        double rand1 = 0.0;
+        double rand2 = 0.0;
+        /* Create a random number generator rnd() with a gaussian distribution of mean 0 and stdev 1.0 */
+        /* see http://www.boost.org/doc/libs/1_55_0/doc/html/boost_random/reference.html and the chapter 7 of Numerical Recipes in C, second edition (1992) for more details */
+        static boost::minstd_rand0 randGen((int)TimingInfo::getNow(true));
+        static boost::normal_distribution<Real> dist(0.0, 1.0);
+        static boost::variate_generator<boost::minstd_rand0&,boost::normal_distribution<Real> > rnd(randGen,dist);
+
+        for(int idPart=0;idPart<idPartMax;idPart++){
+                fluctTime[idPart]-=dtFluct; //define dtFluct in global
+                if (fluctTime[idPart]<=0){
+                        fluctTime[idPart] = 10*dtFluct;
+                        Body* b=Body::byId(idPart,scene).get();
+                        if (!b) continue;
+                        if (!(scene->bodies->exists(idPart))) continue;
+                        const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+                        Real uStar = 0.0;
+                        if (sphere){
+                                Vector3r posSphere = b->state->pos;//position vector of the sphere
+                                int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+                                if (simplifiedReynoldStresses[p]>0.0) uStar = sqrt(simplifiedReynoldStresses[p]);
+                                // if the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
+                                if ((p<nCell)&&(posSphere[2]-zRef>bedElevation)) {
+                                        rand1 = rnd();
+                                        rand2 = -rand1 + rnd();
+                                        vFluctZ[idPart] = rand1*uStar;
+                                        vFluctX[idPart] = rand2*uStar;
+                                        const Real zPos = max(b->state->pos[2]-zRef-bedElevation,11.6*viscoDyn/densFluid/uStar);
+                                        if (uStar>0.0) fluctTime[idPart]=min(0.33*0.41*zPos/uStar,10.);
+                                        }
+                                }
+                        }
+        }
+}
+
+
 
 
