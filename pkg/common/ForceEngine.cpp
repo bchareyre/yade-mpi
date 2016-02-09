@@ -138,8 +138,14 @@ void HydroForceEngine::averageProfile(){
 	vector<Real> dragAverage(nMax,0.0);
 	vector<Real> phiAverage1(nMax,0.0);
 	vector<Real> dragAverage1(nMax,0.0);
+	vector<Real> velAverageX1(nMax,0.0);
+        vector<Real> velAverageY1(nMax,0.0);
+        vector<Real> velAverageZ1(nMax,0.0);
 	vector<Real> phiAverage2(nMax,0.0);
 	vector<Real> dragAverage2(nMax,0.0);
+	vector<Real> velAverageX2(nMax,0.0);
+        vector<Real> velAverageY2(nMax,0.0);
+        vector<Real> velAverageZ2(nMax,0.0);
 
 	//Loop over the particles
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
@@ -180,10 +186,16 @@ void HydroForceEngine::averageProfile(){
 					if (s->radius==radiusPart1){
 						phiAverage1[numLayer]+=volPart; 
 						dragAverage1[numLayer]+=volPart*fDrag[0];
+						velAverageX1[numLayer]+=volPart*b->state->vel[0];
+						velAverageY1[numLayer]+=volPart*b->state->vel[1];
+						velAverageZ1[numLayer]+=volPart*b->state->vel[2];
 					}
 					if (s->radius==radiusPart2){
 						phiAverage2[numLayer]+=volPart;
 						dragAverage2[numLayer]+=volPart*fDrag[0];
+						velAverageX2[numLayer]+=volPart*b->state->vel[0];
+						velAverageY2[numLayer]+=volPart*b->state->vel[1];
+						velAverageZ2[numLayer]+=volPart*b->state->vel[2];
 					}
 				}
 			}
@@ -200,10 +212,30 @@ void HydroForceEngine::averageProfile(){
 			//Normalize the concentration after
 			phiAverage[n]/=vCell;
 			if (twoSize==true){
-				if (phiAverage1[n]!=0) dragAverage1[n]/=phiAverage1[n];
-				else dragAverage1[n]=0.0;
-				if (phiAverage2[n]!=0) dragAverage2[n]/=phiAverage2[n];
-				else dragAverage2[n]=0.0;
+				if (phiAverage1[n]!=0){
+					dragAverage1[n]/=phiAverage1[n];
+					velAverageX1[n]/=phiAverage1[n];
+					velAverageY1[n]/=phiAverage1[n];
+					velAverageZ1[n]/=phiAverage1[n];
+				}
+				else {
+					dragAverage1[n]=0.0;
+					velAverageX1[n]=0.0;
+					velAverageY1[n]=0.0;
+					velAverageZ1[n]=0.0;
+				}
+				if (phiAverage2[n]!=0){
+					dragAverage2[n]/=phiAverage2[n];
+					velAverageX2[n]/=phiAverage2[n];
+					velAverageY2[n]/=phiAverage2[n];
+					velAverageZ2[n]/=phiAverage2[n];
+				}
+				else {
+					dragAverage2[n]=0.0;
+					velAverageX2[n]=0.0;
+					velAverageY2[n]=0.0;
+					velAverageZ2[n]=0.0;
+				}
 				phiAverage1[n]/=vCell;
 				phiAverage2[n]/=vCell;
 			 }
@@ -216,6 +248,12 @@ void HydroForceEngine::averageProfile(){
 			if (twoSize==true){
 				dragAverage1[n] = 0.0;
 				dragAverage2[n] = 0.0;
+				velAverageX1[n]=0.0;
+				velAverageY1[n]=0.0;
+				velAverageZ1[n]=0.0;
+				velAverageX2[n]=0.0;
+				velAverageY2[n]=0.0;
+				velAverageZ2[n]=0.0;
 			}
 		}
 	}
@@ -229,6 +267,12 @@ void HydroForceEngine::averageProfile(){
 	phiPart2 = phiAverage2;
 	averageDrag1 = dragAverage1;
 	averageDrag2 = dragAverage2;
+	vxPart1 = velAverageX1;
+	vyPart1 = velAverageY1;
+	vzPart1 = velAverageZ1;
+	vxPart2 = velAverageX2;
+	vyPart2 = velAverageY2;
+	vzPart2 = velAverageZ2;
 
 	//desactivate the average to avoid calculating at each step, only when asked by the user
 	activateAverage=false; 
