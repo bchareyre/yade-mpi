@@ -14,7 +14,7 @@
 ## http://arxiv.org/pdf/1304.4895.pdf
 ## Also used in:
 ## * Tong et al.2012 (http://dx.doi.org/10.2516/ogst/2012032)
-## * Sari et al 2011 (http://geo.hmg.inpg.fr/~chareyre/pubs/SariChareyreCatalanoPhilippeVincens_Particles2011.pdf)
+## * Sari et al 2011 (http://people.3sr-grenoble.fr/users/bchareyre/pubs/SariChareyreCatalanoPhilippeVincens_Particles2011.pdf)
 
 
 ## The DEM-PFV is applied here to 1D consolidation (oedometer test). The example includes the determination of oedometer modulus Ee and permeability K.
