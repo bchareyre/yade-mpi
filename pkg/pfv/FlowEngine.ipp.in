@@ -295,7 +295,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	const int Sph_Index = sph->getClassIndexStatic();
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
 // 		if (!b || ignoredBody==b->getId() || b->isClumpMember()) continue;
-		if (!b || (mask<=0 or !b->maskCompatible(mask)) || b->isClumpMember()) continue;
+		if (!b || (mask>0 and !b->maskCompatible(mask)) || b->isClumpMember()) continue;
 		posData& dat = buffer[b->getId()];
 		dat.id=b->getId();
 		dat.pos=b->state->pos;
