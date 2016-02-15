@@ -151,9 +151,12 @@ bool Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, shared
 			maxFs = maxFs / Fs;
 			Vector3r trialForce=shearForce;
 			shearForce *= maxFs;
-			if (scene->trackEnergy){
+			if (scene->trackEnergy || traceEnergy){
 				Real sheardissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
-				if(sheardissip>0) scene->energy->add(sheardissip,"shearDissip",shearDissipIx,/*reset*/false);}
+				if(sheardissip>0) {
+					plasticDissipation+=sheardissip;
+					if (scene->trackEnergy) scene->energy->add(sheardissip,"shearDissip",shearDissipIx,/*reset*/false);}
+			}
 			if (Fn<0)  phys->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
 		//Apply the force

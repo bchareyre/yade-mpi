@@ -93,7 +93,7 @@ class Law2_ScGeom6D_CohFrictPhys_CohesionMoment: public LawFunctor{
 		((bool,always_use_moment_law,false,,"If true, use bending/twisting moments at all contacts. If false, compute moments only for cohesive contacts."))
 		((bool,shear_creep,false,,"activate creep on the shear force, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
 		((bool,twist_creep,false,,"activate creep on the twisting moment, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
-		((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts. This will trace only plastic energy in this law, see O.trackEnergy for a more complete energies tracing"))
+		((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at contacts. Note that it will not reflect any energy associated to de-bonding, as it may occur for fragile contacts, nor does it include plastic dissipation in traction."))
 		((bool,useIncrementalForm,false,,"use the incremental formulation to compute bending and twisting moments. Creep on the twisting moment is not included in such a case."))
 		((int,shearDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for shear dissipation (with O.trackEnergy)"))
 		((int,bendingDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for bending dissipation (with O.trackEnergy)"))
@@ -105,6 +105,8 @@ class Law2_ScGeom6D_CohFrictPhys_CohesionMoment: public LawFunctor{
 		.def("bendingElastEnergy",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::bendingElastEnergy,"Compute bending elastic energy.")
 		.def("twistElastEnergy",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::twistElastEnergy,"Compute twist elastic energy.")
 		.def("elasticEnergy",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::totalElastEnergy,"Compute total elastic energy.")
+		.def("plasticDissipation",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::getPlasticDissipation,"Total energy dissipated in plastic slips at all CohFrictPhys contacts. Computed only if :yref:`Law2_ScGeom_FrictPhys_CundallStrack::traceEnergy` is true.")
+		.def("initPlasticDissipation",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
 	);
 	FUNCTOR2D(ScGeom6D,CohFrictPhys);
 	DECLARE_LOGGER;
@@ -141,7 +143,7 @@ class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys : public IPhysFunctor
 		int cohesionDefinitionIteration;
 
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_CohFrictMat_CohFrictMat_CohFrictPhys,IPhysFunctor,
-		"Generates cohesive-frictional interactions with moments, used in the contact law :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`. The normal/shear stiffness and friction definitions are the same as in :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, check the documentation there for details.\n\nAdhesions related to the normal and the shear components are calculated form :yref:`CohFrictMat::normalCohesion` ($C_n$) and :yref:`CohFrictMat::shearlCohesion` ($C_s$). For particles of size $R_1$,$R_2$ the adhesion will be $a_i=C_i min(R_1,R_2)^2$, $i=n\\,s$.\n\nTwist and rolling stiffnesses are proportional to the shear stiffness through dimensionless factors alphaKtw and alphaKr, such that the rotational stiffnesses are defined by $k_s \\alpha_i R_1 R_2$, $i=tw\\,r$",
+		"Generates cohesive-frictional interactions with moments, used in the contact law :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`. The normal/shear stiffness and friction definitions are the same as in :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, check the documentation there for details.\n\nAdhesions related to the normal and the shear components are calculated from :yref:`CohFrictMat::normalCohesion` ($C_n$) and :yref:`CohFrictMat::shearCohesion` ($C_s$). For particles of size $R_1$,$R_2$ the adhesion will be $a_i=C_i min(R_1,R_2)^2$, $i=n,s$.\n\nTwist and rolling stiffnesses are proportional to the shear stiffness through dimensionless factors alphaKtw and alphaKr, such that the rotational stiffnesses are defined by $k_s \\alpha_i R_1 R_2$, $i=tw\\,r$",
 		((bool,setCohesionNow,false,,"If true, assign cohesion to all existing contacts in current time-step. The flag is turned false automatically, so that assignment is done in the current timestep only."))
 		((bool,setCohesionOnNewContacts,false,,"If true, assign cohesion at all new contacts. If false, only existing contacts can be cohesive (also see :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow`), and new contacts are only frictional."))	
 		,
