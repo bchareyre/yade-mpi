@@ -2,6 +2,7 @@
 #include "ViscoelasticPM.hpp"
 #include <boost/unordered_map.hpp>
 #include <core/PartialEngine.hpp>
+#include <functional>
 
 class ViscElCapMat : public ViscElMat {
 	public:
@@ -29,7 +30,6 @@ class ViscElCapPhys : public ViscElPhys{
 	public:
 		virtual ~ViscElCapPhys();
 		Real R;
-		CapillarFunction CapFunct;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElCapPhys,ViscElPhys,"IPhys created from :yref:`ViscElCapMat`, for use with :yref:`Law2_ScGeom_ViscElCapPhys_Basic`.",
 		((bool,Capillar,false,,"True, if capillar forces need to be added."))
 		((bool,liqBridgeCreated,false,,"Whether liquid bridge was created, only after a normal contact of spheres"))
@@ -75,12 +75,23 @@ class Law2_ScGeom_ViscElCapPhys_Basic: public LawFunctor {
 		static Real Lambert_f             (const ScGeom& geom, ViscElCapPhys& phys);
 		static Real Soulie_f              (const ScGeom& geom, ViscElCapPhys& phys);
 		static Real None_f                (const ScGeom& geom, ViscElCapPhys& phys);
+		std::deque<std::function<Real(const ScGeom& geom, ViscElCapPhys& phys)> > CapFunctionsPool;
 		Real critDist(const Real& Vb, const Real& R, const Real& Theta);
 	FUNCTOR2D(ScGeom,ViscElCapPhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ViscElCapPhys_Basic,LawFunctor,"Extended version of Linear viscoelastic model with capillary parameters.",
 		((OpenMPAccumulator<Real>,VLiqBridg,,Attr::noSave,"The total volume of liquid bridges"))
 		((OpenMPAccumulator<int>, NLiqBridg,,Attr::noSave,"The total number of liquid bridges"))
-		,/* ctor */
+		,{
+//enum CapType {None_Capillar, Willett_numeric, Willett_analytic, Weigert, Rabinovich, Lambert, Soulie};
+			CapFunctionsPool.resize(20, nullptr);
+			CapFunctionsPool[None_Capillar] = None_f;
+			CapFunctionsPool[Willett_numeric] = Willett_numeric_f;
+			CapFunctionsPool[Willett_analytic] = Willett_analytic_f;
+			CapFunctionsPool[Weigert] = Weigert_f;
+			CapFunctionsPool[Rabinovich] = Rabinovich_f;
+			CapFunctionsPool[Lambert] = Lambert_f;
+			CapFunctionsPool[Soulie] = Soulie_f;
+		 }
 		,/* py */
 		;
 	)

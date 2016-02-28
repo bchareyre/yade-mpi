@@ -1,9 +1,9 @@
-#include"ViscoelasticCapillarPM.hpp"
-#include<core/State.hpp>
-#include<pkg/dem/ScGeom.hpp>
-#include<core/Omega.hpp>
-#include<core/Scene.hpp>
-#include<pkg/common/Sphere.hpp>
+#include "ViscoelasticCapillarPM.hpp"
+#include <core/State.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <core/Omega.hpp>
+#include <core/Scene.hpp>
+#include <pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((ViscElCapMat)(ViscElCapPhys)(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys)(Law2_ScGeom_ViscElCapPhys_Basic));
 
@@ -57,13 +57,13 @@ void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>&
     
     if (mat1->CapillarType == mat2->CapillarType and mat2->CapillarType != ""){
       
-      if      (mat1->CapillarType == "Willett_numeric")  {phys->CapillarType = Willett_numeric;  phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Willett_numeric_f;}
-      else if (mat1->CapillarType == "Willett_analytic") {phys->CapillarType = Willett_analytic; phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Willett_analytic_f;}
-      else if (mat1->CapillarType == "Weigert")          {phys->CapillarType = Weigert;          phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Weigert_f;}
-      else if (mat1->CapillarType == "Rabinovich")       {phys->CapillarType = Rabinovich;       phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Rabinovich_f;}
-      else if (mat1->CapillarType == "Lambert")          {phys->CapillarType = Lambert;          phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Lambert_f;}
-      else if (mat1->CapillarType == "Soulie")           {phys->CapillarType = Soulie;           phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::Soulie_f;}
-      else                                               {phys->CapillarType = None_Capillar;    phys->CapFunct = Law2_ScGeom_ViscElCapPhys_Basic::None_f;}
+      if      (mat1->CapillarType == "Willett_numeric")  {phys->CapillarType = Willett_numeric;}
+      else if (mat1->CapillarType == "Willett_analytic") {phys->CapillarType = Willett_analytic;}
+      else if (mat1->CapillarType == "Weigert")          {phys->CapillarType = Weigert;}
+      else if (mat1->CapillarType == "Rabinovich")       {phys->CapillarType = Rabinovich;}
+      else if (mat1->CapillarType == "Lambert")          {phys->CapillarType = Lambert;}
+      else if (mat1->CapillarType == "Soulie")           {phys->CapillarType = Soulie;}
+      else                                               {phys->CapillarType = None_Capillar;}
     } else {
       throw runtime_error("CapillarType should be equal for both particles!.");
     }
@@ -131,7 +131,7 @@ bool Law2_ScGeom_ViscElCapPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IP
         NLiqBridg += 1;
       }
       
-      const auto normalCapForceScalar = phys.CapFunct(geom, phys);
+      const auto normalCapForceScalar = CapFunctionsPool[phys.CapillarType](geom, phys);
       Real dampCapForceScalar = 0.0;
       
       if (phys.dcap) {
