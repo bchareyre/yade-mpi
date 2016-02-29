@@ -100,5 +100,5 @@ if ('LIQMIGRATION' in features):
       (abs((O.bodies[id2].state.Vf - 0.041)/0.041) > tolerance)):
     resultStatus += 1
 else:
-  print "This checkLiquidMigration.py cannot be executed because LIQMIGRATION is disables"
+  print "This checkLiquidMigration.py cannot be executed because LIQMIGRATION is disabled"
   
