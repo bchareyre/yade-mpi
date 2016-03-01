@@ -114,9 +114,9 @@ class TriaxialStressController : public BoundaryController
 		((Real,previousMultiplier,1,Attr::readonly,"|yupdate|"))
 		((bool,internalCompaction,true,,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
 		((Real,meanStress,0,Attr::readonly,"Mean stress in the packing. |yupdate|"))
-		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`).|yupdate|"))
-		((Real,externalWork,0,Attr::readonly,"Energy provided by boundaries.|yupdate|"))
-		((bool,updatePorosity,false,,"If true, solid volume will be updated once for porosity calculation purpose (will automatically reset to false after one calculation step). Can be used, when volume of particles changes during the simulation (e.g. when particles are erased or when clumps are created)."))
+		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`). |yupdate|"))
+		((Real,externalWork,0,Attr::readonly,"Energy provided by boundaries. |yupdate|"))
+		((bool,updatePorosity,false,,"If true, :yref:`solid volume<TriaxialStressController::particlesVolume>` will be updated once (will automatically reset to false after one calculation step) e.g. for porosity calculation purpose. Can be used when volume of particles changes during the simulation (e.g. when particles are erased or when clumps are created)."))
 		,
 		/* extra initializers */
 		,
@@ -136,9 +136,9 @@ class TriaxialStressController : public BoundaryController
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
 		.def_readonly("strainRate",&TriaxialStressController::getStrainRate,"Current strain rate in a vector d/dt(exx,eyy,ezz).")
-		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing |ycomp|.")
+		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing. |yupdate|")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
-		.def_readonly("particlesVolume",&TriaxialStressController::particlesVolume,"Total volume of particles (clumps and spheres).")
+		.def_readonly("particlesVolume",&TriaxialStressController::particlesVolume,"Total volume of particles (clumps and spheres). |ycomp|")
 		.def_readonly("spheresVolume",&TriaxialStressController::particlesVolume,"Shorthand for :yref:`TriaxialStressController::particlesVolume`")
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
