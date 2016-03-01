@@ -136,7 +136,7 @@ class TriaxialStressController : public BoundaryController
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
 		.def_readonly("strainRate",&TriaxialStressController::getStrainRate,"Current strain rate in a vector d/dt(exx,eyy,ezz).")
- 		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing.")
+		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing, as automatically measured the last instance :yref:`updatePorosity<TriaxialStressController::updatePorosity>` was true.")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
 		.def_readonly("particlesVolume",&TriaxialStressController::particlesVolume,"Total volume of particles (clumps and spheres).")
 		.def_readonly("spheresVolume",&TriaxialStressController::particlesVolume,"Shorthand for :yref:`TriaxialStressController::particlesVolume`")
