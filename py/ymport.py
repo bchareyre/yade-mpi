@@ -447,12 +447,13 @@ def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
 	f.close()
 	return tetras
 
-def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,**kw):
+def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Quaternion((0,1,0),0.0),**kw):
 	"""Load polyhedra from a text file.
 	
 	:param str filename: file name
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
 	:param float scale: factor scales the given data.
+	:param quaternion orientation:  orientation of the imported polyhedra
 	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.polyhedra_utils.polyhedra`
 	:returns: list of polyhedras.
 
@@ -479,7 +480,7 @@ def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,**kw):
 			i+=1
 			for d in range(verts):
 				dataV = lines[i].split()
-				pos = Vector3(float(dataV[0]),float(dataV[1]),float(dataV[2]))
+				pos = orientation*Vector3(float(dataV[0])*scale,float(dataV[1])*scale,float(dataV[2])*scale)+shift
 				vertLoad.append(pos)
 				i+=1
 			polR = polyhedra_utils.polyhedra(material=material,v=vertLoad,**kw)
