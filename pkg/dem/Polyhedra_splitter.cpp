@@ -31,9 +31,9 @@ void getStressForEachBody(vector<Matrix3r>& bStresses){
 //*********************************************************************************
 /* Size dependent strength */
 
-double PolyhedraSplitter::getStrength(double volume, double strength){
+double PolyhedraSplitter::getStrength(const double & volume, const double & strength) const{
 	//equvalent radius
-	double r_eq = pow(volume*3./4./Mathr::PI,1./3.);
+	const double r_eq = pow(volume*3./4./Mathr::PI,1./3.);
 	//r should be in milimeters
 	return strength/(r_eq/1000.);
 }
@@ -104,18 +104,21 @@ void PolyhedraSplitter::action()
 			//division of stress by volume
 			// double comp_stress = I_valu(min_i,min_i)/p->GetVolume();
 			// double tens_stress = I_valu(max_i,max_i)/p->GetVolume();			
-			Vector3r dirC = I_vect.col(max_i);
-			Vector3r dirT = I_vect.col(min_i);
-			Vector3r dir1  = dirC.normalized() + dirT.normalized();	
-			Vector3r dir2  = dirC.normalized() - dirT.normalized();	
+			const Vector3r dirC = I_vect.col(max_i);
+			const Vector3r dirT = I_vect.col(min_i);
+			const Vector3r dir1  = dirC.normalized() + dirT.normalized();
+			const Vector3r dir2  = dirC.normalized() - dirT.normalized();
 			//double sigma_t = -comp_stress/2.+ tens_stress;
-			double sigma_t = pow((pow(I_valu(0,0)-I_valu(1,1),2)+pow(I_valu(0,0)-I_valu(2,2),2)+pow(I_valu(1,1)-I_valu(2,2),2))/2.,0.5)/p->GetVolume();
-			if (sigma_t > getStrength(p->GetVolume(),m->GetStrength())) {bodies.push_back(b); directions1.push_back(dir1.normalized()); directions2.push_back(dir2.normalized()); sigmas.push_back(sigma_t);};
-		}		
+			const double sigma_t = pow((pow(I_valu(0,0)-I_valu(1,1),2)+pow(I_valu(0,0)-I_valu(2,2),2)+pow(I_valu(1,1)-I_valu(2,2),2))/2.,0.5)/p->GetVolume();
+			if (sigma_t > getStrength(p->GetVolume(),m->GetStrength())) {
+				bodies.push_back(b);
+				directions1.push_back(dir1.normalized());
+				directions2.push_back(dir2.normalized());
+				sigmas.push_back(sigma_t);
+			}
+		}
 	}
-	for(int i=0; i<int(bodies.size()); i++){
-		SplitPolyhedraDouble(bodies[i], directions1[i], directions2[i]);
-	}
+	for(unsigned int i=0; i<bodies.size(); i++) SplitPolyhedraDouble(bodies[i], directions1[i], directions2[i]);
 }
 
 #endif // YADE_CGAL

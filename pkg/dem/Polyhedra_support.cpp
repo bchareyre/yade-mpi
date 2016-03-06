@@ -814,7 +814,7 @@ shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction
 	//calculate first splitted polyhedrons
 	Plane B(ToCGALPoint(point-direction*SPLITTER_GAP), ToCGALVector(direction)); 
 	Polyhedron S1 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) - 1E-6*ToCGALVector(direction));
-	B = Plane(ToCGALPoint(point+direction*SPLITTER_GAP), ToCGALVector((-1.)*direction)); 
+	B = Plane(ToCGALPoint(point+direction*SPLITTER_GAP), ToCGALVector((-1.)*direction));
 	Polyhedron S2 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) + 1E-6*ToCGALVector(direction));
 	Scene* scene=Omega::instance().getScene().get();
 	//scene->bodies->erase(body->id);

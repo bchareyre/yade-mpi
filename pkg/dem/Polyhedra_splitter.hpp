@@ -17,7 +17,7 @@ class PolyhedraSplitter : public PeriodicEngine{
 
 	public:
 		virtual void action();
-		double getStrength(double volume, double strength);
+		double getStrength(const double & volume, const double & strength) const;
 		void Symmetrize(Matrix3r & bStress);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PolyhedraSplitter,PeriodicEngine,"Engine that splits polyhedras.",
