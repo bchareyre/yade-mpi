@@ -3,9 +3,8 @@
 
 #ifdef YADE_CGAL
 
-#include"Polyhedra.hpp"
-#include"Polyhedra_Ig2.hpp"
-#include<pkg/dem/ScGeom.hpp>
+#include "Polyhedra.hpp"
+#include "Polyhedra_Ig2.hpp"
 
 #define _USE_MATH_DEFINES
 
@@ -14,12 +13,18 @@ YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom)
 //**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedras. */
 
-bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
-
+bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
+		const shared_ptr<Shape>& shape1,
+		const shared_ptr<Shape>& shape2,
+		const State& state1,
+		const State& state2,
+		const Vector3r& shift2,
+		const bool& force,
+		const shared_ptr<Interaction>& interaction) {
 	//get polyhedras
 	const Se3r& se31=state1.se3; 
 	const Se3r& se32=state2.se3;
-	Polyhedra* A = static_cast<Polyhedra*>(shape1.get());		
+	Polyhedra* A = static_cast<Polyhedra*>(shape1.get());
 	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
 
 	bool isNew = !interaction->geom;
@@ -181,7 +186,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 																					 const State& state1,const State& state2,
 																					 const Vector3r& shift2, const bool& force,
 																					 const shared_ptr<Interaction>& interaction){
-
+	
 	const Se3r& se31=state1.se3; 
 	const Se3r& se32=state2.se3;
 	Facet*   A = static_cast<Facet*>(shape1.get());	
@@ -265,7 +270,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 	bang->contactPoint=centroid;
 	bang->penetrationVolume=volume;
 	bang->equivalentPenetrationDepth=volume/area;
-	if (interaction && force) bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
+	bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
 	bang->normal=normal;
 	return true;
 }

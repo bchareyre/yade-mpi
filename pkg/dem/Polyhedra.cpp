@@ -3,13 +3,8 @@
 
 #ifdef YADE_CGAL
 
-#include<core/Interaction.hpp>
-#include<core/Omega.hpp>
-#include<core/Scene.hpp>
-#include<core/State.hpp>
-#include<pkg/common/ElastMat.hpp>
-#include<pkg/common/Aabb.hpp>
-#include"Polyhedra.hpp"
+#include <pkg/common/ElastMat.hpp>
+#include "Polyhedra.hpp"
 
 #define _USE_MATH_DEFINES
 
@@ -355,7 +350,7 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 
 void PolyhedraGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& 
 currentNormal, bool isNew, const Vector3r& shift2){
-
+	
 	if(!isNew) {
 		orthonormal_axis = normal.cross(currentNormal);
 		Real angle = scene->dt*0.5*normal.dot(rbp1.angVel + rbp2.angVel);
@@ -443,45 +438,55 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shar
 
 		//erase the interaction when aAbB shows separation, otherwise keep it to be able to store previous separating plane for fast detection of separation 
 		Vector3r shift2=scene->cell->hSize*I->cellDist.cast<Real>();
-		if (A->bound->min[0] >= B->bound->max[0]+shift2[0] || B->bound->min[0]+shift2[0] >= A->bound->max[0] || A->bound->min[1] >= B->bound->max[1]+shift2[1] || B->bound->min[1]+shift2[1] >= A->bound->max[1] || A->bound->min[2] >= B->bound->max[2]+shift2[2] || B->bound->min[2]+shift2[2] >= A->bound->max[2])  {
+		if (A->bound->min[0] >= B->bound->max[0]+shift2[0] ||
+				B->bound->min[0]+shift2[0] >= A->bound->max[0] ||
+				A->bound->min[1] >= B->bound->max[1]+shift2[1] ||
+				B->bound->min[1]+shift2[1] >= A->bound->max[1] ||
+				A->bound->min[2] >= B->bound->max[2]+shift2[2] ||
+				B->bound->min[2]+shift2[2] >= A->bound->max[2]) {
 			return false;
 		}
-			
+		
 		//zero penetration depth means no interaction force
-		if(!(contactGeom->equivalentPenetrationDepth > 1E-18) || !(contactGeom->penetrationVolume > 0)) {phys->normalForce = Vector3r(0.,0.,0.); phys->shearForce = Vector3r(0.,0.,0.); return true;} 
+		if(!(contactGeom->equivalentPenetrationDepth > 1E-18) || !(contactGeom->penetrationVolume > 0)) {
+			phys->normalForce = Vector3r(0.,0.,0.);
+			phys->shearForce = Vector3r(0.,0.,0.);
+			return true;
+		}
+    
 		Real prop = std::pow(contactGeom->penetrationVolume,volumePower);
 		Vector3r normalForce=contactGeom->normal*prop*phys->kn;
 
-		//shear force: in case the polyhdras are separated and come to contact again, one should not use the previous shear force
-		if (contactGeom->isShearNew)
-			shearForce = Vector3r::Zero();
-		else
-			shearForce = contactGeom->rotate(shearForce);
+		//shear force: in case the polyhdras are separated and come to contact again, one
+		//should not use the previous shear force
+		if (contactGeom->isShearNew) shearForce = Vector3r::Zero();
+		else shearForce = contactGeom->rotate(shearForce);
 
 		const Vector3r& shearDisp = contactGeom->shearInc;
 		shearForce -= phys->ks*shearDisp;
-                
-		Real maxFs = normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
+		const Real maxFs = normalForce.squaredNorm()*std::pow(phys->tangensOfFrictionAngle,2);
 
-		if (likely(!scene->trackEnergy  && !traceEnergy)){//Update force but don't compute energy terms (see below))
-			// PFC3d SlipModel, is using friction angle. CoulombCriterion
-			if( shearForce.squaredNorm() > maxFs ){
-				Real ratio = sqrt(maxFs) / shearForce.norm();
-				shearForce *= ratio;}
-		} else {
-			//almost the same with additional Vector3r instatinated for energy tracing, 
-			//duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
-			if(shearForce.squaredNorm() > maxFs){
-				Real ratio = sqrt(maxFs) / shearForce.norm();
-				Vector3r trialForce=shearForce;//store prev force for definition of plastic slip
-				//define the plastic work input and increment the total plastic energy dissipated
-				shearForce *= ratio;
-				Real dissip=((1/phys->ks)*(trialForce-shearForce)).dot(shearForce);
+		if(shearForce.squaredNorm() > maxFs && maxFs){
+			//PFC3d SlipModel, is using friction angle. CoulombCriterion
+			const Real ratio = sqrt(maxFs) / shearForce.norm();
+
+			//Store prev force for definition of plastic slip
+			//Define the plastic work input and increment the total plastic energy dissipated
+			const Vector3r trialForce=shearForce;
+			shearForce *= ratio;
+			
+			if (scene->trackEnergy && traceEnergy) {
+				const Real dissip=((1/phys->ks)*(trialForce-shearForce)).dot(shearForce);
+
 				if (traceEnergy) plasticDissipation += dissip;
 				else if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,false);
+
+				// compute elastic energy as well
+				scene->energy->add(0.5*(normalForce.squaredNorm()/phys->kn+shearForce.squaredNorm()/phys->ks),
+					"elastPotential",elastPotentialIx,true);
 			}
-			// compute elastic energy as well
-			scene->energy->add(0.5*(normalForce.squaredNorm()/phys->kn+shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,true);
+		} else {
+			shearForce = Vector3r::Zero();
 		}
 
 		Vector3r F = -normalForce-shearForce;	

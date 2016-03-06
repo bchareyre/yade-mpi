@@ -6,16 +6,15 @@
 
 #ifdef YADE_CGAL
 
-#include<core/Shape.hpp>
-#include<core/IGeom.hpp>
-#include<core/GlobalEngine.hpp>
-#include<core/Material.hpp>
-#include<pkg/common/Aabb.hpp>
-#include<pkg/common/Dispatching.hpp>
-#include<pkg/dem/FrictPhys.hpp>
-#include<pkg/common/Wall.hpp>
-#include<pkg/common/Facet.hpp>
-#include<lib/base/openmp-accu.hpp>
+#include <core/Omega.hpp>
+#include <core/Shape.hpp>
+#include <core/Interaction.hpp>
+#include <core/Material.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <pkg/dem/FrictPhys.hpp>
+#include <pkg/common/Wall.hpp>
+#include <pkg/common/Facet.hpp>
+#include <pkg/common/Dispatching.hpp>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_3.h>
@@ -29,8 +28,6 @@
 #include <CGAL/AABB_traits.h>
 #include <CGAL/AABB_triangle_primitive.h>
 #include <CGAL/squared_distance_3.h>
-
-#include<time.h>
 
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
