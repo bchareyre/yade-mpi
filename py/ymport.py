@@ -3,7 +3,7 @@ Import geometry from various formats ('import' is python keyword, hence the name
 """
 
 from yade.wrapper import *
-from yade import utils
+from yade import utils, polyhedra_utils
 
 from minieigen import *
 
@@ -446,3 +446,43 @@ def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
 		tetras[int(ls[0])-1] = utils.polyhedron([vertices[int(ls[j])-1] for j in (1,2,3,4)],**kw)
 	f.close()
 	return tetras
+
+def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,**kw):
+	"""Load polyhedra from a text file.
+	
+	:param str filename: file name
+	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
+	:param float scale: factor scales the given data.
+	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.polyhedra_utils.polyhedra`
+	:returns: list of polyhedras.
+
+	Lines starting with # are skipped
+	"""
+	infile = open(fileName,"r")
+	lines = infile.readlines()
+	infile.close()
+	ret=[]
+	i=-1
+	while (i < (len(lines)-1)):
+		i+=1
+		line = lines[i]
+		data = line.split()
+		if (data[0][0] == "#"): continue
+		
+		if (len(data)!=3):
+			raise RuntimeError("Check polyhedra input file! Number of parameters in the first line is not 3!");
+		else:
+			vertLoad = []
+			ids = int(data[0])
+			verts = int(data[1])
+			surfs = int(data[2])
+			i+=1
+			for d in range(verts):
+				dataV = lines[i].split()
+				pos = Vector3(float(dataV[0]),float(dataV[1]),float(dataV[2]))
+				vertLoad.append(pos)
+				i+=1
+			polR = polyhedra_utils.polyhedra(material=material,v=vertLoad,**kw)
+			ret.append(polR)
+			i= i + surfs - 1
+	return ret
