@@ -177,8 +177,10 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const 
 //**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedron and Facet. */
 
-bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
-
+bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,
+																					 const State& state1,const State& state2,
+																					 const Vector3r& shift2, const bool& force,
+																					 const shared_ptr<Interaction>& interaction){
 
 	const Se3r& se31=state1.se3; 
 	const Se3r& se32=state2.se3;
@@ -210,23 +212,21 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
   		CGALpoint help;
 		help = v[0];
 		v[0]=v[1];
-		v[1]=help;	
+		v[1]=help;
 	}
 
 	Real f_area = sqrt(f_normal.squared_length());
 	for (int i=3; i<6; i++) v[i] = v[i-3]-f_normal/f_area*0.05*sqrt(f_area); // vertices in global coordinates
 
 	Polyhedron PA;
-	//use convex hull	
-	//CGAL::convex_hull_3(v.begin(), v.end(), PA);
 
 	//construct polyhedron directly
 	Polyhedron::Halfedge_iterator hei = PA.make_tetrahedron(v[4],v[1],v[0],v[2]);
 	hei = PA.split_vertex(hei, hei->next()->opposite());
-	hei->vertex()->point() = v[3];	
+	hei->vertex()->point() = v[3];
 	hei = PA.split_facet(hei->next()->next()->next(),hei->next());
 	hei = PA.split_vertex(hei, hei->next_on_vertex()->next_on_vertex());
-	hei->vertex()->point() = v[5];		
+	hei->vertex()->point() = v[5];
 
 	shared_ptr<PolyhedraGeom> bang;
 	if (isNew) {
@@ -236,9 +236,9 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 		bang->contactPoint = Vector3r(0,0,0);
 		bang->isShearNew = true;
 		interaction->geom = bang;
-	}else{	
+	} else {
 		// use data from old interaction
-  		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
+		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
 		bang->isShearNew = bang->equivalentPenetrationDepth<=0;
 	}
 
@@ -248,9 +248,9 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 
 	//volume and centroid of intersection
 	Real volume;
-	Vector3r centroid;	
+	Vector3r centroid;
 	P_volume_centroid(Int, &volume, &centroid);
- 	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume()) {bang->equivalentPenetrationDepth=0; return true;}
+	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume()) {bang->equivalentPenetrationDepth=0; return true;}
 	if (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//find normal direction
@@ -258,19 +258,16 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 	if((se32.position-centroid).dot(normal)<0) normal*=-1;
 
 	//calculate area of projection of Intersection into the normal plane
-        Real area = volume/1E-8;
-	//Real area = CalculateProjectionArea(Int, ToCGALVector(normal));
-	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
-		
+	Real area = volume/1E-8;
+	
 	// store calculated stuff in bang; some is redundant
 	bang->equivalentCrossSection=area;
 	bang->contactPoint=centroid;
 	bang->penetrationVolume=volume;
 	bang->equivalentPenetrationDepth=volume/area;
-	bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
+	if (interaction && force) bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
 	bang->normal=normal;
-
-	return true;	
+	return true;
 }
 
 //**********************************************************************************

@@ -10,7 +10,10 @@
 #include<core/Omega.hpp>
 #include<pkg/common/InteractionLoop.hpp>
 
-bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
+bool Ig2_Sphere_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2,
+                                  const State& state1, const State& state2,
+                                  const Vector3r& shift2, const bool& force,
+                                  const shared_ptr<Interaction>& c)
 {
 	TIMING_DELTAS_START();
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
