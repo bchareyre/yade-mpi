@@ -72,20 +72,4 @@ class Ig2_Sphere_Polyhedra_ScGeom: public IGeomFunctor
 REGISTER_SERIALIZABLE(Ig2_Sphere_Polyhedra_ScGeom);
 
 //***************************************************************************
-/*! Create Polyhedra (collision geometry) from colliding Sphere & Polyhedra. */
-/*
-class Ig2_Sphere_Polyhedra_PolyhedraGeom: public IGeomFunctor
-{
-	public:
-		virtual ~Ig2_Sphere_Polyhedra_PolyhedraGeom(){};
-		virtual bool go(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-		FUNCTOR2D(Sphere,Polyhedra);
-		DEFINE_FUNCTOR_ORDER_2D(Sphere,Polyhedra);
-		YADE_CLASS_BASE_DOC(Ig2_Sphere_Polyhedra_PolyhedraGeom,IGeomFunctor,"Create/update geometry of collision between Sphere and Polyhedra");	
-		DECLARE_LOGGER;	
-	private:		
-};
-REGISTER_SERIALIZABLE(Ig2_Sphere_Polyhedra_PolyhedraGeom);
-*/
-
 #endif // YADE_CGAL

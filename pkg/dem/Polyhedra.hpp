@@ -104,7 +104,7 @@ class Polyhedra: public Shape{
 			.def("GetSurfaceTriangulation",&Polyhedra::GetSurfaceTriangulation,"triangulation of facets (for plotting)")
 			.def("GetSurfaces",&Polyhedra::GetSurfaces,"get indices of surfaces' vertices (for postprocessing)")
 			.def("setVertices",&Polyhedra::setVertices,"set vertices and update receiver")
-		);		
+		);
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };
 REGISTER_SERIALIZABLE(Polyhedra);

@@ -326,7 +326,7 @@ class VTKWriter:
 		piece.appendChild(cell_data)
 
 		# Write to file and exit
-		outFile = open(self.baseName+'%04d'%self.snapCount+'.vtu', 'w')
+		outFile = open(self.baseName+'%08d'%self.snapCount+'.vtu', 'w')
 #		xml.dom.ext.PrettyPrint(doc, file)
 		doc.writexml(outFile, newl='\n')
 		outFile.close()
@@ -414,7 +414,7 @@ class VTKExporter:
 		if not bodies: return
 		nBodies = len(bodies)
 		# output file
-		fName = self.baseName+'-spheres-%04d'%(numLabel if numLabel else self.spheresSnapCount)+'.vtk'
+		fName = self.baseName+'-spheres-%08d'%(numLabel if numLabel else self.spheresSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nBodies))
@@ -463,7 +463,7 @@ class VTKExporter:
 		if not bodies: return
 		nBodies = len(bodies)
 		# output file
-		fName = self.baseName+'-facets-%04d'%(numLabel if numLabel else self.facetsSnapCount)+'.vtk'
+		fName = self.baseName+'-facets-%08d'%(numLabel if numLabel else self.facetsSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,3*nBodies))
@@ -543,7 +543,7 @@ class VTKExporter:
 			nodes[e[1]] = pt2
 			nodes[e[2]] = pt3
 		# output file
-		fName = self.baseName+'-facets-%04d'%(numLabel if numLabel else self.facetsSnapCount)+'.vtk'
+		fName = self.baseName+'-facets-%08d'%(numLabel if numLabel else self.facetsSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,len(nodes)))
@@ -592,7 +592,7 @@ class VTKExporter:
 			return
 		nIntrs = len(intrs)
 		# output file
-		fName = self.baseName+'-intrs-%04d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
+		fName = self.baseName+'-intrs-%08d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,2*nIntrs))
@@ -713,7 +713,7 @@ class VTKExporter:
 			return
 		nIntrs = len(intrs)
 		# output file
-		fName = self.baseName+'-cps-%04d'%(numLabel if numLabel else self.contactPointsSnapCount)+'.vtk'
+		fName = self.baseName+'-cps-%08d'%(numLabel if numLabel else self.contactPointsSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nIntrs))
@@ -774,7 +774,7 @@ class VTKExporter:
 			self._warn("exportPeriodicCell: scene is not periodic, no export...")
 			return
 		hSize = O.cell.hSize
-		fName = self.baseName+'-periCell-%04d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
+		fName = self.baseName+'-periCell-%08d'%(numLabel if numLabel else self.intrsSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET UNSTRUCTURED_GRID\nPOINTS 8 double\n"%(comment))
 		vertices = [
@@ -820,7 +820,7 @@ class VTKExporter:
 			bodyFaces.append(ff)
 		# output file
 		nFaces = sum(len(f) for f in bodyFaces)
-		fName = self.baseName+'-polyhedra-%04d'%(numLabel if numLabel else self.polyhedraSnapCount)+'.vtk'
+		fName = self.baseName+'-polyhedra-%08d'%(numLabel if numLabel else self.polyhedraSnapCount)+'.vtk'
 		outFile = open(fName, 'w')
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nVertices))

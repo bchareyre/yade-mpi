@@ -17,7 +17,7 @@ YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhe
 	/* some code in cpp (this file): */ 
 	#ifdef YADE_OPENGL
 		(Gl1_Polyhedra) (Gl1_PolyhedraGeom) (Gl1_PolyhedraPhys)
-	#endif	
+	#endif
 	);
 
 //*********************************************************************************
@@ -56,7 +56,7 @@ void Polyhedra::Initialize(){
 	v.clear();
 	for (Polyhedron::Vertex_iterator vIter = P.vertices_begin(); vIter != P.vertices_end(); ++vIter, i++){
 		v.push_back(Vector3r(vIter->point().x(),vIter->point().y(),vIter->point().z()));
-	}	
+	}
 
 	//list surface triangles for plotting
 	faceTri.clear();
@@ -82,7 +82,7 @@ void Polyhedra::Initialize(){
 		seed = rand();
 		Initialize();
 	}
-        Vector3r translation((-1)*centroid);
+	Vector3r translation((-1)*centroid);
 	
 	//set centroid to be [0,0,0]
 	for(int i=0;i<N;i++) {
@@ -93,10 +93,10 @@ void Polyhedra::Initialize(){
 	Vector3r origin(0,0,0);
 
 	//move and rotate also the CGAL structure Polyhedron
-	Transformation t_trans(1.,0.,0.,translation[0],0.,1.,0.,translation[1],0.,0.,1.,translation[2],1.);		
-	std::transform( P.points_begin(), P.points_end(), P.points_begin(), t_trans);	
+	Transformation t_trans(1.,0.,0.,translation[0],0.,1.,0.,translation[1],0.,0.,1.,translation[2],1.);
+	std::transform( P.points_begin(), P.points_end(), P.points_begin(), t_trans);
 
-	//compute inertia	
+	//compute inertia
 	Real vtet;
 	Vector3r ctet;
 	Matrix3r Itet1, Itet2;
@@ -111,7 +111,7 @@ void Polyhedra::Initialize(){
 			-ctet[0]*ctet[1], ctet[0]*ctet[0]+ctet[2]*ctet[2], -ctet[2]*ctet[1],
 			-ctet[0]*ctet[2], -ctet[2]*ctet[1], ctet[1]*ctet[1]+ctet[0]*ctet[0];
 		inertia_tensor = inertia_tensor + Itet1 + Itet2*vtet; 
-	}	
+	}
 
 	if(std::abs(inertia_tensor(0,1))+std::abs(inertia_tensor(0,2))+std::abs(inertia_tensor(1,2)) < 1E-13){
 		// no need to rotate, inertia already diagonal
@@ -142,9 +142,9 @@ void Polyhedra::Initialize(){
 		Vector3r third = (I_rot.col(0)).cross(I_rot.col(1));
 		I_rot(0,2) = third[0];
 		I_rot(1,2) = third[1];
-		I_rot(2,2) = third[2];	
+		I_rot(2,2) = third[2];
 		
-					
+		
 		inertia = Vector3r(I_new(0,0),I_new(1,1),I_new(2,2));
 		orientation = Quaternionr(I_rot); 
 		//rotate the voronoi cell so that x - is maximal inertia axis and z - is minimal inertia axis
@@ -152,7 +152,7 @@ void Polyhedra::Initialize(){
 		for(int i=0; i< (int) v.size();i++) {
 			v[i] =  orientation.conjugate()*v[i];
 		}
-			
+		
 		//rotate also the CGAL structure Polyhedron
 		Matrix3r rot_mat = (orientation.conjugate()).toRotationMatrix();
 		Transformation t_rot(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),1.);	
@@ -167,12 +167,12 @@ void Polyhedra::Initialize(){
 /* Generator of randomly shaped polyhedron based on Voronoi tessellation*/
 
 void Polyhedra::GenerateRandomGeometry(){
-	srand(seed);	
+	srand(seed);
 
 	vector<CGALpoint> nuclei;
 	nuclei.push_back(CGALpoint(5.,5.,5.));
 	CGALpoint trial;
-	int iter = 0; 
+	unsigned int iter = 0; 
 	bool isOK;
 	//fill box 5x5x5 with randomly located nuclei with restricted minimal mutual distance 0.75 which gives approximate mean mutual distance 1;
 	Real dist_min2 = 0.75*0.75;
@@ -184,32 +184,29 @@ void Polyhedra::GenerateRandomGeometry(){
 			isOK = pow(nuclei[i].x()-trial.x(),2)+pow(nuclei[i].y()-trial.y(),2)+pow(nuclei[i].z()-trial.z(),2) > dist_min2;
 			if (!isOK) break;
 		}
-
 		if(isOK){
 			iter = 0;
 			nuclei.push_back(trial);
-		}				
-	}	
+		}
+	}
 	
-	
-	//perform Voronoi tessellation	
-        nuclei.erase(nuclei.begin());
+	//perform Voronoi tessellation
+	nuclei.erase(nuclei.begin());
 	Triangulation dt(nuclei.begin(), nuclei.end());
 	Triangulation::Vertex_handle zero_point = dt.insert(CGALpoint(5.,5.,5.));
 	v.clear();
-        std::vector<Triangulation::Cell_handle>  ch_cells;
-    	dt.incident_cells(zero_point,std::back_inserter(ch_cells));
-	for(std::vector<Triangulation::Cell_handle>::iterator ci = ch_cells.begin(); ci !=ch_cells.end(); ++ci){
-		v.push_back(FromCGALPoint(dt.dual(*ci))-Vector3r(5.,5.,5.));				
+	std::vector<Triangulation::Cell_handle>  ch_cells;
+ 	dt.incident_cells(zero_point,std::back_inserter(ch_cells));
+	for(auto ci = ch_cells.begin(); ci !=ch_cells.end(); ++ci){
+		v.push_back(FromCGALPoint(dt.dual(*ci))-Vector3r(5.,5.,5.));
 	}
-
 
 	//resize and rotate the voronoi cell
 	Quaternionr Rot(Real(rand())/RAND_MAX,Real(rand())/RAND_MAX,Real(rand())/RAND_MAX,Real(rand())/RAND_MAX);
 	Rot.normalize();
 	for(int i=0; i< (int) v.size();i++) {
 		v[i] = Rot*(Vector3r(v[i][0]*size[0],v[i][1]*size[1],v[i][2]*size[2]));
-	}	
+	}
 	
 	//to avoid patological cases (that should not be present, but CGAL works somehow unpredicable)
 	if (v.size() < 8) {
