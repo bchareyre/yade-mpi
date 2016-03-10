@@ -27,7 +27,7 @@
 //!			O/
 class Ig2_Sphere_PFacet_ScGridCoGeom: public Ig2_Sphere_GridConnection_ScGridCoGeom{
 	public :
-	  
+		
 		boost::tuple<Vector3r,bool, double, double,double> projection(
 					const shared_ptr<Shape>& cm2,
 					const State& state1);
@@ -88,13 +88,6 @@ REGISTER_SERIALIZABLE(Ig2_GridConnection_PFacet_ScGeom);
 class Ig2_PFacet_PFacet_ScGeom: public Ig2_Sphere_PFacet_ScGridCoGeom{
 	public :
 		virtual bool go(const shared_ptr<Shape>& cm1,
-					const shared_ptr<Shape>& cm2,
-					const State& state1,
-					const State& state2,
-					const Vector3r& shift2,
-					const bool& force,
-					const shared_ptr<Interaction>& c);
-		virtual bool goOneWay(const shared_ptr<Shape>& cm1,
 					const shared_ptr<Shape>& cm2,
 					const State& state1,
 					const State& state2,
