@@ -6,7 +6,21 @@
 # 2015 © Klaus Thoeni <klaus.thoeni@gmail.com>
 
 """
-Helper functions for creating cylinders, grids and membranes.
+Helper functions for creating cylinders, grids and membranes. For more details on this type of elements see [Effeindzourou2016]_, [Effeindzourou2015a]_, [Bourrier2013]_,.
+
+For examples using :yref:`GridConnections<GridConnection>`, see
+
+* :ysrc:`examples/grids/CohesiveGridConnectionSphere.py`
+* :ysrc:`examples/grids/GridConnection_Spring.py`
+* :ysrc:`examples/grids/Simple_Grid_Falling.py`
+* :ysrc:`examples/grids/Simple_GridConnection_Falling.py`
+
+For examples using :yref:`PFacets<PFacet>`, see
+
+* :ysrc:`examples/pfacet/gts-pfacet.py`
+* :ysrc:`examples/pfacet/mesh-pfacet.py`
+* :ysrc:`examples/pfacet/pfacetcreators.py`
+
 """
 
 import math,random,doctest,geom,numpy
