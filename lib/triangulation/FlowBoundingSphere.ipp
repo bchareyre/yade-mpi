@@ -690,7 +690,7 @@ vector<Constriction> FlowBoundingSphere<Tesselation>::getConstrictionsFull()
 		rn.push_back(normal[0]);
 		rn.push_back(normal[1]);
 		rn.push_back(normal[2]);
-		Constriction cons (pair<int,int>(f_it->first->info().id(),f_it->first->neighbor(f_it->second)->info().id()),rn);
+		Constriction cons (pair<int,int>(f_it->first->info().id,f_it->first->neighbor(f_it->second)->info().id),rn);
 		constrictions.push_back(cons);
 	}
 	return constrictions;
