@@ -79,7 +79,7 @@ IF (DEBUG)
   SET(CMAKE_BUILD_TYPE Debug)
   ADD_DEFINITIONS("-DYADE_DEBUG -g")
 ELSE (DEBUG)
-  ADD_DEFINITIONS(${CMAKE_CXX_FLAGS_RELEASE})
+  ADD_DEFINITIONS("-DNDEBUG")
 ENDIF (DEBUG)
 
 #===========================================================
