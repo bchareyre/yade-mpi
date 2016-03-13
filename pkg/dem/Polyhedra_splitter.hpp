@@ -6,10 +6,8 @@
 
 #ifdef YADE_CGAL
 
-#include<pkg/common/PeriodicEngines.hpp>
-#include<core/Interaction.hpp>
-
-#include"Polyhedra.hpp"
+#include <pkg/common/PeriodicEngines.hpp>
+#include "Polyhedra.hpp"
 
 //*********************************************************************************
 /* Polyhedra Splitter */

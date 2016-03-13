@@ -3,8 +3,7 @@
 
 #ifdef YADE_CGAL
 
-#include<pkg/dem/Polyhedra_splitter.hpp>
-
+#include <pkg/dem/Polyhedra_splitter.hpp>
 
 YADE_PLUGIN((PolyhedraSplitter));
 CREATE_LOGGER(PolyhedraSplitter);
@@ -53,14 +52,12 @@ void PolyhedraSplitter::Symmetrize(Matrix3r & bStress){
 //**********************************************************************************
 //split polyhedra
 void SplitPolyhedraDouble(const shared_ptr<Body>& body, Vector3r direction1, Vector3r direction2){
-
 	const Se3r& se3=body->state->se3; 
 	Vector3r point = se3.position;
 
 	shared_ptr<Body> B2 = SplitPolyhedra(body, direction1, point);
 	shared_ptr<Body> B3 = SplitPolyhedra(B2, direction2, point);
 	shared_ptr<Body> B4 = SplitPolyhedra(body, direction2, point);
-
 }
 
 
@@ -75,8 +72,6 @@ void PolyhedraSplitter::action()
 	vector<shared_ptr<Body> > bodies;
 	vector<Vector3r > directions1, directions2;
 	vector<double > sigmas;
-
-
 
 	vector<Matrix3r> bStresses;
 	getStressForEachBody(bStresses);

@@ -1,7 +1,6 @@
 // © 2013 Jan Elias, http://www.fce.vutbr.cz/STM/elias.j/, elias.j@fce.vutbr.cz
 // https://www.vutbr.cz/www_base/gigadisk.php?i=95194aa9a
 
-
 #pragma once
 
 #ifdef YADE_CGAL
@@ -14,7 +13,9 @@
 #include <pkg/dem/FrictPhys.hpp>
 #include <pkg/common/Wall.hpp>
 #include <pkg/common/Facet.hpp>
+#include <pkg/common/Sphere.hpp>
 #include <pkg/common/Dispatching.hpp>
+#include <pkg/common/ElastMat.hpp>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_3.h>

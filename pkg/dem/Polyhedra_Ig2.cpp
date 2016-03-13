@@ -3,10 +3,7 @@
 
 #ifdef YADE_CGAL
 
-#include "Polyhedra.hpp"
 #include "Polyhedra_Ig2.hpp"
-
-#define _USE_MATH_DEFINES
 
 YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) );
 
@@ -84,8 +81,8 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	//calculate area of projection of Intersection into the normal plane
 	//Real area = CalculateProjectionArea(Int, ToCGALVector(normal));
 	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
-        //Real area = volume/1E-8;
-        Real area = std::pow(volume,2./3.);
+	//Real area = volume/1E-8;
+	Real area = std::pow(volume,2./3.);
 	// store calculated stuff in bang; some is redundant
 	bang->equivalentCrossSection=area;
 	bang->contactPoint=centroid;
@@ -104,14 +101,27 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	PrintPolyhedron2File(Int,fin);
 	fclose(fin);
 	*/
-	return true;	
+	return true;
 }
 
 //**********************************************************************************
+
+bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::goReverse(
+		const shared_ptr<Shape>& shape1,
+		const shared_ptr<Shape>& shape2,
+		const State& state1,
+		const State& state2,
+		const Vector3r& shift2,
+		const bool& force,
+		const shared_ptr<Interaction>& c) {
+			return go(shape1,shape2,state2,state1,-shift2,force,c);
+		}
+//**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedron and Wall. */
 
-bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
-
+bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const shared_ptr<Shape>& shape2,
+		const State& state1,const State& state2, const Vector3r& shift2, const bool& force,
+		const shared_ptr<Interaction>& interaction) {
 	const int& PA(shape1->cast<Wall>().axis); 
 	const int& sense(shape1->cast<Wall>().sense);
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;	
@@ -137,7 +147,7 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const 
 		if (dot<1) { normal[PA] = -1; }
 	}
 	CGALvector CGALnormal = CGALvector(normal[0],normal[1],normal[2]);
-        Plane A = Plane(CGALpoint(se31.position[0],se31.position[1],se31.position[2]),CGALvector(normal[0],normal[1],normal[2]));
+	Plane A = Plane(CGALpoint(se31.position[0],se31.position[1],se31.position[2]),CGALvector(normal[0],normal[1],normal[2]));
 
 	shared_ptr<PolyhedraGeom> bang;
 	if (isNew) {
@@ -146,9 +156,9 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const 
 		bang->contactPoint = Vector3r(0,0,0);
 		bang->isShearNew = true;
 		interaction->geom = bang;
-	}else{	
+	}else{
 		// use data from old interaction
-  		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
+		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
 		bang->isShearNew = bang->equivalentPenetrationDepth<=0;
 	}
 
@@ -158,13 +168,13 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const 
 
 	//volume and centroid of intersection
 	Real volume;
-	Vector3r centroid;	
+	Vector3r centroid;
 	P_volume_centroid(Int, &volume, &centroid);
 	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume())  {bang->equivalentPenetrationDepth=0; return true;}
 	if (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))  {bang->equivalentPenetrationDepth=0; return true;}
 
 	//calculate area of projection of Intersection into the normal plane
-        Real area = volume/1E-8;
+	Real area = volume/1E-8;
 	//Real area = CalculateProjectionArea(Int, CGALnormal);
 	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
 
@@ -214,7 +224,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 	//chage normal + change order of vertices to get outwarding facet normal for initial tetrahedron
  	if ((ToCGALPoint(se32.position)-f_center)*(f_normal) < 0) {
 		f_normal = (-1)*f_normal;
-  		CGALpoint help;
+		CGALpoint help;
 		help = v[0];
 		v[0]=v[1];
 		v[1]=help;

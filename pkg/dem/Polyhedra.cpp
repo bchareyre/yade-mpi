@@ -3,10 +3,7 @@
 
 #ifdef YADE_CGAL
 
-#include <pkg/common/ElastMat.hpp>
 #include "Polyhedra.hpp"
-
-#define _USE_MATH_DEFINES
 
 YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (Ip2_FrictMat_PolyhedraMat_FrictPhys) (Law2_PolyhedraGeom_PolyhedraPhys_Volumetric)
 	/* some code in cpp (this file): */ 
@@ -19,9 +16,7 @@ YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhe
 /* Polyhedra Constructor */
 
 void Polyhedra::Initialize(){
-
 	if (init) return;
-
 	bool isRandom = false;
 	
 	//get vertices
@@ -139,7 +134,6 @@ void Polyhedra::Initialize(){
 		I_rot(1,2) = third[1];
 		I_rot(2,2) = third[2];
 		
-		
 		inertia = Vector3r(I_new(0,0),I_new(1,1),I_new(2,2));
 		orientation = Quaternionr(I_rot); 
 		//rotate the voronoi cell so that x - is maximal inertia axis and z - is minimal inertia axis
@@ -150,9 +144,11 @@ void Polyhedra::Initialize(){
 		
 		//rotate also the CGAL structure Polyhedron
 		Matrix3r rot_mat = (orientation.conjugate()).toRotationMatrix();
-		Transformation t_rot(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),1.);	
+		Transformation t_rot(
+			rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),
+			rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),
+			rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),1.);
 		std::transform( P.points_begin(), P.points_end(), P.points_begin(), t_rot);
-
 	}
 	//initialization done
 	init = 1;
@@ -248,7 +244,7 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	//Quaternionr invRot=se3.orientation.conjugate();
 	int N = (int) t->v.size();
-	Vector3r v_g, mincoords(0.,0.,0.), maxcoords(0.,0.,0.);		
+	Vector3r v_g, mincoords(0.,0.,0.), maxcoords(0.,0.,0.);
 	for(int i=0; i<N; i++) {
 		v_g=se3.orientation*t->v[i]; // vertices in global coordinates
 		mincoords = Vector3r(min(mincoords[0],v_g[0]),min(mincoords[1],v_g[1]),min(mincoords[2],v_g[2]));
@@ -292,11 +288,10 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 		}
 	}
 
+	void Gl1_PolyhedraGeom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&,
+		const shared_ptr<Body>&, const shared_ptr<Body>&, bool) {draw(ig);}
 
-	void Gl1_PolyhedraGeom::go(const shared_ptr<IGeom>& ig, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool){ draw(ig);}
-
-	void Gl1_PolyhedraGeom::draw(const shared_ptr<IGeom>& ig){		
-	};
+	void Gl1_PolyhedraGeom::draw(const shared_ptr<IGeom>& ig){};
 
 	GLUquadric* Gl1_PolyhedraPhys::gluQuadric=NULL;
 	Real Gl1_PolyhedraPhys::maxFn;
@@ -306,8 +301,12 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 	int Gl1_PolyhedraPhys::slices;
 	int Gl1_PolyhedraPhys::stacks;
 
-	void Gl1_PolyhedraPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-		if(!gluQuadric){ gluQuadric=gluNewQuadric(); if(!gluQuadric) throw runtime_error("Gl1_PolyhedraPhys::go unable to allocate new GLUquadric object (out of memory?)."); }
+	void Gl1_PolyhedraPhys::go(const shared_ptr<IPhys>& ip, const shared_ptr<Interaction>& i,
+		const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+		if(!gluQuadric){
+			gluQuadric=gluNewQuadric();
+			if(!gluQuadric) throw runtime_error("Gl1_PolyhedraPhys::go unable to allocate new GLUquadric object (out of memory?).");
+		}
 		PolyhedraPhys* np=static_cast<PolyhedraPhys*>(ip.get());
 		shared_ptr<IGeom> ig(i->geom); if(!ig) return; // changed meanwhile?
 		PolyhedraGeom* geom=YADE_CAST<PolyhedraGeom*>(ig.get());
@@ -331,7 +330,7 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 		Vector3r relPos;
 		relPos=p2-p1;
 		Real dist=relPos.norm();
-				
+		
 		glDisable(GL_CULL_FACE); 
 		glPushMatrix();
 			glTranslatef(p1[0],p1[1],p1[2]);
@@ -348,8 +347,8 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 //**********************************************************************************
 //!Precompute data needed for rotating tangent vectors attached to the interaction
 
-void PolyhedraGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& 
-currentNormal, bool isNew, const Vector3r& shift2){
+void PolyhedraGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene,
+	const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, const Vector3r& shift2) {
 	
 	if(!isNew) {
 		orthonormal_axis = normal.cross(currentNormal);
@@ -377,14 +376,12 @@ Vector3r& PolyhedraGeom::rotate(Vector3r& shearForce) const {
 	return shearForce;
 }
 
-
 //**********************************************************************************
 /* Material law, physics */
 
 void Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys::go( const shared_ptr<Material>& b1
 					, const shared_ptr<Material>& b2
-					, const shared_ptr<Interaction>& interaction)
-{
+					, const shared_ptr<Interaction>& interaction) {
 	if(interaction->phys) return;
 	const shared_ptr<PolyhedraMat>& mat1 = YADE_PTR_CAST<PolyhedraMat>(b1);
 	const shared_ptr<PolyhedraMat>& mat2 = YADE_PTR_CAST<PolyhedraMat>(b2);
@@ -407,7 +404,6 @@ void Ip2_FrictMat_PolyhedraMat_FrictPhys::go(const shared_ptr<Material>& pp1, co
 }
 
 //**************************************************************************************
-#if 1
 Real Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::getPlasticDissipation() {return (Real) plasticDissipation;}
 void Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
 Real Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::elasticEnergy()
@@ -421,13 +417,10 @@ Real Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::elasticEnergy()
 	}
 	return energy;
 }
-#endif
-
 
 //**************************************************************************************
 // Apply forces on polyhedrons in collision based on geometric configuration
 bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* I){
-
 		if (!I->geom) {return true;} 
 		const shared_ptr<PolyhedraGeom>& contactGeom(YADE_PTR_DYN_CAST<PolyhedraGeom>(I->geom));
 		if(!contactGeom) {return true;} 
