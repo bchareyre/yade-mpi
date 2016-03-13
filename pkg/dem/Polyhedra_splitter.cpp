@@ -97,10 +97,14 @@ void PolyhedraSplitter::action()
 			//division of stress by volume
 			const Vector3r dirC = I_vect.col(max_i);
 			const Vector3r dirT = I_vect.col(min_i);
-			const Vector3r dir1  = dirC.normalized() + dirT.normalized();
-			const Vector3r dir2  = dirC.normalized() - dirT.normalized();
+			const Vector3r dir1 = dirC.normalized() + dirT.normalized();
+			const Vector3r dir2 = dirC.normalized() - dirT.normalized();
 			//double sigma_t = -comp_stress/2.+ tens_stress;
-			const Real sigma_t = pow((pow(I_valu(0,0)-I_valu(1,1),2)+pow(I_valu(0,0)-I_valu(2,2),2)+pow(I_valu(1,1)-I_valu(2,2),2))/2.,0.5)/p->GetVolume();
+			const Real sigma_t = pow((
+				pow(I_valu(0,0)-I_valu(1,1),2)+
+				pow(I_valu(0,0)-I_valu(2,2),2)+
+				pow(I_valu(1,1)-I_valu(2,2),2))
+				/2.,0.5)/p->GetVolume();
 			if (sigma_t > getStrength(p->GetVolume(),m->GetStrength())) {
 				splitsV.push_back(std::make_tuple(b, dir1.normalized(), dir2.normalized()));
 			}

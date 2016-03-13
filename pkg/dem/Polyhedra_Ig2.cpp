@@ -93,10 +93,6 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	
 	if((se32.position+shift2-centroid).dot(normal)<0) normal*=-1;	
 	
-	//calculate area of projection of Intersection into the normal plane
-	//Real area = CalculateProjectionArea(Int, ToCGALVector(normal));
-	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
-	//Real area = volume/1E-8;
 	Real area = std::pow(volume,2./3.);
 	// store calculated stuff in bang; some is redundant
 	bang->equivalentCrossSection=area;
@@ -194,8 +190,6 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const 
 
 	//calculate area of projection of Intersection into the normal plane
 	Real area = volume/1E-8;
-	//Real area = CalculateProjectionArea(Int, CGALnormal);
-	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
 
 	// store calculated stuff in bang; some is redundant
 	bang->equivalentCrossSection=area;

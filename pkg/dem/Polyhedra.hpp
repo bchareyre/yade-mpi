@@ -321,8 +321,6 @@ void PrintPolyhedron(Polyhedron P);
 void PrintPolyhedron2File(Polyhedron P,FILE* X);
 //normal by least square fitting of separating segments
 Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB);
-//calculate area of projection of polyhedron into the plane
-Real CalculateProjectionArea(Polyhedron Int, CGALvector CGALnormal);
 //split polyhedron
 shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point);
 //new polyhedra
