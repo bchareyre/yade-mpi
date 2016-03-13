@@ -29,21 +29,30 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	//move and rotate 1st the CGAL structure Polyhedron
 	Matrix3r rot_mat = (se31.orientation).toRotationMatrix();
 	Vector3r trans_vec = se31.position;
-	Transformation t_rot_trans(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+	
+	Transformation t_rot_trans(
+		rot_mat(0,0), rot_mat(0,1), rot_mat(0,2), trans_vec[0],
+		rot_mat(1,0), rot_mat(1,1), rot_mat(1,2), trans_vec[1],
+		rot_mat(2,0), rot_mat(2,1), rot_mat(2,2), trans_vec[2], 1.
+	);
+	
 	Polyhedron PA = A->GetPolyhedron();
 	std::transform( PA.points_begin(), PA.points_end(), PA.points_begin(), t_rot_trans);
+	
 	std::transform( PA.facets_begin(), PA.facets_end(), PA.planes_begin(),Plane_equation());	
-
-
+	
 	//move and rotate 2nd the CGAL structure Polyhedron
 	rot_mat = (se32.orientation).toRotationMatrix();
 	trans_vec = se32.position + shift2;
 	t_rot_trans = Transformation(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+	
 	Polyhedron PB = B->GetPolyhedron();
+	
 	std::transform( PB.points_begin(), PB.points_end(), PB.points_begin(), t_rot_trans);
 	std::transform( PB.facets_begin(), PB.facets_end(), PB.planes_begin(),Plane_equation());
-
+	
 	shared_ptr<PolyhedraGeom> bang;
+	
 	if (isNew) {
 		// new interaction
 		bang=shared_ptr<PolyhedraGeom>(new PolyhedraGeom());
@@ -53,31 +62,37 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 		interaction->geom = bang;
 	}else{	
 		// use data from old interaction
-  		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
+		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
 		bang->isShearNew = bang->equivalentPenetrationDepth<=0;
 	}
-
-
+  
 	//find intersection Polyhedra
 	Polyhedron Int;
 	Int = Polyhedron_Polyhedron_intersection(PA,PB,ToCGALPoint(bang->contactPoint),ToCGALPoint(se31.position),ToCGALPoint(se32.position+shift2), bang->sep_plane);	
-
+	
 	//volume and centroid of intersection
 	Real volume;
 	Vector3r centroid;	
 	P_volume_centroid(Int, &volume, &centroid);
+	
  	if(isnan(volume) || volume<=1E-25 || volume > min(A->GetVolume(),B->GetVolume())) {
 		bang->equivalentPenetrationDepth=0;
 		bang->penetrationVolume=min(A->GetVolume(),B->GetVolume());
 		bang->normal = (A->GetVolume()>B->GetVolume() ? 1 : -1)*(se32.position+shift2-se31.position);
 		return true;
 	}
-	if ( (!Is_inside_Polyhedron(PA, ToCGALPoint(centroid))) or (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid))))  {bang->equivalentPenetrationDepth=0; return true;}
-
+	
+	if ((!Is_inside_Polyhedron(PA, ToCGALPoint(centroid))) or 
+			(!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))) {
+				bang->equivalentPenetrationDepth=0;
+				return true;
+		}
+	
 	//find normal direction
-        Vector3r normal = FindNormal(Int, PA, PB);
+	Vector3r normal = FindNormal(Int, PA, PB);
+	
 	if((se32.position+shift2-centroid).dot(normal)<0) normal*=-1;	
-
+	
 	//calculate area of projection of Intersection into the normal plane
 	//Real area = CalculateProjectionArea(Int, ToCGALVector(normal));
 	//if(isnan(area) || area<=1E-20) {bang->equivalentPenetrationDepth=0; return true;}
@@ -132,7 +147,11 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const 
 	//move and rotate also the CGAL structure Polyhedron
 	Matrix3r rot_mat = (se32.orientation).toRotationMatrix();
 	Vector3r trans_vec = se32.position;
-	Transformation t_rot_trans(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+	
+	Transformation t_rot_trans(
+		rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),trans_vec[0],
+		rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],
+		rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PB = B->GetPolyhedron();
 	std::transform( PB.points_begin(), PB.points_end(), PB.points_begin(), t_rot_trans);
 	std::transform( PB.facets_begin(), PB.facets_end(), PB.planes_begin(),Plane_equation());
@@ -201,22 +220,25 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 	const Se3r& se32=state2.se3;
 	Facet*   A = static_cast<Facet*>(shape1.get());	
 	Polyhedra* B = static_cast<Polyhedra*>(shape2.get());
-
+	
 	bool isNew = !interaction->geom;
-
+	
 	//move and rotate 1st the CGAL structure Polyhedron
 	Matrix3r rot_mat = (se32.orientation).toRotationMatrix();
 	Vector3r trans_vec = se32.position;
-	Transformation t_rot_trans(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+	Transformation t_rot_trans(
+		rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),trans_vec[0],
+		rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],
+		rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PB = B->GetPolyhedron();
 	std::transform( PB.points_begin(), PB.points_end(), PB.points_begin(), t_rot_trans);
 	std::transform( PB.facets_begin(), PB.facets_end(), PB.planes_begin(),Plane_equation());
-
+	
 	//move and rotate facet
 	vector<CGALpoint> v;
 	v.resize(6);
 	for (int i=0; i<3; i++) v[i] = ToCGALPoint(se31.orientation*A->vertices[i] + se31.position); // vertices in global coordinates
-
+	
 	//determine 
 	CGALpoint f_center((v[0].x()+v[1].x()+v[2].x())/3.,(v[0].y()+v[1].y()+v[2].y())/3.,(v[0].z()+v[1].z()+v[2].z())/3.);
 	CGALvector f_normal = CGAL::cross_product((v[1]-v[0]),(v[2]-v[0]));
@@ -229,7 +251,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 		v[0]=v[1];
 		v[1]=help;
 	}
-
+	
 	Real f_area = sqrt(f_normal.squared_length());
 	for (int i=3; i<6; i++) v[i] = v[i-3]-f_normal/f_area*0.05*sqrt(f_area); // vertices in global coordinates
 
@@ -242,7 +264,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 	hei = PA.split_facet(hei->next()->next()->next(),hei->next());
 	hei = PA.split_vertex(hei, hei->next_on_vertex()->next_on_vertex());
 	hei->vertex()->point() = v[5];
-
+	
 	shared_ptr<PolyhedraGeom> bang;
 	if (isNew) {
 		// new interaction
@@ -256,22 +278,22 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
 		bang->isShearNew = bang->equivalentPenetrationDepth<=0;
 	}
-
+	
 	//find intersection Polyhedra
 	Polyhedron Int;
 	Int = Polyhedron_Polyhedron_intersection(PA,PB,ToCGALPoint(bang->contactPoint),ToCGALPoint(se31.position),ToCGALPoint(se32.position), bang->sep_plane);	
-
+	
 	//volume and centroid of intersection
 	Real volume;
 	Vector3r centroid;
 	P_volume_centroid(Int, &volume, &centroid);
 	if(isnan(volume) || volume<=1E-25 || volume > B->GetVolume()) {bang->equivalentPenetrationDepth=0; return true;}
 	if (!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))  {bang->equivalentPenetrationDepth=0; return true;}
-
+	
 	//find normal direction
 	Vector3r normal = FindNormal(Int, PA, PB);
 	if((se32.position-centroid).dot(normal)<0) normal*=-1;
-
+	
 	//calculate area of projection of Intersection into the normal plane
 	Real area = volume/1E-8;
 	
@@ -282,6 +304,7 @@ bool Ig2_Facet_Polyhedra_PolyhedraGeom::go(const shared_ptr<Shape>& shape1,const
 	bang->equivalentPenetrationDepth=volume/area;
 	bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
 	bang->normal=normal;
+	
 	return true;
 }
 

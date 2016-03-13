@@ -3,7 +3,7 @@
 
 #ifdef YADE_CGAL
 
-#include"Polyhedra.hpp"
+#include "Polyhedra.hpp"
 
 #define _USE_MATH_DEFINES
 
@@ -368,7 +368,7 @@ CGALpoint PlaneIntersection( Plane a,  Plane b,  Plane c){
 Vector3r SolveLinSys3x3(Matrix3r A, Vector3r y){
 	//only system 3x3 by Cramers rule 
 	Real det =    A(0,0)*A(1,1)*A(2,2)+A(0,1)*A(1,2)*A(2,0)+A(0,2)*A(1,0)*A(2,1)-A(0,2)*A(1,1)*A(2,0)-A(0,1)*A(1,0)*A(2,2)-A(0,0)*A(1,2)*A(2,1);	
-	if (det == 0) {cerr << "error in linear solver" << endl; return Vector3r(0,0,0);}
+	if (det == 0) {LOG_WARN("error in linear solver"); return Vector3r(0,0,0);}
 	return Vector3r((y(0)*A(1,1)*A(2,2)+A(0,1)*A(1,2)*y(2)+A(0,2)*y(1)*A(2,1)-A(0,2)*A(1,1)*y(2)-A(0,1)*y(1)*A(2,2)-y(0)*A(1,2)*A(2,1))/det, (A(0,0)*y(1)*A(2,2)+y(0)*A(1,2)*A(2,0)+A(0,2)*A(1,0)*y(2)-A(0,2)*y(1)*A(2,0)-y(0)*A(1,0)*A(2,2)-A(0,0)*A(1,2)*y(2))/det, (A(0,0)*A(1,1)*y(2)+A(0,1)*y(1)*A(2,0)+y(0)*A(1,0)*A(2,1)-y(0)*A(1,1)*A(2,0)-A(0,1)*A(1,0)*y(2)-A(0,0)*y(1)*A(2,1))/det);
 }
 
@@ -378,9 +378,10 @@ critical point, because CGAL often returnes segmentation fault. The planes must 
 */
 Polyhedron ConvexHull(vector<CGALpoint> &planes){
 	Polyhedron Int;
-	//cout << "C"; cout.flush();
+	for (const auto p : planes) {
+		if (isnan(p.x()) || isnan(p.y()) || isnan(p.z())) return Int;
+	}
 	if (planes.size()>3) CGAL::convex_hull_3(planes.begin(), planes.end(), Int);
-	//cout << "-C"<< endl; 	cout.flush();
 	return Int;
 }
 
@@ -520,7 +521,7 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 					if (const CGALpoint *ipoint = CGAL::object_cast<CGALpoint>(&result)) {
 						inside = vIter->point() + 0.5*CGALvector(vIter->point(),*ipoint);
 					}else{
-						cerr << "Error in line-plane intersection" << endl; 
+						LOG_WARN("Error in line-plane intersection"); 
 					}
 				}
 				if(Is_inside_Polyhedron(A,inside,DISTANCE_LIMIT) && Oriented_squared_distance(B,inside)<=-lim) intersection_found = true;
@@ -564,6 +565,7 @@ Polyhedron Polyhedron_Plane_intersection(Polyhedron A, Plane B, CGALpoint centro
 
  	//compute convex hull of it
 	Intersection = ConvexHull(dual_planes);
+	if (Intersection.empty()) return Intersection;
 
 	//return to original position
 	std::transform( Intersection.points_begin(), Intersection.points_end(), Intersection.points_begin(), transl_back);
@@ -673,10 +675,20 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 	
 	//dualize again
 	dual_planes.clear();
-	for(Polyhedron::Plane_iterator pi =Intersection.planes_begin(); pi!=Intersection.planes_end(); ++pi) dual_planes.push_back(CGALpoint(-pi->a()/pi->d(),-pi->b()/pi->d(),-pi->c()/pi->d()));
-
- 	//compute convex hull of it
+	for(Polyhedron::Plane_iterator pi =Intersection.planes_begin(); pi!=Intersection.planes_end(); ++pi) {
+		const auto pX = -pi->a()/pi->d();
+		const auto pY = -pi->b()/pi->d();
+		const auto pZ = -pi->c()/pi->d();
+		if (isnan(pX) || isnan(pY) || isnan(pZ)) {
+			Polyhedron IntersectionEmpty;
+			return IntersectionEmpty;
+		} else {
+			dual_planes.push_back(CGALpoint(-pi->a()/pi->d(),-pi->b()/pi->d(),-pi->c()/pi->d()));
+		}
+	}
+	//compute convex hull of it
 	Intersection = ConvexHull(dual_planes);
+	if (Intersection.empty())  return Intersection;
 	//return to original position
 	std::transform( Intersection.points_begin(), Intersection.points_end(), Intersection.points_begin(), transl_back);
 	
@@ -792,37 +804,37 @@ shared_ptr<Body> NewPolyhedra(vector<Vector3r> v, shared_ptr<Material> mat){
 
 //**********************************************************************************
 //split polyhedra
-shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point){
-
-	direction.normalize();
-
+shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, const Vector3r direction, const Vector3r point){
+	Scene* scene=Omega::instance().getScene().get();
 	const Se3r& se3=body->state->se3; 
 	Polyhedra* A = static_cast<Polyhedra*>(body->shape.get());
 	State* X = static_cast<State*>(body->state.get());
 
-	Vector3r OrigPos = X->pos;
-	Vector3r OrigVel = X->vel;
-	Vector3r OrigAngVel = X->angVel;
+	const Vector3r OrigPos = X->pos;
+	const Vector3r OrigVel = X->vel;
+	const Vector3r OrigAngVel = X->angVel;
 
 	//move and rotate CGAL structure Polyhedron
 	Matrix3r rot_mat = (se3.orientation).toRotationMatrix();
 	Vector3r trans_vec = se3.position;
-	Transformation t_rot_trans(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+	Transformation t_rot_trans(
+		rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),trans_vec[0],
+		rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],
+		rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
 	Polyhedron PA = A->GetPolyhedron();
 	std::transform( PA.points_begin(), PA.points_end(), PA.points_begin(), t_rot_trans);
  
 	//calculate first splitted polyhedrons
 	Plane B(ToCGALPoint(point-direction*SPLITTER_GAP), ToCGALVector(direction)); 
 	Polyhedron S1 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) - 1E-6*ToCGALVector(direction));
+
 	B = Plane(ToCGALPoint(point+direction*SPLITTER_GAP), ToCGALVector((-1.)*direction));
 	Polyhedron S2 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) + 1E-6*ToCGALVector(direction));
-	Scene* scene=Omega::instance().getScene().get();
 	//scene->bodies->erase(body->id);
 
-	
 	//replace original polyhedron
-	A->Clear();		
-	for(Polyhedron::Vertex_iterator vi = S1.vertices_begin(); vi !=  S1.vertices_end(); vi++){ A->v.push_back(FromCGALPoint(vi->point()));}; 
+	A->Clear();
+	for(Polyhedron::Vertex_iterator vi = S1.vertices_begin(); vi !=  S1.vertices_end(); vi++) A->v.push_back(FromCGALPoint(vi->point()));
 	A->Initialize();
 	X->pos = A->GetCentroid();
 	X->ori = A->GetOri();
@@ -830,13 +842,12 @@ shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction
 	X->refPos[0] = X->refPos[0]+1.;
 	X->inertia =A->GetInertia()*body->material->density;
 	X->vel = OrigVel + OrigAngVel.cross(X->pos-OrigPos);
-	X->angVel = OrigAngVel;	
+	X->angVel = OrigAngVel;
 	
 	//second polyhedron
 	vector<Vector3r> v2;
-	for(Polyhedron::Vertex_iterator vi = S2.vertices_begin(); vi !=  S2.vertices_end(); vi++){ v2.push_back(FromCGALPoint(vi->point()));}; 
+	for(Polyhedron::Vertex_iterator vi = S2.vertices_begin(); vi !=  S2.vertices_end(); vi++) v2.push_back(FromCGALPoint(vi->point()));
 	shared_ptr<Body> BP = NewPolyhedra(v2, body->material);
-	//BP->shape->color = body->shape->color;
 	BP->shape->color = Vector3r(Real(rand())/RAND_MAX,Real(rand())/RAND_MAX,Real(rand())/RAND_MAX);
 	scene->bodies->insert(BP);
 	//set proper state variables

@@ -5,6 +5,11 @@
 
 #ifdef YADE_CGAL
 
+// NDEBUG causes crashes in CGAL sometimes. Anton
+#ifdef NDEBUG
+	#undef NDEBUG
+#endif
+
 #include <core/Omega.hpp>
 #include <core/Shape.hpp>
 #include <core/Interaction.hpp>
@@ -60,7 +65,7 @@ class Polyhedra: public Shape{
 		Vector3r GetInertia(){Initialize(); return inertia;}
 		vector<int> GetSurfaceTriangulation(){Initialize(); return faceTri;}
 		vector<vector<int>> GetSurfaces() const;
-		void Initialize();		
+		void Initialize();
 		bool IsInitialized(){return init;}
 		std::vector<Vector3r> GetOriginalVertices();
 		Real GetVolume(){Initialize(); return volume;}

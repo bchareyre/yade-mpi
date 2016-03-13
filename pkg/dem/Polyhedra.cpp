@@ -481,9 +481,9 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shar
 		} else {
 			shearForce = Vector3r::Zero();
 		}
-
 		Vector3r F = -normalForce-shearForce;	
 		if (contactGeom->equivalentPenetrationDepth != contactGeom->equivalentPenetrationDepth) exit(1);
+		
 		scene->forces.addForce (idA,F);
 		scene->forces.addForce (idB, -F);
 		scene->forces.addTorque(idA, -(A->state->pos-contactGeom->contactPoint).cross(F));
@@ -501,9 +501,8 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shar
 		fprintf(fin,"A\t%e\t%e\t%e\n",A->state->pos[0],A->state->pos[1],A->state->pos[2]);
 		fprintf(fin,"B\t%e\t%e\t%e\n",B->state->pos[0],B->state->pos[1],B->state->pos[2]);
 		fprintf(fin,"centroid\t%e\t%e\t%e\n",contactGeom->contactPoint[0],contactGeom->contactPoint[1],contactGeom->contactPoint[2]);
-		fclose(fin);	
-		*/		
-
+		fclose(fin);
+		*/
 		//needed to be able to acces interaction forces in other parts of yade
 		phys->normalForce = normalForce;
 		phys->shearForce = shearForce;

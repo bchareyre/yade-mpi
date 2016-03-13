@@ -2,7 +2,6 @@
 // https://www.vutbr.cz/www_base/gigadisk.php?i=95194aa9a
 
 #ifdef YADE_CGAL
-
 #include "Polyhedra.hpp"
 
 //***************************************************************************

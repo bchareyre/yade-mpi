@@ -80,7 +80,7 @@ void PolyhedraSplitter::action()
 		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		shared_ptr<PolyhedraMat> m=YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
-	
+		
 		if(p && m->IsSplitable){
 			//not real strees, to get real one, it has to be divided by body volume
 			Matrix3r stress = bStresses[b->id];

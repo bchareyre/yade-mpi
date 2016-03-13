@@ -5,9 +5,9 @@
 #pragma once
 
 #ifdef YADE_CGAL
-
-#include <pkg/common/PeriodicEngines.hpp>
 #include "Polyhedra.hpp"
+#include <pkg/common/PeriodicEngines.hpp>
+
 
 //*********************************************************************************
 /* Polyhedra Splitter */
