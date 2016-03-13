@@ -86,14 +86,12 @@ void PolyhedraSplitter::action()
 			//get eigenstresses
 			Symmetrize(stress);
 			Matrix3r I_vect(Matrix3r::Zero()), I_valu(Matrix3r::Zero()); 
-			matrixEigenDecomposition(stress,I_vect,I_valu);	
-			int min_i = 0;
-			if (I_valu(min_i,min_i) > I_valu(1,1)) min_i = 1;
-			if (I_valu(min_i,min_i) > I_valu(2,2)) min_i = 2;	
-			int max_i = 0;
-			if (I_valu(max_i,max_i) < I_valu(1,1)) max_i = 1;
-			if (I_valu(max_i,max_i) < I_valu(2,2)) max_i = 2;
-			
+			matrixEigenDecomposition(stress,I_vect,I_valu);
+
+			Eigen::Matrix3f::Index min_i, max_i;
+			I_valu.diagonal().minCoeff(&min_i);
+			I_valu.diagonal().maxCoeff(&max_i);
+
 			//division of stress by volume
 			const Vector3r dirC = I_vect.col(max_i);
 			const Vector3r dirT = I_vect.col(min_i);
