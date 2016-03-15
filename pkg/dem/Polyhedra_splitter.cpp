@@ -8,6 +8,8 @@
 YADE_PLUGIN((PolyhedraSplitter));
 CREATE_LOGGER(PolyhedraSplitter);
 
+using PSplitT = std::tuple<const shared_ptr<Body>&, Vector3r, Vector3r>;
+
 //*********************************************************************************
 /* Evaluate tensorial stress estimation in polyhedras */
 
@@ -50,13 +52,16 @@ void PolyhedraSplitter::Symmetrize(Matrix3r & bStress){
 
 //**********************************************************************************
 //split polyhedra
-void SplitPolyhedraDouble(const shared_ptr<Body>& body, Vector3r direction1, Vector3r direction2){
-	const Se3r& se3=body->state->se3; 
-	Vector3r point = se3.position;
+void SplitPolyhedraDouble(const PSplitT & split){
+	const auto & b =(get<0>(split));
+	const auto & d1=(get<1>(split));
+	const auto & d2=(get<2>(split));
+	const Se3r& se3=b->state->se3;
+	const Vector3r pnt = se3.position;
 
-	shared_ptr<Body> B2 = SplitPolyhedra(body, direction1, point);
-	shared_ptr<Body> B3 = SplitPolyhedra(B2, direction2, point);
-	shared_ptr<Body> B4 = SplitPolyhedra(body, direction2, point);
+	shared_ptr<Body> B2 = SplitPolyhedra(b, d1, pnt);
+	shared_ptr<Body> B3 = SplitPolyhedra(B2, d2, pnt);
+	shared_ptr<Body> B4 = SplitPolyhedra(b, d2, pnt);
 }
 
 //*********************************************************************************
@@ -67,10 +72,7 @@ void PolyhedraSplitter::action()
 	const shared_ptr<Scene> _rb=shared_ptr<Scene>();
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 
-	vector<shared_ptr<Body> > bodies;
-	vector<Vector3r > directions1, directions2;
-	vector<Real > sigmas;
-
+	vector<PSplitT> splitsV;
 	vector<Matrix3r> bStresses (scene->bodies->size(), Matrix3r::Zero());
 	getStressForEachBody(bStresses);
 
@@ -100,14 +102,11 @@ void PolyhedraSplitter::action()
 			//double sigma_t = -comp_stress/2.+ tens_stress;
 			const Real sigma_t = pow((pow(I_valu(0,0)-I_valu(1,1),2)+pow(I_valu(0,0)-I_valu(2,2),2)+pow(I_valu(1,1)-I_valu(2,2),2))/2.,0.5)/p->GetVolume();
 			if (sigma_t > getStrength(p->GetVolume(),m->GetStrength())) {
-				bodies.push_back(b);
-				directions1.push_back(dir1.normalized());
-				directions2.push_back(dir2.normalized());
-				sigmas.push_back(sigma_t);
+				splitsV.push_back(std::make_tuple(b, dir1.normalized(), dir2.normalized()));
 			}
 		}
 	}
-	for(unsigned int i=0; i<bodies.size(); i++) SplitPolyhedraDouble(bodies[i], directions1[i], directions2[i]);
+	std::for_each(splitsV.begin(), splitsV.end(), &SplitPolyhedraDouble);
 }
 
 #endif // YADE_CGAL
