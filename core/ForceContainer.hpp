@@ -51,164 +51,71 @@ class ForceContainer{
 		std::vector<Body::id_t>  _maxId;
 		vvector _force, _torque, _move, _rot, _permForce, _permTorque;
 		std::vector<size_t> sizeOfThreads;
-		size_t size;
-		bool syncedSizes;
+		size_t size = 0;
+		bool syncedSizes = true;
 		int nThreads;
-		bool synced,moveRotUsed,permForceUsed;
+		bool synced = true;
+		bool moveRotUsed = false;
+		bool permForceUsed = false;
 		boost::mutex globalMutex;
-		Vector3r _zero;
+		Vector3r _zero = Vector3r::Zero();
 
-		inline void ensureSize(Body::id_t id, int threadN){
-			assert(nThreads>omp_get_thread_num());
-			const Body::id_t idMaxTmp = max(id, _maxId[threadN]);
-			_maxId[threadN] = 0;
-			if (threadN<0) {
-				resizePerm(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
-			} else if (sizeOfThreads[threadN]<=(size_t)idMaxTmp) {
-				resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)),threadN);
-			}
-		}
-		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
+		void ensureSize(Body::id_t id, int threadN);
+		void ensureSynced();
 		
 		// dummy function to avoid template resolution failure
-		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
+		friend class boost::serialization::access;
+		template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): size(0), syncedSizes(true),synced(true),moveRotUsed(false),permForceUsed(false),_zero(Vector3r::Zero()),syncCount(0),lastReset(0){
-			nThreads=omp_get_max_threads();
-			for(int i=0; i<nThreads; i++){
-				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
-				_moveData.push_back(vvector());  _rotData.push_back(vvector());
-				sizeOfThreads.push_back(0);
-				_maxId.push_back(0);
-			}
-		}
-		const Vector3r& getForce(Body::id_t id)         { ensureSynced(); return ((size_t)id<size)?_force[id]:_zero; }
-		void  addForce(Body::id_t id, const Vector3r& f){ ensureSize(id,omp_get_thread_num()); synced=false;   _forceData[omp_get_thread_num()][id]+=f;}
-		const Vector3r& getTorque(Body::id_t id)        { ensureSynced(); return ((size_t)id<size)?_torque[id]:_zero; }
-		void addTorque(Body::id_t id, const Vector3r& t){ ensureSize(id,omp_get_thread_num()); synced=false;   _torqueData[omp_get_thread_num()][id]+=t;}
-		const Vector3r& getMove(Body::id_t id)          { ensureSynced(); return ((size_t)id<size)?_move[id]:_zero; }
-		void  addMove(Body::id_t id, const Vector3r& m) { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
-		const Vector3r& getRot(Body::id_t id)           { ensureSynced(); return ((size_t)id<size)?_rot[id]:_zero; }
-		void  addRot(Body::id_t id, const Vector3r& r)  { ensureSize(id,omp_get_thread_num()); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
-		void  addMaxId(Body::id_t id)                   { _maxId[omp_get_thread_num()]=id;}
+		unsigned long syncCount = 0;
+		long lastReset = 0;
+		ForceContainer();
+		const Vector3r& getForce(Body::id_t id);
+		void  addForce(Body::id_t id, const Vector3r& f);
+		const Vector3r& getTorque(Body::id_t id);
+		void  addTorque(Body::id_t id, const Vector3r& t);
+		const Vector3r& getMove(Body::id_t id);
+		void  addMove(Body::id_t id, const Vector3r& m);
+		const Vector3r& getRot(Body::id_t id);
+		void  addRot(Body::id_t id, const Vector3r& r);
+		void  addMaxId(Body::id_t id);
 
-		void  setPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id,-1); synced=false;   _permForce[id]=f; permForceUsed=true;}
-		void setPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id,-1); synced=false;   _permTorque[id]=t; permForceUsed=true;}
-		const Vector3r& getPermForce(Body::id_t id) { ensureSynced(); return ((size_t)id<size)?_permForce[id]:_zero; }
-		const Vector3r& getPermTorque(Body::id_t id) { ensureSynced(); return ((size_t)id<size)?_permTorque[id]:_zero; }
+		void  setPermForce(Body::id_t id, const Vector3r& f);
+		void  setPermTorque(Body::id_t id, const Vector3r& t);
+		const Vector3r& getPermForce(Body::id_t id);
+		const Vector3r& getPermTorque(Body::id_t id);
 		
 		/*! Function to allow friend classes to get force even if not synced. Used for clumps by NewtonIntegrator.
 		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
 		* for a particular body id. */
-		const Vector3r& getForceUnsynced (Body::id_t id){assert ((size_t)id<size); return _force[id];}
-		const Vector3r& getTorqueUnsynced(Body::id_t id){assert ((size_t)id<size); return _torque[id];}
-		void  addForceUnsynced(Body::id_t id, const Vector3r& f){ assert ((size_t)id<size); _force[id]+=f; }
-		void  addTorqueUnsynced(Body::id_t id, const Vector3r& m){ assert ((size_t)id<size); _torque[id]+=m; }
+		const Vector3r& getForceUnsynced (Body::id_t id);
+		const Vector3r& getTorqueUnsynced(Body::id_t id);
+		void  addForceUnsynced(Body::id_t id, const Vector3r& f);
+		void  addTorqueUnsynced(Body::id_t id, const Vector3r& m);
 		
 		/* To be benchmarked: sum thread data in getForce/getTorque upon request for each body individually instead of by the sync() function globally */
 		// this function is used from python so that running simulation is not slowed down by sync'ing on occasions
 		// since Vector3r writes are not atomic, it might (rarely) return wrong value, if the computation is running meanwhile
-		Vector3r getForceSingle (Body::id_t id){ Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=((size_t)id<sizeOfThreads[t])?_forceData [t][id]:_zero; } if (permForceUsed) ret+=_permForce[id]; return ret; }
-		Vector3r getTorqueSingle(Body::id_t id){ Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=((size_t)id<sizeOfThreads[t])?_torqueData[t][id]:_zero; } if (permForceUsed) ret+=_permTorque[id]; return ret; }
-		Vector3r getMoveSingle  (Body::id_t id){ Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=((size_t)id<sizeOfThreads[t])?_moveData  [t][id]:_zero; } return ret; }
-		Vector3r getRotSingle   (Body::id_t id){ Vector3r ret(Vector3r::Zero()); for(int t=0; t<nThreads; t++){ ret+=((size_t)id<sizeOfThreads[t])?_rotData   [t][id]:_zero; } return ret; }
+		Vector3r getForceSingle (Body::id_t id);
+		Vector3r getTorqueSingle(Body::id_t id);
+		Vector3r getMoveSingle  (Body::id_t id);
+		Vector3r getRotSingle   (Body::id_t id);
 		
-		inline void syncSizesOfContainers() {
-			if (syncedSizes) return;
-			//check whether all containers have equal length, and if not resize it
-			for(int i=0; i<nThreads; i++){
-				if (sizeOfThreads[i]<size) resize(size,i);
-			}
-			_force.resize(size,Vector3r::Zero());
-			_torque.resize(size,Vector3r::Zero());
-			_permForce.resize(size,Vector3r::Zero());
-			_permTorque.resize(size,Vector3r::Zero());
-			_move.resize(size,Vector3r::Zero());
-			_rot.resize(size,Vector3r::Zero());
-			syncedSizes=true;
-		}
+		void syncSizesOfContainers();
 		/* Sum contributions from all threads, save to _force&_torque.
 		 * Locks globalMutex, since one thread modifies common data (_force&_torque).
 		 * Must be called before get* methods are used. Exception is thrown otherwise, since data are not consistent. */
-		inline void sync(){
-			for(int i=0; i<nThreads; i++){
-				if (_maxId[i] > 0) { synced = false;}
-			}
-			if(synced) return;
-			boost::mutex::scoped_lock lock(globalMutex);
-			if(synced) return; // if synced meanwhile
-			
-			for(int i=0; i<nThreads; i++){
-				if (_maxId[i] > 0) { ensureSize(_maxId[i],i);}
-			}
-			
-			syncSizesOfContainers();
-
-			for(long id=0; id<(long)size; id++){
-				Vector3r sumF(Vector3r::Zero()), sumT(Vector3r::Zero());
-				for(int thread=0; thread<nThreads; thread++){ sumF+=_forceData[thread][id]; sumT+=_torqueData[thread][id];}
-				_force[id]=sumF; _torque[id]=sumT;
-				if (permForceUsed) {_force[id]+=_permForce[id]; _torque[id]+=_permTorque[id];}
-			}
-			if(moveRotUsed){
-				for(long id=0; id<(long)size; id++){
-					Vector3r sumM(Vector3r::Zero()), sumR(Vector3r::Zero());
-					for(int thread=0; thread<nThreads; thread++){ sumM+=_moveData[thread][id]; sumR+=_rotData[thread][id];}
-					_move[id]=sumM; _rot[id]=sumR;
-				}
-			}
-			synced=true; syncCount++;
-		}
-		unsigned long syncCount;
-		long lastReset;
-
-		void resize(size_t newSize, int threadN){
-			_forceData [threadN].resize(newSize,Vector3r::Zero());
-			_torqueData[threadN].resize(newSize,Vector3r::Zero());
-			_moveData[threadN].resize(newSize,Vector3r::Zero());
-			_rotData[threadN].resize(newSize,Vector3r::Zero());
-			sizeOfThreads[threadN] = newSize;
-			if (size<newSize) size=newSize;
-			syncedSizes=false;
-		}
-		void resizePerm(size_t newSize){
-			_permForce.resize(newSize,Vector3r::Zero());
-			_permTorque.resize(newSize,Vector3r::Zero());
-			if (size<newSize) size=newSize;
-			syncedSizes=false;
-		}
+		void sync();
+		void resize(size_t newSize, int threadN);
+		void resizePerm(size_t newSize);
 		/*! Reset all resetable data, also reset summary forces/torques and mark the container clean.
 		If resetAll, reset also user defined forces and torques*/
 		// perhaps should be private and friend Scene or whatever the only caller should be
-		void reset(long iter, bool resetAll=false){
-			syncSizesOfContainers();
-			for(int thread=0; thread<nThreads; thread++){
-				memset(&_forceData [thread][0],0,sizeof(Vector3r)*sizeOfThreads[thread]);
-				memset(&_torqueData[thread][0],0,sizeof(Vector3r)*sizeOfThreads[thread]);
-				if(moveRotUsed){
-					memset(&_moveData  [thread][0],0,sizeof(Vector3r)*sizeOfThreads[thread]);
-					memset(&_rotData   [thread][0],0,sizeof(Vector3r)*sizeOfThreads[thread]);
-				}
-			}
-			memset(&_force [0], 0,sizeof(Vector3r)*size);
-			memset(&_torque[0], 0,sizeof(Vector3r)*size);
-			if(moveRotUsed){
-				memset(&_move  [0], 0,sizeof(Vector3r)*size);
-				memset(&_rot   [0], 0,sizeof(Vector3r)*size);
-			}
-			if (resetAll){
-				memset(&_permForce [0], 0,sizeof(Vector3r)*size);
-				memset(&_permTorque[0], 0,sizeof(Vector3r)*size);
-				permForceUsed = false;
-			}
-			if (!permForceUsed) synced=true; else synced=false;
-			moveRotUsed=false;
-			lastReset=iter;
-		}
+		void reset(long iter, bool resetAll=false);
 		//! say for how many threads we have allocated space
-		const int& getNumAllocatedThreads() const {return nThreads;}
-		const bool& getMoveRotUsed() const {return moveRotUsed;}
-		const bool& getPermForceUsed() const {return permForceUsed;}
+		const int& getNumAllocatedThreads();
+		const bool& getMoveRotUsed();
+		const bool& getPermForceUsed();
 };
 
 #else
@@ -219,100 +126,52 @@ class ForceContainer {
 		std::vector<Vector3r> _torque;
 		std::vector<Vector3r> _move;
 		std::vector<Vector3r> _rot;
-		std::vector<Vector3r> _permForce, _permTorque;
-		Body::id_t _maxId;
-		size_t size;
-		bool moveRotUsed, permForceUsed;
-		inline void ensureSize(Body::id_t id){ 
-			const Body::id_t idMaxTmp = max(id, _maxId);
-			_maxId = 0;
-			if(size<=(size_t)idMaxTmp) resize(min((size_t)1.5*(idMaxTmp+100),(size_t)(idMaxTmp+2000)));
-		}
-		#if 0
-			const Vector3r& getForceUnsynced (Body::id_t id){ return getForce(id);}
-			const Vector3r& getTorqueUnsynced(Body::id_t id){ return getForce(id);}
-		#endif
+		std::vector<Vector3r> _permForce;
+		std::vector<Vector3r> _permTorque;
+		Body::id_t _maxId=0;
+		size_t size=0;
+		bool moveRotUsed = false;
+		bool permForceUsed = false;
+		void ensureSize(Body::id_t id);
+		
+		const Vector3r& getForceUnsynced (Body::id_t id);
+		const Vector3r& getTorqueUnsynced(Body::id_t id);
+		
 		// dummy function to avoid template resolution failure
 		friend class boost::serialization::access; template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){}
 	public:
-		ForceContainer(): _maxId(0), size(0), moveRotUsed(false), permForceUsed(false), syncCount(0), lastReset(0){}
-		const Vector3r& getForce(Body::id_t id){ensureSize(id); return _force[id];}
-		void  addForce(Body::id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
-		const Vector3r& getTorque(Body::id_t id){ensureSize(id); return _torque[id];}
-		void  addTorque(Body::id_t id,const Vector3r& t){ensureSize(id); _torque[id]+=t;}
-		const Vector3r& getMove(Body::id_t id){ensureSize(id); return _move[id];}
-		void  addMove(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
-		const Vector3r& getRot(Body::id_t id){ensureSize(id); return _rot[id];}
-		void  addRot(Body::id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
-		void  setPermForce(Body::id_t id, const Vector3r& f){ ensureSize(id);  _permForce[id]=f; permForceUsed=true;}
-		void setPermTorque(Body::id_t id, const Vector3r& t){ ensureSize(id);  _permTorque[id]=t; permForceUsed=true;}
-		void  addMaxId(Body::id_t id) { _maxId=id;}
-		const Vector3r& getPermForce(Body::id_t id) { ensureSize(id); return _permForce[id]; }
-		const Vector3r& getPermTorque(Body::id_t id) { ensureSize(id); return _permTorque[id]; }
+		unsigned long syncCount = 0;
+		long lastReset=0;
+		ForceContainer() {}
+		const Vector3r& getForce(Body::id_t id);
+		void  addForce(Body::id_t id,const Vector3r& f);
+		const Vector3r& getTorque(Body::id_t id);
+		void  addTorque(Body::id_t id,const Vector3r& t);
+		const Vector3r& getMove(Body::id_t id);
+		void  addMove(Body::id_t id,const Vector3r& f);
+		const Vector3r& getRot(Body::id_t id);
+		void  addRot(Body::id_t id,const Vector3r& f);
+		void  setPermForce(Body::id_t id, const Vector3r& f);
+		void setPermTorque(Body::id_t id, const Vector3r& t);
+		void  addMaxId(Body::id_t id);
+		const Vector3r& getPermForce(Body::id_t id);
+		const Vector3r& getPermTorque(Body::id_t id);
 		// single getters do the same as globally synced ones in the non-parallel flavor
-		const Vector3r getForceSingle (Body::id_t id){ 
-			ensureSize(id); 
-			if (permForceUsed) {
-				return _force [id] + _permForce[id];
-			} else {
-				return _force [id];
-			}
-		}
-		const Vector3r getTorqueSingle(Body::id_t id){ 
-			ensureSize(id); 
-			if (permForceUsed) {
-				return _torque[id] + _permTorque[id];
-			} else {
-				return _torque[id];
-			}
-		}
-		const Vector3r& getMoveSingle  (Body::id_t id){ ensureSize(id); return _move  [id]; }
-		const Vector3r& getRotSingle   (Body::id_t id){ ensureSize(id); return _rot   [id]; }
+		const Vector3r getForceSingle (Body::id_t id);
+		const Vector3r getTorqueSingle(Body::id_t id);
+		const Vector3r& getMoveSingle  (Body::id_t id);
+		const Vector3r& getRotSingle   (Body::id_t id);
 
 		//! Set all forces to zero
-		void reset(long iter, bool resetAll=false){
-			memset(&_force [0],0,sizeof(Vector3r)*size);
-			memset(&_torque[0],0,sizeof(Vector3r)*size);
-			if(moveRotUsed){
-				memset(&_move  [0],0,sizeof(Vector3r)*size);
-				memset(&_rot   [0],0,sizeof(Vector3r)*size);
-				moveRotUsed=false;
-			}
-			if (resetAll){
-				memset(&_permForce [0], 0,sizeof(Vector3r)*size);
-				memset(&_permTorque[0], 0,sizeof(Vector3r)*size);
-				permForceUsed = false;
-			}
-			lastReset=iter;
-		}
-		
-		void sync() {
-			if (_maxId>0) {ensureSize(_maxId); _maxId=0;}
-			if (permForceUsed) {
-				for(long id=0; id<(long)size; id++) {
-					_force[id]+=_permForce[id];
-					_torque[id]+=_permTorque[id];
-				}
-			}
-			return;
-		}
-		unsigned long syncCount;
+		void reset(long iter, bool resetAll=false);
+		void sync();
 		// interaction in which the container was last reset; used by NewtonIntegrator to detect whether ForceResetter was not forgotten
-		long lastReset;
 		/*! Resize the container; this happens automatically,
 		 * but you may want to set the size beforehand to avoid resizes as the simulation grows. */
-		void resize(size_t newSize){
-			_force.resize(newSize,Vector3r::Zero());
-			_torque.resize(newSize,Vector3r::Zero());
-			_permForce.resize(newSize,Vector3r::Zero());
-			_permTorque.resize(newSize,Vector3r::Zero());
-			_move.resize(newSize,Vector3r::Zero());
-			_rot.resize(newSize,Vector3r::Zero());
-			size=newSize;
-		}
-		const int getNumAllocatedThreads() const {return 1;}
-		const bool& getMoveRotUsed() const {return moveRotUsed;}
-		const bool& getPermForceUsed() const {return permForceUsed;}
+		void resize(size_t newSize);
+		const int getNumAllocatedThreads() const;
+		const bool& getMoveRotUsed() const;
+		const bool& getPermForceUsed() const;
 };
 
 #endif
