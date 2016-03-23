@@ -221,6 +221,7 @@ void ForceContainer::reset(long iter, bool resetAll) {
 }
 
 void ForceContainer::resize(size_t newSize, int threadN) {
+  LOG_DEBUG("Resize ForceContainer from the size "<<size<<" to the size "<<newSize);
   _forceData [threadN].resize(newSize,Vector3r::Zero());
   _torqueData[threadN].resize(newSize,Vector3r::Zero());
   _moveData[threadN].resize(newSize,Vector3r::Zero());

@@ -247,6 +247,16 @@ void Omega::loadSimulation(const string& f, bool quiet){
 	if(scene->getClassName()!="Scene") throw logic_error("Wrong file format (scene is not a Scene!?) in "+f);
 	sceneFile=f;
 	timeInit();
+	
+	//Add zero-force to the youngest body to be sure ForceContainer is large enough.
+	const int _sz = scene->bodies->size();
+	for(Body::id_t _id=0; _id<_sz; _id++) {
+		if((&scene->bodies)[_id]) {
+			scene->forces.addForce(_id, Vector3r::Zero());
+			break;
+		}
+	}
+	
 	if(!quiet) LOG_DEBUG("Simulation loaded");
 }
 
