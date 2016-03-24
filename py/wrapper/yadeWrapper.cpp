@@ -1,29 +1,24 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 
-#include<lib/base/Math.hpp>
-#include<unistd.h>
-#include<list>
-#include<signal.h>
+#include <boost/python/raw_function.hpp>
+#include <boost/bind.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
-#include<boost/python/raw_function.hpp>
-#include<boost/bind.hpp>
-#include<boost/lambda/bind.hpp>
-#include<boost/thread/thread.hpp>
-#include<boost/date_time/posix_time/posix_time.hpp>
-#include<boost/algorithm/string.hpp>
+#include <lib/base/Logging.hpp>
+#include <lib/pyutil/gil.hpp>
+#include <lib/pyutil/raw_constructor.hpp>
+#include <lib/pyutil/doc_opts.hpp>
+#include <core/Omega.hpp>
+#include <core/ThreadRunner.hpp>
+#include <core/FileGenerator.hpp>
+#include <core/EnergyTracker.hpp>
 
-#include<lib/base/Logging.hpp>
-#include<lib/pyutil/gil.hpp>
-#include<lib/pyutil/raw_constructor.hpp>
-#include<lib/pyutil/doc_opts.hpp>
-#include<core/Omega.hpp>
-#include<core/ThreadRunner.hpp>
-#include<core/FileGenerator.hpp>
-#include<core/EnergyTracker.hpp>
+#include <pkg/dem/STLImporter.hpp>
 
-#include<pkg/dem/STLImporter.hpp>
-
-#include<pkg/common/Dispatching.hpp>
+#include <pkg/common/Dispatching.hpp>
 #include <core/GlobalEngine.hpp>
 #include <core/PartialEngine.hpp>
 #include <core/Functor.hpp>
@@ -34,7 +29,6 @@
 
 #include <core/Clump.hpp>
 #include <pkg/common/Sphere.hpp>
-
 #include <boost/math/special_functions/nonfinite_num_facets.hpp>
 
 #include <locale>
@@ -251,7 +245,8 @@ class pyBodyContainer{
 				if (c == a*numSphereList/numReplaceTmp) {
 					bpListTmp[a] = b; a++;
 					posTmp.push_back(c);//remember position in sphereList
-				} c++;
+				}
+				c++;
 			}
 			for (int jj = 0; jj < a; jj++) {
 				sphereList.erase(sphereList.begin()+posTmp[jj]-jj);//remove bodies from sphereList, that were already found
@@ -259,17 +254,7 @@ class pyBodyContainer{
 			}
 			
 			//adapt position- and radii-informations and replace spheres from bpListTmp by clumps:
-			#ifdef YADE_OPENMP
-			omp_lock_t locker;
-			omp_init_lock(&locker);//since bodies are created and deleted in following sections, it is neccessary to lock critical parts of the code (avoid seg fault)
-			#pragma omp parallel for schedule(dynamic) shared(locker)
-			for(int i=0; i<numReplaceTmp; i++) {
-				while (! omp_test_lock(&locker)) usleep(1);
-				const shared_ptr<Body>& b = bpListTmp[i];
-				LOG_DEBUG("replaceByClumps: Started processing body "<<bpListTmp[i]->id<<" in parallel ...");
-			#else
 			FOREACH (const shared_ptr<Body>& b, bpListTmp) {
-			#endif
 				//get sphere, that should be replaced:
 				const Sphere* sphere = YADE_CAST<Sphere*> (b->shape.get());
 				shared_ptr<Material> matTmp = b->material;
@@ -313,10 +298,6 @@ class pyBodyContainer{
 					LOG_DEBUG("New body (sphere) "<<newSphere->id<<" added.");
 					idsTmp[jj] = newSphere->id;
 				}
-				//cout << "thread " << omp_get_thread_num() << " unsets locker" << endl;
-				#ifdef YADE_OPENMP
-				omp_unset_lock(&locker);//end of critical section
-				#endif
 				Body::id_t newClumpId = clump(idsTmp, discretization);
 				ret.append(py::make_tuple(newClumpId,idsTmp));
 				erase(b->id,false);
