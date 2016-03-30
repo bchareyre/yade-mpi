@@ -82,6 +82,7 @@ public:
 	double	deformation (unsigned int id,unsigned int i,unsigned int j) {
 		if (!mma.analyser->ParticleDeformation.size()) {LOG_ERROR("compute deformations first"); return 0;}
 		if (mma.analyser->ParticleDeformation.size()<id) {LOG_ERROR("id out of bounds"); return 0;}
+		if (i<1 || i>3 || j<1 || j>3) {LOG_ERROR("tensor index must be between 1 and 3"); return 0;}
 		return mma.analyser->ParticleDeformation[id](i,j);}
 
 	/// number of facets in the tesselation (finite branches of the triangulation)
