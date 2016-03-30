@@ -77,14 +77,14 @@ if (abs(f[2] - 23.68293)/f[2] >  tolerance or len(O.bodies) <> 4):
 else:
    printSuccess()
    
-O.run(280, True)
-if (abs(f[2] - 34.540740)/f[2] >  tolerance or len(O.bodies) <> 7):
-   printWarning (34.540740, f[2], 7, len(O.bodies))
+O.run(250, True)
+if (abs(f[2] - 32.7028)/f[2] >  tolerance or len(O.bodies) <> 4):
+   printWarning (32.7028, f[2], 4, len(O.bodies))
    resultStatus += 1
 else:
    printSuccess()
 
-O.run(200, True)
+O.run(130, True)
 if (f.norm() == 0 >  tolerance or len(O.bodies) <> 7):
    printWarning (0.0, f[2], 7, len(O.bodies))
    resultStatus += 1

@@ -6,7 +6,7 @@ scriptsToRun=os.listdir(checksPath)
 resultStatus = 0
 nFailed=0
 
-skipScripts = ['checkList.py', 'checkPolyhedraCrush']
+skipScripts = ['checkList.py']
 
 for script in scriptsToRun:
 	if (script[len(script)-3:]==".py" and script not in skipScripts):
