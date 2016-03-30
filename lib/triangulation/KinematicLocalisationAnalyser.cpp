@@ -727,9 +727,9 @@ CVector KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, i
 			CVector meanFieldDisp =CVector(TS0->grain(id).sphere.point().x(), TS0->grain(id).sphere.point().y(), TS0->grain(id).sphere.point().z())-fixedPoint;
 			if (1){//fluctuations
 				meanFieldDisp = CVector(
-				meanFieldDisp[0]*Delta_epsilon(0,0),
-				meanFieldDisp[1]*Delta_epsilon(1,1),
-				meanFieldDisp[2]*Delta_epsilon(2,2));
+				meanFieldDisp[0]*Delta_epsilon(1,1),
+				meanFieldDisp[1]*Delta_epsilon(2,2),
+				meanFieldDisp[2]*Delta_epsilon(3,3));
 			} else meanFieldDisp=CVector(0,0,0);
 			if (consecutive) v = v + TS1->grain(id).translation-meanFieldDisp;
 			else  v = v + (TS1->grain(id).sphere.point() - TS0->grain(id).sphere.point()-meanFieldDisp);
