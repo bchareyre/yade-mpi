@@ -404,7 +404,7 @@ Vector3r SolveLinSys3x3(Matrix3r A, Vector3r y){
 Polyhedron ConvexHull(vector<CGALpoint> &planes){
 	Polyhedron Int;
 	for (const auto p : planes) {
-		if (isnan(p.x()) || isnan(p.y()) || isnan(p.z())) return Int;
+		if (std::isnan(p.x()) || std::isnan(p.y()) || std::isnan(p.z())) return Int;
 	}
 	if (planes.size()>3) CGAL::convex_hull_3(planes.begin(), planes.end(), Int);
 	return Int;
@@ -683,7 +683,7 @@ Polyhedron Polyhedron_Polyhedron_intersection(Polyhedron A, Polyhedron B, CGALpo
 		const auto pX = -pi->a()/pi->d();
 		const auto pY = -pi->b()/pi->d();
 		const auto pZ = -pi->c()/pi->d();
-		if (isnan(pX) || isnan(pY) || isnan(pZ)) {
+		if (std::isnan(pX) || std::isnan(pY) || std::isnan(pZ)) {
 			Polyhedron IntersectionEmpty;
 			return IntersectionEmpty;
 		} else {

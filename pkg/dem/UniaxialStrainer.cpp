@@ -38,13 +38,13 @@ void UniaxialStrainer::init(){
 	if(originalLength<=0) throw runtime_error(("UniaxialStrainer: Initial length is negative or zero (swapped reference particles?)! "+boost::lexical_cast<string>(originalLength)).c_str());
 	/* this happens is nan propagates from e.g. brefcom consitutive law in case 2 bodies have _exactly_ the same position
 	 * (the the normal strain is 0./0.=nan). That is an user's error, however and should not happen. */
-	if(isnan(originalLength)) throw logic_error("UniaxialStrainer: Initial length is NaN!");
-	assert(originalLength>0 && !isnan(originalLength));
+	if(std::isnan(originalLength)) throw logic_error("UniaxialStrainer: Initial length is NaN!");
+	assert(originalLength>0 && !std::isnan(originalLength));
 
-	assert(!isnan(strainRate) || !isnan(absSpeed));
-	if(!isnan(std::numeric_limits<Real>::quiet_NaN())){ throw runtime_error("UniaxialStrainer: NaN's are not properly supported (compiled with -ffast-math?), which is required."); }
+	assert(!std::isnan(strainRate) || !std::isnan(absSpeed));
+	if(!std::isnan(std::numeric_limits<Real>::quiet_NaN())){ throw runtime_error("UniaxialStrainer: NaN's are not properly supported (compiled with -ffast-math?), which is required."); }
 
-	if(isnan(strainRate)){ strainRate=absSpeed/originalLength; LOG_INFO("Computed new strainRate "<<strainRate); }
+	if(std::isnan(strainRate)){ strainRate=absSpeed/originalLength; LOG_INFO("Computed new strainRate "<<strainRate); }
 	else {absSpeed=strainRate*originalLength;}
 
 	if(!setSpeeds){
@@ -77,7 +77,7 @@ void UniaxialStrainer::init(){
 			b->state->vel[axis]=pNormalized*(v1-v0)+v0;
 		}
 	}
-	if(isnan(crossSectionArea)){ throw std::invalid_argument("UniaxialStrain.crossSectionArea must be specified."); }
+	if(std::isnan(crossSectionArea)){ throw std::invalid_argument("UniaxialStrain.crossSectionArea must be specified."); }
 }
 
 void UniaxialStrainer::action(){
@@ -93,7 +93,7 @@ void UniaxialStrainer::action(){
 	} else currentStrainRate=strainRate;
 	// how much do we move (in total, symmetry handled below)
 	Real dAX=currentStrainRate*originalLength*scene->dt;
-	if(!isnan(stopStrain)){
+	if(!std::isnan(stopStrain)){
 		Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 		Real newStrain=(axialLength+dAX)/originalLength-1;
 		if((newStrain*stopStrain>0) && std::abs(newStrain)>=stopStrain){ // same sign of newStrain and stopStrain && over the limit from below in abs values

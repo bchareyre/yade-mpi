@@ -20,7 +20,7 @@ void Facet::postLoad(Facet&)
 	// in the future, a fixed-size array should be used instead of vector<Vector3r> for vertices
 	// this is prevented by yade::serialization now IIRC
 	if(vertices.size()!=3){ throw runtime_error(("Facet must have exactly 3 vertices (not "+boost::lexical_cast<string>(vertices.size())+")").c_str()); }
-	if(isnan(vertices[0][0])) return;  // not initialized, nothing to do
+	if(std::isnan(vertices[0][0])) return;  // not initialized, nothing to do
 	Vector3r e[3] = {vertices[1]-vertices[0] ,vertices[2]-vertices[1] ,vertices[0]-vertices[2]};
 	#define CHECK_EDGE(i) if(e[i].squaredNorm()==0){LOG_FATAL("Facet has coincident vertices "<<i<<" ("<<vertices[i]<<") and "<<(i+1)%3<<" ("<<vertices[(i+1)%3]<<")!");}
 		CHECK_EDGE(0); CHECK_EDGE(1);CHECK_EDGE(2);

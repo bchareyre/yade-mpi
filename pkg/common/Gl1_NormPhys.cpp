@@ -34,7 +34,7 @@
 		fnNorm=std::abs(fnNorm);
 		Real radiusScale=1.;
 		// weak/strong fabric, only used if maxWeakFn is set
-		if(!isnan(maxWeakFn)){
+		if(!std::isnan(maxWeakFn)){
 			if(fnNorm*fnSign<maxWeakFn){ // weak fabric
 				if(weakFilter>0) return;
 				radiusScale=weakScale;

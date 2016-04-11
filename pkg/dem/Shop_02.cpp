@@ -87,7 +87,7 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 	else theta=0;
 	Real hRef=dH_dTheta*(theta-theta0);
 	long period;
-	if(isnan(periodStart)){
+	if(std::isnan(periodStart)){
 		Real h=Shop::periodicWrap(pt[axis]-hRef,hRef-Mathr::PI*dH_dTheta,hRef+Mathr::PI*dH_dTheta,&period);
 		return boost::make_tuple(r,h,theta);
 	}
@@ -235,7 +235,7 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive, bool splitNor
 		Real N=(compressionPositive?-1:1)*phys->normalForce.dot(n);
 		// Real R=(Body::byId(I->getId2(),scene)->state->pos+cellHsize*I->cellDist.cast<Real>()-Body::byId(I->getId1(),scene)->state->pos).norm();
 		Real R=.5*(geom->refR1+geom->refR2);
-		Real Fsplit=(!isnan(thresholdForce))?thresholdForce:Fmean;
+		Real Fsplit=(!std::isnan(thresholdForce))?thresholdForce:Fmean;
 		if (compressionPositive?(N<Fsplit):(N>Fsplit)){
 			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
 				sigNStrong(i,j)+=R*N*n[i]*n[j];}
@@ -301,7 +301,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	fabricStrong=Matrix3r::Zero(); 
 	fabricWeak=Matrix3r::Zero(); 
 	int nStrong(0), nWeak(0); // number of strong and weak contacts respectively
-	if (!splitTensor & !isnan(thresholdForce)) {LOG_WARN("The bool splitTensor should be set to True if you specified a threshold value for the contact force, otherwise the function will return only the fabric tensor and not the two separate contributions.");}
+	if (!splitTensor & !std::isnan(thresholdForce)) {LOG_WARN("The bool splitTensor should be set to True if you specified a threshold value for the contact force, otherwise the function will return only the fabric tensor and not the two separate contributions.");}
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
@@ -309,7 +309,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 		const Vector3r& n=geom->normal;
 		Real  f=(revertSign?-1:1)*phys->normalForce.dot(n); 
 		// slipt the tensor according to the mean contact force or a threshold value if this is given
-		Real Fsplit=(!isnan(thresholdForce))?thresholdForce:Fmean;
+		Real Fsplit=(!std::isnan(thresholdForce))?thresholdForce:Fmean;
 		if (revertSign?(f<Fsplit):(f>Fsplit)){ // reminder: forces are compared with their sign
 			for(int i=0; i<3; i++) for(int j=i; j<3; j++){
 				fabricStrong(i,j)+=n[i]*n[j];

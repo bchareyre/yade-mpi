@@ -102,7 +102,7 @@ void NewtonIntegrator::action()
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
 	// FIXME: will not work for pure shear transformation, which does not change Cell::getSize()
-	if(scene->isPeriodic && ((prevCellSize!=scene->cell->getSize())) && /* initial value */!isnan(prevCellSize[0]) ){ cellChanged=true; maxVelocitySq=(prevCellSize-scene->cell->getSize()).squaredNorm()/pow(dt,2); }
+	if(scene->isPeriodic && ((prevCellSize!=scene->cell->getSize())) && /* initial value */!std::isnan(prevCellSize[0]) ){ cellChanged=true; maxVelocitySq=(prevCellSize-scene->cell->getSize()).squaredNorm()/pow(dt,2); }
 	else { maxVelocitySq=0; cellChanged=false; }
 
 	#ifdef YADE_BODY_CALLBACK
@@ -144,8 +144,8 @@ void NewtonIntegrator::action()
 			//in most cases, the initial force on clumps will be zero and next line is not changing f and m, but make sure we don't miss something (e.g. user defined forces on clumps)
 			f=scene->forces.getForce(id); m=scene->forces.getTorque(id);
 			#ifdef YADE_DEBUG
-				if(isnan(f[0])||isnan(f[1])||isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+boost::lexical_cast<string>(id)+".").c_str());
-				if(isnan(m[0])||isnan(m[1])||isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+boost::lexical_cast<string>(id)+".").c_str());
+				if(std::isnan(f[0])||std::isnan(f[1])||std::isnan(f[2])) throw runtime_error(("NewtonIntegrator: NaN force acting on #"+boost::lexical_cast<string>(id)+".").c_str());
+				if(std::isnan(m[0])||std::isnan(m[1])||std::isnan(m[2])) throw runtime_error(("NewtonIntegrator: NaN torque acting on #"+boost::lexical_cast<string>(id)+".").c_str());
 				if(state->mass<=0 && ((state->blockedDOFs & State::DOF_XYZ) != State::DOF_XYZ)) throw runtime_error(("NewtonIntegrator: #"+boost::lexical_cast<string>(id)+" has some linear accelerations enabled, but State::mass is non-positive."));
 				if(state->inertia.minCoeff()<=0 && ((state->blockedDOFs & State::DOF_RXRYRZ) != State::DOF_RXRYRZ)) throw runtime_error(("NewtonIntegrator: #"+boost::lexical_cast<string>(id)+" has some angular accelerations enabled, but State::inertia contains non-positive terms."));
 			#endif

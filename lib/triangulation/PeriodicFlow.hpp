@@ -406,7 +406,7 @@ void PeriodicFlow<_Tesselation>::gaussSeidel(Real dt)
 				if (j==0) n += compFlowFactor*(cell->info().kNorm())[j2];
 			} else {
 				m += (cell->info().kNorm())[j2]*cell->neighbor(j2)->info().shiftedP();
-				if ( isinf(m) && j<10 ) cout << "(cell->info().kNorm())[j2] = " << (cell->info().kNorm())[j2] << " cell->neighbor(j2)->info().shiftedP() = " << cell->neighbor(j2)->info().shiftedP() << endl;
+				if ( std::isinf(m) && j<10 ) cout << "(cell->info().kNorm())[j2] = " << (cell->info().kNorm())[j2] << " cell->neighbor(j2)->info().shiftedP() = " << cell->neighbor(j2)->info().shiftedP() << endl;
 				if (j==0) n += (cell->info().kNorm())[j2];
 			} 
 		  }

@@ -104,7 +104,7 @@ void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool is
 // add -DYADE_SCGEOM_DEBUG to CXXFLAGS to enable this piece or just do
 // #define YADE_SCGEOM_DEBUG //(but do not commit with that enabled in the code)
 #ifdef YADE_SCGEOM_DEBUG
-		if (isnan(aa.angle())) {
+		if (std::isnan(aa.angle())) {
 			cerr<<"NaN angle found in angleAxisr(q), for quaternion "<<delta<<", after quaternion product"<<endl;
 			cerr<<"rbp1.ori * (initialOrientation1.conjugate())) * (initialOrientation2 * (rbp2.ori.conjugate()) with quaternions :"<<endl;
 			cerr<<rbp1.ori<<" * "<<initialOrientation1<<" * "<<initialOrientation2<<" * "<<rbp2.ori<<endl<<" and sub-products :"<<endl<<rbp1.ori * (initialOrientation1.conjugate())<<" * "<<initialOrientation2 * (rbp2.ori.conjugate())<<endl;
@@ -115,7 +115,7 @@ void ScGeom6D::precomputeRotations(const State& rbp1, const State& rbp2, bool is
 			cerr<<delta<<" "<<bb.angle()<<endl;
 		}
 #else
-		if (isnan(aa.angle())) aa.angle()=0;
+		if (std::isnan(aa.angle())) aa.angle()=0;
 #endif
 		if (aa.angle() > Mathr::PI) aa.angle() -= Mathr::TWO_PI;   // angle is between 0 and 2*pi, but should be between -pi and pi
 		twist = (aa.angle() * aa.axis().dot(normal));

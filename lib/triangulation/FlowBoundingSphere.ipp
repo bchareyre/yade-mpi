@@ -895,7 +895,7 @@ void FlowBoundingSphere<Tesselation>::gaussSeidel(Real dt)
 						} else {							
 						/// INCOMPRESSIBLE 
 							m += (cell->info().kNorm())[j2] * cell->neighbor(j2)->info().p();
-							if ( isinf(m) && j<10 ) cout << "(cell->info().kNorm())[j2] = " << (cell->info().kNorm())[j2] << " cell->neighbor(j2)->info().p() = " << cell->neighbor(j2)->info().p() << endl;
+							if ( std::isinf(m) && j<10 ) cout << "(cell->info().kNorm())[j2] = " << (cell->info().kNorm())[j2] << " cell->neighbor(j2)->info().p() = " << cell->neighbor(j2)->info().p() << endl;
 							if (j==0) n += (cell->info().kNorm())[j2];
 						}  
 					}

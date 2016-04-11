@@ -43,14 +43,14 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 
 	// check unassigned values
 	if (!mat1->neverDamage) {
-		assert(!isnan(mat1->sigmaT));
-		assert(!isnan(mat1->epsCrackOnset));
-		assert(!isnan(mat1->relDuctility));
+		assert(!std::isnan(mat1->sigmaT));
+		assert(!std::isnan(mat1->epsCrackOnset));
+		assert(!std::isnan(mat1->relDuctility));
 	}
 	if (!mat2->neverDamage) {
-		assert(!isnan(mat2->sigmaT));
-		assert(!isnan(mat2->epsCrackOnset));
-		assert(!isnan(mat2->relDuctility));
+		assert(!std::isnan(mat2->sigmaT));
+		assert(!std::isnan(mat2->epsCrackOnset));
+		assert(!std::isnan(mat2->relDuctility));
 	}
 
 	cpmPhys->damLaw = mat1->damLaw;
@@ -273,7 +273,7 @@ Real Law2_ScGeom_CpmPhys_Cpm::elasticEnergy() {
 
 #ifdef YADE_DEBUG
 	#define CPM_YADE_DEBUG_A \
-		if(isnan(epsN)){\
+		if(std::isnan(epsN)){\
 			/*LOG_FATAL("refLength="<<geom->refLength<<"; pos1="<<geom->se31.position<<"; pos2="<<geom->se32.position<<"; displacementN="<<geom->displacementN());*/ \
 			throw runtime_error("!! epsN==NaN !!");\
 		}
@@ -283,8 +283,8 @@ Real Law2_ScGeom_CpmPhys_Cpm::elasticEnergy() {
 
 
 #define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); LOG_FATAL("in interaction #"<<I->getId1()<<"+#"<<I->getId2()); Omega::instance().saveSimulation("/tmp/verificationFailed.xml"); throw;}
-#define NNAN(a) YADE_VERIFY(!isnan(a));
-#define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
+#define NNAN(a) YADE_VERIFY(!std::isnan(a));
+#define NNANV(v) YADE_VERIFY(!std::isnan(v[0])); assert(!std::isnan(v[1])); assert(!std::isnan(v[2]));
 
 bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I){
 	TIMING_DELTAS_START();

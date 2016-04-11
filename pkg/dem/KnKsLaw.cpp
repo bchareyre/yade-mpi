@@ -228,7 +228,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 
 	//we need to use correct branches in the periodic case, the following apply for spheres only
 	Vector3r force = -phys->normalForce-dampedShearForce;
-	if(isnan(force.norm())) {
+	if(std::isnan(force.norm())) {
 		//std::cout<<"shearForce: "<<shearForce<<", normalForce: "<<phys->normalForce<<", debugFn: "<<debugFn<<", viscous: "<<phys->normalViscous<<", normal: "<<phys->normal<<", geom normal: "<<geom->normal<<", effective_phi: "<<phys->effective_phi<<", shearIncrement: "<<shearIncrement<<", id1: "<<id1<<", id2: "<<id2<<", shearForceBeforeRotate: "<<shearForceBeforeRotate<<", shearForceAfterRotate: " <<shearForceAfterRotate<<endl;
 	}
 	scene->forces.addForce(id1,force);

@@ -450,7 +450,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 		
 		ChainedCylinder *cc1=static_cast<ChainedCylinder*>(cm1.get());
 		ChainedCylinder *cc2=static_cast<ChainedCylinder*>(cm2.get());
-		if(isnan(dist)){ //now if we didn't found a suitable distance because the segments don't cross each other, we try to find a sphere-cylinder distance.
+		if(std::isnan(dist)){ //now if we didn't found a suitable distance because the segments don't cross each other, we try to find a sphere-cylinder distance.
 			Vector3r pointsToCheck[4]={A,A+a,B,B+b}; Real resultDist=dist, resultProj=dist ; int whichCaseIsCloser=-1 ;
 			for (int i=0;i<4;i++){  //loop on the 4 cylinder's extremities and look at the extremity-cylinder distance
 				Vector3r S=pointsToCheck[i], C=(i<2)?B:A, vec=(i<2)?b:a; Vector3r CS=S-C;
@@ -458,7 +458,7 @@ bool Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::go(	const shared_ptr<Shape>& 
 				if(d<0.) resultDist=CS.norm();
 				else if(d>vec.norm()) resultDist=(C+vec-S).norm();
 				else resultDist=(CS.cross(vec)).norm()/(vec.norm());
-				if(dist>resultDist or isnan(dist)){dist=resultDist ; whichCaseIsCloser=i; resultProj=d;}
+				if(dist>resultDist or std::isnan(dist)){dist=resultDist ; whichCaseIsCloser=i; resultProj=d;}
 			}
 			//we know which extremity may be in contact (i), so k and m are computed to generate the right fictiousStates.
 			insideCyl1=1 ; insideCyl2=1;

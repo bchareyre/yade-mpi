@@ -164,7 +164,7 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 			scm->precompute(state1,state2,scene,c,avgNormal,!(hasGeom),Vector3r(0,0,0)/*shift 2 */, false /* avoidGranularRatcheting */); //Assign contact point and normal after precompute!!!!
 			scm->contactPoint = contactPt;
 			scm->penetrationDepth=penetrationDepth;
-			if(isnan(avgNormal.norm())) {
+			if(std::isnan(avgNormal.norm())) {
 				//std::cout<<"avgNormal: "<<avgNormal<<endl;
 			}
 			scm->normal = avgNormal;
@@ -424,7 +424,7 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 	Real Fdy = fdx * Q1(0,1) + fdy*Q1(1,1) + fdz*Q1(2,1);
 	Real Fdz = fdx * Q1(0,2) + fdy*Q1(1,2) + fdz*Q1(2,2);
 
-	if (isnan(Fdx) == true || isnan(Fdy) == true || isnan(Fdz)==true) {
+	if (std::isnan(Fdx) == true || std::isnan(Fdy) == true || std::isnan(Fdz)==true) {
 		//std::cout<<"Q1(0,0): "<<Q1(0,0)<<","<<Q1(0,1)<<","<<Q1(0,2)<<","<<Q1(1,0)<<","<<Q1(1,1)<<","<<Q1(1,2)<<","<<Q1(2,0)<<","<<Q1(2,1)<<","<<Q1(2,2)<<", q:"<<q0<<","<<q1<<","<<q2<<","<<q3<<", fd: "<<fdx<<","<<fdy<<","<<fdz<<endl;
 	}
 
