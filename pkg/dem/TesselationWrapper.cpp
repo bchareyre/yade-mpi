@@ -70,11 +70,13 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	int nonSpheres =0;
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();
+	Scene* scene = Omega::instance().getScene().get();
 	for (; bi!=biEnd ; ++bi) {
 		if ( (*bi)->shape->getClassIndex() ==  Sph_Index ) {
-// 		if ((*bi)->isDynamic()) { //then it is a sphere (not a wall) FIXME : need test if isSphere
 			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
-			const Vector3r& pos = (*bi)->state->pos;
+//FIXME: is the scene periodicity verification useful in the next line ? Tesselation seems to work in both periodic and non-periodic conditions with "scene->cell->wrapShearedPt((*bi)->state->pos)". I keep the verification to be consistent with all other uses of "wrapShearedPt" function.
+			const Vector3r& pos = Omega::instance().getScene().get()->isPeriodic	? scene->cell->wrapShearedPt((*bi)->state->pos)
+												: (*bi)->state->pos;
 			const Real rad = s->radius;
 			CGT::Sphere sp(CGT::Point(pos[0],pos[1],pos[2]),rad*rad);
 			spheres.push_back(sp);
