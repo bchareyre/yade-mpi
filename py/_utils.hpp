@@ -142,3 +142,42 @@ void setNewVerticesOfFacet(const shared_ptr<Body>& b, const Vector3r& v1, const 
 py::list intrsOfEachBody();
 
 py::list numIntrsOfEachBody();
+
+/* The 5 following setters are used to workaround a long-standing bug in the c++/python binding which produces a memory leak (see two links below).
+ * https://bugs.launchpad.net/yade/+bug/1041084
+ * https://answers.launchpad.net/yade/+question/253112
+ * It is not in the spirit of Yade Python binding but you can use them if you massively update bodies attributes.
+ * TODO : remove them as soon as the bug is solved.
+*/
+
+/* Set a body position from its id and a new vector3r.
+ *  @param id is the body id
+ *  @param newPos is the desired updated position
+ *  @param axis is the axis along which the position has to be updated (ex: if axis=="xy" and newPos==Vector3r(r0,r1,r2), r2 will be ignored and the position along z will not be updated).
+*/
+void setBodyPosition(int id, Vector3r newPos, string axis="xyz");
+
+/* Set a body velocity from its id and a new vector3r.
+ *  @param id is the body id
+ *  @param newPos is the desired updated velocity
+ *  @param axis is the axis along which the velocity has to be updated (ex: if axis=="xy" and newVel==Vector3r(r0,r1,r2), r2 will be ignored and the velocity along z will not be updated).
+*/
+void setBodyVelocity(int id, Vector3r newVel, string axis="xyz");
+
+/* Set a body orientation from its id and a new Quaternionr.
+ *  @param id is the body id
+ *  @param newOri is the desired updated orientation
+*/
+void setBodyOrientation(int id, Quaternionr newOri);
+
+/* Set a body angular velocity from its id and a new Vector3r.
+ *  @param id is the body id
+ *  @param newAngVel is the desired updated angular velocity
+*/
+void setBodyAngularVelocity(int id, Vector3r newAngVel);
+
+/* Set a body color from its id and a new Vector3r.
+ *  @param id is the body id
+ *  @param newColor is the desired rgb color
+*/
+void setBodyColor(int id, Vector3r newColor);

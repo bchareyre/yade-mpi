@@ -414,6 +414,44 @@ Real Shop__getSpheresVolume2D(int mask=-1){ return Shop::getSpheresVolume2D(Omeg
 Real Shop__getVoidRatio2D(Real zlen=1){ return Shop::getVoidRatio2D(Omega::instance().getScene(),zlen);}
 py::tuple Shop__getStressAndTangent(Real volume=0, bool symmetry=true){return Shop::getStressAndTangent(volume,symmetry);}
 
+void setBodyPosition(int id, Vector3r newPos, string axis){
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	const Body* b=(*rb->bodies)[id].get();
+	for (char c : axis){
+		if(c=='x') {b->state->pos[0] = newPos[0];continue;}
+		if(c=='y') {b->state->pos[1] = newPos[1];continue;}
+		if(c=='z') {b->state->pos[2] = newPos[2];continue;}
+	}
+}
+
+void setBodyVelocity(int id, Vector3r newVel, string axis){
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	const Body* b=(*rb->bodies)[id].get();
+	for (char c : axis){
+		if(c=='x') {b->state->vel[0] = newVel[0];continue;}
+		if(c=='y') {b->state->vel[1] = newVel[1];continue;}
+		if(c=='z') {b->state->vel[2] = newVel[2];continue;}
+	}
+}
+
+void setBodyOrientation(int id, Quaternionr newOri){
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	const Body* b=(*rb->bodies)[id].get();
+	b->state->ori=newOri;
+}
+
+void setBodyAngularVelocity(int id, Vector3r newAngVel){
+	shared_ptr<Scene> rb=Omega::instance().getScene();
+	const Body* b=(*rb->bodies)[id].get();
+	b->state->angVel=newAngVel;
+}
+
+void setBodyColor(int id, Vector3r newColor){
+  shared_ptr<Scene> rb=Omega::instance().getScene();
+	const Body* b=(*rb->bodies)[id].get();
+	b->shape->color=newColor;
+}
+
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
@@ -481,4 +519,9 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("getSpheresVolume2D",Shop__getSpheresVolume2D,(py::arg("mask")=-1),"Compute the total volume of discs in the simulation (might crash for now if dynamic bodies are not discs), mask parameter is considered");
 	py::def("voidratio2D",Shop__getVoidRatio2D,(py::arg("zlen")=1),"Compute 2D packing void ratio $\\frac{V-V_s}{V_s}$ where $V$ is overall volume and $V_s$ is volume of disks.\n\n:param float zlen: length in the third direction.\n");
 	py::def("getStressAndTangent",Shop__getStressAndTangent,(py::args("volume")=0,py::args("symmetry")=true),"Compute overall stress of periodic cell using the same equation as function getStress. In addition, the tangent operator is calculated using the equation published in [Kruyt and Rothenburg1998]_:\n\n.. math:: S_{ijkl}=\\frac{1}{V}\\sum_{c}(k_n n_i l_j n_k l_l + k_t t_i l_j t_k l_l)\n\n:param float volume: same as in function getStress\n:param bool symmetry: make the tensors symmetric.\n\n:return: macroscopic stress tensor and tangent operator as py::tuple");
+	py::def("setBodyPosition",setBodyPosition,(py::args("id"),py::args("pos"),py::args("axis")="xyz"),"Set a body position from its id and a new vector3r.\n\n:param int id: the body id.\n:param Vector3 pos: the desired updated position.\n:param str axis: the axis along which the position has to be updated (ex: if axis==\"xy\" and pos==Vector3r(r0,r1,r2), r2 will be ignored and the position along z will not be updated).");
+	py::def("setBodyVelocity",setBodyVelocity,(py::args("id"),py::args("vel"),py::args("axis")="xyz"),"Set a body velocity from its id and a new vector3r.\n\n:param int id: the body id.\n:param Vector3 vel: the desired updated velocity.\n:param str axis: the axis along which the velocity has to be updated (ex: if axis==\"xy\" and vel==Vector3r(r0,r1,r2), r2 will be ignored and the velocity along z will not be updated).");
+	py::def("setBodyOrientation",setBodyOrientation,(py::args("id"),py::args("ori")),"Set a body orientation from its id and a new Quaternionr.\n\n:param int id: the body id.\n:param Quaternion ori: the desired updated orientation.");
+	py::def("setBodyAngularVelocity",setBodyAngularVelocity,(py::args("id"),py::args("angVel")),"Set a body angular velocity from its id and a new Vector3r.\n\n:param int id: the body id.\n:param Vector3 angVel: the desired updated angular velocity.");
+	py::def("setBodyColor",setBodyColor,(py::args("id"),py::args("color")),"Set a body color from its id and a new Vector3r.\n\n:param int id: the body id.\n:param Vector3 color: the desired updated color.");
 }
