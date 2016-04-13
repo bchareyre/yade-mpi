@@ -277,7 +277,7 @@ def tetraPoly(vertices,dynamic=True,fixed=False,wire=True,color=None,highlight=F
 	inertia = b.shape.GetInertia()
 	center = b.shape.GetCentroid()
 	_commonBodySetup(b,volume,inertia,material,noBound=noBound,pos=center,fixed=fixed)
-	b.aspherical=False
+	b.aspherical=True
 	b.state.ori = b.shape.GetOri()
 	b.mask=mask
 	b.chain=chain
@@ -323,7 +323,7 @@ def polyhedron(vertices,dynamic=True,fixed=False,wire=True,color=None,highlight=
 	inertia = b.shape.GetInertia()
 	center = b.shape.GetCentroid()
 	_commonBodySetup(b,volume,inertia,material,noBound=noBound,pos=center,fixed=fixed)
-	b.aspherical=False
+	b.aspherical=True
 	b.state.ori = b.shape.GetOri()
 	b.mask=mask
 	b.chain=chain
