@@ -153,7 +153,9 @@ class Bo1_Polyhedra_Aabb: public BoundFunctor{
 	public:
 		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 		FUNCTOR1D(Polyhedra);
-		YADE_CLASS_BASE_DOC(Bo1_Polyhedra_Aabb,BoundFunctor,"Create/update :yref:`Aabb` of a :yref:`Polyhedra`");
+		YADE_CLASS_BASE_DOC_ATTRS(Bo1_Polyhedra_Aabb,BoundFunctor,"Create/update :yref:`Aabb` of a :yref:`Polyhedra`",
+			((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"see :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor`"))
+		);
 };
 REGISTER_SERIALIZABLE(Bo1_Polyhedra_Aabb);
 

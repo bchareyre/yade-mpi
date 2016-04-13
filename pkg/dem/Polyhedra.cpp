@@ -250,6 +250,10 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 		mincoords = Vector3r(min(mincoords[0],v_g[0]),min(mincoords[1],v_g[1]),min(mincoords[2],v_g[2]));
 		maxcoords = Vector3r(max(maxcoords[0],v_g[0]),max(maxcoords[1],v_g[1]),max(maxcoords[2],v_g[2]));
 	}
+	if (aabbEnlargeFactor>0) {
+		mincoords *= aabbEnlargeFactor;
+		maxcoords *= aabbEnlargeFactor;
+	}
 	aabb->min=se3.position+mincoords;
 	aabb->max=se3.position+maxcoords;
 }

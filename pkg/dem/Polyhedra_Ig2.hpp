@@ -16,7 +16,9 @@ class Ig2_Polyhedra_Polyhedra_PolyhedraGeom: public IGeomFunctor
 			const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		FUNCTOR2D(Polyhedra,Polyhedra);
 		DEFINE_FUNCTOR_ORDER_2D(Polyhedra,Polyhedra);
-		YADE_CLASS_BASE_DOC(Ig2_Polyhedra_Polyhedra_PolyhedraGeom,IGeomFunctor,"Create/update geometry of collision between 2 Polyhedras");	
+		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Polyhedra_Polyhedra_PolyhedraGeom,IGeomFunctor,"Create/update geometry of collision between 2 Polyhedras",
+			((Real,interactionDetectionFactor,1,,"see :yref:`Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor`"))
+		);
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ig2_Polyhedra_Polyhedra_PolyhedraGeom);
@@ -69,6 +71,45 @@ class Ig2_Sphere_Polyhedra_ScGeom: public IGeomFunctor
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Polyhedra_ScGeom);
+
+
+//***************************************************************************
+/*! Plyhedra -> ScGeom. */
+class Ig2_Polyhedra_Polyhedra_ScGeom: public IGeomFunctor
+{
+	public:
+		virtual ~Ig2_Polyhedra_Polyhedra_ScGeom(){};
+		virtual bool go(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1,
+			const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1,
+			const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		FUNCTOR2D(Polyhedra,Polyhedra);
+		DEFINE_FUNCTOR_ORDER_2D(Polyhedra,Polyhedra);
+		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Polyhedra_Polyhedra_ScGeom,IGeomFunctor,"EXPERIMENTAL. Ig2 functor creating ScGeom from two Polyhedra shapes. The radii are computed as a distance of contact point (computed using Ig2_Polyhedra_Polyhedra_PolyhedraGeom) and center of particle. Tested only for face-face contacts (like brick wall).",
+			((Real,interactionDetectionFactor,1,,"see Ig2_Sphere_Sphere_ScGeom.interactionDetectionFactor"))
+		);
+		DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ig2_Polyhedra_Polyhedra_ScGeom);
+
+class Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom: public IGeomFunctor
+{
+	public:
+		virtual ~Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom(){};
+		virtual bool go(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1,
+			const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1,
+			const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		FUNCTOR2D(Polyhedra,Polyhedra);
+		DEFINE_FUNCTOR_ORDER_2D(Polyhedra,Polyhedra);
+		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom,IGeomFunctor,"EXPERIMENTAL. A hacky helper Ig2 functor combining two Polyhedra shapes and creating, according to the settings, either ScGeom or PolyhedraGeom.",
+			((bool,createScGeom,true,,"If true, creates ScGeom on new contacts. Creates PolyhedraGeom otherwise. On existing contacts Ig2_Polyhedra_Polyhedra_PolyhedraGeom or Ig2_Polyhedra_Polyhedra_ScGeom is used according to present IGeom isntance."))
+			((shared_ptr<Ig2_Polyhedra_Polyhedra_PolyhedraGeom>,ig2polyhedraGeom,new Ig2_Polyhedra_Polyhedra_PolyhedraGeom,,"Helper Ig2 functor for PolyhedraGeom (to be able to modify its settings)"))
+			((shared_ptr<Ig2_Polyhedra_Polyhedra_ScGeom>,ig2scGeom,new Ig2_Polyhedra_Polyhedra_ScGeom,,"Helper Ig2 functor for ScGeom (to be able to modify its settings)"))
+		);
+		DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom);
 
 //***************************************************************************
 #endif // YADE_CGAL

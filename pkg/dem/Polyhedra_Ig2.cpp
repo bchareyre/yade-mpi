@@ -5,7 +5,9 @@
 
 #include "Polyhedra_Ig2.hpp"
 
-YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) );
+YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) 
+	(Ig2_Polyhedra_Polyhedra_ScGeom) (Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom)
+);
 
 //**********************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedras. */
@@ -29,11 +31,13 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	//move and rotate 1st the CGAL structure Polyhedron
 	Matrix3r rot_mat = (se31.orientation).toRotationMatrix();
 	Vector3r trans_vec = se31.position;
+	const Real& s = interactionDetectionFactor;
 	
 	Transformation t_rot_trans(
-		rot_mat(0,0), rot_mat(0,1), rot_mat(0,2), trans_vec[0],
-		rot_mat(1,0), rot_mat(1,1), rot_mat(1,2), trans_vec[1],
-		rot_mat(2,0), rot_mat(2,1), rot_mat(2,2), trans_vec[2], 1.
+		s*rot_mat(0,0), s*rot_mat(0,1), s*rot_mat(0,2), trans_vec[0],
+		s*rot_mat(1,0), s*rot_mat(1,1), s*rot_mat(1,2), trans_vec[1],
+		s*rot_mat(2,0), s*rot_mat(2,1), s*rot_mat(2,2), trans_vec[2],
+		1.
 	);
 	
 	Polyhedron PA = A->GetPolyhedron();
@@ -44,7 +48,12 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	//move and rotate 2nd the CGAL structure Polyhedron
 	rot_mat = (se32.orientation).toRotationMatrix();
 	trans_vec = se32.position + shift2;
-	t_rot_trans = Transformation(rot_mat(0,0),rot_mat(0,1),rot_mat(0,2), trans_vec[0],rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+	t_rot_trans = Transformation(
+		s*rot_mat(0,0), s*rot_mat(0,1), s*rot_mat(0,2), trans_vec[0],
+		s*rot_mat(1,0), s*rot_mat(1,1), s*rot_mat(1,2), trans_vec[1],
+		s*rot_mat(2,0), s*rot_mat(2,1), s*rot_mat(2,2), trans_vec[2],
+		1.
+	);
 	
 	Polyhedron PB = B->GetPolyhedron();
 	
@@ -59,7 +68,6 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 		bang->sep_plane.assign(3,0);
 		bang->contactPoint = Vector3r(0,0,0);
 		bang->isShearNew = true;
-		interaction->geom = bang;
 	}else{	
 		// use data from old interaction
 		bang=YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);
@@ -79,14 +87,16 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 		bang->equivalentPenetrationDepth=0;
 		bang->penetrationVolume=min(A->GetVolume(),B->GetVolume());
 		bang->normal = (A->GetVolume()>B->GetVolume() ? 1 : -1)*(se32.position+shift2-se31.position);
-		return true;
+		return !isNew;
 	}
 	
 	if ((!Is_inside_Polyhedron(PA, ToCGALPoint(centroid))) or 
 			(!Is_inside_Polyhedron(PB, ToCGALPoint(centroid)))) {
 				bang->equivalentPenetrationDepth=0;
-				return true;
+				return !isNew;
 		}
+
+	if (isNew) interaction->geom = bang;
 	
 	//find normal direction
 	Vector3r normal = FindNormal(Int, PA, PB);
@@ -99,6 +109,7 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeom::go(
 	bang->contactPoint=centroid;
 	bang->penetrationVolume=volume;
 	bang->equivalentPenetrationDepth=volume/area;
+	scene = Omega::instance().getScene().get();
 	bang->precompute(state1,state2,scene,interaction,normal,bang->isShearNew,shift2);
 	bang->normal=normal;
 	
@@ -427,5 +438,77 @@ bool Ig2_Sphere_Polyhedra_ScGeom::go(const shared_ptr<Shape>& shape1,const share
 
 	return true;
 }
+
+
+
+//**********************************************************************************
+/*! Plyhedra -> ScGeom. */
+bool Ig2_Polyhedra_Polyhedra_ScGeom::go(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction) {
+	const Se3r& se31=state1.se3;
+	const Se3r& se32=state2.se3;
+	shared_ptr<ScGeom> geom;
+	bool isNew = !interaction->geom;
+	if (isNew) {
+		Ig2_Polyhedra_Polyhedra_PolyhedraGeom ppGeom = Ig2_Polyhedra_Polyhedra_PolyhedraGeom();
+		ppGeom.interactionDetectionFactor = interactionDetectionFactor;
+		bool pp = ppGeom.go(shape1,shape2,state2,state1,shift2,force,interaction);
+		if (!pp) {
+			return false;
+		}
+		shared_ptr<PolyhedraGeom> pGeom = YADE_PTR_CAST<PolyhedraGeom>(interaction->geom);	
+		geom = shared_ptr<ScGeom>(new ScGeom());
+		geom->radius1 = (pGeom->contactPoint-se31.position).norm();
+		geom->radius2 = (pGeom->contactPoint-se32.position+shift2).norm();
+		interaction->geom=geom;
+	} else {
+		geom = YADE_PTR_CAST<ScGeom>(interaction->geom);
+	}
+	const Real& radius1 = geom->radius1;
+	const Real& radius2 = geom->radius2;
+	Vector3r normal=(se32.position+shift2)-se31.position;
+	Real norm=normal.norm(); normal/=norm; // normal is unit vector now
+	Real penetrationDepth=radius1+radius2-norm;
+	geom->contactPoint=se31.position+(radius1-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
+	geom->penetrationDepth=penetrationDepth;
+	scene = Omega::instance().getScene().get();
+	geom->precompute(state1,state2,scene,interaction,normal,isNew,shift2,false);
+	return true;
+}
+
+bool Ig2_Polyhedra_Polyhedra_ScGeom::goReverse(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction) {
+	return go(shape1,shape2,state2,state1,-shift2,force,interaction);
+}
+
+
+
+
+bool Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom::go(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction) {
+	bool isNew = !interaction->geom;
+	if (isNew) {
+		if (createScGeom) {
+			return ig2scGeom->go(shape1,shape2,state1,state2,shift2,force,interaction);
+		} else {
+			return ig2polyhedraGeom->go(shape1,shape2,state1,state2,shift2,force,interaction);
+		}
+	}
+	//
+	ScGeom* scGeom = dynamic_cast<ScGeom*>(interaction->geom.get());
+	if (scGeom) {
+		return ig2scGeom->go(shape1,shape2,state1,state2,shift2,force,interaction);
+	}
+	//
+	PolyhedraGeom* pGeom = dynamic_cast<PolyhedraGeom*>(interaction->geom.get());
+	if (pGeom) {
+		return ig2polyhedraGeom->go(shape1,shape2,state1,state2,shift2,force,interaction);
+	}
+	//
+	LOG_ERROR("TODO, should not happen");
+	return false;
+}
+
+bool Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom::goReverse(const shared_ptr<Shape>& shape1, const shared_ptr<Shape>& shape2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction) {
+	return go(shape1,shape2,state2,state1,-shift2,force,interaction);
+}
+
 
 #endif // YADE_CGAL
