@@ -72,12 +72,12 @@ def getStressTensor(scene):
 # get contact normal based fabric tensor
 def getFabric2D(scene):
    Omega().stringToScene(scene)
-   f = utils.fabricTensor(splitTensor=False,revertSign=False)[0]
+   f = utils.fabricTensor(splitTensor=False)[0]
    return [[f[0,0],f[0,1]],[f[1,0],f[1,1]]]
 
 def getFabric3D(scene):
    Omega().stringToScene(scene)
-   f = utils.fabricTensor(splitTensor=False,revertSign=False)[0]
+   f = utils.fabricTensor(splitTensor=False)[0]
    return [[f[0,0],f[0,1],f[0,2]],[f[1,0],f[1,1],f[1,2]],[f[2,0],f[2,1],f[2,2]]]
 
 """ # Used for clumped particle model only

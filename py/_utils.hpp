@@ -126,7 +126,7 @@ Real Shop__getPorosity(Real volume=-1);
 Real Shop__getVoxelPorosity(int resolution=200, Vector3r start=Vector3r(0,0,0),Vector3r end=Vector3r(0,0,0));
 
 //Matrix3r Shop__stressTensorOfPeriodicCell(bool smallStrains=false){return Shop::stressTensorOfPeriodicCell(smallStrains);}
-py::tuple Shop__fabricTensor(bool splitTensor=false, bool revertSign=false, Real thresholdForce=NaN);
+py::tuple Shop__fabricTensor(bool splitTensor=false, Real thresholdForce=NaN);
 py::tuple Shop__normalShearStressTensors(bool compressionPositive=false, bool splitNormalTensor=false, Real thresholdForce=NaN);
 
 py::list Shop__getStressLWForEachBody();
