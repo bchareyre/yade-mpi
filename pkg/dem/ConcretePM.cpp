@@ -24,7 +24,9 @@ void Ip2_FrictMat_CpmMat_FrictPhys::go(const shared_ptr<Material>& pp1, const sh
 	TIMING_DELTAS_START();
 	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(pp1);
 	const shared_ptr<CpmMat>& mat2 = YADE_PTR_CAST<CpmMat>(pp2);
-	Ip2_FrictMat_FrictMat_FrictPhys().go(mat1,mat2,interaction);
+	Ip2_FrictMat_FrictMat_FrictPhys iPhysFunctor = Ip2_FrictMat_FrictMat_FrictPhys();
+	iPhysFunctor.frictAngle = frictAngle;
+	iPhysFunctor.go(mat1,mat2,interaction);
 	TIMING_DELTAS_CHECKPOINT("end of Ip2_FritPhys");
 }
 

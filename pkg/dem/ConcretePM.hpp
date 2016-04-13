@@ -241,6 +241,7 @@ class Ip2_FrictMat_CpmMat_FrictPhys: public IPhysFunctor{
 		FUNCTOR2D(FrictMat,CpmMat);
 		DECLARE_LOGGER;
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_CpmMat_FrictPhys,IPhysFunctor,"Convert :yref:`CpmMat` instance and :yref:`FrictMat` instance to :yref:`FrictPhys` with corresponding parameters (young, poisson, frictionAngle). Uses simple (arithmetic) averages if material parameters are different.",
+			((shared_ptr<MatchMaker>,frictAngle,,,"See :yref:`Ip2_FrictMat_FrictMat_FrictPhys`."))
 		);
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_CpmMat_FrictPhys);
