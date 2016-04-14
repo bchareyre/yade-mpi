@@ -2,7 +2,10 @@
 // https://www.vutbr.cz/www_base/gigadisk.php?i=95194aa9a
 
 #ifdef YADE_CGAL
-
+// NDEBUG causes crashes in CGAL sometimes. Anton
+#ifdef NDEBUG
+	#undef NDEBUG
+#endif
 #include "Polyhedra_Ig2.hpp"
 
 YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) 
