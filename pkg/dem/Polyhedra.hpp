@@ -72,7 +72,8 @@ class Polyhedra: public Shape{
 		Quaternionr GetOri(){Initialize(); return orientation;}
 		Polyhedron GetPolyhedron(){return P;};
 		void Clear(){v.clear(); P.clear(); init = 0; size = Vector3r(1.,1.,1.); faceTri.clear();};
-		void setVertices(const std::vector<Vector3r>& v) { init=false; this->v=v; Initialize(); }
+		void setVertices(const std::vector<Vector3r>& v);
+		void setVertices4(const Vector3r& v0, const Vector3r& v1,const Vector3r& v2,const Vector3r& v3);
 
 	protected:	
 		//triangulation of facets for plotting
@@ -106,7 +107,8 @@ class Polyhedra: public Shape{
 			.def("GetCentroid",&Polyhedra::GetCentroid,"return polyhedra's centroid")
 			.def("GetSurfaceTriangulation",&Polyhedra::GetSurfaceTriangulation,"triangulation of facets (for plotting)")
 			.def("GetSurfaces",&Polyhedra::GetSurfaces,"get indices of surfaces' vertices (for postprocessing)")
-			.def("setVertices",&Polyhedra::setVertices,"set vertices and update receiver")
+			.def("setVertices",&Polyhedra::setVertices,"set vertices and update receiver. Takes a list/tuple of vertices as argument.\n\n.. note:: Causes memory leaks, so if you want to use it maaaany times, use one of setVertices mentioned lower, passing each vertex as individual argument (currently only setVertices(v1,v2,v3,v4) for tetrahedron is implemented, on request it is easy to implement more vertices).")
+			.def("setVertices",&Polyhedra::setVertices4,"set 4 vertices and update receiver. Each vertex is single argument.")
 		);
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };

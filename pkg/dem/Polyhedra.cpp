@@ -154,6 +154,22 @@ void Polyhedra::Initialize(){
 	init = 1;
 }
 
+void Polyhedra::setVertices(const std::vector<Vector3r>& v) {
+	init = false;
+	this->v = v;
+	Initialize();
+}
+
+void Polyhedra::setVertices4(const Vector3r& v0, const Vector3r& v1,const Vector3r& v2,const Vector3r& v3) {
+	init = false;
+	v.resize(4);
+	v[0] = v0;
+	v[1] = v1;
+	v[2] = v2;
+	v[3] = v3;
+	Initialize();
+}
+
 //**************************************************************************
 /* Generator of randomly shaped polyhedron based on Voronoi tessellation*/
 
