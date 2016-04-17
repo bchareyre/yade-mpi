@@ -1,33 +1,34 @@
 from yade import plot, polyhedra_utils, ymport, export
-from numpy import linspace
-import itertools
 
-frictionIn = 0.6
+frictionIn = 0.0
 densityIn = 3000.0
 youngIn = 1E10
 poissonIn = 0.3
-numP = 1
-C = 0.2
-Z = 1
 sizeB = 0.020
-odt = 0.00005
-vtkP = 100
-maxIter = 1e5
+odt = 0.00001
 vel=0.01
 tolerance = 0.05
-startPos = 2*sizeB
+startPos = sizeB
 
 def printWarning (f_awaited, f_real, n_awaited, n_real):
    print ("The awaited force is %.4f, but obtained force is %.4f; number of bodies: %d vs %d! Iteration %d"%(f_awaited, f_real, n_awaited, n_real, O.iter))
 
 def printSuccess ():
-   print ("Checkpoint: force values are OK! Iteration %d"%(O.iter))
+   print ("Checkpoint: force values and number of bodies are OK! Iteration %d"%(O.iter))
+
+def checkForcesBodies(fR, bodNum):
+   if (abs(f[2] - fR)/f[2] >  tolerance or len(O.bodies) <> bodNum):
+      printWarning (fR, f[2], 4, len(O.bodies))
+      resultStatus += 1
+   else:
+      printSuccess()
 
 mat1 = PolyhedraMat(density=densityIn, young=youngIn,poisson=poissonIn, frictionAngle=frictionIn,IsSplitable=True,strength=1)
 O.bodies.append(utils.wall(0,axis=2,sense=1, material = mat1))
 
-t = polyhedra_utils.polyhedralBall(sizeB, 50, mat1, (0,0,0))
-t.state.pos = (0.,0.,0.020)
+vertices = [[0,0,0],[sizeB,0,0],[sizeB,sizeB,0],[sizeB,sizeB,sizeB],[0,sizeB,0],[0,sizeB,sizeB],[0,0,sizeB],[sizeB,0,sizeB]]
+t = polyhedra_utils.polyhedra(mat1,v=vertices)
+t.state.pos = (0,0,sizeB/2)
 O.bodies.append(t)
 
 topmesh=O.bodies.append(geom.facetBox((0.,0.,startPos),(sizeB,sizeB,0.), material=mat1))
@@ -62,32 +63,12 @@ def addPlotData():
     if (O.forces.f(i)):
       f+=O.forces.f(i)
 
-O.run(4000, True)
+from yade import qt
+qt.Controller()
+V = qt.View()
 
-if (abs(f[2] - 18.2849787)/f[2] >  tolerance or len(O.bodies) <> 4):
-   printWarning (18.2849787, f[2], 4, len(O.bodies))
-   resultStatus += 1
-else:
-   printSuccess()
-   
-O.run(150, True)
-if (abs(f[2] - 23.68293)/f[2] >  tolerance or len(O.bodies) <> 4):
-   printWarning (23.68293, f[2], 4, len(O.bodies))
-   resultStatus += 1
-else:
-   printSuccess()
-   
-O.run(250, True)
-if (abs(f[2] - 32.7028)/f[2] >  tolerance or len(O.bodies) <> 4):
-   printWarning (32.7028, f[2], 4, len(O.bodies))
-   resultStatus += 1
-else:
-   printSuccess()
-
-O.run(130, True)
-if (f.norm() == 0 >  tolerance or len(O.bodies) <> 7):
-   printWarning (0.0, f[2], 7, len(O.bodies))
-   resultStatus += 1
-else:
-   printSuccess()
+O.run(250, True); checkForcesBodies(25.44893, 4)
+O.run(50, True); checkForcesBodies(28.791353, 4)
+O.run(10, True); checkForcesBodies(30.731547, 4)
+O.run(20, True); checkForcesBodies(33.483438, 7)
 
