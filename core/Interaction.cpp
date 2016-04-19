@@ -25,6 +25,9 @@ void Interaction::init(){
 void Interaction::reset(){
 	geom=shared_ptr<IGeom>();
 	phys=shared_ptr<IPhys>();
+	functorCache.geom = nullptr;
+	functorCache.phys = nullptr;
+	functorCache.constLaw = nullptr;
 	init();
 }
 
