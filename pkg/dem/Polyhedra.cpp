@@ -481,7 +481,12 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shar
 
 		if(shearForce.squaredNorm() > maxFs && maxFs){
 			//PFC3d SlipModel, is using friction angle. CoulombCriterion
-			const Real ratio = sqrt(maxFs) / shearForce.norm();
+			Real ratio = sqrt(maxFs) / shearForce.norm();
+			if (std::isinf(ratio)) {
+				LOG_DEBUG(shearForce.squaredNorm() > maxFs && maxFs); // the condition should be 1 (we are in this branch), but is actually 0
+				LOG_DEBUG(shearForce); // should be (0,0,0)
+				ratio = 0;
+			}
 
 			//Store prev force for definition of plastic slip
 			//Define the plastic work input and increment the total plastic energy dissipated
