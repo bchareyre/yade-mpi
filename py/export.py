@@ -577,7 +577,7 @@ class VTKExporter:
 		outFile.close()
 		self.facetsSnapCount += 1
 
-	def exportInteractions(self,ids='all',what=[],verticesWhat=[],comment="comment",numLabel=None):
+	def exportInteractions(self,ids='all',what=[],verticesWhat=[],comment="comment",numLabel=None,useRef=False):
 		"""exports interactions and defined properties.
 		
 		:param [(int,int)]|"all" ids: if "all", then export all interactions, otherwise only interactions from (int,int) list
@@ -599,9 +599,9 @@ class VTKExporter:
 		# write coords of intrs bodies (also taking into account possible periodicity
 		for ii,jj in intrs:
 			i = O.interactions[ii,jj]
-			pos = O.bodies[ii].state.pos 
+			pos = O.bodies[ii].state.refPos if useRef else O.bodies[ii].state.pos 
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
-			pos = O.bodies[jj].state.pos + (O.cell.hSize*i.cellDist if O.periodic else Vector3.Zero)
+			pos = (O.bodies[jj].state.refPos if useRef else O.bodies[jj].state.pos) + (O.cell.hSize*i.cellDist if O.periodic else Vector3.Zero)
 			outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		# write interactions as lines
 		outFile.write("LINES %d %d\n"%(nIntrs,3*nIntrs))
@@ -794,7 +794,7 @@ class VTKExporter:
 		outFile.write('\nCELL_TYPES 1\n12\n')
 		outFile.close()
 
-	def exportPolyhedra(self,ids='all',what=[],comment="comment",numLabel=None):
+	def exportPolyhedra(self,ids='all',what=[],comment="comment",numLabel=None,useRef=False):
 		"""Exports polyhedrons and defined properties.
 		
 		:param ids: if "all", then export all polyhedrons, otherwise only polyhedrons from integer list
@@ -825,12 +825,25 @@ class VTKExporter:
 		# head
 		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nVertices))
 		# write position of vertices
-		for b in bodies:
-			bPos = b.state.pos
-			bOri = b.state.ori
-			for v in b.shape.v:
-				pos = bPos + bOri*v
-				outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
+		if useRef:
+			dspls = []
+			for b in bodies:
+				bPos = b.state.pos
+				bOri = b.state.ori
+				brPos = b.state.refPos
+				brOri = b.state.refOri
+				for v in b.shape.v:
+					rPos = brPos + brOri*v
+					pos = bPos + bOri*v
+					outFile.write("%g %g %g\n"%(rPos[0],rPos[1],rPos[2]))
+					dspls.append(pos-rPos)
+		else:
+			for b in bodies:
+				bPos = b.state.pos
+				bOri = b.state.ori
+				for v in b.shape.v:
+					pos = bPos + bOri*v
+					outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
 		# write triangle faces
 		outFile.write("\nPOLYGONS %d %d\n"%(nFaces,4*nFaces))
 		j = 0
@@ -841,6 +854,11 @@ class VTKExporter:
 				outFile.write("3 %d %d %d\n"%t)
 			j += len(b.shape.v)
 		# write additional data from 'what' param
+		if useRef:
+			outFile.write("\nPOINT_DATA %d\n"%(len(dspls)))
+			outFile.write("\nVECTORS displacement double\n")
+			for v in dspls:
+				outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
 		if what:
 			outFile.write("\nCELL_DATA %d"%(nFaces))
 		# see exportSpheres for explanation of this code block
