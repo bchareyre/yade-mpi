@@ -122,4 +122,4 @@ for branch in repodeb.branches:
 for branch in repodeb.branches:
     branchstr = str(branch)
     if (branchstr<>'master'):
-        os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
+        os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --digest-algo SHA512 --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
