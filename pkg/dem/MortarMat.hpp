@@ -26,6 +26,7 @@ class MortarMat: public FrictMat {
 			((Real,compressiveStrength,10e6,,"compressiveStrength [Pa]"))
 			((Real,cohesion,1e6,,"cohesion [Pa]"))
 			((Real,ellAspect,3,,"aspect ratio of elliptical 'cap'. Value >1 means the ellipse is longer along normal stress axis."))
+			((bool,neverDamage,false,,"If true, interactions remain elastic regardless stresses"))
 			,
 			createIndex();
 		);
@@ -40,27 +41,23 @@ REGISTER_SERIALIZABLE(MortarMat);
 
 class MortarPhys: public FrictPhys {
 	public:
-		Real epsN, sigmaN;
-		Vector3r epsT, sigmaT;
+		Real sigmaN;
+		Vector3r sigmaT;
 		virtual ~MortarPhys();
+		bool failureCondition(Real sigmaN, Real sigmaT);
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(MortarPhys,FrictPhys,"IPhys class containing parameters of MortarMat. Used by Law2_ScGeom_MortarPhys_Lourenco.",
 			((Real,tensileStrength,NaN,,"tensileStrength [Pa]"))
 			((Real,compressiveStrength,NaN,,"compressiveStrength [Pa]"))
 			((Real,cohesion,NaN,,"cohesion [Pa]"))
 			((Real,ellAspect,NaN,,"aspect ratio of elliptical 'cap'. Value >1 means the ellipse is longer along normal stress axis."))
 			((Real,crossSection,NaN,,"Crosssection of interaction"))
-			((Real,refLength,NaN,,"Initial length of interaction [m]"))
-			((Real,refPD,NaN,,"Reference penetration depth [m]"))
-			((Real,E,NaN,,"interaction Young's modulus [Pa]"))
-			((Real,G,NaN,,"interaction shear modulus [Pa]"))
+			((bool,neverDamage,false,,"If true, interactions remain elastic regardless stresses"))
 			, // ctors
-			epsT = Vector3r::Zero();
 			createIndex();
 			,
-			.def_readonly("epsN",&MortarPhys::epsN,"Current normal strain |yupdate|")
-			.def_readonly("epsT",&MortarPhys::epsT,"Current shear strain |yupdate|")
 			.def_readonly("sigmaN",&MortarPhys::sigmaN,"Current normal stress |yupdate|")
 			.def_readonly("sigmaT",&MortarPhys::sigmaT,"Current shear stress |yupdate|")
+			.def("failureCondition",&MortarPhys::failureCondition,"Failure condition from normal stress and norm of shear stress (false=elastic, true=damaged)")
 		);
 		DECLARE_LOGGER;
 		REGISTER_CLASS_INDEX(MortarPhys,NormShearPhys);
