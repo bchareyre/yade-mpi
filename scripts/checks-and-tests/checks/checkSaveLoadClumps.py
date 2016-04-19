@@ -9,6 +9,7 @@
 
 from yade import pack
 import tempfile, shutil
+import time
 
 #define material for all bodies:
 id_Mat=O.materials.append(FrictMat(young=1e6,poisson=0.3,density=1000,frictionAngle=1))
@@ -51,7 +52,8 @@ tmp_dir = tempfile.mkdtemp()
 O.save(tmp_dir + '/restartMinWorkEx_'+partType+'_Initial')
 O.run(100000,True)
 O.save(tmp_dir + '/restartMinWorkEx_'+partType+str(O.iter))
-
+time.sleep(1)
 O.reset()
+time.sleep(1)
 O.load(tmp_dir + '/restartMinWorkEx_'+partType +'100000')
 O.run(1000, True)
