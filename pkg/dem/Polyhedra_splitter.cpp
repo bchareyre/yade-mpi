@@ -3,6 +3,11 @@
 
 #ifdef YADE_CGAL
 
+// NDEBUG causes crashes in CGAL sometimes. Anton
+#ifdef NDEBUG
+	#undef NDEBUG
+#endif
+
 #include <pkg/dem/Polyhedra_splitter.hpp>
 
 YADE_PLUGIN((PolyhedraSplitter));
