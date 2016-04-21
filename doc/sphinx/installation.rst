@@ -111,7 +111,7 @@ Some of them are only optional. The last ones are only relevant for using the fl
 
 * `cmake <http://www.cmake.org/>`_ build system
 * `gcc <http://www.gcc.gnu.org>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
-* `boost <http://www.boost.org/>`_ 1.35 or later
+* `boost <http://www.boost.org/>`_ 1.47 or later
 * `Qt <http://www.qt.io/>`_ library
 * `freeglut3 <http://freeglut.sourceforge.net>`_
 * `libQGLViewer <http://www.libqglviewer.com>`_
