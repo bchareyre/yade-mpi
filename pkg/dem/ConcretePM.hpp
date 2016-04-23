@@ -229,6 +229,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public IPhysFunctor{
 		DECLARE_LOGGER;
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,IPhysFunctor,"Convert 2 :yref:`CpmMat` instances to :yref:`CpmPhys` with corresponding parameters. Uses simple (arithmetic) averages if material are different. Simple copy of parameters is performed if the :yref:`material<CpmMat>` is shared between both particles. See :yref:`cpm-model<CpmMat>` for detals.",
 			((long,cohesiveThresholdIter,10,,"Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive (10 by default)."))
+			((shared_ptr<MatchMaker>,E,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's normal modulus. If ``None``, average value is used."))
 		);
 };
 REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);

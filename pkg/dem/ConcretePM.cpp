@@ -76,8 +76,9 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	} else {
 		// averaging over both materials
 		#define _AVGATTR(a) cpmPhys->a=.5*(mat1->a+mat2->a)
-			cpmPhys->E = .5*(mat1->young + mat2->young);
-			cpmPhys->G = .5*(mat1->poisson + mat2->poisson)*.5*(mat1->young + mat2->young);
+			Real e = (!E) ? .5*(mat1->young + mat2->young) : (*E)(mat1->id,mat2->id,mat1->young,mat2->young);
+			cpmPhys->E = e;
+			cpmPhys->G = .5*(mat1->poisson + mat2->poisson)*cpmPhys->E;
 			cpmPhys->tanFrictionAngle = tan(.5*(mat1->frictionAngle + mat2->frictionAngle));
 			cpmPhys->undamagedCohesion = .5*(mat1->sigmaT + mat2->sigmaT);
 			cpmPhys->isCohesive = (cohesiveThresholdIter < 0 || scene->iter < cohesiveThresholdIter);
