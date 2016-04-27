@@ -11,8 +11,8 @@
 #pragma once
 
 #include <boost/scoped_ptr.hpp>
-#include<stdexcept>
-#include<string>
+#include <stdexcept>
+#include <string>
 
 /*! \brief Abstract interface for all Indexable class.
 	An indexable class is a class that will be managed by a MultiMethodManager.

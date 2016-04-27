@@ -92,7 +92,7 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 	} else {
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
 		I->cellDist=cellDist;
-		b1->shape && b2->shape && operator()(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/ false,I);
+		b1->shape && b2->shape && I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/true,I);
 		return I;
 	}
 }
@@ -124,11 +124,12 @@ void IGeomDispatcher::action(){
 			bool wasReal=I->isReal();
 			if (!b1->shape || !b2->shape) { assert(!wasReal); continue; } // some bodies do not have shape
 			bool geomCreated;
+			//const bool forceFalse=false;
 			if(!isPeriodic){
-				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/ false, I);
+				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 			} else{
 				Vector3r shift2=cellHsize*I->cellDist.cast<Real>();
-				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, /*force*/ false, I);
+				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			// reset && erase interaction that existed but now has no geometry anymore
 			if(wasReal && !geomCreated){ scene->interactions->requestErase(I); }
