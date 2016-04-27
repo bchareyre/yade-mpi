@@ -486,8 +486,8 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shar
 			//PFC3d SlipModel, is using friction angle. CoulombCriterion
 			Real ratio = sqrt(maxFs) / shearForce.norm();
 			if (std::isinf(ratio)) {
-				LOG_DEBUG(shearForce.squaredNorm() > maxFs && maxFs); // the condition should be 1 (we are in this branch), but is actually 0
-				LOG_DEBUG(shearForce); // should be (0,0,0)
+				LOG_DEBUG("shearForce.squaredNorm() > maxFs && maxFs: " << (shearForce.squaredNorm() > maxFs && maxFs)); // the condition should be 1 (we are in this branch), but is actually 0
+				LOG_DEBUG("shearForce: "<<shearForce); // should be (0,0,0)
 				ratio = 0;
 			}
 
