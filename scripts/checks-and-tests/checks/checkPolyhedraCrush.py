@@ -63,9 +63,9 @@ def addPlotData():
     if (O.forces.f(i)):
       f+=O.forces.f(i)
 
-from yade import qt
-qt.Controller()
-V = qt.View()
+#from yade import qt
+#qt.Controller()
+#V = qt.View()
 
 O.run(250, True); checkForcesBodies(25.44893, 4)
 O.run(50, True); checkForcesBodies(28.791353, 4)
