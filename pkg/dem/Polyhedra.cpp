@@ -507,6 +507,7 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& ig, shar
 					"elastPotential",elastPotentialIx,true);
 			}
 		} else {
+			if (maxFs==0) shearForce = Vector3r::Zero();
 			scene->energy->add(0.5*(normalForce.squaredNorm()/phys->kn+shearForce.squaredNorm()/phys->ks),
 				"elastPotential",elastPotentialIx,true);
 		}
