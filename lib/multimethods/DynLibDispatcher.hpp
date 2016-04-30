@@ -8,16 +8,13 @@
 
 #pragma once
 
-
-#include "Indexable.hpp"
-
-
+#include <lib/multimethods/Indexable.hpp>
 #include <lib/factory/ClassFactory.hpp>
 #include <lib/serialization/Serializable.hpp>
 
-#include<loki/Functor.h>
-#include<loki/Typelist.h>
-#include<loki/NullType.h>
+#include <loki/Functor.h>
+#include <loki/Typelist.h>
+#include <loki/NullType.h>
 // compat with former yade's local Loki
 #define TYPELIST_1 LOKI_TYPELIST_1
 #define TYPELIST_2 LOKI_TYPELIST_2
@@ -31,8 +28,16 @@
 #include <string>
 #include <ostream>
 
-struct DynLibDispatcher_Item2D{ int ix1, ix2; std::string functorName; DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){}; };
-struct DynLibDispatcher_Item1D{ int ix1     ; std::string functorName; DynLibDispatcher_Item1D(int a,        std::string c):ix1(a),       functorName(c){}; };
+struct DynLibDispatcher_Item2D {
+	int ix1, ix2;
+	std::string functorName;
+	DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){};
+};
+struct DynLibDispatcher_Item1D {
+	int ix1;
+	std::string functorName;
+	DynLibDispatcher_Item1D(int a, std::string c):ix1(a), functorName(c){};
+};
 ///
 /// base classes involved in multiple dispatch must be derived from Indexable
 ///
@@ -45,114 +50,62 @@ template
 				// 		FIXME: should use shared_ptr references, like this: DynLibDispatcher< TYPELIST_2( shared_ptr<PhysicalAction>& , shared_ptr<Body>& ) , ....
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
-	class TList,		//	typelist of arguments passed to multivirtual function
+	class TList,
+				//	typelist of arguments passed to multivirtual function
 				//	WARNING: first arguments must be shared_ptr<BaseClass>, for details see FunctorWrapper
 				
-	bool autoSymmetry=true	//	true -	the function called is always the same,
-				//		only order of arguments is rearranged
-				//		to make correct function call, 
-				//		only go() is called
-				//		
-				//	false -	the function called is always different.
-				//		arguments order is not rearranged
-				//		go(), and goReverse() are called, respectively
-				//
+	bool autoSymmetry=true
+				/*true - the function called is always the same,
+						only order of arguments is rearranged
+						to make correct function call, 
+						only go() is called
+				
+					false - the function called is always different.
+						arguments order is not rearranged
+						go(), and goReverse() are called, respectively*/
 >
 class DynLibDispatcher
 {
-		// this template recursively defines a type for callBacks matrix, with required number of dimensions
+	// this template recursively defines a type for callBacks matrix, with required number of dimensions
 	private:
-		template<class T > struct Matrix
-		  {
-			typedef Loki::NullType ResultIterator;
-			typedef Loki::NullType ResultIteratorInt;
-		  };
+		template<class T > struct Matrix {
+				using ResultIterator = Loki::NullType;
+				using ResultIteratorInt = Loki::NullType;
+			};
 
-	template<class Head > struct Matrix< Loki::Typelist< Head, Loki::NullType > >
-		  {
-			typedef vector< shared_ptr< Executor > > 			Result;
-			typedef vector< int > 						ResultInt;
-			typedef typename vector< shared_ptr< Executor > >::iterator 	ResultIterator;
-			typedef vector< int >::iterator 				ResultIteratorInt;
+	template<class Head > struct Matrix< Loki::Typelist< Head, Loki::NullType > > {
+				using Result = vector< shared_ptr< Executor > >;
+				using ResultInt = vector< int >;
+				using ResultIterator = typename vector< shared_ptr< Executor > >::iterator;
+				using ResultIteratorInt = vector< int >::iterator;
 		  };
 
 	template<class Head, class Tail >
-		  struct Matrix< Loki::Typelist< Head, Tail > >
-		  {
-			// recursive typedef to get matrix of required dimensions
-			typedef typename Matrix< Tail >::Result 		InsideType;
-			typedef typename Matrix< Tail >::ResultInt 		InsideTypeInt;
-			typedef vector< InsideType > 				Result;
-			typedef vector< InsideTypeInt > 			ResultInt;
-			typedef typename vector< InsideType >::iterator 	ResultIterator;
-			typedef typename vector< InsideTypeInt >::iterator 	ResultIteratorInt;
-		  };
-		
-		// this template helps declaring iterators for each dimension of callBacks matrix
-	template<class T > struct GetTail
-		  {
-			typedef Loki::NullType Result;
-		  };
-
-	template<class Head, class Tail>
-		  struct GetTail< Loki::Typelist< Head , Tail > >
-		  {
-			typedef Tail Result;
-		  };
-
-	template<class Head >
-		  struct GetTail< Loki::Typelist< Head , Loki::NullType > >
-		  {
-			typedef Loki::NullType Result;
-		  };
-
-	template <typename G, typename T, typename U>
-		  struct Select
-		  {
-			typedef T Result;
-		  };
-	
-	template <typename T, typename U>
-		  struct Select<Loki::NullType, T, U>
-		  {
-			typedef U Result;
+		  struct Matrix< Loki::Typelist< Head, Tail > > {
+				// recursive typedef to get matrix of required dimensions
+				using InsideType = typename Matrix< Tail >::Result;
+				using InsideTypeInt = typename Matrix< Tail >::ResultInt;
+				using Result = vector< InsideType >;
+				using ResultInt = vector< InsideTypeInt >;
+				using ResultIterator = typename vector< InsideType >::iterator;
+				using ResultIteratorInt = typename vector< InsideTypeInt >::iterator;
 		  };
 
 	typedef typename Loki::TL::Append<  Loki::NullType , BaseClass >::Result BaseClassList;
-	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 0>::Result	BaseClass1;  // 1D
-	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 1>::Result	BaseClass2;  // 2D
-		
-	typedef typename GetTail< BaseClassList >::Result			Tail2; // 2D
-	typedef typename GetTail< Tail2 >::Result				Tail3; // 3D
-	typedef typename GetTail< Tail3 >::Result				Tail4; // 4D ...
-		
-	typedef typename Matrix< BaseClassList >::ResultIterator 		Iterator2; // outer iterator 2D
-		
-	typedef typename Matrix< BaseClassList >::ResultIteratorInt		IteratorInfo2;
-		
+	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 0>::Result    BaseClass1;  // 1D
+	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 1>::Result    BaseClass2;  // 2D
+	
+	
+	typedef typename Matrix< BaseClassList >::ResultIterator     Iterator2; // outer iterator 2D
+	typedef typename Matrix< BaseClassList >::ResultIteratorInt  IteratorInfo2;
+	
 	typedef typename Matrix< BaseClassList >::Result MatrixType;
 	typedef typename Matrix< BaseClassList >::ResultInt MatrixIntType;
-	MatrixType callBacks;		// multidimensional matrix that stores functors ( 1D, 2D, 3D, 4D, ....)
-	MatrixIntType callBacksInfo;	// multidimensional matrix for extra information about functors in the matrix
-						// currently used to remember if it is reversed functor
-						
-	// ParmNReal is defined to avoid ambigious function call for different dimensions of multimethod
-	typedef Loki::FunctorImpl<ResultType, TList > Impl;
-	typedef TList ParmList;
-	typedef Loki::NullType Parm1; 						// it's always at least 1D
-	typedef typename Impl::Parm2 Parm2Real;
-	typedef typename Select< Tail2 , Loki::NullType , Parm2Real >::Result Parm2; 	// 2D
-	typedef typename Impl::Parm3 Parm3Real;
-	typedef typename Select< Tail3 , Loki::NullType , Parm3Real >::Result Parm3; 	// 3D - to have 3D just working, without symmetry handling - change this line to be: typedef typename Impl::Parm3 Parm3;
-	typedef typename Impl::Parm4 Parm4Real;
-	typedef typename Select< Tail4 , Loki::NullType , Parm4Real >::Result Parm4;	// 4D - same as above
-	typedef typename Impl::Parm5 Parm5;
-	typedef typename Impl::Parm6 Parm6;
-	typedef typename Impl::Parm7 Parm7;
-	typedef typename Impl::Parm8 Parm8;
-	typedef typename Impl::Parm9 Parm9;
-	
- 	public:
+	MatrixType callBacks;        // multidimensional matrix that stores functors ( 1D, 2D, 3D, 4D, ....)
+	MatrixIntType callBacksInfo; // multidimensional matrix for extra information about functors in the matrix
+	                             // currently used to remember if it is reversed functor
+
+	public:
 		DynLibDispatcher()
 		  {
 			// FIXME - static_assert( typeid(BaseClass1) == typeid(Parm1) ); // 1D
@@ -160,10 +113,13 @@ class DynLibDispatcher
 			clearMatrix();
 		};
 		  
-		void clearMatrix(){ callBacks.clear(); callBacksInfo.clear(); }
+		void clearMatrix() {
+			callBacks.clear();
+			callBacksInfo.clear();
+		}
 
 		shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1){
-		  	int ix1;
+			int ix1;
 			if(arg1->getClassIndex()<0) throw runtime_error("No functor for type "+arg1->getClassName()+" (index "+boost::lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
 			if(locateMultivirtualFunctor1D(ix1,arg1)) return callBacks[ix1];
 			return shared_ptr<Executor>();
@@ -187,12 +143,22 @@ class DynLibDispatcher
 
 		/*! Return representation of the dispatch matrix as vector of int,string (i.e. index,functor name) */
 		vector<DynLibDispatcher_Item1D> dataDispatchMatrix1D(){
-			vector<DynLibDispatcher_Item1D> ret; for(size_t i=0; i<callBacks.size(); i++){ if(callBacks[i]) ret.push_back(DynLibDispatcher_Item1D(i,callBacks[i]->getClassName())); }
+			vector<DynLibDispatcher_Item1D> ret;
+			for(size_t i=0; i<callBacks.size(); i++) {
+				if(callBacks[i]) ret.push_back(DynLibDispatcher_Item1D(i,callBacks[i]->getClassName()));
+			}
 			return ret;
 		}
 		/*! Return representation of the dispatch matrix as vector of int,int,string (i.e. index1,index2,functor name) */
 		vector<DynLibDispatcher_Item2D> dataDispatchMatrix2D(){
-			vector<DynLibDispatcher_Item2D> ret; for(size_t i=0; i<callBacks.size(); i++){ for(size_t j=0; j<callBacks[i].size(); j++){ /*cerr<<"["<<i<<","<<j<<"]";*/ if(callBacks[i][j]) { /* cerr<<"()"; */ ret.push_back(DynLibDispatcher_Item2D(i,j,callBacks[i][j]->getClassName())); } } }
+			vector<DynLibDispatcher_Item2D> ret;
+			for(size_t i=0; i<callBacks.size(); i++) {
+				for(size_t j=0; j<callBacks[i].size(); j++) {
+					if(callBacks[i][j]) {
+						ret.push_back(DynLibDispatcher_Item2D(i,j,callBacks[i][j]->getClassName()));
+					}
+				}
+			}
 			return ret;
 		}
 
@@ -205,9 +171,11 @@ class DynLibDispatcher
 		}
 		/*! Dump 2d dispatch matrix to given stream. */
 		std::ostream& dumpDispatchMatrix2D(std::ostream& out, const string& prefix=""){
-			for(size_t i=0; i<callBacks.size(); i++){	for(size_t j=0; j<callBacks.size(); j++){
-				if(callBacks[i][j]) out<<prefix<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
-			}}
+			for(size_t i=0; i<callBacks.size(); i++) {
+				for(size_t j=0; j<callBacks.size(); j++) {
+					if(callBacks[i][j]) out<<prefix<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
+				}
+			}
 			return out;
 		}
 
@@ -328,7 +296,7 @@ class DynLibDispatcher
 			return false; // FIXME - this line should be not needed
 		}
 
-		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2) {
+		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1, shared_ptr<BaseClass2>& base2) {
 			//#define _DISP_TRACE(msg) cerr<<"@DT@"<<__LINE__<<" "<<msg<<endl;
 			#define _DISP_TRACE(msg)
 			if(callBacks.empty()) return false;
@@ -353,9 +321,12 @@ class DynLibDispatcher
 				e.g. if MetaInteractingGeometry2AABB is not in BoundingVoumeMetaEngine, it is looked up at every step.
 
 			*/
-			if(callBacks[index1][index2]){ _DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName()); return true; }
+			if(callBacks[index1][index2]) {
+				_DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName());
+				return true;
+			}
 			int foundIx1,foundIx2; int maxDp1=-1, maxDp2=-1;
-			// if(base1->getBaseClassIndex(0)<0) maxDp1=0; if(base2->getBaseClassIndex(0)<0) maxDp2=0;
+			
 			for(int dist=1; ; dist++){
 				bool distTooBig=true;
 				foundIx1=foundIx2=-1; // found no dispatch at this depth yet
@@ -364,7 +335,8 @@ class DynLibDispatcher
 					if((maxDp1>=0 && dp1>maxDp1) || (maxDp2>=0 && dp2>maxDp2)) continue;
 					_DISP_TRACE(" Trying indices with depths "<<dp1<<" and "<<dp2<<", dist="<<dist);
 					int ix1=dp1>0?base1->getBaseClassIndex(dp1):index1, ix2=dp2>0?base2->getBaseClassIndex(dp2):index2;
-					if(ix1<0) maxDp1=dp1; if(ix2<0) maxDp2=dp2;
+					if(ix1<0) maxDp1=dp1;
+					if(ix2<0) maxDp2=dp2;
 					if(ix1<0 || ix2<0) continue; // hierarchy height exceeded in either dimension
 					distTooBig=false;
 					if(callBacks[ix1][ix2]){
@@ -373,324 +345,66 @@ class DynLibDispatcher
 							dumpDispatchMatrix2D(cerr,"AMBIGUOUS: "); throw runtime_error("Ambiguous dispatch.");
 						}
 						foundIx1=ix1; foundIx2=ix2;
-						callBacks[index1][index2]=callBacks[ix1][ix2]; callBacksInfo[index1][index2]=callBacksInfo[ix1][ix2];
+						callBacks[index1][index2]=callBacks[ix1][ix2];
+						callBacksInfo[index1][index2]=callBacksInfo[ix1][ix2];
 						_DISP_TRACE("Found callback ["<<ix1<<"]["<<ix2<<"] → "<<callBacks[ix1][ix2]->getClassName());
 					}
 				}
 				if(foundIx1!=-1) return true;
-				if(distTooBig){ _DISP_TRACE("Undefined dispatch, dist="<<dist); return false; /* undefined dispatch */ }
+				if(distTooBig){
+					_DISP_TRACE("Undefined dispatch, dist="<<dist);
+					return false; /* undefined dispatch */
+				}
 			}
 		};
-
-		
 		
 // calling multivirtual function, 1D
+		template<typename... Args>
+		ResultType operator() (shared_ptr<BaseClass1>& base, Args... args)
+		{
+			int index;
+			if( locateMultivirtualFunctor1D(index,base) )
+				return (callBacks[index])->go(base, args...);
+			else	return ResultType();
+		}
+		
 
-		ResultType operator() (shared_ptr<BaseClass1>& base)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3, p4);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3, p4, p5);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3, p4, p5, p6);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8);
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base, Parm2 p2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6, Parm7 p7, Parm8 p8, Parm9 p9)
-		{
-			int index;
-			if( locateMultivirtualFunctor1D(index,base) )
-				return (callBacks[index])->go(base, p2, p3, p4, p5, p6, p7, p8, p9);
-			else	return ResultType();
-		}
-	
 // calling multivirtual function, 2D, 
 // symmetry handling in private struct
-
-/// @cond 
 	private:
-		template< bool useSymmetry, class BaseClassTrait1, class BaseClassTrait2, class ParmTrait3, class ParmTrait4, class ParmTrait5, class ParmTrait6,
-				class ParmTrait7, class ParmTrait8, class ParmTrait9 >
+		template< bool useSymmetry, class BaseClassTrait1, class BaseClassTrait2, typename... Args>
 		struct InvocationTraits
 		{
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2 )
-			{	
-				return ex->goReverse	(base1, base2);	
-			}	
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3)
+			static ResultType doDispatch(shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, Args... args)
 			{
-				return ex->goReverse	(base1, base2, p3);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
-						ParmTrait4 p4)
-			{
-				return ex->goReverse	(base1, base2, p3, p4);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5)
-			{
-				return ex->goReverse	(base1, base2, p3, p4, p5);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6)
-			{	
-				return ex->goReverse	(base1, base2, p3, p4, p5, p6);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7)
-			{	
-				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8)
-			{	
-				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex, shared_ptr<BaseClassTrait1> base1, shared_ptr<BaseClassTrait2> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9)
-			{	
-				return ex->goReverse	(base1, base2, p3, p4, p5, p6, p7, p8, p9);
+				return ex->goReverse (base1, base2, args...);
 			}
 		};
-		template< class BaseClassTrait, class ParmTrait3, class ParmTrait4, class ParmTrait5, class ParmTrait6
-					, class ParmTrait7, class ParmTrait8, class ParmTrait9>
-		struct InvocationTraits< true , BaseClassTrait, BaseClassTrait, ParmTrait3, ParmTrait4, ParmTrait5, ParmTrait6
-					, ParmTrait7, ParmTrait8, ParmTrait9 >
+		template< class BaseClassTrait, typename... Args>
+		struct InvocationTraits< true , BaseClassTrait, BaseClassTrait, Args... >
 		{
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2 )
+			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, Args... args)
 			{
-				return ex->go		(base2, base1 );
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3)
-			{
-				return ex->go		(base2, base1, p3);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
-						ParmTrait4 p4)
-			{
-				return ex->go		(base2, base1, p3, p4);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5)
-			{	
-				return ex->go		(base2, base1, p3, p4, p5);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6)
-			{	
-				return ex->go		(base2, base1, p3, p4, p5, p6);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7)
-			{	
-				return ex->go		(base2, base1, p3, p4, p5, p6, p7);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8)
-			{	
-				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8);
-			}
-			static ResultType doDispatch( shared_ptr<Executor>& ex , shared_ptr<BaseClassTrait> base1, shared_ptr<BaseClassTrait> base2, ParmTrait3 p3,
-						ParmTrait4 p4, ParmTrait5 p5, ParmTrait6 p6, ParmTrait7 p7, ParmTrait8 p8, ParmTrait9 p9)
-			{	
-				return ex->go		(base2, base1, p3, p4, p5, p6, p7, p8, p9);
+				return ex->go (base2, base1, args...);
 			}
 		};
 
 // calling multivirtual function, 2D, public interface
 	public:
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
+		template<typename... Args>
+		ResultType operator() (shared_ptr<BaseClass1>& base1, shared_ptr<BaseClass2>& base2, Args... args)
 		{
 			int index1, index2;
 			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
 			{
-				if(callBacksInfo[index1][index2])	// reversed
+				if(callBacksInfo[index1][index2])// reversed
 				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9 > CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2 );
+					using CallTraits=InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Args...> ;
+					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, args...);
 				}
 				else
-					return (callBacks[index1][index2] )->go			(base1, base2 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3);
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4 );
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5 );
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6 );
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
-						Parm7 p7)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7 );
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
-						Parm7 p7, Parm8 p8)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8);
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8 );
-			}
-			else	return ResultType();
-		}
-		
-		ResultType operator() (shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2, Parm3 p3, Parm4 p4, Parm5 p5, Parm6 p6,
-						Parm7 p7, Parm8 p8, Parm9 p9)
-		{
-			int index1, index2;
-			if( locateMultivirtualFunctor2D(index1,index2,base1,base2) )
-			{
-				if(callBacksInfo[index1][index2])	// reversed
-				{
-					typedef InvocationTraits<autoSymmetry, BaseClass1, BaseClass2, Parm3, Parm4, Parm5, Parm6,
-						Parm7, Parm8, Parm9> CallTraits;
-					return CallTraits::doDispatch( callBacks[index1][index2] , base1, base2, p3, p4, p5, p6, p7, p8, p9 );
-				}
-				else
-					return (callBacks[index1][index2] )->go			(base1, base2, p3, p4, p5, p6, p7, p8, p9 );
+					return (callBacks[index1][index2] )->go(base1, base2, args...);
 			}
 			else	return ResultType();
 		}
 };
-
-
