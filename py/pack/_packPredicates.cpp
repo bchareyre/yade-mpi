@@ -108,7 +108,7 @@ class inSphere: public Predicate {
 	Vector3r center; Real radius;
 public:
 	inSphere(const Vector3r& _center, Real _radius){center=_center; radius=_radius;}
-	virtual bool operator()(const Vector3r& pt, Real pad=0.) const { return ((pt-center).norm()-pad<=radius-pad); }
+	virtual bool operator()(const Vector3r& pt, Real pad=0.) const { return ((pt-center).norm()<=radius-pad); }
 	virtual py::tuple aabb() const {return vvec2tuple(Vector3r(center[0]-radius,center[1]-radius,center[2]-radius),Vector3r(center[0]+radius,center[1]+radius,center[2]+radius));}
 };
 
