@@ -9,12 +9,11 @@
 #pragma once
 
 
-#include<core/Engine.hpp>
-#include<core/Functor.hpp>
-#include<core/Omega.hpp>
-#include<lib/multimethods/DynLibDispatcher.hpp>
+#include <core/Engine.hpp>
+#include <core/Functor.hpp>
+#include <core/Omega.hpp>
+#include <lib/multimethods/DynLibDispatcher.hpp>
 
-#include<boost/preprocessor/cat.hpp>
 
 // real base class for all dispatchers (the other one are templates)
 class Dispatcher: public Engine{
@@ -88,39 +87,20 @@ int Indexable_getClassIndex(const shared_ptr<TopIndexable> i){return i->getClass
 //! Return sequence (hierarchy) of class indices of given indexable; optionally convert to names
 template<typename TopIndexable>
 boost::python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, bool convertToNames){
-	int depth=1; boost::python::list ret; int idx0=i->getClassIndex();
+	int depth=1;
+	boost::python::list ret;
+	int idx0=i->getClassIndex();
 	if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx0));
 	else ret.append(idx0);
+	
 	if(idx0<0) return ret; // don't continue and call getBaseClassIndex(), since we are at the top already
+	
 	while(true){
 		int idx=i->getBaseClassIndex(depth++);
 		if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx));
 		else ret.append(idx);
 		if(idx<0) return ret;
 	}
-}
-
-//! Return functors of this dispatcher, as list of functors of appropriate type
-template<typename DispatcherT>
-std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
-	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
-	FOREACH(const shared_ptr<Functor>& functor, self->functors){ shared_ptr<typename DispatcherT::functorType> functorRightType(YADE_PTR_DYN_CAST<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
-	return ret;
-}
-
-template<typename DispatcherT>
-void Dispatcher_functors_set(shared_ptr<DispatcherT> self, std::vector<shared_ptr<typename DispatcherT::functorType> > functors){
-	self->clear();
-	FOREACH(const shared_ptr<typename DispatcherT::functorType>& item, functors) self->add(item);
-}
-
-// Dispatcher is not a template, hence converting this into a real constructor would be complicated; keep it separated, at least for now...
-//! Create dispatcher of given type, with functors given as list in argument
-template<typename DispatcherT>
-shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typename DispatcherT::functorType> >& functors){
-	shared_ptr<DispatcherT> instance(new DispatcherT);
-	Dispatcher_functors_set<DispatcherT>(instance,functors);
-	return instance;
 }
 
 template < class FunctorType, bool autoSymmetry=true>
@@ -185,9 +165,13 @@ class Dispatcher2D : public Dispatcher,
 		typedef baseClass2 argType2;
 		typedef FunctorType functorType;
 		typedef DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,typename FunctorType::ReturnType,typename FunctorType::ArgumentTypes,autoSymmetry> dispatcherBase;
-		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1> arg1, shared_ptr<baseClass2> arg2){ return dispatcherBase::getExecutor(arg1,arg2); }
-    boost::python::dict dump(bool convertIndicesToNames){
-      boost::python::dict ret;
+		
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1> arg1, shared_ptr<baseClass2> arg2){
+			return dispatcherBase::getExecutor(arg1,arg2);
+		}
+		
+		boost::python::dict dump (bool convertIndicesToNames) {
+			boost::python::dict ret;
 			FOREACH(const DynLibDispatcher_Item2D& item, dispatcherBase::dataDispatchMatrix2D()){
 				if(convertIndicesToNames){
 					string arg1=Dispatcher_indexToClassName<argType1>(item.ix1), arg2=Dispatcher_indexToClassName<argType2>(item.ix2);
