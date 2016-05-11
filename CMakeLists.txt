@@ -23,7 +23,7 @@
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
-#  USE_QT5: use QT5 for GUI, experimental (OFF by default)
+#  USE_QT5: use QT5 for GUI (ON by default)
 
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8.11)
@@ -131,7 +131,7 @@ OPTION(ENABLE_LIQMIGRATION "Enable liquid control (very experimental), see [Mani
 OPTION(ENABLE_MASK_ARBITRARY "Enable arbitrary precision of bitmask variables (only Body::groupMask yet implemented) (experimental). Use -DMASK_ARBITRARY_SIZE=int to set number of used bits (256 by default)" OFF)
 OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)" OFF)
 OPTION(ENABLE_POTENTIAL_PARTICLES "Enable potential particles" OFF)
-OPTION(USE_QT5 "USE Qt5 for GUI" OFF)
+OPTION(USE_QT5 "USE Qt5 for GUI" ON)
 
 #===========================================================
 # Use Eigen3 by default

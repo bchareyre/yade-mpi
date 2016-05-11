@@ -143,8 +143,8 @@ need root privileges.
 		sudo apt-get install cmake git freeglut3-dev libloki-dev \
 		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
 		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
-		libgts-dev python-pygraphviz libvtk5-dev python-scientific libeigen3-dev \
-		python-xlib python-qt4 pyqt4-dev-tools gtk2-engines-pixbuf python-argparse \
+		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
+		python-xlib python-pyqt5 pyqt5-dev-tools gtk2-engines-pixbuf python-argparse \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
 		
@@ -243,16 +243,6 @@ The following options are available:
 
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_. 
-
-.. warning:: To provide Qt4->Qt5 migration one needs to provide an additional option USE_QT5.
- This option should be ON or OFF according to the Qt version, which was used
- to compile libQGLViewer. On Debian/Ubuntu operating systems libQGLViewer
- of version 2.6.3 and higher are compiled against Qt5 (for other operating systems
- refer to the package archive of your distribution), so if you are using
- such version, please switch this option ON. Otherwise, if you mix Qt-versions a
- ``Segmentation fault`` will appear just after Yade is started. To provide
- necessary build dependencies for Qt5, install ``python-pyqt5 pyqt5-dev-tools``
- instead of ``python-qt4 pyqt4-dev-tools``.
 
 If cmake finishes without errors, you will see all enabled 
 and disabled options at the end. Then start the actual compilation process with::
