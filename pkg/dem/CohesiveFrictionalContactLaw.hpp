@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include<core/GlobalEngine.hpp>
-#include<pkg/common/Dispatching.hpp>
-#include<pkg/common/ElastMat.hpp>
-#include<pkg/dem/ScGeom.hpp>
-#include<boost/tuple/tuple.hpp>
-#include<pkg/common/NormShearPhys.hpp>
-#include<pkg/dem/FrictPhys.hpp>
+#include <core/GlobalEngine.hpp>
+#include <pkg/common/Dispatching.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <pkg/dem/ScGeom.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <pkg/common/NormShearPhys.hpp>
+#include <pkg/dem/FrictPhys.hpp>
+#include <pkg/common/MatchMaker.hpp>
 
 
 // The following code was moved from CohFrictMat.hpp
@@ -146,6 +147,8 @@ class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys : public IPhysFunctor
 		"Generates cohesive-frictional interactions with moments, used in the contact law :yref:`Law2_ScGeom6D_CohFrictPhys_CohesionMoment`. The normal/shear stiffness and friction definitions are the same as in :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, check the documentation there for details.\n\nAdhesions related to the normal and the shear components are calculated from :yref:`CohFrictMat::normalCohesion` ($C_n$) and :yref:`CohFrictMat::shearCohesion` ($C_s$). For particles of size $R_1$,$R_2$ the adhesion will be $a_i=C_i min(R_1,R_2)^2$, $i=n,s$.\n\nTwist and rolling stiffnesses are proportional to the shear stiffness through dimensionless factors alphaKtw and alphaKr, such that the rotational stiffnesses are defined by $k_s \\alpha_i R_1 R_2$, $i=tw\\,r$",
 		((bool,setCohesionNow,false,,"If true, assign cohesion to all existing contacts in current time-step. The flag is turned false automatically, so that assignment is done in the current timestep only."))
 		((bool,setCohesionOnNewContacts,false,,"If true, assign cohesion at all new contacts. If false, only existing contacts can be cohesive (also see :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow`), and new contacts are only frictional."))	
+		((shared_ptr<MatchMaker>,normalCohesion,,,"Instance of :yref:`MatchMaker` determining tensile strength"))
+		((shared_ptr<MatchMaker>,shearCohesion,,,"Instance of :yref:`MatchMaker` determining cohesive part of the shear strength (a frictional term might be added depending on :yref:`CohFrictPhys::cohesionDisablesFriction`)"))
 		,
 		cohesionDefinitionIteration = -1;
 		);
