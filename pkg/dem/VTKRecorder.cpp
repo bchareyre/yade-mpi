@@ -698,19 +698,29 @@ void VTKRecorder::action(){
 			if (box){
 
 				Vector3r pos(scene->isPeriodic ? scene->cell->wrapShearedPt(b->state->pos) : b->state->pos);
+				Quaternionr ori(b->state->ori);
 				Vector3r ext(box->extents);
 				vtkSmartPointer<vtkQuad> boxes = vtkSmartPointer<vtkQuad>::New();
+
+				Vector3r A = Vector3r(-ext[0], -ext[1], -ext[2]);
+				Vector3r B = Vector3r(-ext[0], +ext[1], -ext[2]);
+				Vector3r C = Vector3r(+ext[0], +ext[1], -ext[2]);
+				Vector3r D = Vector3r(+ext[0], -ext[1], -ext[2]);
 				
-				Vector3r A = Vector3r(pos[0]-ext[0], pos[1]-ext[1], pos[2]-ext[2]);
-				Vector3r B = Vector3r(pos[0]-ext[0], pos[1]+ext[1], pos[2]-ext[2]);
-				Vector3r C = Vector3r(pos[0]+ext[0], pos[1]+ext[1], pos[2]-ext[2]);
-				Vector3r D = Vector3r(pos[0]+ext[0], pos[1]-ext[1], pos[2]-ext[2]);
-				
-				Vector3r E = Vector3r(pos[0]-ext[0], pos[1]-ext[1], pos[2]+ext[2]);
-				Vector3r F = Vector3r(pos[0]-ext[0], pos[1]+ext[1], pos[2]+ext[2]);
-				Vector3r G = Vector3r(pos[0]+ext[0], pos[1]+ext[1], pos[2]+ext[2]);
-				Vector3r H = Vector3r(pos[0]+ext[0], pos[1]-ext[1], pos[2]+ext[2]);
-				
+				Vector3r E = Vector3r(-ext[0], -ext[1], +ext[2]);
+				Vector3r F = Vector3r(-ext[0], +ext[1], +ext[2]);
+				Vector3r G = Vector3r(+ext[0], +ext[1], +ext[2]);
+				Vector3r H = Vector3r(+ext[0], -ext[1], +ext[2]);
+
+				A = pos + ori*A;
+				B = pos + ori*B;
+				C = pos + ori*C;
+				D = pos + ori*D;
+				E = pos + ori*E;
+				F = pos + ori*F;
+				G = pos + ori*G;
+				H = pos + ori*H;
+
 				addWallVTK(boxes, boxesPos, A, B, C, D);
 				boxesCells->InsertNextCell(boxes);
 				
