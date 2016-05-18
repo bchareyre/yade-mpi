@@ -448,6 +448,7 @@ def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
 	return tetras
 
 def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Quaternion((0,1,0),0.0),**kw):
+	from yade import polyhedra_utils
 	"""Load polyhedra from a text file.
 	
 	:param str filename: file name
