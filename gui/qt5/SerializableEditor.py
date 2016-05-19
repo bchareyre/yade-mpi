@@ -136,7 +136,7 @@ class AttrEditor_Complex(AttrEditor,QLineEdit):
 		self.setContentsMargins(0,0,0,0)
 		self.first=True
 		val=self.getter()
-		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setContentsMargins(0,0,0,0)
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
 			w=QLineEdit('')
 			self.grid.addWidget(w,row,col);
@@ -171,7 +171,7 @@ class AttrEditor_Quaternion(AttrEditor,QFrame):
 	def __init__(self,parent,getter,setter):
 		AttrEditor.__init__(self,getter,setter)
 		QFrame.__init__(self,parent)
-		self.grid=QHBoxLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		self.grid=QHBoxLayout(self); self.grid.setSpacing(0); self.grid.setContentsMargins(0,0,0,0)
 		for i in range(4):
 			if i==3:
 				# add vertical divider (axis | angle)
@@ -287,7 +287,7 @@ class AttrEditor_MatrixXi(AttrEditor,QFrame):
 		self.rows,self.cols=rows,cols
 		self.idxConverter=idxConverter
 		self.setContentsMargins(0,0,0,0)
-		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setMargin(0)
+		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setContentsMargins(0,0,0,0)
 		for row,col in itertools.product(range(self.rows),range(self.cols)):
 			w=QSpinBox()
 			w.setRange(int(-1e9),int(1e9)); w.setSingleStep(1);
