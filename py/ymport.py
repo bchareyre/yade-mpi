@@ -8,13 +8,14 @@ from yade import utils
 from minieigen import *
 
 
-def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
+def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,attrs=[],**kw):
 	"""Load sphere coordinates from file in specific format, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
 	
 	:param str filename: file name
-	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`
+	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`, 'x_y_z_r_attrs'
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
 	:param float scale: factor scales the given data.
+	:param list attrs: attrs read from file if export.textExt(format='x_y_z_r_attrs') were used ('passed by refernece' style)
 	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.sphere`
 	:returns: list of spheres.
 
@@ -41,6 +42,12 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,**kw):
 		elif (format=='id_x_y_z_r_matId'):
 			pos = Vector3(float(data[1]),float(data[2]),float(data[3]))
 			ret.append(utils.sphere(shift+scale*pos,scale*float(data[4]),material=int(data[5]),**kw))
+
+		elif (format=='x_y_z_r_attrs'):
+			pos = Vector3(float(data[0]),float(data[1]),float(data[2]))
+			s = utils.sphere(shift+scale*pos,scale*float(data[3]),**kw)
+			ret.append(s)
+			attrs.append(data[4:])
 			
 		else:
 			raise RuntimeError("Please, specify a correct format output!");
