@@ -1,0 +1,14 @@
+A series of scripts that prepare and agglomerate packing, i.e. cohesive elastic aggregates, each composed of dense particle packing
+
+A general idea:
+- create a "macro" particles as large spheres using makeCloud
+- "mesh" these macroparticles with smaller spheres
+- run compression to make the loose packing denser
+- save the result
+- use the resulting packing in actual simulation
+
+Scripts in order to run:
+- makeCloud.py  ... a script to prepare loose packing of macro particles using makeCloud
+- divide.py     ... a script to divide the macro particles from previous step into clump of particles
+- compress.py   ... a script to create dense packing of agglomerates
+- simulation.py ... use of prepared dense packing of agglomerates in a simple simulation
