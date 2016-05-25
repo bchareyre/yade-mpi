@@ -1,6 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse, os, git, shutil, sys, time
-
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument("-i", help="config file")
@@ -12,7 +11,7 @@ args = parser.parse_args()
 configfile = args.i
 jobsNumber = args.jobsNumber
 
-infileconf  = open(configfile)
+infileconf  = open(configfile, 'r')
 linesconf   = infileconf.readlines()
 gitdebdir   = linesconf[1].strip()
 pbdir       = linesconf[4].strip()
@@ -41,17 +40,19 @@ assert repodeb.bare == False
 assert repoups.bare == False
 
 if (repodeb.is_dirty()):
+    print (repodeb.untracked_files)
     raise RuntimeError('Git-debian-repo has an uncommitted changes. Exiting.')
 
 if (repoups.is_dirty()):
+    print (repoups.untracked_files)
     raise RuntimeError('Git-upstream-repo has an uncommitted changes. Exiting.')
 
 for branch in repodeb.branches:
     branchstr = str(branch)
-    if (branchstr<>'master'):
-        print "Switching to branch %s"%(branch)
+    if (branchstr!='master'):
+        print ("Switching to branch %s"%(branch))
         repodeb.git.checkout(branch)
-        infile = open(gitdebdir+"/pbuilder")
+        infile = open(gitdebdir+"/pbuilder", 'r')
         lines = infile.readlines()
         mirror = lines[0].strip()
         components = lines[1].strip()
@@ -70,14 +71,14 @@ for branch in repodeb.branches:
                 if (othermirror!="#"):
                     createPbTar += ' --othermirror "' + othermirror + '"'
                     addAllowuntrusted =  " --allow-untrusted "
-                print createPbTar
+                print (createPbTar)
 
-                print "Creating tarball %s"%(tarball)
+                print ("Creating tarball %s"%(tarball))
                 os.system(createPbTar)
             else:
-                print "Tarball %s exists"%(tarball)
+                print ("Tarball %s exists"%(tarball))
                 if (args.update):
-                    print "Updating %s as requested" %(tarball)
+                    print ("Updating %s as requested" %(tarball))
                     updatePbTar = ('sudo pbuilder --update --basetgz %s'%(tarball))
                     os.system(updatePbTar)
             
@@ -94,8 +95,8 @@ for branch in repodeb.branches:
             versiondebian = repoups.git.describe()[0:-8] + repoups.head.commit.hexsha[0:7] + "~" + branchstr
 
             # Get package name
-            infilepname = open(gitdebdir+"/changelog"); sourcePackName = infilepname.readlines()[0].split()[0]
-            print sourcePackName
+            infilepname = open(gitdebdir+"/changelog", 'r'); sourcePackName = infilepname.readlines()[0].split()[0]
+            print (sourcePackName)
 
             os.system('cd %s; apack %s_%s.orig.tar.xz build'%(builddirup,sourcePackName,versiondebian))
             shutil.copytree(gitdebdir, builddirdeb+"/debian")
@@ -109,10 +110,10 @@ for branch in repodeb.branches:
             if (len(archs)>1 and a != archs[0]):
               buildarch = '--binary-arch'     #Build only arch-packages
             
-            print "Building package %s_%s"%(sourcePackName, versiondebian)
+            print ("Building package %s_%s"%(sourcePackName, versiondebian))
             buildPackage = ('sudo pbuilder --build --architecture %s --basetgz %s %s --logfile %s/pbuilder.log --debbuildopts "-j%d" --buildresult %s %s %s/*.dsc'%
                 (a, tarball, addAllowuntrusted, builddirup, jobsNumber, builddirres, buildarch, builddirup))
-            print buildPackage
+            print (buildPackage)
             os.system(buildPackage)
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, builddirup))
             os.system('sudo chown %s:%s %s * -R'%(userg, groupg, gitdebdir))
@@ -121,5 +122,5 @@ for branch in repodeb.branches:
 
 for branch in repodeb.branches:
     branchstr = str(branch)
-    if (branchstr<>'master'):
-        os.system('rm %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --digest-algo SHA512 --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
+    if (branchstr!='master'):
+        os.system('rm -rf %s/%s/Release.gpg ; su %s -c \'gpg --no-tty --digest-algo SHA512 --batch --default-key "%s" --detach-sign --passphrase-fd=0 --passphrase-file=%s -o %s/%s/Release.gpg %s/%s/Release\''%(patharchive, branch, userg, keyg, keypasspath, patharchive, branch, patharchive, branch))
