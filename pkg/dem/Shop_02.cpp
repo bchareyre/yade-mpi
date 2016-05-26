@@ -282,6 +282,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	Fmean=0; // initialize
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
+		if( !dynamic_cast<Sphere*>(Body::byId(I->getId1(),scene)->shape.get()) || !dynamic_cast<Sphere*>(Body::byId(I->getId2(),scene)->shape.get()) ) continue; // test intended to disregard boundary interactions (in non-periodic simulations)
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		const Vector3r& n=geom->normal;
@@ -303,6 +304,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	if (!splitTensor & !std::isnan(thresholdForce)) {LOG_WARN("The bool splitTensor should be set to True if you specified a threshold value for the contact force, otherwise the function will return only the fabric tensor and not the two separate contributions.");}
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
+		if( !dynamic_cast<Sphere*>(Body::byId(I->getId1(),scene)->shape.get()) || !dynamic_cast<Sphere*>(Body::byId(I->getId2(),scene)->shape.get()) ) continue; // test intended to disregard boundary interactions (in non-periodic simulations)
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		const Vector3r& n=geom->normal;
