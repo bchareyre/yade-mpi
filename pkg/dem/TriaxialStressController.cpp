@@ -169,31 +169,43 @@ void TriaxialStressController::action()
 		Vector3r wallForce (0, goal2*width*depth, 0);
 		if (wall_bottom_activated) {
 			if (stressMask & 2)  controlExternalStress(wall_bottom, wallForce, p_bottom, max_vel2);
-			else p_bottom->vel[1] += (-normal[wall_bottom][1]*0.5*goal2*height -p_bottom->vel[1])*(1-strainDamping);
+			else {
+				p_bottom->vel[1] += (-normal[wall_bottom][1]*0.5*goal2*height -p_bottom->vel[1])*(1-strainDamping);
+				externalWork += p_bottom->vel.dot(getForce(scene,wall_bottom_id))*scene->dt;}
 		} else p_bottom->vel=Vector3r::Zero();
 		if (wall_top_activated) {
 			if (stressMask & 2)  controlExternalStress(wall_top, -wallForce, p_top, max_vel2);
-			else p_top->vel[1] += (-normal[wall_top][1]*0.5*goal2*height -p_top->vel[1])*(1-strainDamping);
+			else {
+				p_top->vel[1] += (-normal[wall_top][1]*0.5*goal2*height -p_top->vel[1])*(1-strainDamping);
+				externalWork += p_top->vel.dot(getForce(scene,wall_top_id))*scene->dt;}
 		} else p_top->vel=Vector3r::Zero();
 		
 		wallForce = Vector3r(goal1*height*depth, 0, 0);
 		if (wall_left_activated) {
 			if (stressMask & 1) controlExternalStress(wall_left, wallForce, p_left, max_vel1);
-			else p_left->vel[0] += (-normal[wall_left][0]*0.5*goal1*width -p_left->vel[0])*(1-strainDamping);
+			else {
+				p_left->vel[0] += (-normal[wall_left][0]*0.5*goal1*width -p_left->vel[0])*(1-strainDamping);
+				externalWork += p_left->vel.dot(getForce(scene,wall_left_id))*scene->dt;}
 		} else p_left->vel=Vector3r::Zero();
 		if (wall_right_activated) {
 			if (stressMask & 1) controlExternalStress(wall_right, -wallForce, p_right, max_vel1);
-			else p_right->vel[0] += (-normal[wall_right][0]*0.5*goal1*width -p_right->vel[0])*(1-strainDamping);
+			else {
+				p_right->vel[0] += (-normal[wall_right][0]*0.5*goal1*width -p_right->vel[0])*(1-strainDamping);
+				externalWork += p_right->vel.dot(getForce(scene,wall_right_id))*scene->dt;}
 		} else p_right->vel=Vector3r::Zero();
 
 		wallForce = Vector3r(0, 0, goal3*height*width);
 		if (wall_back_activated) {
 			if (stressMask & 4) controlExternalStress(wall_back, wallForce, p_back, max_vel3);
-			else p_back->vel[2] += (-normal[wall_back][2]*0.5*goal3*depth -p_back->vel[2])*(1-strainDamping);
+			else {
+				p_back->vel[2] += (-normal[wall_back][2]*0.5*goal3*depth -p_back->vel[2])*(1-strainDamping);
+				externalWork += p_back->vel.dot(getForce(scene,wall_back_id))*scene->dt;}
 		} else p_back->vel=Vector3r::Zero();
 		if (wall_front_activated) {
 			if (stressMask & 4) controlExternalStress(wall_front, -wallForce, p_front, max_vel3);
-			else p_front->vel[2] += (-normal[wall_front][2]*0.5*goal3*depth -p_front->vel[2])*(1-strainDamping);
+			else {
+				p_front->vel[2] += (-normal[wall_front][2]*0.5*goal3*depth -p_front->vel[2])*(1-strainDamping);
+				externalWork += p_front->vel.dot(getForce(scene,wall_front_id))*scene->dt;}
 		} else p_front->vel=Vector3r::Zero();
 	}
 	else //if internal compaction
