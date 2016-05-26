@@ -701,7 +701,7 @@ Real Shop::getSpheresVolume2D(const shared_ptr<Scene>& _scene, int mask){
 	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
 	Real vol=0;
 	FOREACH(shared_ptr<Body> b, *scene->bodies){
-		if (!b || !b->isDynamic()) continue;
+		if (!b) continue;
 		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
 		if((!s) or ((mask>0) and ((b->groupMask & mask)==0))) continue;
 		vol += Mathr::PI*pow(s->radius,2);
