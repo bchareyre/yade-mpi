@@ -281,8 +281,9 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 /* Plotting */
 
 #ifdef YADE_OPENGL
-	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include <lib/opengl/OpenGLWrapper.hpp>
 	bool Gl1_Polyhedra::wire;
+	
 	void Gl1_Polyhedra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3r(cm->color[0],cm->color[1],cm->color[2]));
@@ -293,20 +294,33 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 		if (wire || wire2) { 
 			glDisable(GL_LIGHTING);
 			glBegin(GL_LINES);
-				#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
-					for(int tri=0; tri < (int) faceTri.size(); tri+=3) {__ONEWIRE(faceTri[tri],faceTri[tri+1]); __ONEWIRE(faceTri[tri],faceTri[tri+2]); __ONEWIRE(faceTri[tri+1],faceTri[tri+2]);}
-				#undef __ONEWIRE
+			for(int tri=0; tri < (int) faceTri.size(); tri+=3) {
+				glOneWire(t, faceTri[tri], faceTri[tri+1]);
+				glOneWire(t, faceTri[tri], faceTri[tri+2]);
+				glOneWire(t, faceTri[tri+1], faceTri[tri+2]);
+			}
 			glEnd();
 		}
 		else
 		{
 			Vector3r centroid = t->GetCentroid();
-			Vector3r faceCenter, n;
 			glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
-				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]); n.normalize(); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-centroid).dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
-					for(int tri=0; tri < (int) faceTri.size(); tri+=3) {__ONEFACE(faceTri[tri],faceTri[tri+1],faceTri[tri+2]);}
-				#undef __ONEFACE
+			for(int tri=0; tri < (int) faceTri.size(); tri+=3) {
+				const auto a = faceTri[tri+0];
+				const auto b = faceTri[tri+1];
+				const auto c = faceTri[tri+2];
+				
+				Vector3r n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]);
+				n.normalize();
+				Vector3r faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.;
+				if((faceCenter-centroid).dot(n)<0) n=-n;
+				
+				glNormal3v(n);
+				glVertex3v(t->v[a]);
+				glVertex3v(t->v[b]);
+				glVertex3v(t->v[c]);
+			}
 			glEnd();
 		}
 	}

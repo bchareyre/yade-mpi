@@ -981,7 +981,8 @@ void TetraVolumetricLaw::action()
 }
 
 #ifdef YADE_OPENGL
-	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include <lib/opengl/OpenGLWrapper.hpp>
+	
 	bool Gl1_Tetra::wire;
 	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
 	{
@@ -991,22 +992,22 @@ void TetraVolumetricLaw::action()
 		if (wire && wire2) { // wireframe, as for Tetrahedron
 			glDisable(GL_LIGHTING);
 			glBegin(GL_LINES);
-				#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
-					__ONEWIRE(0,1);__ONEWIRE(0,2);__ONEWIRE(0,3);__ONEWIRE(1,2);__ONEWIRE(1,3);__ONEWIRE(2,3);
-				#undef __ONEWIRE
+				glOneWire(t, 0, 1);
+				glOneWire(t, 0, 2);
+				glOneWire(t, 0, 3);
+				glOneWire(t, 1, 2);
+				glOneWire(t, 1, 3);
+				glOneWire(t, 2, 3);
 			glEnd();
 		}
 		else
 		{
-			Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
 			glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
-				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]); n.normalize(); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
-					__ONEFACE(0,2,1);
-					__ONEFACE(0,1,3);
-					__ONEFACE(1,2,3);
-					__ONEFACE(0,3,2);
-				#undef __ONEFACE
+				glOneFace (t, 0,2,1);
+				glOneFace (t, 0,1,3);
+				glOneFace (t, 1,2,3);
+				glOneFace (t, 0,3,2);
 			glEnd();
 		}
 	}

@@ -214,4 +214,18 @@ template< > inline void glMaterial< int >			( GLenum face, GLenum pname, int par
 template< > inline void glMaterialv< Vector3r >	( GLenum face, GLenum pname, const Vector3r params )	{	const GLfloat _p[3]={(float) params[0], (float) params[1], (float) params[2]}; glMaterialfv(face,pname,_p);	};
 template< > inline void glMaterialv< Vector3i >		( GLenum face, GLenum pname, const Vector3i params )	{	glMaterialiv(face,pname,(int*)&params);	};
 
+template< typename Type > inline void glOneWire(Type & t, unsigned int a, unsigned int b) { glVertex3v(t->v[a]); glVertex3v(t->v[b]); }
+ 
+template< typename Type > inline void glOneFace(Type & t, unsigned int a, unsigned int b, unsigned int c) {
+	const Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25;
+	Vector3r n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]);
+	n.normalize();
+	const Vector3r faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.;
+	if((faceCenter-center).dot(n)<0) n=-n;
+	glNormal3v(n);
+	glVertex3v(t->v[a]);
+	glVertex3v(t->v[b]);
+	glVertex3v(t->v[c]);
+}
+
 #undef LDOUBL

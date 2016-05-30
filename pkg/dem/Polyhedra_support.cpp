@@ -12,15 +12,15 @@
 //EMPRIRICAL CONSTANTS - ADJUST IF SEGMENTATION FAULT OCCUR, IT IS A PROBLEM OF CGAL. THESE ARE USED TO CHECK CGAL IMPUTS
 //DISTANCE_LIMIT controls numerical issues in calculating intersection. It should be small enough to neglect only extremely
 //small overlaps, but large enough to prevent errors during computation of convex hull
-#define DISTANCE_LIMIT 2E-11//-11
+const Real DISTANCE_LIMIT = 2E-11;
 //MERGE_PLANES_LIMIT - if two facets of two intersecting polyhedron differ less, then they are treated ose one only
-#define MERGE_PLANES_LIMIT 1E-18 //18
+const Real MERGE_PLANES_LIMIT = 1E-18; //18
 //SIMPLIFY_LIMIT - if two facets of one polyhedron differ less, then they are joint into one facet
-#define SIMPLIFY_LIMIT 1E-19 //19
+const Real SIMPLIFY_LIMIT = 1E-19; //19
 //FIND_NORMAL_LIMIT - to determine which facet of intersection belongs to which polyhedron
-#define FIND_NORMAL_LIMIT 1E-40
+const Real FIND_NORMAL_LIMIT = 1E-40;
 //SPLITTER_GAP - creates gap between splitted polyhedrons
-#define SPLITTER_GAP 1E-8
+const Real SPLITTER_GAP = 1E-8;
 
 
 //**********************************************************************************
