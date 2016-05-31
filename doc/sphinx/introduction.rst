@@ -160,6 +160,8 @@ Normal simulations, however, are run continuously. Starting/stopping the loop is
 	In [1]: O.run(100000,True)
 
 	In [1]: O.stopAtIter=500000
+        
+	In [1]: O.run()
 
 	In [1]: O.wait()
 

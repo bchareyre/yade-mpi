@@ -334,7 +334,7 @@ A particle object is not yet part of the simulation; in order to do so, a specia
 
 .. ipython::
 
-	Yade [1]: O.bodies.append(s)            # adds particle s to the simulation; returns id of the particle(s) added
+	Yade [1]: idS = O.bodies.append(s)            # adds particle s to the simulation; returns id of the particle(s) added
 
 
 Packs
