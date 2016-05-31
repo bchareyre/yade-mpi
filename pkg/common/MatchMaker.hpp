@@ -1,6 +1,7 @@
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<lib/serialization/Serializable.hpp>
+#include <lib/serialization/Serializable.hpp>
+#include <boost/unordered_map.hpp>
 
 namespace py = boost::python;
 
@@ -11,7 +12,6 @@ namespace py = boost::python;
 
 */
 class MatchMaker: public Serializable {
-	#if 1
 		Real fbZero(Real v1, Real v2) const{ return 0.; }
 		Real fbAvg(Real v1, Real v2) const{ return (v1+v2)/2.; }
 		Real fbMin(Real v1, Real v2) const{ return min(v1,v2); }
@@ -22,7 +22,10 @@ class MatchMaker: public Serializable {
 		// whether the current fbPtr function needs valid input values in order to give meaningful result.
 		// must be kept in sync with fbPtr, which is done in postLoad
 		bool fbNeedsValues;
-	#endif 
+		
+		// unordered set for a fast coefficient search
+		boost::unordered_map<std::pair<int, int>, Real> matchSet;
+		
 	public:
 		virtual ~MatchMaker() {};
 		MatchMaker(std::string _algo): algo(_algo){ postLoad(*this); }
@@ -34,7 +37,7 @@ class MatchMaker: public Serializable {
 		// if no match is found and val1 or val2 are not given, throw exception
 		Real operator()(const int id1, const int id2, const Real val1=NaN, const Real val2=NaN) const;
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(MatchMaker,Serializable,"Class matching pair of ids to return pre-defined (for a pair of ids defined in :yref:`matches<MatchMaker.matches>`) or derived value (computed using :yref:`algo<MatchMaker.algo>`) of a scalar parameter. It can be called (``id1``, ``id2``, ``val1=NaN``, ``val2=NaN``) in both python and c++. \n\n.. note:: There is a :ref:`converter <customconverters>` from python number defined for this class, which creates a new :yref:`MatchMaker` returning the value of that number; instead of giving the object instance therefore, you can only pass the number value and it will be converted automatically.",
-			((std::vector<Vector3r>,matches,,,"Array of ``(id1,id2,value)`` items; queries matching ``id1`` + ``id2`` or ``id2`` + ``id1`` will return ``value``"))
+			((std::vector<Vector3r>,matches,,Attr::readonly,"Array of ``(id1,id2,value)`` items; queries matching ``id1`` + ``id2`` or ``id2`` + ``id1`` will return ``value``"))
 			((std::string,algo,"avg",Attr::triggerPostLoad,"Alogorithm used to compute value when no match for ids is found. Possible values are\n\n* 'avg' (arithmetic average)\n* 'min' (minimum value)\n* 'max' (maximum value)\n* 'harmAvg' (harmonic average)\n\nThe following algo algorithms do *not* require meaningful input values in order to work:\n\n* 'val' (return value specified by :yref:`val<MatchMaker.val>`)\n* 'zero' (always return 0.)\n\n"))
 			((Real,val,NaN,,"Constant value returned if there is no match and :yref:`algo<MatchMaker::algo>` is ``val``"))
 			, fbPtr=&MatchMaker::fbAvg; fbNeedsValues=true; /* keep in sync with the algo value for algo */
