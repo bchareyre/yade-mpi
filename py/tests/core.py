@@ -218,3 +218,51 @@ class TestMaterials(unittest.TestCase):
 		self.assertRaises(KeyError,lambda: O.materials['nonexistent label'])
 		self.assert_(O.materials['materialZero']==O.materials[0])
 
+class TestMatchMaker(unittest.TestCase):
+	def setUp(self):
+		O.reset();
+		
+	def testMatchMakerCollisions(self):
+		fr = 0.5;rho=2000
+		tc = 0.001; en = 0.5; et = 0.5;
+		mat1 = O.materials.append(ViscElMat(frictionAngle=fr,tc=tc,en=en,et=et,density=rho))
+		mat2 = O.materials.append(ViscElMat(frictionAngle=fr,tc=tc,en=en,et=et,density=rho))
+		mat3 = O.materials.append(ViscElMat(frictionAngle=fr,tc=tc,en=en,et=et,density=rho))
+		r1 = 0.002381
+		r2 = 0.002381
+		id11 = O.bodies.append(utils.sphere(center=[0,0,0],radius=r1,material=mat1,fixed=True,color=[0,0,1]))
+		id12 = O.bodies.append(utils.sphere(center=[0,0,(r1+r2)],radius=r2,material=mat2,fixed=False,color=[0,0,1]))
+		
+		id21 = O.bodies.append(utils.sphere(center=[3*r1,0,0],radius=r1,material=mat1,fixed=True,color=[0,1,0]))
+		id22 = O.bodies.append(utils.sphere(center=[3*r1,0,(r1+r2)],radius=r2,material=mat3,fixed=False,color=[0,1,0]))
+		
+		id31 = O.bodies.append(utils.sphere(center=[6*r1,0,0],radius=r1,material=mat2,fixed=True,color=[1,0,0]))
+		id32 = O.bodies.append(utils.sphere(center=[6*r1,0,(r1+r2)],radius=r2,material=mat3,fixed=False,color=[1,0,0]))
+		
+		O.engines = [
+			ForceResetter(),
+			InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=r1*10.0),
+			InteractionLoop(
+				[Ig2_Sphere_Sphere_ScGeom()],
+				[Ip2_ViscElMat_ViscElMat_ViscElPhys( 
+					en=MatchMaker(matches=((mat1,mat2,.1),(mat1,mat3,.2),(mat2,mat3,.4))),
+					et=MatchMaker(matches=((mat1,mat2,.7),(mat1,mat3,.8),(mat2,mat3,.9))),
+					frictAngle=MatchMaker(matches=((mat1,mat2,.1),(mat1,mat3,.2),(mat2,mat3,.3)))
+				)],
+				[Law2_ScGeom_ViscElPhys_Basic()],
+				),
+			NewtonIntegrator(damping=0,gravity=[0,0,-9.81]),
+		]
+		
+		O.step()
+		self.assertTrue((atan(O.interactions[id11,id12].phys.tangensOfFrictionAngle)-0.1)==0)
+		self.assertTrue((atan(O.interactions[id21,id22].phys.tangensOfFrictionAngle)-0.2)==0)
+		self.assertTrue((atan(O.interactions[id31,id32].phys.tangensOfFrictionAngle)-0.3)==0)
+		
+		self.assertTrue(round(O.interactions[id11,id12].phys.cn, 3) - 0.26 == 0)
+		self.assertTrue(round(O.interactions[id21,id22].phys.cn, 3) - 0.182 == 0)
+		self.assertTrue(round(O.interactions[id31,id32].phys.cn, 3) - 0.104 == 0)
+
+		self.assertTrue(round(O.interactions[id11,id12].phys.cs, 3) - 0.012== 0)
+		self.assertTrue(round(O.interactions[id21,id22].phys.cs, 3) - 0.007 == 0)
+		self.assertTrue(round(O.interactions[id31,id32].phys.cs, 3) - 0.003 == 0)
