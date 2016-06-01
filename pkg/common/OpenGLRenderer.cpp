@@ -3,23 +3,16 @@
 
 #ifdef YADE_OPENGL
 
-#include"OpenGLRenderer.hpp"
-#include<lib/opengl/OpenGLWrapper.hpp>
-#include<lib/opengl/GLUtils.hpp>
-#include<core/Timing.hpp>
-#include<core/Scene.hpp>
-#include<pkg/common/Aabb.hpp>
-#include<lib/pyutil/gil.hpp>
+#include "OpenGLRenderer.hpp"
+#include <lib/opengl/GLUtils.hpp>
+#include <core/Timing.hpp>
+#include <core/Scene.hpp>
+#include <pkg/common/Aabb.hpp>
+#include <lib/pyutil/gil.hpp>
 
-#ifdef __APPLE__
-#  include <OpenGL/glu.h>
-#  include <OpenGL/gl.h>
-#  include <GLUT/glut.h>
-#else
-#  include <GL/glu.h>
-#  include <GL/gl.h>
-#  include <GL/glut.h>
-#endif
+#include <GL/glu.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
 
 YADE_PLUGIN((OpenGLRenderer)(GlExtraDrawer));
 CREATE_LOGGER(OpenGLRenderer);
@@ -29,7 +22,6 @@ void GlExtraDrawer::render(){ throw runtime_error("GlExtraDrawer::render called 
 bool OpenGLRenderer::initDone=false;
 const int OpenGLRenderer::numClipPlanes;
 OpenGLRenderer::~OpenGLRenderer(){}
-
 
 void OpenGLRenderer::init(){
 	typedef std::pair<string,DynlibDescriptor> strDldPair; // necessary as FOREACH, being macro, cannot have the "," inside the argument (preprocessor does not parse templates)
@@ -52,12 +44,6 @@ void OpenGLRenderer::init(){
 	}
 
 	initDone=true;
-	// glGetError crashes at some machines?! Was never really useful, anyway.
-	// reported http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01482.html
-	#if 0
-		int e=glGetError();
-		if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderer::init returned GL error ")+boost::lexical_cast<string>(e)).c_str());
-	#endif
 }
 
 void OpenGLRenderer::setBodiesRefSe3(){
@@ -66,16 +52,22 @@ void OpenGLRenderer::setBodiesRefSe3(){
 	scene->cell->refHSize=scene->cell->hSize;
 }
 
+template<class FunctorType, class DispatcherT>
+void OpenGLRenderer::setupDispatcher(const vector<string> & names, DispatcherT & dispatcher) {
+	dispatcher.clearMatrix();
+	for(const auto & s : names) {
+		shared_ptr<FunctorType> f(boost::static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(s)));
+		f->initgl();
+		dispatcher.add(f);
+	}
+}
 
 void OpenGLRenderer::initgl(){
 	LOG_DEBUG("(re)initializing GL for gldraw methods.\n");
-	#define _SETUP_DISPATCHER(names,FunctorType,dispatcher) dispatcher.clearMatrix(); FOREACH(string& s,names) {shared_ptr<FunctorType> f(boost::static_pointer_cast<FunctorType>(ClassFactory::instance().createShared(s))); f->initgl(); dispatcher.add(f);}
-		// _SETUP_DISPATCHER(stateFunctorNames,GlStateFunctor,stateDispatcher);
-		_SETUP_DISPATCHER(boundFunctorNames,GlBoundFunctor,boundDispatcher);
-		_SETUP_DISPATCHER(shapeFunctorNames,GlShapeFunctor,shapeDispatcher);
-		_SETUP_DISPATCHER(geomFunctorNames,GlIGeomFunctor,geomDispatcher);
-		_SETUP_DISPATCHER(physFunctorNames,GlIPhysFunctor,physDispatcher);
-	#undef _SETUP_DISPATCHER
+	setupDispatcher<GlBoundFunctor, GlBoundDispatcher> (boundFunctorNames, boundDispatcher);
+	setupDispatcher<GlShapeFunctor, GlShapeDispatcher> (shapeFunctorNames, shapeDispatcher);
+	setupDispatcher<GlIGeomFunctor, GlIGeomDispatcher> (geomFunctorNames, geomDispatcher);
+	setupDispatcher<GlIPhysFunctor, GlIPhysDispatcher> (physFunctorNames, physDispatcher);
 }
 
 bool OpenGLRenderer::pointClipped(const Vector3r& p){
@@ -83,7 +75,6 @@ bool OpenGLRenderer::pointClipped(const Vector3r& p){
 	for(int i=0;i<numClipPlanes;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).dot(clipPlaneNormals[i])<0) return true;
 	return false;
 }
-
 
 void OpenGLRenderer::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) {
@@ -228,8 +219,6 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 			d->render();
 		glPopMatrix();
 	}
-
-
 }
 
 void OpenGLRenderer::renderAllInteractionsWire(){
@@ -287,7 +276,6 @@ void OpenGLRenderer::renderIGeom(){
 		}
 	}
 }
-
 
 void OpenGLRenderer::renderIPhys(){
 	physDispatcher.scene=scene.get(); physDispatcher.updateScenePtr();
@@ -411,6 +399,5 @@ void OpenGLRenderer::renderShape(){
 		glPopName();
 	}
 }
-
 
 #endif /* YADE_OPENGL */

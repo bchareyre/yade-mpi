@@ -2,12 +2,10 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
-#include<lib/multimethods/DynLibDispatcher.hpp>
-#include<core/Dispatcher.hpp>
-#include<core/Body.hpp>
-#include<lib/opengl/OpenGLWrapper.hpp>
-
-#include<pkg/common/GLDrawFunctors.hpp>
+#include <lib/multimethods/DynLibDispatcher.hpp>
+#include <core/Dispatcher.hpp>
+#include <core/Body.hpp>
+#include <pkg/common/GLDrawFunctors.hpp>
 
 struct GlExtraDrawer: public Serializable{
 	Scene* scene;
@@ -88,6 +86,7 @@ class OpenGLRenderer : public Serializable
 		// called also to render selectable entitites;
 		void renderShape();
 		void renderAllInteractionsWire();
+		template<class FunctorType, class DispatcherT> void setupDispatcher(const vector<string> & names, DispatcherT & dispatcher);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
 		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),,"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
