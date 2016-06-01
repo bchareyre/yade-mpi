@@ -279,7 +279,7 @@ class Law2_ScGeom_CpmPhys_Cpm: public LawFunctor{
 		((Real,yieldLogSpeed,.1,,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
 		((Real,yieldEllipseShift,NaN,,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
 		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),,"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
-		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),,"Strain at which softening in compression starts (non-negative to deactivate)"))
+		((Real,epsSoft,((void)"approximates confinement (for -3e-3) -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-std::numeric_limits<Real>::lowest()),,"Strain at which softening in compression starts (non-negative to deactivate). The default value is such that plasticity does not occur"))
 		((Real,relKnSoft,.3,,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
 		/*ctor*/,
 		.def("yieldSigmaTMagnitude",&Law2_ScGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
