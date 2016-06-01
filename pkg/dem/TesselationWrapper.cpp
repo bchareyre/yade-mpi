@@ -8,14 +8,17 @@
 
 #ifdef YADE_CGAL
 
-#include<pkg/dem/Shop.hpp>
-#include"TesselationWrapper.hpp"
-#include<lib/triangulation/Timer.h>
-#include<pkg/dem/SpherePack.hpp>
-#include<lib/pyutil/numpy.hpp>
+#include <pkg/dem/Shop.hpp>
+#include "TesselationWrapper.hpp"
+#include <lib/triangulation/Timer.h>
+#include <pkg/dem/SpherePack.hpp>
+#include <lib/pyutil/numpy_boost.hpp>
 
 YADE_PLUGIN((TesselationWrapper));
 CREATE_LOGGER(TesselationWrapper);
+
+// helper macro do assign Matrix3r values to subarrays
+#define MATRIX3R_TO_NUMPY(mat,arr) arr[0]=mat(0,0);arr[1]=mat(0,1);arr[2]=mat(0,2);arr[3]=mat(1,0);arr[4]=mat(1,1);arr[5]=mat(1,2);arr[6]=mat(2,0);arr[7]=mat(2,1);arr[8]=mat(2,2);
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
