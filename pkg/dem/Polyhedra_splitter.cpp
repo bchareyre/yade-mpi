@@ -13,7 +13,7 @@
 YADE_PLUGIN((PolyhedraSplitter));
 CREATE_LOGGER(PolyhedraSplitter);
 
-using PSplitT = std::tuple<const shared_ptr<Body>&, Vector3r, Vector3r>;
+using PSplitT = std::tuple<const shared_ptr<Body>, Vector3r, Vector3r>;
 
 //*********************************************************************************
 /* Evaluate tensorial stress estimation in polyhedras */
@@ -81,7 +81,7 @@ void PolyhedraSplitter::action()
 	vector<Matrix3r> bStresses (scene->bodies->size(), Matrix3r::Zero());
 	getStressForEachBody(bStresses);
 
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	for(const auto b : *(rb->bodies)) {
 		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		shared_ptr<PolyhedraMat> m=YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
