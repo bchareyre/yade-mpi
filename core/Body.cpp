@@ -21,9 +21,9 @@ boost::python::list Body::py_intrs(){
 }
 
 // return list of interactions of this particle
-unsigned int Body::coordNumber(){
+const unsigned int Body::coordNumber() const {
 	unsigned int intrSize = 0;
-	for(Body::MapId2IntrT::iterator it=this->intrs.begin(),end=this->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
+	for(auto it=this->intrs.begin(),end=this->intrs.end(); it!=end; ++it) {  //Iterate over all bodie's interactions
 		if(!(*it).second->isReal()) continue;
 		intrSize++;
 	}

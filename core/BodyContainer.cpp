@@ -14,7 +14,7 @@ void BodyContainer::clear(){
 	body.clear();
 }
 
-Body::id_t BodyContainer::insert(shared_ptr<Body>& b){
+Body::id_t BodyContainer::insert(shared_ptr<Body> b){
 	const shared_ptr<Scene>& scene=Omega::instance().getScene(); 
 	b->iterBorn=scene->iter;
 	b->timeBorn=scene->time;
@@ -41,8 +41,8 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 		const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
 		std::map<Body::id_t,Se3r>& members = clump->members;
 		std::vector<Body::id_t> idsToRemove;
-		FOREACH(MemberMap::value_type mm, members) idsToRemove.push_back(mm.first); // Prepare an array of ids, which need to be removed.
-		FOREACH(Body::id_t memberId, idsToRemove){
+		for(const auto mm : members) idsToRemove.push_back(mm.first); // Prepare an array of ids, which need to be removed.
+		for(Body::id_t memberId : idsToRemove){
 			if (eraseClumpMembers) {
 				this->erase(memberId,false);	// erase members
 			} else {
@@ -54,7 +54,7 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 		return true;
 	}
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
-	for(Body::MapId2IntrT::iterator it=b->intrs.begin(),end=b->intrs.end(); it!=end; ++it) {  //Iterate over all body's interactions
+	for(auto it=b->intrs.begin(), end=b->intrs.end(); it!=end; ++it) {  //Iterate over all body's interactions
 		scene->interactions->requestErase((*it).second);
 	}
 	b->id=-1;//else it sits in the python scope without a chance to be inserted again

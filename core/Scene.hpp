@@ -10,19 +10,16 @@
 
 #pragma once
 
-#include<core/Body.hpp>
-#include<core/Cell.hpp>
-#include<core/BodyContainer.hpp>
-#include<core/Engine.hpp>
-#include<core/Material.hpp>
-#include<core/DisplayParameters.hpp>
-#include<core/ForceContainer.hpp>
-#include<core/InteractionContainer.hpp>
-#include<core/EnergyTracker.hpp>
+#include <core/Body.hpp>
+#include <core/Cell.hpp>
+#include <core/BodyContainer.hpp>
+#include <core/Engine.hpp>
+#include <core/Material.hpp>
+#include <core/DisplayParameters.hpp>
+#include <core/ForceContainer.hpp>
+#include <core/InteractionContainer.hpp>
+#include <core/EnergyTracker.hpp>
 
-#ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX 255 
-#endif
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
@@ -33,6 +30,8 @@ class Bound;
 #endif
 
 class Scene: public Serializable{
+	const unsigned int hostNameMax = 255;
+	
 	public:
 		//! Adds material to Scene::materials. It also sets id of the material accordingly and returns it.
 		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
@@ -58,7 +57,6 @@ class Scene: public Serializable{
 		bool timeStepperActivate(bool activate);
 		static const int nSpeedIter = 10;       //Number of iterations, which are taking into account for speed calculation
 		Eigen::Matrix<Real,nSpeedIter,1> SpeedElements; //Array for saving speed-values for last "nSpeedIter"-iterations
-
 
 		shared_ptr<Engine> engineByName(const string& s);
 

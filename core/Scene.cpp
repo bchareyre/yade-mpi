@@ -9,22 +9,18 @@
 *************************************************************************/
 
 #include"Scene.hpp"
-#include<core/Engine.hpp>
-#include<core/Timing.hpp>
-#include<core/TimeStepper.hpp>
 
-#include<lib/base/Math.hpp>
-#include<boost/date_time/posix_time/posix_time.hpp>
-#include<boost/algorithm/string.hpp>
+#include <lib/base/Math.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
-#include<core/BodyContainer.hpp>
-#include<core/InteractionContainer.hpp>
+#include <core/BodyContainer.hpp>
+#include <core/InteractionContainer.hpp>
+#include <core/TimeStepper.hpp>
 
-
-// POSIX-only
-#include<pwd.h>
-#include<unistd.h>
-#include<time.h>
+#include <pwd.h>
+#include <unistd.h>
+#include <time.h>
 
 namespace py=boost::python;
 
@@ -36,8 +32,8 @@ bool TimingInfo::enabled=false;
 void Scene::fillDefaultTags(){
 	// fill default tags
 	struct passwd* pw;
-	char hostname[HOST_NAME_MAX];
-	gethostname(hostname,HOST_NAME_MAX);
+	char hostname[hostNameMax];
+	gethostname(hostname,hostNameMax);
 	pw=getpwuid(geteuid()); if(!pw) throw runtime_error("getpwuid(geteuid()) failed!");
 	// a few default tags
 	// real name: will have all non-ASCII characters replaced by ? since serialization doesn't handle that
@@ -52,8 +48,6 @@ void Scene::fillDefaultTags(){
 	// tags.push_back("revision="+py::extract<string>(py::import("yade.config").attr("revision"))());;
 }
 
-
-
 void Scene::postLoad(Scene&){
 	// update the interaction container; must be done in Scene ctor as well; important!
 	interactions->postLoad__calledFromScene(bodies);
@@ -64,8 +58,6 @@ void Scene::postLoad(Scene&){
 		if(b->material!=materials[b->material->id]) throw std::logic_error("Scene::postLoad: Internal inconsistency, shared materials not preserved when loaded; please report bug.");
 	}
 }
-
-
 
 void Scene::moveToNextTimeStep(){
 	if(runInternalConsistencyChecks){
@@ -137,8 +129,6 @@ void Scene::moveToNextTimeStep(){
 	}
 }
 
-
-
 shared_ptr<Engine> Scene::engineByName(const string& s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->getClassName()==s) return e;
@@ -172,8 +162,6 @@ bool Scene::timeStepperActivate(bool a){
 	return n>0;
 }
 
-
-
 void Scene::checkStateTypes(){
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b || !b->material) continue;
@@ -204,4 +192,3 @@ void Scene::updateBound(){
 	bound->min=mn; 
 	bound->max=mx;
 }
-

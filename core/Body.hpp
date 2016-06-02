@@ -9,14 +9,14 @@
 *************************************************************************/
 #pragma once
 
-#include"Shape.hpp"
-#include"Bound.hpp"
-#include"State.hpp"
-#include"Material.hpp"
+#include "Shape.hpp"
+#include "Bound.hpp"
+#include "State.hpp"
+#include "Material.hpp"
 
-#include<lib/base/Math.hpp>
-#include<lib/serialization/Serializable.hpp>
-#include<lib/multimethods/Indexable.hpp>
+#include <lib/base/Math.hpp>
+#include <lib/serialization/Serializable.hpp>
+#include <lib/multimethods/Indexable.hpp>
 
 class Scene;
 class Interaction;
@@ -24,9 +24,9 @@ class Interaction;
 class Body: public Serializable{
 	public:
 		// numerical types for storing ids
-		typedef int id_t;
+		using id_t = int ;
 		// internal structure to hold some interaction of a body; used by InteractionContainer;
-		typedef std::map<Body::id_t, shared_ptr<Interaction> > MapId2IntrT;
+		using MapId2IntrT = std::map<Body::id_t, shared_ptr<Interaction> >;
 		// groupMask type
 
 		// bits for Body::flags
@@ -63,9 +63,9 @@ class Body: public Serializable{
 		boost::python::list py_intrs();
 
 		Body::id_t getId() const {return id;};
-		unsigned int coordNumber();  // Number of neighboring particles
+		const unsigned int coordNumber() const;  // Number of neighboring particles
 
-		mask_t getGroupMask() const {return groupMask; };
+		const mask_t getGroupMask() const {return groupMask; };
 		bool maskOk(int mask) const;
 		bool maskCompatible(int mask) const;
 #ifdef YADE_MASK_ARBITRARY

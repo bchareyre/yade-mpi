@@ -322,7 +322,7 @@ class pyBodyContainer{
 					R2 = 0.0; dens = 0.0; vol = 0.0;
 					const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(b->shape);
 					std::map<Body::id_t,Se3r>& members = clump->members;
-					FOREACH(MemberMap::value_type& mm, members){
+					for(MemberMap::value_type& mm : members){
 						const Body::id_t& memberId=mm.first;
 						const shared_ptr<Body>& member=Body::byId(memberId,scene);
 						assert(member->isClumpMember());

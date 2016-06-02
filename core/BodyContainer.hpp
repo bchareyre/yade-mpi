@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include<lib/serialization/Serializable.hpp>
-#include<boost/tuple/tuple.hpp>
+#include <lib/serialization/Serializable.hpp>
+#include <boost/tuple/tuple.hpp>
 
 class Body;
 class InteractionContainer;
@@ -27,8 +27,8 @@ Any alternative implementation should use the same API.
 */
 class BodyContainer: public Serializable{
 	private:
-		typedef std::vector<shared_ptr<Body> > ContainerT;
-		typedef std::map<Body::id_t,Se3r> MemberMap;
+		using ContainerT = std::vector<shared_ptr<Body> > ;
+		using MemberMap = std::map<Body::id_t,Se3r> ;
 		ContainerT body;
 	public:
 		friend class InteractionContainer;  // accesses the body vector directly
@@ -48,12 +48,12 @@ class BodyContainer: public Serializable{
 			smart_iterator(const ContainerT::iterator& source) {(*this)=source;}
 			smart_iterator(const smart_iterator& source) {(*this)=source; end=source.end;}
 		};
-		typedef smart_iterator iterator;
-		typedef const smart_iterator const_iterator;
+		using iterator = smart_iterator ;
+		using const_iterator = const smart_iterator ;
 
 		BodyContainer() {};
 		virtual ~BodyContainer() {};
-		Body::id_t insert(shared_ptr<Body>&);
+		Body::id_t insert(shared_ptr<Body>);
 		void clear();
 		iterator begin() {
 			iterator temp(body.begin());
@@ -65,11 +65,13 @@ class BodyContainer: public Serializable{
 			return temp;
 		}
 
-		size_t size() const { return body.size(); }
+		const size_t size() const { return body.size(); }
 		shared_ptr<Body>& operator[](unsigned int id){ return body[id];}
 		const shared_ptr<Body>& operator[](unsigned int id) const { return body[id]; }
 
-		bool exists(Body::id_t id) const { return (id>=0) && ((size_t)id<body.size()) && ((bool)body[id]); }
+		const bool exists(Body::id_t id) const {
+			return ((id>=0) && ((size_t)id<body.size()) && ((bool)body[id]));
+		}
 		bool erase(Body::id_t id, bool eraseClumpMembers);
 		
 		REGISTER_CLASS_AND_BASE(BodyContainer,Serializable);

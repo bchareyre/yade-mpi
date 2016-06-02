@@ -33,14 +33,14 @@ class State: public Serializable, public Indexable{
 		void blockedDOFs_vec_set(const std::string& dofs);
 
 		//! Return displacement (current-reference position)
-		Vector3r displ() const {return pos-refPos;}
+		const Vector3r displ() const {return pos-refPos;}
 		//! Return rotation (current-reference orientation, as Vector3r)
-		Vector3r rot() const { Quaternionr relRot=refOri.conjugate()*ori; AngleAxisr aa(relRot); return aa.axis()*aa.angle(); }
+		const Vector3r rot() const { Quaternionr relRot=refOri.conjugate()*ori; AngleAxisr aa(relRot); return aa.axis()*aa.angle(); }
 
 		// python access functions: pos and ori are references to inside Se3r and cannot be pointed to directly
-		Vector3r pos_get() const {return pos;}
+		const Vector3r pos_get() const {return pos;}
 		void pos_set(const Vector3r p) {pos=p;}
-		Quaternionr ori_get() const {return ori; }
+		const Quaternionr ori_get() const {return ori; }
 		void ori_set(const Quaternionr o){ori=o;}
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
