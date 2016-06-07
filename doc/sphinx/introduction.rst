@@ -157,11 +157,15 @@ Normal simulations, however, are run continuously. Starting/stopping the loop is
 
 	In [1]: O.pause()
 
+	In [1]: O.iter
+	104587
+
 	In [1]: O.run(100000,True)
 
+	In [1]: O.iter
+	204587
+
 	In [1]: O.stopAtIter=500000
-        
-	In [1]: O.run()
 
 	In [1]: O.wait()
 
@@ -249,9 +253,11 @@ Entire simulation, i.e. both data and functions, are stored in a single ``Scene`
 
 .. ipython::
 
-	Yade [1]: len(O.bodies)  # there are no bodies as of yet
+	Yade [1]: O.bodies       # some data components
 
-	Yade [2]: O.engines      # functional components, empty at the moment
+	Yade [2]: len(O.bodies)  # there are no bodies as of yet
+
+	Yade [3]: O.engines      # functional components, empty at the moment
 
 Data components
 ^^^^^^^^^^^^^^^
@@ -282,11 +288,13 @@ Explicitly assigning all 4 properties to each particle by hand would be not prac
 
 .. ipython::
 	
-   In [2]: s=utils.sphere(center=[0,0,0],radius=1)
+   In [3]: s=utils.sphere(center=[0,0,0],radius=1)
 
-   In [3]: s.state.pos
+   In [5]: s.shape, s.state, s.mat, s.bound
 
-   In [4]: s.shape.radius
+   In [6]: s.state.pos
+
+   In [7]: s.shape.radius
 
 
 We see that a sphere with material of type :yref:`FrictMat` (default, unless you provide another :yref:`Material`) and bounding volume of type :yref:`Aabb` (axis-aligned bounding box) was created. Its position is at origin and its radius is 1.0. Finally, this object can be inserted into the simulation; and we can insert yet one sphere as well.
@@ -352,21 +360,21 @@ Suppose now interactions have been already created. We can access them by the id
 
 .. ipython::
 
-	In [1]: if (O.interactions[0,1]): print ("Interaction exists!")
-	Interaction exists!
+	In [1]: O.interactions[0,1]
+	<Interaction instance at 0x93f9528>
 
-	In [2]: if (O.interactions[1,0]): print ("Interaction exists!")     # order of ids is not important
+	In [2]: O.interactions[1,0]     # order of ids is not important
 
 	In [2]: i=O.interactions[0,1]
 	
 	In [3]: i.id1,i.id2
 	(0, 1)
 
-	In [4]: if (i.geom): print ("Geom instance exists!")
-	Geom instance exists!
+	In [4]: i.geom
+	<ScGeom instance at 0x9403838>
 
-	In [5]: if (i.phys): print ("Phys instance exists!")
-	Phys instance exists!
+	In [5]: i.phys
+	<ElasticContactInteraction instance at 0x94038d0>
 
 	In [6]: O.interactions[100,10111]
 	ValueError: No such interaction

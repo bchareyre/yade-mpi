@@ -320,6 +320,8 @@ In order to avoid such tasks, shorthand functions are defined in the :yref:`yade
 	
 	Yade [1]: s=utils.sphere((0,0,0),radius=1)    # create sphere particle centered at (0,0,0) with radius=1
 
+	Yade [1]: s.shape                       # s.shape describes the geometry of the particle
+
 	Yade [1]: s.shape.radius                # we already know the Sphere class
 
 	Yade [1]: s.state.mass, s.state.inertia # inertia is computed from density and geometry
@@ -334,7 +336,7 @@ A particle object is not yet part of the simulation; in order to do so, a specia
 
 .. ipython::
 
-	Yade [1]: idS = O.bodies.append(s)            # adds particle s to the simulation; returns id of the particle(s) added
+	Yade [1]: O.bodies.append(s)            # adds particle s to the simulation; returns id of the particle(s) added
 
 
 Packs
