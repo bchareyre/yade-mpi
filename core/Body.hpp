@@ -14,6 +14,9 @@
 #include "State.hpp"
 #include "Material.hpp"
 
+#include <unordered_map>
+#include <boost/serialization/unordered_map.hpp>
+
 #include <lib/base/Math.hpp>
 #include <lib/serialization/Serializable.hpp>
 #include <lib/multimethods/Indexable.hpp>
@@ -26,7 +29,7 @@ class Body: public Serializable{
 		// numerical types for storing ids
 		using id_t = int ;
 		// internal structure to hold some interaction of a body; used by InteractionContainer;
-		using MapId2IntrT = std::map<Body::id_t, shared_ptr<Interaction> >;
+		using MapId2IntrT = std::unordered_map<Body::id_t, shared_ptr<Interaction> >;
 		// groupMask type
 
 		// bits for Body::flags

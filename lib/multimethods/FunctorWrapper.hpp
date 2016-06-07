@@ -97,7 +97,6 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 {
 	private : 
 		typedef Loki::FunctorImpl<ResultType, ArgumentTypeList > Impl;
-		typedef ArgumentTypeList ParmList;
 		typedef typename Impl::Parm1 Parm1;
 		typedef typename Impl::Parm2 Parm2;
 		typedef typename Impl::Parm3 Parm3;
