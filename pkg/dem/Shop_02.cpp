@@ -225,7 +225,7 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive, bool splitNor
 	
 	// *** Normal stress tensor split into two parts according to subnetworks of strong and weak forces (or other distinction if a threshold value for the force is assigned) ***/
 	Real Fmean(0); Matrix3r f, fs, fw;
-	fabricTensor(Fmean,f,fs,fw,false,NaN);
+	fabricTensor(Fmean,f,fs,fw); // 0,false,NaN for cutoff, split and thresholdForce as default arguments
 	Matrix3r sigNStrong(Matrix3r::Zero()), sigNWeak(Matrix3r::Zero());
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
@@ -257,55 +257,53 @@ py::tuple Shop::normalShearStressTensors(bool compressionPositive, bool splitNor
 
 /* Return the fabric tensor as according to [Satake1982]. */
 /* as side-effect, set Gl1_NormShear::strongWeakThresholdForce */
-void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, Matrix3r& fabricWeak, bool splitTensor, Real thresholdForce){
+void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, Matrix3r& fabricWeak, Real cutoff, bool splitTensor, Real thresholdForce){
 	Scene* scene=Omega::instance().getScene().get();
 
 	// *** Fabric tensor ***/
 	fabric=Matrix3r::Zero(); 
 	int count=0; // number of interactions
+	py::tuple aabb = Shop::aabbExtrema(cutoff);
+	Vector3r bbMin = py::extract<Vector3r>(aabb[0]), bbMax = py::extract<Vector3r>(aabb[1]);
+	Vector3r cp;
+	
+	Fmean=0; // initialize average contact force for split = 1 fabric measurements
+	// interactions loop to compute the fabric tensor returned when split = 0, and also measures average force for subsequent computations for split = 1:
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		if( !dynamic_cast<Sphere*>(Body::byId(I->getId1(),scene)->shape.get()) || !dynamic_cast<Sphere*>(Body::byId(I->getId2(),scene)->shape.get()) ) continue; // test intended to disregard boundary interactions (in non-periodic simulations)
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		cp = geom->contactPoint;
+		if( !(cp[0]>=bbMin[0] && cp[0]<=bbMax[0] && cp[1]>=bbMin[1] && cp[1]<=bbMax[1] && cp[2]>=bbMin[2] && cp[2]<=bbMax[2]) ) continue; // possible to use isInBB() from _utils.cpp ? (NB: would exclude the contact points exactly along the BB)
 		const Vector3r& n=geom->normal;
 		for(int i=0; i<3; i++) for(int j=i; j<3; j++){
 			fabric(i,j)+=n[i]*n[j];
 		}
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
+		Real f=-phys->normalForce.dot(n);  // will be < 0 in compression
+		Fmean+=f;
 		count++;
 	}
+	Fmean/=count;
 	// fill terms under the diagonal
 	fabric(1,0)=fabric(0,1); fabric(2,0)=fabric(0,2); fabric(2,1)=fabric(1,2);
 	fabric/=count;
 	
-	// *** Average contact force ***/
-	// calculate average contact force
-	Fmean=0; // initialize
-	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-		if(!I->isReal()) continue;
-		if( !dynamic_cast<Sphere*>(Body::byId(I->getId1(),scene)->shape.get()) || !dynamic_cast<Sphere*>(Body::byId(I->getId2(),scene)->shape.get()) ) continue; // test intended to disregard boundary interactions (in non-periodic simulations)
-		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
-		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
-		const Vector3r& n=geom->normal;
-		Real f=-phys->normalForce.dot(n);  // will be < 0 in compression
-		Fmean+=f;
-	}
-	Fmean/=count; 
-
 	#ifdef YADE_OPENGL
 		Gl1_NormPhys::maxWeakFn=Fmean;
 	#endif
 	
 	// *** Weak and strong fabric tensors ***/
 	// evaluate two different parts of the fabric tensor 
-	// make distinction between strong and weak network of contact forces
+	// making distinction between strong and weak network of contact forces
 	fabricStrong=Matrix3r::Zero(); 
 	fabricWeak=Matrix3r::Zero(); 
 	int nStrong(0), nWeak(0); // number of strong and weak contacts respectively
 	if (!splitTensor & !std::isnan(thresholdForce)) {LOG_WARN("The bool splitTensor should be set to True if you specified a threshold value for the contact force, otherwise the function will return only the fabric tensor and not the two separate contributions.");}
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
-		if( !dynamic_cast<Sphere*>(Body::byId(I->getId1(),scene)->shape.get()) || !dynamic_cast<Sphere*>(Body::byId(I->getId2(),scene)->shape.get()) ) continue; // test intended to disregard boundary interactions (in non-periodic simulations)
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		cp = geom->contactPoint;
+		if( !(cp[0]>=bbMin[0] && cp[0]<=bbMax[0] && cp[1]>=bbMin[1] && cp[1]<=bbMax[1] && cp[2]>=bbMin[2] && cp[2]<=bbMax[2]) ) continue; // see above for idea about isInBB() from _utils.cpp
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(I->phys.get());
 		const Vector3r& n=geom->normal;
 		Real  f=-phys->normalForce.dot(n);
@@ -339,9 +337,9 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	}
 }
 
-py::tuple Shop::fabricTensor(bool splitTensor, Real thresholdForce){
+py::tuple Shop::fabricTensor(Real cutoff,bool splitTensor, Real thresholdForce){
 	Real Fmean; Matrix3r fabric, fabricStrong, fabricWeak;
-	fabricTensor(Fmean,fabric,fabricStrong,fabricWeak,splitTensor,thresholdForce);
+	fabricTensor(Fmean,fabric,fabricStrong,fabricWeak,cutoff,splitTensor,thresholdForce);
 	// returns fabric tensor or alternatively the two distinct contributions according to strong and weak subnetworks (or, if thresholdForce is specified, the distinction is made according to that value and not the mean one)
 	if (!splitTensor){return py::make_tuple(fabric);} 
 	else{return py::make_tuple(fabricStrong,fabricWeak);}
