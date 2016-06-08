@@ -14,11 +14,6 @@
 #include "State.hpp"
 #include "Material.hpp"
 
-#if (BOOST_VERSION >= 105600)
-  #include <unordered_map>
-  #include <boost/serialization/unordered_map.hpp>
-#endif
-
 #include <lib/base/Math.hpp>
 #include <lib/serialization/Serializable.hpp>
 #include <lib/multimethods/Indexable.hpp>
@@ -31,11 +26,7 @@ class Body: public Serializable{
 		// numerical types for storing ids
 		using id_t = int ;
 		// internal structure to hold some interaction of a body; used by InteractionContainer;
-#if (BOOST_VERSION >= 105600)
-		using MapId2IntrT = std::unordered_map<Body::id_t, shared_ptr<Interaction> >;
-#else
 		using MapId2IntrT = std::map<Body::id_t, shared_ptr<Interaction> >;
-#endif
 		// groupMask type
 
 		// bits for Body::flags
