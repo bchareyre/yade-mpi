@@ -48,8 +48,12 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 
 	:return: Body object with the :yref:`ChainedCylinder` :yref:`shape<Body.shape>`.
 
-	.. note:: :yref:`ChainedCylinder` is deprecated and might be removed in the future, use  :yref:`GridConnection` instead.
+	.. note:: :yref:`ChainedCylinder` is deprecated and will be removed in the future, use :yref:`GridConnection` instead. See :yref:`yade.gridpfacet.cylinder` and :yref:`yade.gridpfacet.cylinderConnection`.
 	"""
+
+	import warnings
+	warnings.warn('\033[1;31mchainedCylinder is deprecated and will be removed in the future, use GridConnection instead.\033[1;0m',category=UserWarning)
+
 	segment=end-begin
 	b=Body()
 	b.shape=ChainedCylinder(radius=radius,length=segment.norm(),color=color if color else utils.randomColor(),wire=wire,highlight=highlight)
@@ -92,13 +96,13 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 
 	:param id1,id2: the two :yref:`GridNodes<GridNode>` forming the cylinder. 
 	:param float radius: radius of the cylinder. Note that the radius needs to be the same as the one for the :yref:`GridNodes<GridNode>`.
-	:param Vector3 cellDist: for periodic boundary conditions, see :yref:`Interaction.cellDist`. Note: periodic boundary conditions are not yet implemented! 
+	:param Vector3 cellDist: for periodic boundary conditions, see :yref:`Interaction.cellDist`. Note: periodic boundary conditions for gridConnections are not yet implemented! 
 
 	See documentation of :yref:`yade.utils.sphere` for meaning of other parameters.
 
 	:return: Body object with the :yref:`GridConnection` :yref:`shape<Body.shape>`.
 
-	.. note:: The material of the :yref:`GridNodes<GridNode>` will be used to set the constitutive behaviour of the internal connection, i.e., the constitutive behaviour of the cylinder. The material of the :yref:`GridConnection` is used for interactions with other bodies.
+	.. note:: The material of the :yref:`GridNodes<GridNode>` will be used to set the constitutive behaviour of the internal connection, i.e., the constitutive behaviour of the cylinder. The material of the :yref:`GridConnection` is used for interactions with other (external) bodies.
 	"""
 	b=Body()
 	b.shape=GridConnection(radius=radius,color=color if color else utils.randomColor(),wire=wire,highlight=highlight)
@@ -138,6 +142,50 @@ def gridConnection(id1,id2,radius,wire=False,color=None,highlight=False,material
 	i.phys.ktw=2.*I*G/L
 	b.mask=mask
 	return b
+
+
+#TODO: find a better way of handling the Id lists for checking duplicated gridNodes or gridConnections with the same coordinates etc. It would be better to handle this globally, maybe implement something like O.bodies.getGridNodes
+def cylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,nodesIds=[],cylIds=[],dynamic=None,fixed=False,wire=False,color=None,highlight=False,intMaterial=-1,extMaterial=-1,mask=1):
+	"""
+	Create a cylinder with given parameters. The shape corresponds to the Minkowski sum of line-segment and sphere, hence, the cylinder has rounded vertices. The cylinder (:yref:`GridConnection<GridConnection>`) and its corresponding nodes (yref:`GridNodes<GridNode>`) are automatically added to the simulation. The lists with nodes and cylinder ids will be updated automatically.
+
+	:param Vector3 begin: first point of the Minkowski sum in the global coordinate system.
+	:param Vector3 end: last point of the Minkowski sum in the global coordinate system.
+	:param Real radius: radius of sphere in the Minkowski sum.
+	:param list nodesIds: list with ids of already existing :yref:`GridNodes<GridNode>`. New ids will be added.
+	:param list cylIds: list with ids of already existing :yref:`GridConnections<GridConnection>`. New id will be added.
+	:param intMaterial: :yref:`Body.material` used to create the interaction physics between the two GridNodes
+	:param extMaterial: :yref:`Body.material` used to create the interaction physics between the Cylinder (GridConnection) and other bodies (e.g., spheres interaction with the cylinder)
+	
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters.
+
+	"""
+	id1 = O.bodies.append( gridNode(begin,radius,dynamic=dynamic,fixed=fixed,wire=wire,color=color,highlight=highlight,material=intMaterial) )
+	nodesIds.append(id1)
+	id2 = O.bodies.append( gridNode(end,radius,dynamic=dynamic,fixed=fixed,wire=wire,color=color,highlight=highlight,material=intMaterial) )
+	nodesIds.append(id2)
+	cylIds.append(O.bodies.append( gridConnection(id1,id2,radius=radius,wire=wire,color=color,highlight=highlight,material=extMaterial,mask=mask,cellDist=None) ))
+
+
+def cylinderConnection(vertices,radius=0.2,nodesIds=[],cylIds=[],dynamic=None,fixed=False,wire=False,color=None,highlight=False,intMaterial=-1,extMaterial=-1,mask=1):
+	"""
+	Create a chain of cylinders with given parameters. The cylinders (:yref:`GridConnection<GridConnection>`) and its corresponding nodes (yref:`GridNodes<GridNode>`) are automatically added to the simulation. The lists with nodes and cylinder ids will be updated automatically.
+
+	:param [[Vector3]] vertices: coordinates of vertices to connect in the global coordinate system.
+	
+	See :yref:`yade.gridpfacet.cylinder` documentation for meaning of other parameters.
+
+	"""
+	# create all gridNodes first
+	nodesIdsCC=[]
+	for i in vertices:
+		nodesIdsCC.append( O.bodies.append(gridNode(i,radius=radius,
+						dynamic=dynamic,fixed=fixed,wire=wire,color=color,highlight=highlight,material=intMaterial)) )
+	nodesIds.extend(nodesIdsCC)
+	# now create connection between the gridNodes
+	for i,j in zip( nodesIdsCC[:-1], nodesIdsCC[1:]):
+		cylIds.append( O.bodies.append( gridConnection(i,j,radius=radius,
+						wire=wire,color=color,highlight=highlight,material=intMaterial,mask=mask,cellDist=None)) )
 
 
 def pfacet(id1,id2,id3,wire=True,color=None,highlight=False,material=-1,mask=1,cellDist=None):
@@ -185,7 +233,7 @@ def pfacet(id1,id2,id3,wire=True,color=None,highlight=False,material=-1,mask=1,c
 	return b
 
 
-#TODO: find a better way of handling the Id lists for checking duplicated gridNodes or gridNodes with the same coordinates etc. It would be better to handle this globally, maybe implement something like O.bodies.getGridNodes
+#TODO: find a better way of handling the Id lists for checking duplicated gridNodes or gridConnections with the same coordinates etc. It would be better to handle this globally, maybe implement something like O.bodies.getGridNodes
 def pfacetCreator1(vertices,radius,nodesIds=[],cylIds=[],pfIds=[],wire=False,fixed=True,materialNodes=-1,material=-1,color=None):
 	"""
 	Create a :yref:`PFacet<PFacet>` element from 3 vertices and automatically append to simulation. The function uses the vertices to create :yref:`GridNodes<GridNode>` and automatically checks for existing nodes.
