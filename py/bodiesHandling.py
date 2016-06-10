@@ -217,6 +217,8 @@ def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=
 		
 		b.state.pos=orientation*(b.state.pos-dims['center'])+dims['center']
 		b.shape.radius*=scale
+		b.state.mass*=pow(scale, 3)
+		b.state.inertia*=pow(scale, 5)
 		b.state.pos=(b.state.pos-dims['center'])*scale + dims['center']
 		
 		b.state.pos+=shift
