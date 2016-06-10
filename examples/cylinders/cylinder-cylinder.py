@@ -3,7 +3,7 @@
 
 from yade.gridpfacet import *
 
-#### Parameters ####
+#### Parameter ####
 L=1.		# length of the cylinder element
 r=0.1		# radius of the cylinder element
 phi=30.	# friction angle
@@ -13,7 +13,6 @@ E=1e6		# Young's modulus
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([
-		#Bo1_Sphere_Aabb(),
 		Bo1_GridConnection_Aabb(),
 	]),
 	InteractionLoop([
@@ -25,7 +24,7 @@ O.engines=[
 		Ip2_FrictMat_FrictMat_FrictPhys()	# physics for external interactions, i.e., cylinder-cylinder interaction
 	],
 	[
-		Law2_ScGeom6D_CohFrictPhys_CohesionMoment(),	# contact law for "internal" cylider forces
+		Law2_ScGeom6D_CohFrictPhys_CohesionMoment(),	# contact law for "internal" cylinder forces
 		Law2_GridCoGridCoGeom_FrictPhys_CundallStrack()	# contact law for cylinder-cylinder interaction
 	]
 	),

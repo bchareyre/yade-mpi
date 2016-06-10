@@ -3,9 +3,9 @@
 
 from yade.gridpfacet import *
 
-#### Parameters ####
-L=10.   # length of the beam
-n=12	# number of nodes used to generate the beam
+#### Parameter ####
+L=10.		# length of the beam
+n=12		# number of nodes used to generate the beam
 r=L/50.	# radius of the beam element
 
 #### Engines ####
@@ -20,7 +20,7 @@ O.engines=[
 	NewtonIntegrator(gravity=(0,0,-10),damping=0.5,label='newton')
 ]
 
-#### Creat materials and set different properties ####
+#### Create materials and set different properties ####
 O.materials.append(CohFrictMat(young=1e6,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=False,label='mat1'))
 O.materials.append(CohFrictMat(young=1e6,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat2'))
 O.materials.append(CohFrictMat(young=3e6,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat3'))
@@ -32,10 +32,10 @@ vertices2=[]
 vertices3=[]
 vertices4=[]
 for i in range(0,n):
-  vertices1.append( ([i*L/n,0,0]) )
-  vertices2.append( ([i*L/n,1,0]) )
-  vertices3.append( ([i*L/n,2,0]) )
-  vertices4.append( ([i*L/n,3,0]) )
+  vertices1.append( [i*L/n,0,0] )
+  vertices2.append( [i*L/n,1,0] )
+  vertices3.append( [i*L/n,2,0] )
+  vertices4.append( [i*L/n,3,0] )
 
 #### Create cylinder connections ####
 nodesIds=[]
