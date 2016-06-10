@@ -47,7 +47,7 @@ class WireMat: public FrictMat {
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new WireState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<WireState*>(s); }
 		void postLoad(WireMat&);
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,FrictMat,"Material for use with the Wire classes",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireMat,FrictMat,"Material for use with the Wire classes. In conjunction with the corresponding functors it can be used to model steel wire meshes [Thoeni2014]_, geotextiles [Cheng2016]_ and more.",
 			((Real,diameter,0.0027,,"Diameter of the single wire in [m] (the diameter is used to compute the cross-section area of the wire)."))
 			((unsigned int,type,0,,"Three different types are considered:\n\n"
 			"== ===============================================================\n"
