@@ -78,9 +78,7 @@ class Integrator;
 class GeneralIntegratorInsertionSortCollider;// Forward decleration of child to decleare it as friend
 
 class InsertionSortCollider: public Collider{
-
 	friend class GeneralIntegratorInsertionSortCollider;
-
 	//! struct for storing bounds of bodies
 	struct Bounds{
 		//! coordinate along the given sortAxis
@@ -90,7 +88,7 @@ class InsertionSortCollider: public Collider{
 		//! periodic cell coordinate
 		int period;
 		//! is it the minimum (true) or maximum (false) bound?
-		struct{ unsigned hasBB:1; unsigned isMin:1; } flags;
+		struct {bool hasBB:true, isMin:true;} flags;
 		Bounds(Real coord_, Body::id_t id_, bool isMin): coord(coord_), id(id_), period(0){ flags.isMin=isMin; }
 		bool operator<(const Bounds& b) const {
 			/* handle special case of zero-width bodies, which could otherwise get min/max swapped in the unstable std::sort */
