@@ -6,7 +6,7 @@ YADE_PLUGIN((MatchMaker));
 
 Real MatchMaker::operator()(int id1, int id2, Real val1, Real val2) const {
 	const int minId = std::min(id1, id2);
-	const int maxId = std::max(id2, id2);
+	const int maxId = std::max(id1, id2);
 	
 	const auto foundMatchItem = matchSet.find (std::make_pair(minId, maxId));
 	
