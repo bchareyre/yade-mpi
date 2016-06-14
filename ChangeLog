@@ -1,4 +1,214 @@
 ==================================================
+yade-2016.06a
+Tue, Jun 14 20:30:53 2016 +0200
+
+Anton Gladky (88):
+      Remove release.
+      Clean some unused macroses (old wm3-stuff)
+      Remove some global headers
+      Raise minimal boost version to 1.47
+      Add -DNDEBUG if compiling in release mode
+      Tiny code refactoring
+      Clean some warnings and old stuff.
+      Return removed header back.
+      Fix warning in newer matplotlib.
+      Drop old commented stuff in python-scrips.
+      Remove flags and preSteps from scene
+      Remove deprecated findBoundDispatcherInEnginesIfNoFunctorsAndWarn
+      Remove PISC_DEBUG.
+      Fix typo in installation sections of doce. Thanks to Jan.
+      Export normal and viscous part of the visco-elastic contact
+      Remove confusing part in installation part of documentation regarding Qt5.
+      Fix typo in CMakeLists
+      Tiny updates of examples of LudingPM.
+      Fix compilation warnings.
+      Update formatting in SpherePack
+      Fix an order of calculation of c in SpherePack
+      Fix some compilation warnings.
+      Fix cappitalization typo in Lapack (case-sensitive in this case).
+      Respect VTK6 in PotentialParticles.
+      Add .travis.yml for CI.
+      Remove version restriction on sphinx.
+      Use trusty as build-env.
+      Add -y parameter to apt-get install.
+      Fix numpy import on travis.
+      Fix segfault during save/load of CapViscModels
+      Add one more check-script (capillary models)
+      Fix typo in check-script.
+      Fix crash in Ig2_Facet_Polyhedra_PolyhedraGeom
+      vtkExporter: increase number of leading zeros to 8
+      Move implementation of methods of ForceContainer in cpp.
+      Split implementation of ForceContainer in parallel and serial.
+      Add zero-forces to the youngest body after simulation load. Closes LP:1560171
+      Drop parallel execution in replaceByClumps. Closes LP:1559098
+      Add import of polyhedras from the file.
+      Add an opportunity to shift, scale and rotate imported polyhedrons
+      Minor fixes in Polyhedra_splitter.
+      Fix division by zero crash in Polyhedra
+      Add CGAL_DISABLE_ROUNDING_MATH_CHECK, -frounding-math when CGAL is enabled.
+      Fix some formatting issues.
+      Non-invasive fixes in polyhedra_splitter.
+      Get max-min coefs in polyhedra_splitter simpler.
+      Use tuple as a parameter for SplitPolyhedraDouble
+      Add check script for polyhedra crash.
+      Use explicitly -DNDEBUG instead of CMAKE_CXX_FLAGS_RELEASE
+      Check isnan in some coordinates before calling CGAL.
+      Minor formatting fixes in Polyhedra.
+      Add check-script for save/load of clumps.
+      Disable checkPolyhedraCrush. It is unstable now.
+      Fix checkPolyhedraCrush
+      Remove polyhedra_utils import from "ymport"
+      Add prefix std:: to isnan and isinf.
+      Update checkPolyhedraCrush
+      Update files for ppa-infrastructure.
+      Undef NDEBUG in all polyhedra files.
+      Add pause for checkSaveLoadClumps to escape race condition.
+      Use variadic arguments in DynLibDispatcher.
+      Fix crash in polyhedra, if maxFs=0.
+      Fix checkPolyhedraCrush (remove qt)
+      Remove unused functionality in Dispatcher.
+      Set Qt5 by default.
+      Add mathcmaker for normalCohesion and shearCohesion.
+      Split QGLViewer.cmake on qt4 and qt5 versions.
+      Add .gitattributes to ignore line endings.
+      Migrate buildppa to python3.
+      Replace some "#define"(s) by functions.
+      Remove some machine-specific items in documentation.
+      Add unit test for matchmaker.
+      Replace vector by unordered_map data structure in Matchmaker.
+      Minor fix in documentation.
+      Replace some "defines" by functions.
+      Remove numpy.hpp.
+      Fix bug in polyhedra_splitter.
+      Some cosmetic fixes in core-files.
+      Enable C++14.
+      Revert 2dc99 and ed8dcb.
+      Use unordered_map instead of map for MapId2IntrT
+      Use unordered_map only for Boost >= 1.56
+      Back to C++11.
+      Revert using unordered_map in Body.
+      Scale mass and inertia in spheresModify.
+      Reduce size of flags in Bounds of InsertionSortCollider
+      Fix bug in MatchMaker.
+      Add RELEASE file.
+
+Bruno Chareyre (16):
+      add labels to default engines for easier showcases
+      fix ambiguous syntax, fixing https://bugs.launchpad.net/bugs/1514477
+      introduce 2nd edition of the documentation and contact for consuting (in homepage)
+      update the webpage about citation with 2nd edition, add 1st edition as an external reference, update pdf metadata
+      fix one DOI of the 2nd ed. documentation
+      Add missing toctree's for the citable book versions
+      fix typo in installation page
+      fixed DOI
+      fix some hyperlinks pointing to the old geo.hmg.inpg.fr
+      declare mask attribute for FlowEngine, fixes a compile error
+      use FlowEngine's mask consistently
+      implement standalone plastic-shear energy counter in CohesiveFrictional Law2
+      define constrictions with consistent cell's ids (see https://answers.launchpad.net/yade/+question/288118)
+      fix a compile error
+      update boost version in prerequisites (installation page)
+      Documentation: include unp in the equations of Law2_ScGeom6D_CohFrictPhys_CohesionMoment
+
+Burak Er (1):
+      Implement deformable elements
+
+ChiaWeng Boon (1):
+      Commit Potential Particles: non-spherical particles for DEM
+
+Francois Kneib (8):
+      TesselationWrapper : add a security that prevents user to access the strain tensor of a particle (aka deformation) outside its boundaries.
+      Fix a tensor access in local displacement calculation.
+      Fix a bug in Tesselationwrapper: one of the bounding planes was not rightly positionned.
+      Fix in TesselationWrapper: allow the tesselation to compute right triangulation in the boundaries of a periodic boundaries conditions simulation.
+      Add 5 setters for bodies pos,vel,ori,angVel,color to workaround the memory leak bug when assigning attributes from python (see https://bugs.launchpad.net/yade/+bug/1041084). They are not supposed to stay in the code for a long period (remove them when the bug is solved), but are useful in sims that massively change values of python/c++ binded attributes.
+      Simplify one line in TesselationWrapper.
+      Fix the debug build that failed to compile due to a mistake in pkg/dem/Polyhedra.cpp
+      Fix the inspector GUI for Qt5, thanks to Mark S. Bentley.
+
+Jan Stránský (30):
+      Merge pull request #47 from booncw/master
+      Potential particles modification
+      Merge branch 'master' of github.com:yade/trunk
+      Potential particles modifications
+      added forgotten file from previous commit
+      Modified python interface for O.forces.addF(...,permanent=True) and addT(...,permanent=True)
+      fixed some warnings during docs build
+      Added frictAngle MatchMaker for Ip2_FrictMat_CpmMat_FrictPhys
+      set b.aspherical=True in utils.polyhedron and utils.tetraPoly
+      Polyhedra modification
+      Added a material model for mortar layer
+      Polyhedra.setVertices improvement, preventing memory leaks (question #290947 and bug #1570679)
+      Interaction::reset explicitly resets also its functorCache
+      Fixed a strange bug in Law2_PolyhedraGeom_PolyhedraPhys_Volumetric and shearForce
+      Added useRef parameters to VTKExporter.exportPolyhedra and VTKExporter.exportInteractions
+      Modified MortarMat
+      Merge branch 'master' of github.com:yade/trunk
+      fixed computation of shearForce in Law2_PolyhedraGeom_PolyhedraPhys_Volumetric
+      added and modified examples for MortarMat
+      Merge branch 'master' of github.com:yade/trunk
+      added MatchMaker for E in Ip2_CmpMat_CpmMat_CpmPhys
+      Fixed a bug in pack.inSphere, related to question #292846
+      Merge branch 'master' of github.com:yade/trunk
+      VTKRecorder, added orientation for box export (question #293635)
+      Modification of CPM
+      Fixed ymport.textPolyhedra function (bug #1582775)
+      added x_y_z_r_attrs format to ymport.textExt
+      Added an example for generation of 'agglomerate' packing
+      Fixed Law2_Cpm default parameter to keep backward compatibility (question #294657)
+      Better default value from previous commit
+
+Jerome Duriez (12):
+      +1 journal paper
+      Incorporating previous +1 paper in JCFpm doc
+      + another journal paper
+      makeCloud doc changes with the hope to make it clearer for all users
+      Doc of TriaxStressController.porosity precised
+      Doc improvements of previous commit improved
+      Last doc improvement of previous commit
+      normalForce and shearForce convention (sustained by #2) precised in docs
+      fabricTensor() now ok for non-periodic simulations. revertSign attribute removed as well
+      getSpheres*() functions: getting rid of dynamic test, see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg11956.html
+      fabricTensor(): unify the behavior regarding boundary interactions whether split=0 or 1: they are now disregarded in both cases
+      fabricTensor(): re introducing all kind of interactions in the loop, with the new possibility defining a cutoff. See http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg11982.html
+
+Klaus Thoeni (23):
+      fix some typos and add some more details
+      fix Anton's previous commit (make doc was not working)
+      fix documentation for Note
+      some polishing
+      gts shift and scale apparently only take three float values, hence changed
+      Merge branch 'master' of github.com:yade/trunk
+      move grid specific functions in separate module and add some more doc
+      add some more examples, show same functionality as with chained cylinders
+      update doc
+      add Grid and pFacet references
+      Initial version of the PFacet implementation (contributed by Anna Effeindzourou)
+      Examples for creating pfacets
+      update tests according to new gridpfacet module
+      remove postLoad function as not used, this fixes as well serialization problem in --test
+      better handling of double contacts, get gid of function ScGem goOneWay
+      improved documentation
+      add definition for cylinder and cylinderConnection basen on gridConnection, add warning for chainedCylinder usage
+      examples for cylinder and cylinderConnection
+      example with many cylinders and 2 pFacets
+      QT5 is default now
+      correct some typos
+      similar to example in chained-cylinder-roots.py
+      add reference
+
+Raphael Maurin (6):
+      HydroForceEngine: modify the turbulent fluctuations formulation and add a new DRW model The turbulent fluctuations model takes now the form of a function of HydroForceEngine and is not anymore called from a flag. In addition, an alternative DRW model has been added.
+      HydroForceEngine: adapt the averageProfile function for bi-disperse mixtures. Evaluate the streamwise, spanwise and wall-normal average particle velocity for the two defined types of particles.
+      HydroForceEngine: modify turbulent fluctuation model. Add a fluctuation along the spanwise (y) direction. Reset the fluctuation to zero when the particle is out of the flow (fix a bug) Comment a bit more the turbulentFluctuation function
+      HydroForceEngine, hpp file completing the last commit
+      Add references
+      add a link in the publications
+
+bchareyre (1):
+      compute external work correctly in TriaxialStressController
+
+==================================================
 yade-1.20.0
 Fri, Oct 9 21:20:00 2015 +0200
 
