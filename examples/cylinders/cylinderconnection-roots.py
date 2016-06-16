@@ -26,14 +26,16 @@ O.engines=[
 		Ig2_Box_Sphere_ScGeom(),
 		Ig2_GridNode_GridNode_GridNodeGeom6D(),
 		Ig2_Sphere_GridConnection_ScGridCoGeom(),
+		Ig2_GridConnection_GridConnection_GridCoGridCoGeom()
 	],
 	[
 		Ip2_CohFrictMat_CohFrictMat_CohFrictPhys(setCohesionNow=True,setCohesionOnNewContacts=False),	# internal cylinder physics
 		Ip2_FrictMat_FrictMat_FrictPhys()	# physics for external interactions, i.e., cylinder-cylinder, sphere-sphere, cylinder-sphere
 	],
 	[
-		Law2_ScGeom_FrictPhys_CundallStrack(),	# contact law for sphere-sphere, cylinder-sphere
-		Law2_ScGeom6D_CohFrictPhys_CohesionMoment(),	# contact law for "internal" cylider forces
+		Law2_ScGeom_FrictPhys_CundallStrack(),	# contact law for sphere-sphere
+		Law2_ScGridCoGeom_FrictPhys_CundallStrack(),	# contact law for cylinder-sphere
+		Law2_ScGeom6D_CohFrictPhys_CohesionMoment(),	# contact law for "internal" cylinder forces
 		Law2_GridCoGridCoGeom_FrictPhys_CundallStrack()	# contact law for cylinder-cylinder interaction
 	]
 	),
