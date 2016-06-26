@@ -153,6 +153,8 @@ void HydroForceEngine::averageProfile(){
 		const Real zPos = b->state->pos[2]-zRef;
 		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 
+		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
+
 		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
 		if ((Np>=0)&&(Np<nCell)){
 			uRel = Vector3r(vxFluid[Np]+vFluctX[b->id], vFluctY[b->id],vFluctZ[b->id]) - b->state->vel;
