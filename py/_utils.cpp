@@ -1,4 +1,5 @@
 #include <py/_utils.hpp>
+#include <numpy/arrayobject.h>
 
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
@@ -453,9 +454,6 @@ void setBodyColor(int id, Vector3r newColor){
 }
 
 BOOST_PYTHON_MODULE(_utils){
-	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
-	import_array();
-
 	YADE_SET_DOCSTRING_OPTS;
 
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");

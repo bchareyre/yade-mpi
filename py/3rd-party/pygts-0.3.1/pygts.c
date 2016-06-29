@@ -762,11 +762,6 @@ init_gts(void)
   m = Py_InitModule3("_gts", gts_methods,"Gnu Triangulated Surface Library");
   if (m == NULL) return;
 
-#if PYGTS_HAS_NUMPY
-  /* Make sure Surface.iso can work with numpy arrays */
-  import_array()
-#endif
-
   /* Add new types to python */
   Py_INCREF(&PygtsObjectType);
   PyModule_AddObject(m, "Object", (PyObject *)&PygtsObjectType);

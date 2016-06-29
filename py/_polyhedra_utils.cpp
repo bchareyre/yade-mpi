@@ -3,19 +3,18 @@
 
 #ifdef YADE_CGAL
 
-#include"pkg/dem/Polyhedra.hpp"
+#include "pkg/dem/Polyhedra.hpp"
 
-#include<core/Scene.hpp>
-#include<core/Omega.hpp>
-#include<pkg/common/Sphere.hpp>
-#include<pkg/common/ElastMat.hpp>
-#include<lib/pyutil/doc_opts.hpp>
-#include<cmath>
+#include <core/Scene.hpp>
+#include <core/Omega.hpp>
+#include <pkg/common/Sphere.hpp>
+#include <pkg/common/ElastMat.hpp>
+#include <lib/pyutil/doc_opts.hpp>
+#include <cmath>
 
-#include<numpy/ndarrayobject.h>
+#include <numpy/ndarraytypes.h>
 
 namespace py = boost::python;
-
 
 //**********************************************************************************
 //print polyhedron in basic position
@@ -519,11 +518,7 @@ bool convexHull(vector<Vector3r> points){
 } 
 
 BOOST_PYTHON_MODULE(_polyhedra_utils){
-	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
-	import_array();
-
 	YADE_SET_DOCSTRING_OPTS;
-
 	py::def("PrintPolyhedra",PrintPolyhedra,"Print list of vertices sorted according to polyhedrons facets.");
 	py::def("PrintPolyhedraActualPos",PrintPolyhedraActualPos,"Print list of vertices sorted according to polyhedrons facets.");
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");

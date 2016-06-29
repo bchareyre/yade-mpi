@@ -11,8 +11,6 @@
 #include<lib/pyutil/doc_opts.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 
-#include<numpy/ndarrayobject.h>
-
 namespace py = boost::python;
 
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax);
