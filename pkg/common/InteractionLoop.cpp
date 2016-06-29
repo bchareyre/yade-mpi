@@ -7,18 +7,17 @@ void InteractionLoop::pyHandleCustomCtorArgs(boost::python::tuple& t, boost::pyt
 	if(boost::python::len(t)==0) return; // nothing to do
 	if(boost::python::len(t)!=3) throw invalid_argument("Exactly 3 lists of functors must be given");
 	// parse custom arguments (3 lists) and do in-place modification of args
-	typedef std::vector<shared_ptr<IGeomFunctor> > vecGeom;
-	typedef std::vector<shared_ptr<IPhysFunctor> > vecPhys;
-	typedef std::vector<shared_ptr<LawFunctor> > vecLaw;
+	using vecGeom = std::vector<shared_ptr<IGeomFunctor> >;
+	using vecPhys = std::vector<shared_ptr<IPhysFunctor> >;
+	using vecLaw = std::vector<shared_ptr<LawFunctor> >;
 	vecGeom vg=boost::python::extract<vecGeom>(t[0])();
 	vecPhys vp=boost::python::extract<vecPhys>(t[1])();
 	vecLaw vl=boost::python::extract<vecLaw>(t[2])();
-	FOREACH(shared_ptr<IGeomFunctor> gf, vg) this->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<IPhysFunctor> pf, vp) this->physDispatcher->add(pf);
-	FOREACH(shared_ptr<LawFunctor> cf, vl) this->lawDispatcher->add(cf);
+	for(const auto gf : vg) this->geomDispatcher->add(gf);
+	for(const auto pf : vp) this->physDispatcher->add(pf);
+	for(const auto cf : vl) this->lawDispatcher->add(cf);
 	t=boost::python::tuple(); // empty the args; not sure if this is OK, as there is some refcounting in raw_constructor code
 }
-
 
 void InteractionLoop::action(){
 	// update Scene* of the dispatchers
@@ -37,7 +36,7 @@ void InteractionLoop::action(){
 	*/
 	// pair of callback object and pointer to the function to be called
 	vector<IntrCallback::FuncPtr> callbackPtrs;
-	FOREACH(const shared_ptr<IntrCallback> cb, callbacks){
+	for (const auto cb : callbacks){
 		cb->scene=scene;
 		callbackPtrs.push_back(cb->stepInit());
 	}
@@ -60,7 +59,7 @@ void InteractionLoop::action(){
 	for(long i=0; i<size; i++){
 		const shared_ptr<Interaction>& I=(*scene->interactions)[i];
 	#else
-	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+	for (const auto & I : *scene->interactions){
 	#endif
 		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());

@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<core/GlobalEngine.hpp>
-#include<pkg/common/Callbacks.hpp>
-#include<pkg/common/Dispatching.hpp>
+#include <core/GlobalEngine.hpp>
+#include <pkg/common/Callbacks.hpp>
+#include <pkg/common/Dispatching.hpp>
 
 #ifdef USE_TIMING_DELTAS
 	#define TIMING_DELTAS_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)
@@ -14,7 +14,7 @@
 
 class InteractionLoop: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
-	typedef std::pair<Body::id_t, Body::id_t> idPair;
+	using idPair = std::pair<Body::id_t, Body::id_t>;
 	// store interactions that should be deleted after loop in action, not later
 	#ifdef YADE_OPENMP
 		std::vector<std::list<idPair> > eraseAfterLoopIds;
