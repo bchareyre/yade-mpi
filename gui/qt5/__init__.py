@@ -13,6 +13,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5 import QtWebKit, QtWebKitWidgets
 
 from yade.qt.ui_controller import Ui_Controller
 
@@ -28,7 +29,6 @@ webWindows=[]
 sphinxOnlineDocPath='https://www.yade-dem.org/doc/'
 "Base URL for the documentation. Packaged versions should change to the local installation directory."
 
-
 import os.path
 # find if we have docs installed locally from package
 sphinxLocalDocPath=yade.config.prefix+'/share/doc/yade'+yade.config.suffix+'-doc/html/'
@@ -42,11 +42,7 @@ else: sphinxPrefix=sphinxOnlineDocPath
 
 sphinxDocWrapperPage=sphinxPrefix+'/yade.wrapper.html'
 
-
-
-
 def openUrl(url):
-	from PyQt5 import QtWebKit
 	global maxWebWindows,webWindows
 	reuseLast=False
 	# use the last window if the class is the same and only the attribute differs
@@ -55,12 +51,14 @@ def openUrl(url):
 		#print str(webWindows[-1].url()).split('#')[-1].split('.')[2],url.split('#')[-1].split('.')[2]
 	except: pass
 	if not reuseLast:
-		if len(webWindows)<maxWebWindows: webWindows.append(QtWebKit.QWebView())
+		if len(webWindows)<maxWebWindows: webWindows.append(QtWebKitWidgets.QWebView())
 		else: webWindows=webWindows[1:]+[webWindows[0]]
 	web=webWindows[-1]
-	web.load(QUrl(url)); web.setWindowTitle(url);
-	web.show();	web.raise_()
-
+	connect(web.page().networkAccessManager(),SIGNAL("sslErrors (QNetworkReply *, const QList<QSslError> &)"),sslErrorHandler)
+	web.load(QUrl(url))
+	web.setWindowTitle(url)
+	web.setFocus()
+	web.show()
 
 controller=None
 
