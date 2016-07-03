@@ -42,6 +42,9 @@ else: sphinxPrefix=sphinxOnlineDocPath
 
 sphinxDocWrapperPage=sphinxPrefix+'/yade.wrapper.html'
 
+def sslErrorHandler(reply, errorList):
+	reply.ignoreSslErrors()
+
 def openUrl(url):
 	global maxWebWindows,webWindows
 	reuseLast=False
@@ -54,7 +57,7 @@ def openUrl(url):
 		if len(webWindows)<maxWebWindows: webWindows.append(QtWebKitWidgets.QWebView())
 		else: webWindows=webWindows[1:]+[webWindows[0]]
 	web=webWindows[-1]
-	connect(web.page().networkAccessManager(),SIGNAL("sslErrors (QNetworkReply *, const QList<QSslError> &)"),sslErrorHandler)
+	web.page().networkAccessManager().sslErrors.connect(sslErrorHandler)
 	web.load(QUrl(url))
 	web.setWindowTitle(url)
 	web.setFocus()
