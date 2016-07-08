@@ -135,13 +135,17 @@ class ControllerClass(QWidget,Ui_Controller):
 		self.displayArea.setWidget(se)
 	def loadSlot(self):
 		f=QFileDialog.getOpenFileName(self,'Load simulation','','Yade simulations (*.xml *.xml.bz2 *.xml.gz *.yade *.yade.gz *.yade.bz2);; *.*')
-		f=str(f)
+		f=str(f[0])
 		if not f: return # cancelled
 		self.deactivateControls()
 		O.load(f)
 	def saveSlot(self):
 		f=QFileDialog.getSaveFileName(self,'Save simulation','','Yade simulations (*.xml *.xml.bz2 *.xml.gz *.yade *.yade.gz *.yade.bz2);; *.*')
-		f=str(f)
+		f=str(f[0])
+		splf = f.split('.')
+		if (len(splf) == 1):
+			print('No extension is found in the file name! Added .xml.bz2')
+			f = f+'.xml.bz2'
 		if not f: return # cancelled
 		O.save(f)
 	def reloadSlot(self):
