@@ -85,7 +85,7 @@ void LinearDragEngine::action(){
 void HydroForceEngine::action(){	
 	/* Application of hydrodynamical forces */
 	if (activateAverage==true) averageProfile(); //Calculate the average solid profiles
-	
+
 	FOREACH(Body::id_t id, ids){
 		Body* b=Body::byId(id,scene).get();
 		if (!b) continue;
@@ -94,7 +94,7 @@ void HydroForceEngine::action(){
 		if (sphere){
 			Vector3r posSphere = b->state->pos;//position vector of the sphere
 			int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
-			if ((p<nCell)&&(p>0)) {
+			if ((p<nCell)&&(p>=0)) {
 				Vector3r liftForce = Vector3r::Zero();
 				Vector3r dragForce = Vector3r::Zero();
 				Vector3r vRel = Vector3r(vxFluid[p]+vFluctX[id],vFluctY[id],vFluctZ[id]) -  b->state->vel;//fluid-particle relative velocity
@@ -152,7 +152,6 @@ void HydroForceEngine::averageProfile(){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const Real zPos = b->state->pos[2]-zRef;
 		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
-
 		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
 
 		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
@@ -396,6 +395,62 @@ void HydroForceEngine::turbulentFluctuationBIS(){
         }
 }
 
+/* Velocity fluctuation determination.  To execute at a given period*/
+/* Should be initialized before running HydroForceEngine */
+void HydroForceEngine::turbulentFluctuationFluidizedBed(){
+	/* check size */
+	size_t size=vFluctX.size();
+	if(size<scene->bodies->size()){
+		size=scene->bodies->size();
+		vFluctX.resize(size);
+		vFluctY.resize(size);
+		vFluctZ.resize(size);
+	}
+	/* reset stored values to zero */
+	memset(& vFluctX[0],0,size);
+	memset(& vFluctY[0],0,size);
+	memset(& vFluctZ[0],0,size);
 
+	/* Create a random number generator rnd() with a gaussian distribution of mean 0 and stdev 1.0 */
+	/* see http://www.boost.org/doc/libs/1_55_0/doc/html/boost_random/reference.html and the chapter 7 of Numerical Recipes in C, second edition (1992) for more details */
+	static boost::minstd_rand0 randGen((int)TimingInfo::getNow(true));
+	static boost::normal_distribution<Real> dist(0.0, 1.0);
+	static boost::variate_generator<boost::minstd_rand0&,boost::normal_distribution<Real> > rnd(randGen,dist);
+
+	double rand1 = 0.0;
+	double rand2 = 0.0;
+	double rand3 = 0.0;
+	/* Attribute a fluid velocity fluctuation to each body above the bed elevation */
+	FOREACH(Body::id_t id, ids){
+		Body* b=Body::byId(id,scene).get();
+		if (!b) continue;
+		if (!(scene->bodies->exists(id))) continue;
+		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+		if (sphere){
+			Vector3r posSphere = b->state->pos;//position vector of the sphere
+			int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+			// If the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
+			// The fluctuation magnitude is linked to the value of the Reynolds stress tensor at the given position, a kind of local friction velocity ustar
+			if ((p<nCell)&&(posSphere[2]-zRef>0.)) {  // Remove the particles outside of the flow
+				Real uStar2 = simplifiedReynoldStresses[p];
+				if (uStar2>0.0){
+					Real uStar = sqrt(uStar2);
+					rand1 = rnd();
+					rand2 = rnd();
+					rand3 = rnd();
+					vFluctZ[id] = rand1*uStar;
+					vFluctY[id] = rand2*uStar;
+					vFluctX[id] = rand3*uStar;
+				}
+			}
+			else{
+				vFluctZ[id] = 0.0;
+				vFluctY[id] = 0.0;
+				vFluctX[id] = 0.0;
+
+			}
+		}
+	}
+}
 
 
