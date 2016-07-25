@@ -11,7 +11,7 @@
 //FIXME : in triaxialStressController, change test about null force in updateStiffnessccc
 //keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can just uncomment the following line
-// #define LAW2_SCGEOM_CAPILLARYPHYS_Capillarity1
+#define LAW2_SCGEOM_CAPILLARYPHYS_Capillarity1
 #ifdef LAW2_SCGEOM_CAPILLARYPHYS_Capillarity1
 
 #include <pkg/dem/Law2_ScGeom_CapillaryPhys_Capillarity1.hpp>
@@ -462,7 +462,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity1::solver(Real suction,bool reset)
 	      if (!hertzOn) cundallContactPhysics->capillaryPressure = suction;
 	      else mindlinContactPhysics->capillaryPressure = suction;
 	      /// Capillary solution finder:
-	      if ((Pinterpol>=0) && (hertzOn? mindlinContactPhysics->meniscus : cundallContactPhysics->meniscus)) {
+	      if ((Pinterpol>=0) && (hertzOn? mindlinContactPhysics->meniscus : cundallContactPhysics->meniscus)) {//FIXME: need an "else {delete}"
 		MeniscusPhysicalData solution = interpolate1(dtPbased,K::Point_3(R2/R1, Pinterpol, Dinterpol), cundallContactPhysics->m, solutions, reset);
 /// capillary adhesion force
 		Real Finterpol = solution.force;
@@ -486,6 +486,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity1::solver(Real suction,bool reset)
                 if (cundallContactPhysics->meniscus== false) cundallContactPhysics->SInterface=4*3.141592653589793238462643383279502884*(pow(R1,2))+4*3.141592653589793238462643383279502884*(pow(R2,2));
                 if (!Vinterpol) {
                     if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove((*ii));
+/// FIXME: the following D>(...) test is wrong, should be based on penetrationDepth, and should "continue" after erasing
 		    if (D>((interactionDetectionFactor-1)*(currentContactGeometry->radius2+currentContactGeometry->radius1))) scene->interactions->requestErase(interaction);
                 }
 /// wetting angles
@@ -500,7 +501,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity1::solver(Real suction,bool reset)
 	      
 	    }
 	    else{
-	      if (cundallContactPhysics->vMeniscus==0 and cundallContactPhysics->capillaryPressure!=0){
+	      if (cundallContactPhysics->vMeniscus==0 and cundallContactPhysics->capillaryPressure!=0){//FIXME: test capillaryPressure consistently (!0 or >0 or >=0?!)
 		Real Pinterpol = 0;
 	        if (!hertzOn) Pinterpol = cundallContactPhysics->isBroken ? 0 : cundallContactPhysics->capillaryPressure*R1/liquidTension;
 	        else Pinterpol = mindlinContactPhysics->isBroken ? 0 : cundallContactPhysics->capillaryPressure*R1/liquidTension;

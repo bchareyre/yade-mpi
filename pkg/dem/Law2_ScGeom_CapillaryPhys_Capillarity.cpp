@@ -135,6 +135,14 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				//If P=0, we use null solution
 				MeniscusParameters
 				solution(Pinterpol? capillary->interpolate(R1,R2,Dinterpol, Pinterpol, currentIndexes) : MeniscusParameters());
+				/// If no bridge, delete the interaction if necessary and escape
+				if (!solution.V) {
+					if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove(interaction);
+					if (D>0) {scene->interactions->requestErase(interaction); continue;}
+					else if ((Pinterpol > 0) && (showError)) {
+						LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files."); // V=0 at a contact reveals a problem if and only if uc* > 0
+						showError = false;}//show error message once / avoid console spam	
+				}
 				/// capillary adhesion force
 				Real Finterpol = solution.F;
 				Vector3r fCap = - Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->normal;
@@ -151,14 +159,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					if (Vinterpol != 0) mindlinContactPhysics->meniscus = true;
 					else mindlinContactPhysics->meniscus = false;
 				}
-				if (!Vinterpol) {
-					if ((fusionDetection) || (hertzOn ? mindlinContactPhysics->isBroken : cundallContactPhysics->isBroken)) bodiesMenisciiList.remove(interaction);
-					if (D>0) scene->interactions->requestErase(interaction);
-					else if ((Pinterpol > 0) && (showError)) {
-						LOG_ERROR("No meniscus found at a contact. capillaryPressure may be too large wrt. the loaded data files."); // V=0 at a contact reveals a problem if and only if uc* > 0
-						showError = false;//show error message once / avoid console spam
-					}
-				}
+				
 				/// wetting angles
 				if (!hertzOn) {
 					cundallContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
