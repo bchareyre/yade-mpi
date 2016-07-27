@@ -72,7 +72,6 @@ getIncidentVtxWeights(const Dt& dt,
   //helpful array for permutations
   const int comb [6] = {1, 2, 3, 0, 1, 2};
   typedef typename Dt::Geom_traits Gt;
-  typedef typename Gt::Point_3 Point;
   typedef typename Dt::Cell_handle Cell_handle;
   typedef typename Dt::Locate_type Locate_type;
   typedef typename Gt::FT Coord_type;
