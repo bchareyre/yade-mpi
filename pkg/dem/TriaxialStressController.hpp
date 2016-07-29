@@ -115,7 +115,7 @@ class TriaxialStressController : public BoundaryController
 		((bool,internalCompaction,true,,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
 		((Real,meanStress,0,Attr::readonly,"Mean stress in the packing. |yupdate|"))
 		((Real,volumetricStrain,0,Attr::readonly,"Volumetric strain (see :yref:`TriaxialStressController::strain`). |yupdate|"))
-		((Real,externalWork,0,Attr::readonly,"Boundary mechanical work (negativ when the boundaries actually provide energy to the sample). |yupdate|"))
+		((Real,externalWork,0,Attr::readonly,"Mechanical work associated to the boundary conditions, i.e. $\\int_{\\partial \\Omega} \\mat{T} \cdot  \\mat{u} ds$ with $\\mat{T}$ the surface traction and $\\mat{u}$ the displacement at the boundary. |yupdate|"))
 		((bool,updatePorosity,false,,"If true, :yref:`solid volume<TriaxialStressController::particlesVolume>` will be updated once (will automatically reset to false after one calculation step) e.g. for porosity calculation purpose. Can be used when volume of particles changes during the simulation (e.g. when particles are erased or when clumps are created)."))
 		,
 		/* extra initializers */
