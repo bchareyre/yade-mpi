@@ -18,12 +18,10 @@ void Serializable::pyRegisterClass(boost::python::object _scope) {
 		.def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr)
 		.def("dict",&Serializable::pyDict,"Return dictionary of attributes.")
 		.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary")
-		#if 1
 			/* boost::python pickling support, as per http://www.boost.org/doc/libs/1_42_0/libs/python/doc/v2/pickle.html */ 
 			.def("__getstate__",&Serializable::pyDict).def("__setstate__",&Serializable::pyUpdateAttrs)
 			.add_property("__safe_for_unpickling__",&Serializable::getClassName,"just define the attr, return some bogus data")
 			.add_property("__getstate_manages_dict__",&Serializable::getClassName,"just define the attr, return some bogus data")
-		#endif
 		// constructor with dictionary of attributes
 		.def("__init__",boost::python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
 		// comparison operators
