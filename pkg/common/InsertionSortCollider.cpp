@@ -221,6 +221,9 @@ void InsertionSortCollider::action(){
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
 		assert((size_t)BB[0].size==2*scene->bodies->size());
+		
+		//Increase the size of force container.
+		scene->forces.addMaxId(2*scene->bodies->size());
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
