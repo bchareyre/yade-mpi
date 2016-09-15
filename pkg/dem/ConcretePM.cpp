@@ -331,6 +331,7 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	/* shorthands */
 	Real& epsN(phys->epsN);
 	Vector3r& epsT(phys->epsT);
+	Vector3r& epsTPl(phys->epsTPl);
 	Real& kappaD(phys->kappaD);
 	/* Real& epsPlSum(phys->epsPlSum); */
 	const Real& E(phys->E); \
@@ -395,13 +396,12 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 			Real sigmaNSoft=E*(epsSoft+relKnSoft*(epsN-epsNPl-epsSoft));
 			if(sigmaNSoft>sigmaN){ /*assert(sigmaNSoft>sigmaN);*/ epsNPl+=(sigmaN-sigmaNSoft)/E; sigmaN=sigmaNSoft; }
 		}
-		sigmaT = G*epsT; /* trial stress */
+		sigmaT = G*(epsT-epsTPl); /* trial stress */
 		Real yieldSigmaT = std::max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); /* Mohr-Coulomb law with damage */
 		if (sigmaT.squaredNorm() > yieldSigmaT*yieldSigmaT) {
 			Real scale = yieldSigmaT/sigmaT.norm();
 			sigmaT *= scale; /* stress return */
-			//epsT *= scale;
-			/* epsPlSum += yieldSigmaT*geom->slipToStrainTMax(yieldSigmaT/G);*/ /* adjust strain */
+			epsTPl += sigmaT*(1-scale)/G;
 		}
 		relResidualStrength = isCohesive? (kappaD<epsCrackOnset? 1. : (1-omega)*(kappaD)/epsCrackOnset) : 0;
 	#endif
