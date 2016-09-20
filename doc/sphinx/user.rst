@@ -1674,21 +1674,20 @@ Getting help
 =============
 
 
+Questions and answers
+---------------------
+
+Please use Launchpad interface at https://answers.launchpad.net/yade/ for asking questions about Yade. In case you're not familiar with computer oriented discussion lists, please read `this wiki page <https://www.yade-dem.org/wiki/Howtoask>`_ (a Yade-oriented and shortened version of `How To Ask Questions The Smart Way <http://catb.org/~esr/faqs/smart-questions.html>`_) before posting, in order to increase your chances getting help. Do not forget to state what *version* of Yade you use (shown when you start Yade), whether you installed it from source code or a package, what operating system (such as Ubuntu 10.04), and if you have done any local modifications to source code in case of compiled version.
+
 Mailing lists
 --------------
 
-Yade has two mailing-lists. Both are hosted at http://www.launchpad.net and before posting, you must register to Launchpad and subscribe to the list by adding yourself to "team" of the same name running the list.
+In addition to the Q&A Launchpad interface, Yade has two mailing-lists. Both are hosted at http://www.launchpad.net and before posting, you must register to Launchpad and subscribe to the list by adding yourself to "team" of the same name running the list.
 
 yade-users@lists.launchpad.net
-	is general help list for Yade users. Add yourself to `yade-users team <https://launchpad.net/~yade-users>`_ so that you can post messages. `List archive <http://www.mail-archive.com/yade-users@lists.launchpad.net/>`_ is available.
+	is a general discussion list for all Yade users. Add yourself to `yade-users team <https://launchpad.net/~yade-users>`_ so that you can post messages. `List archive <http://www.mail-archive.com/yade-users@lists.launchpad.net/>`_ is available.
 yade-dev@lists.launchpad.net
 	is for discussions about Yade development; you must be member of `yade-dev team <https://launchpad.net/~yade-dev>`_ to post. This list is `archived <http://www.mail-archive.com/yade-dev@lists.launchpad.net/>`_ as well.
-
-Read `How To Ask Questions The Smart Way <http://catb.org/~esr/faqs/smart-questions.html>`_ before posting. Do not forget to state what *version* of yade you use (shown when you start yade), what operating system (such as Ubuntu 10.04), and if you have done any local modifications to source code.
-
-Questions and answers
----------------------
-Launchpad provides interface for giving questions at https://answers.launchpad.net/yade/ which you can use instead of mailing lists; at the moment, it functionality somewhat overlaps with yade-users, but has the advantage of tracking whether a particular question has already been answered.
 
 Wiki
 -----
