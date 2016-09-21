@@ -21,16 +21,16 @@ YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 void Law2_ScGeom_CapillaryPhys_Capillarity::postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&){
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw);
-  capillary->fill("M(r=1)");
-  capillary->fill("M(r=1.1)");
-  capillary->fill("M(r=1.25)");
-  capillary->fill("M(r=1.5)");
-  capillary->fill("M(r=1.75)");
-  capillary->fill("M(r=2)");
-  capillary->fill("M(r=3)");
-  capillary->fill("M(r=4)");
-  capillary->fill("M(r=5)");
-  capillary->fill("M(r=10)");
+  capillary->fill(("M(r=1)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=1.1)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=1.25)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=1.5)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=1.75)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=2)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=3)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=4)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=5)"+suffCapFiles).c_str());
+  capillary->fill(("M(r=10)"+suffCapFiles).c_str());
 }
 
 
@@ -40,6 +40,8 @@ MeniscusParameters::MeniscusParameters()
         F = 0;
         delta1 = 0;
         delta2 = 0;
+        nn11 = 0;
+        nn33 = 0;
 }
 
 MeniscusParameters::MeniscusParameters(const MeniscusParameters &source)
@@ -48,6 +50,8 @@ MeniscusParameters::MeniscusParameters(const MeniscusParameters &source)
         F = source.F;
         delta1 = source.delta1;
         delta2 = source.delta2;
+        nn11 = source.nn11;
+        nn33 = source.nn33;
 }
 
 MeniscusParameters::~MeniscusParameters()
@@ -162,11 +166,16 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 				
 				/// wetting angles
 				if (!hertzOn) {
-					cundallContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
+					cundallContactPhysics->Delta1 = min(max(solution.delta1,solution.delta2),90.0); // undesired values greater than 90 degrees (by few degrees) may be present in the capillary files for high r (~ 10) and very low suction and distance
 					cundallContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
 				} else {
-					mindlinContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
+					mindlinContactPhysics->Delta1 = min(max(solution.delta1,solution.delta2),90.0);
 					mindlinContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
+				}
+				// nn11 and nn33
+				if (!hertzOn) {
+					cundallContactPhysics->nn11 = pow(R2/alpha,2) * solution.nn11;
+					cundallContactPhysics->nn33 = pow(R2/alpha,2) * solution.nn33;
 				}
 			}
 		///interaction is not real	//If the interaction is not real, it should not be in the list
@@ -286,7 +295,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 }
 
 MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, int* index)
-{	//cerr << "interpolate" << endl;
+{
         if (R1 > R2) {
                 Real R3 = R1;
                 R1 = R2;
@@ -320,6 +329,8 @@ MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, i
                         result.F = result_inf.F*(1-r) + r*result_sup.F;
                         result.delta1 = result_inf.delta1*(1-r) + r*result_sup.delta1;
                         result.delta2 = result_inf.delta2*(1-r) + r*result_sup.delta2;
+                        result.nn11 = result_inf.nn11*(1-r) + r*result_sup.nn11;
+                        result.nn33 = result_inf.nn33*(1-r) + r*result_sup.nn33;
 
                         i=NB_R_VALUES;
                         //cerr << "i = " << i << endl;
@@ -329,7 +340,6 @@ MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, i
                 {
                         result = data_complete[i].Interpolate2(D,P, index[0], index[1]);
                         i=NB_R_VALUES;
-                        //cerr << "i = " << i << endl;
                 }
         }
         return result;
@@ -343,7 +353,6 @@ Tableau::Tableau(const char* filename)
 {
         ifstream file (filename);
         file >> R;
-        //cerr << "r = " << R << endl;
         int n_D;	//number of D values
         file >> n_D;
 
@@ -373,7 +382,7 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
         MeniscusParameters result_inf;
         MeniscusParameters result_sup;
 
-        for ( unsigned int i=0; i < full_data.size(); ++i)
+        for ( unsigned int i=0; i < full_data.size(); ++i) // loop over D values
         {
                 if (full_data[i].D > D )	// ok si D rang�s ds l'ordre croissant
 
@@ -387,6 +396,8 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
                         result.F = result_inf.F*(1-rD) + rD*result_sup.F;
                         result.delta1 = result_inf.delta1*(1-rD) + rD*result_sup.delta1;
                         result.delta2 = result_inf.delta2*(1-rD) + rD*result_sup.delta2;
+                        result.nn11 = result_inf.nn11*(1-rD) + rD*result_sup.nn11;
+                        result.nn33 = result_inf.nn33*(1-rD) + rD*result_sup.nn33;
 
                         i = full_data.size();
                 }
@@ -410,19 +421,20 @@ TableauD::TableauD(ifstream& file)
         Real x;
         int n_lines;	//pb: n_lines is real!!!
         file >> n_lines;
-        //cout << n_lines << endl;
 
         file.ignore(200, '\n'); // saute les caract�res (200 au maximum) jusque au caract�re \n (fin de ligne)*_
 
         if (n_lines!=0)
                 for (; i<n_lines; ++i) {
                         data.push_back(vector<Real> ());
-                        for (int j=0; j < 6; ++j)	// [D,P,V,F,delta1,delta2]
+                        for (int j=0; j < 8; ++j)	// [D,P,V,F,delta1,delta2,nn11,nn33]
                         {
                                 file >> x;
                                 data[i].push_back(x);
                         }
                 }
+        else
+                LOG_ERROR("Problem regarding the capillary file structure (e.g. n_D is not consistent with the actual data), and/or mismatch with the expected structure by the code ! Will segfault");
         D = data[i-1][0];
 }
 
@@ -441,17 +453,23 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
                         Real Vinf=data[index-1][2];
                         Real Delta1inf=data[index-1][4];
                         Real Delta2inf=data[index-1][5];
+                        Real nn11inf = data[index-1][6];
+                        Real nn33inf = data[index-1][7];
 
                         Real Psup=data[index][1];
                         Real Fsup=data[index][3];
                         Real Vsup=data[index][2];
                         Real Delta1sup=data[index][4];
                         Real Delta2sup=data[index][5];
+                        Real nn11sup = data[index][6];
+                        Real nn33sup = data[index][7];
 
                         result.V = Vinf+((Vsup-Vinf)/(Psup-Pinf))*(P-Pinf);
                         result.F = Finf+((Fsup-Finf)/(Psup-Pinf))*(P-Pinf);
                         result.delta1 = Delta1inf+((Delta1sup-Delta1inf)/(Psup-Pinf))*(P-Pinf);
                         result.delta2 = Delta2inf+((Delta2sup-Delta2inf)/(Psup-Pinf))*(P-Pinf);
+                        result.nn11 = nn11inf + (nn11sup - nn11inf) / (Psup-Pinf) * (P-Pinf);
+                        result.nn33 = nn33inf + (nn33sup - nn33inf) / (Psup-Pinf) * (P-Pinf);
                         return result;
 
         	}
@@ -459,37 +477,45 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
 	//compteur2+=1;
         for (int k=1; k < dataSize; ++k) 	// Length(data) ??
 
-        {	//cerr << "k = " << k << endl;
+        {
                 if ( data[k][1] > P) 	// OK si P rangés ds l'ordre croissant
 
-                {	//cerr << "if" << endl;
+                {
                         Real Pinf=data[k-1][1];
                         Real Finf=data[k-1][3];
                         Real Vinf=data[k-1][2];
                         Real Delta1inf=data[k-1][4];
                         Real Delta2inf=data[k-1][5];
+                        Real nn11inf = data[k-1][6];
+                        Real nn33inf = data[k-1][7];
 
                         Real Psup=data[k][1];
                         Real Fsup=data[k][3];
                         Real Vsup=data[k][2];
                         Real Delta1sup=data[k][4];
                         Real Delta2sup=data[k][5];
+                        Real nn11sup = data[k][6];
+                        Real nn33sup = data[k][7];
 
                         result.V = Vinf+((Vsup-Vinf)/(Psup-Pinf))*(P-Pinf);
                         result.F = Finf+((Fsup-Finf)/(Psup-Pinf))*(P-Pinf);
                         result.delta1 = Delta1inf+((Delta1sup-Delta1inf)/(Psup-Pinf))*(P-Pinf);
                         result.delta2 = Delta2inf+((Delta2sup-Delta2inf)/(Psup-Pinf))*(P-Pinf);
+                        result.nn11 = nn11inf + (nn11sup - nn11inf) / (Psup-Pinf) * (P-Pinf);
+                        result.nn33 = nn33inf + (nn33sup - nn33inf) / (Psup-Pinf) * (P-Pinf);
                         index = k;
 
                         k=dataSize;
                 }
                 else if (data[k][1] == P)
 
-                {	//cerr << "elseif" << endl;
+                {
                         result.V = data[k][2];
                         result.F = data[k][3];
                         result.delta1 = data[k][4];
                         result.delta2 = data[k][5];
+                        result.nn11= data[k][6];
+                        result.nn33= data[k][7];
                         index = k;
 
                         k=dataSize;

@@ -26,6 +26,8 @@ class CapillaryPhys : public FrictPhys
 				 ((Real,Delta2,0.,,"Defines the surface area wetted by the meniscus on the biggest grains of radius R2 (R1<R2)"))
 				 ((Vector3r,fCap,Vector3r::Zero(),,"Capillary force produced by the presence of the meniscus. This is the force acting on particle #2"))
 				 ((short int,fusionNumber,0.,,"Indicates the number of meniscii that overlap with this one"))
+				 ((Real,nn11,0.,,":math:`\\iint_A n_1 n_1 \\, dS = \\iint_A n_2 n_2 \\, dS`, $A$ being the liquid-gas surface of the meniscus, $\\vec n$ the associated normal, and $(1,2,3)$ a local basis with $3$ the meniscus orientation (:yref:`ScGeom.normal`). NB: $A$ = 2 :yref:`nn11<CapillaryPhys.nn11>` + :yref:`nn33<CapillaryPhys.nn33>`."))
+				 ((Real,nn33,0.,,":math:`\\iint_A n_3 n_3 \\, dS`, $A$ being the liquid-gas surface of the meniscus, $\\vec n$ the associated normal, and $(1,2,3)$ a local basis with $3$ the meniscus orientation (:yref:`ScGeom.normal`). NB: $A$ = 2 :yref:`nn11<CapillaryPhys.nn11>` + :yref:`nn33<CapillaryPhys.nn33>`."))
 				 ,,
 				 createIndex();currentIndexes[0]=currentIndexes[1]=currentIndexes[2]=currentIndexes[3]=0;
 				 ,

@@ -37,6 +37,8 @@ public :
 	Real F; // adimentionnal capillary force for this meniscus : true force / ( 2 * pi * Rmax * superficial tension), (30) of Annexe1 of Scholtes2009d
 	Real delta1; // angle defined Fig 2.5 Scholtes2009d
 	Real delta2; // angle defined Fig 2.5 Scholtes2009d
+	Real nn11; // CapillaryPhys.nn11 / R2^2
+	Real nn33; // CapillaryPhys.nn33 / R2^2
 	int index1;
 	int index2;
 
@@ -94,6 +96,7 @@ class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 	((bool,binaryFusion,true,,"If true, capillary forces are set to zero as soon as, at least, 1 overlap (menisci fusion) is detected. Otherwise :yref:`fCap<CapillaryPhys.fCap>` = :yref:`fCap<CapillaryPhys.fCap>` / (:yref:`fusionNumber<CapillaryPhys.fusionNumber>` + 1 )"))
 	((bool,createDistantMeniscii,false,,"Generate meniscii between distant spheres? Else only maintain the existing ones. For modeling a wetting path this flag should always be false. For a drying path it should be true for one step (initialization) then false, as in the logic of [Scholtes2009c]_"))
         ((Real,surfaceTension,0.073,,"Value of considered surface tension")) // (0.073 N/m is water tension at 20 Celsius degrees)
+	((string,suffCapFiles,"",,"Capillary files suffix: M(r=X)suffCapFiles"))
 	,,/*constructor*/
 	hertzInitialized = false;
 	hertzOn = false;
@@ -107,7 +110,7 @@ class TableauD // Laplace solutions for a given r, and a given D (and a given co
 	public:
 		Real D; // one cst D value in each TableauD (the one appearing last line of corresponding group D=cst in the capillary file)
 		std::vector<std::vector<Real> > data;
-		MeniscusParameters Interpolate3(Real P, int& index);
+		MeniscusParameters Interpolate3(Real P, int& index); // does the interpolation on uc*
 		TableauD();
   		TableauD(std::ifstream& file);
   		~TableauD();
@@ -122,14 +125,14 @@ class Tableau // Laplace solutions for a given r (and a given contact angle): on
 	public: 
 		Real R;
 		std::vector<TableauD> full_data; // members of full_data are the different TableauD, for different D.
-		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2);		
+		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2); // does the interpolation on d* (returning no meniscus when d* > the greatest D of the file)
 		std::ifstream& operator<< (std::ifstream& file);		
 		Tableau();
     		Tableau(const char* filename);
     		~Tableau();
 };
 
-class capillarylaw // the whole set of capillary files M(r=..)
+class capillarylaw // class for a whole set of capillary files M(r=..)
 {
 	public:
 		capillarylaw();
