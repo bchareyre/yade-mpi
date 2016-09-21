@@ -55,7 +55,7 @@ for i =1:length(rRatioVec)
 % ##### Preliminary A: find maxD values #####
 % It is considered to be for zero suction (corresponds ~ to Scholtes' data)
 % And assumed to occur for delta1 greater than 15 deg (> 30 deg in Scholtes)
-    disp('Search for maximum distance starting')
+    fprintf(['\nFor r = ',num2str(rRatio),', starting search for maximum distance\n'])
 %     fflush(stdout); % Octave command for flush display
     d1here = 15:0.5:90-theta; % I got the exact same results with 15:1:90 or 15:0.2:90
     data = solveLaplace_uc(theta,rRatio,0,d1here,deltaZ,0);
@@ -197,12 +197,14 @@ function outData = interpolate(dist,valUc,bigData)
 
 dataGreaterDist = bigData(bigData(:,1)>= dist,:);
 
-if isempty(dataGreaterDist)
-    % this should never happen: bigData includes all cases uc=0, and dist =
-    % maxD (the worst case) is one of them
+if isempty(dataGreaterDist) % may happen for maxD, see for instance delta1 
+    % increment = 0.5 for maxD determination (with uc*=0), vs possibly 
+    % another value for computing bigData
     outData = [];
-    out='\nUnexpected behavior obtained during interpolate function for dist =';
-    fprintf([out,num2str(dist),'. Please give a look..\n']);
+    out = '\nWARNING: Reaching the last distance value was not possible here. Before use in YADE, you need to';
+    out = [out,' modify by hand the 2d line (where nValDist appears) of this capillary file:\n'];
+    out = [out,'Just substract 1 to the nValDist value appearing therein\n'];
+    fprintf([out,'Sorry about that..\n\n']);
     return
 end
 maxUc_dist = max(dataGreaterDist(:,2));
@@ -241,12 +243,11 @@ data_dist = data_dist(data_dist(:,2) >= 0,:); % in case we faced the break above
 if size(data_dist,1) > nValUcOK
     error('Problem here !')
 end
-if size(data_dist,1) == 0
-    % may happen for dist = maxD
-   out = '\nWARNING: Reaching the last distance value was not possible here. Before use in YADE, you need to';
-   out = [out,' modify by hand the 2d line (where nValDist appears) of this capillary file:\n'];
-   out = [out,'Just substract 1 to the nValDist value appearing therein\n'];
-   fprintf([out,'Sorry about that..\n\n']);
+if size(data_dist,1) == 0 % may happen for dist = maxD
+    out = '\nWARNING: Reaching the last distance value was not possible here. Before use in YADE, you need to';
+    out = [out,' modify by hand the 2d line (where nValDist appears) of this capillary file:\n'];
+    out = [out,'Just substract 1 to the nValDist value appearing therein\n'];
+    fprintf([out,'Sorry about that..\n\n']);
 end
 
 outData = [nValUcOK 0 0 0 0 0 0 0;data_dist];
