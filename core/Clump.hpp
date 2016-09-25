@@ -59,6 +59,7 @@ class Clump: public Shape {
 		static void del(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody);
 		//! Recalculate physical properties of Clump.
 		static void updateProperties(const shared_ptr<Body>& clump, unsigned int discretization);
+		static void updatePropertiesNonSpherical(const shared_ptr<Body>& clump, bool intersecting,shared_ptr<Scene> rb);//FIXME
 		//! Calculate positions and orientations of members based on relative Se3; newton pointer (if non-NULL) calls NewtonIntegrator::saveMaximaVelocity
 		// done as template to avoid cross-dependency between clump and newton (not necessary if all plugins are linked together)
 		template<class IntegratorT>
@@ -79,7 +80,7 @@ class Clump: public Shape {
 			}
 		}
 
-
+		static void addNonSpherical(const shared_ptr<Body>& clump, const shared_ptr<Body>& subBody); //FIXME
 		//! update member positions after clump being moved by mouse (in case simulation is paused and engines will not do that).
 		void userForcedDisplacementRedrawHook(){ throw runtime_error("Clump::userForcedDisplacementRedrawHook not yet implemented (with Clump as subclass of Shape).");}
 
@@ -98,7 +99,7 @@ class Clump: public Shape {
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Clump,Shape,"Rigid aggregate of bodies",
 		((MemberMap,members,,Attr::hidden,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)"))
-		// ((vector<int>,ids,,Attr::readonly,"Ids of constituent particles (only informative; direct modifications will have no effect)."))
+		 ((vector<int>,ids,,Attr::readonly,"Ids of constituent particles (only informative; direct modifications will have no effect).")) //FIXME
 		,/*ctor*/ createIndex();
 		,/*py*/ .add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")
 	);

@@ -21,6 +21,19 @@ Vector3r& ScGeom::rotate(Vector3r& shearForce) const {
 	return shearForce;
 }
 
+
+Vector3r& ScGeom::rotateNonSpherical(Vector3r& shearForce) const { //FIXME
+	// approximated rotations
+	shearForce -= shearForce.cross(orthonormal_axis);
+	//shearForce -= shearForce.cross(twist_axis);
+	//NOTE : make sure it is in the tangent plane? It's never been done before. Is it not adding rounding errors at the same time in fact?...
+	//shearForce -= normal.dot(shearForce)*normal;
+	if(std::isnan(shearForce.norm())){
+		std::cout<<"orthonormal_axis: "<<orthonormal_axis<<", normal: "<<normal<<endl;
+	}
+	return shearForce;
+}
+
 //!Precompute data needed for rotating tangent vectors attached to the interaction
 void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene, const shared_ptr<Interaction>& c, const Vector3r& currentNormal, bool isNew, const Vector3r& shift2, bool avoidGranularRatcheting){
 	if(!isNew) {
@@ -36,6 +49,8 @@ void ScGeom::precompute(const State& rbp1, const State& rbp2, const Scene* scene
 	relativeVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	shearInc = relativeVelocity*scene->dt;
 }
+
+
 
 Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, const Vector3r& shift2, const Vector3r& shiftVel, bool avoidGranularRatcheting){
 	if(avoidGranularRatcheting){
