@@ -548,7 +548,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 		sample->ComputeNormalsOff();
 		//sample->Update();
 		vtkSmartPointer<vtkContourFilter> contours = vtkContourFilter::New();
-		contours->SetInputData(sample->GetOutput());
+		contours->SetInputConnection(sample->GetOutputPort());
 		contours->SetNumberOfContours(1);
 		contours->SetValue(0,0.0);		 
 		vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
@@ -895,7 +895,7 @@ void PotentialBlockVTKRecorder::action(){
 		sample->ComputeNormalsOff();
 		//sample->Update();
 		vtkSmartPointer<vtkContourFilter> contours = vtkContourFilter::New();
-		contours->SetInputData(sample->GetOutput());
+		contours->SetInputConnection(sample->GetOutputPort());
 		contours->SetNumberOfContours(1);
 		contours->SetValue(0,0.0);		 
 		vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
@@ -907,7 +907,8 @@ void PotentialBlockVTKRecorder::action(){
 		pbColors->SetName("pbColors");
 		pbColors->SetNumberOfComponents(3);
 		Vector3r color = pb->color; //Vector3r(0,100,0);
-		if (b->isDynamic() == false){ color = Vector3r(157,157,157); } 
+		//if (b->isDynamic() == false){ color = Vector3r(157,157,157); } 
+		color = Vector3r(157,157,157);
 		unsigned char c[3]; //c = {color[0],color[1],color[2]};
 		c[0]=color[0];
 		c[1]=color[1];

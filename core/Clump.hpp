@@ -60,6 +60,7 @@ class Clump: public Shape {
 		//! Recalculate physical properties of Clump.
 		static void updateProperties(const shared_ptr<Body>& clump, unsigned int discretization);
 		static void updatePropertiesNonSpherical(const shared_ptr<Body>& clump, bool intersecting,shared_ptr<Scene> rb);//FIXME
+		static void updatePropertiesNonSpherical(const shared_ptr<Body>& clump, bool intersecting);//FIXME
 		//! Calculate positions and orientations of members based on relative Se3; newton pointer (if non-NULL) calls NewtonIntegrator::saveMaximaVelocity
 		// done as template to avoid cross-dependency between clump and newton (not necessary if all plugins are linked together)
 		template<class IntegratorT>

@@ -139,8 +139,9 @@ class pyBodyContainer{
 					clump->ids.erase(clump->ids.begin()+i);
 				}
 			}
-			Clump::updateProperties(clumpBody,/*intersecting*/ false);
+			Clump::updatePropertiesNonSpherical(clumpBody,/*intersecting*/ false);
 			proxee->erase(memberBody->getId(),false);
+			
 		}
 		
 	}

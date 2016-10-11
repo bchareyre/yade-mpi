@@ -344,6 +344,111 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 
 }
 
+void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool intersecting){ //FIXME
+//LOG_DEBUG("Updating clump #"<<getId()<<" parameters");
+	//assert(members.size()>0);
+	const shared_ptr<State> state(clumpBody->state);
+	const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
+
+	// trivial case
+	if(clump->members.size()==1){
+		LOG_DEBUG("Clump of size one will be treated specially.")
+		MemberMap::iterator I=clump->members.begin();
+		shared_ptr<Body> subBody=Body::byId(I->first);
+		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+		State* subState=subBody->state.get();
+		// se3 of the clump as whole is the same as the member's se3
+		state->pos=subState->pos;
+		state->ori=subState->ori;
+		// relative member's se3 is identity
+		I->second.position=Vector3r::Zero(); I->second.orientation=Quaternionr::Identity();
+		state->inertia=subState->inertia;	
+		state->mass=subState->mass;
+		state->vel=Vector3r::Zero();
+		state->angVel=Vector3r::Zero();
+		return;
+	}
+
+	/* quantities suffixed by
+		g: global (world) coordinates
+		s: local subBody's coordinates
+		c: local clump coordinates
+	*/
+	double M=0; // mass
+	Vector3r Sg(0,0,0); // static moment, for getting clump's centroid
+	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
+
+	if(intersecting){
+		LOG_WARN("Self-intersecting clumps not yet implemented, intersections will be ignored.");
+		intersecting=false;
+	}
+
+	// begin non-intersecting loop here
+	if(!intersecting){
+		FOREACH(MemberMap::value_type& I, clump->members){
+			// I.first is Body::id_t, I.second is Se3r of that body
+			shared_ptr<Body> subBody=Body::byId(I.first);
+			State* subState=subBody->state.get();
+			M+=subState->mass;
+			Sg+=subState->mass*subState->pos;
+			// transform from local to global coords
+			Quaternionr subState_ori_conjugate=subState->ori.conjugate();
+			Matrix3r Imatrix=Matrix3r::Zero(); Imatrix.diagonal()=subState->inertia; 
+			// TRWM3MAT(Imatrix); TRWM3QUAT(subRBP_orientation_conjugate);
+			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subState_ori_conjugate),subState->mass,-1.*subState->pos);
+			//TRWM3MAT(Clump::inertiaTensorRotate(Matrix3r(subRBP->inertia),subRBP_orientation_conjugate));
+		}
+	}
+	//TRVAR1(M); TRWM3MAT(Ig); TRWM3VEC(Sg);
+	assert(M>0);
+
+	state->pos=Sg/M; // clump's centroid
+	// this will calculate translation only, since rotation is zero
+	Matrix3r Ic_orientG=Clump::inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, state->pos); // inertia at clump's centroid but with world orientation
+	//TRWM3MAT(Ic_orientG);
+
+	Matrix3r R_g2c(Matrix3r::Zero()); //rotation matrix
+	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
+	//TRWM3MAT(Ic_orientG);
+	matrixEigenDecomposition(Ic_orientG,R_g2c,Ic);
+	/*! @bug eigendecomposition might be wrong. see http://article.gmane.org/gmane.science.physics.yade.devel/99 for message. It is worked around below, however.
+	*/
+	// has NaNs for identity matrix!
+	//TRWM3MAT(R_g2c);
+
+	// set quaternion from rotation matrix
+	state->ori=Quaternionr(R_g2c); state->ori.normalize();
+	// now Ic is diagonal
+	state->inertia=Ic.diagonal();
+	state->mass=M;
+
+
+	// this block will be removed once EigenDecomposition works for diagonal matrices
+	//#if 1
+	//	if(isnan(R_g2c(0,0))||isnan(R_g2c(0,1))||isnan(R_g2c(0,2))||isnan(R_g2c(1,0))||isnan(R_g2c(1,1))||isnan(R_g2c(1,2))||isnan(R_g2c(2,0))||isnan(R_g2c(2,1))||isnan(R_g2c(2,2))){
+	//		throw std::logic_error("Clump::updateProperties: NaNs in eigen-decomposition of inertia matrix?!");
+	//	}
+	//#endif
+	//TRWM3VEC(state->inertia);
+
+	// TODO: these might be calculated from members... but complicated... - someone needs that?!
+	state->vel=state->angVel=Vector3r::Zero();
+
+	clumpBody->setAspherical(state->inertia[0]!=state->inertia[1] || state->inertia[0]!=state->inertia[2]);
+
+	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
+	FOREACH(MemberMap::value_type& I, clump->members){
+		// now, I->first is Body::id_t, I->second is Se3r of that body
+		shared_ptr<Body> subBody=Body::byId(I.first);
+		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+		State* subState=subBody->state.get();
+		I.second.orientation=state->ori.conjugate()*subState->ori;
+		I.second.position=state->ori.conjugate()*(subState->pos-state->pos);
+	}
+
+
+}
+
 void Clump::addNonSpherical(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBody){ //FIXME
 	Body::id_t subId=subBody->getId();
 	if(subBody->clumpId!=Body::ID_NONE) throw std::invalid_argument(("Body #"+boost::lexical_cast<string>(subId)+" is already in clump #"+boost::lexical_cast<string>(subBody->clumpId)).c_str());
