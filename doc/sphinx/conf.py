@@ -686,37 +686,37 @@ V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, J
 
 \end{titlepage}
 
-\text{\sffamily\bfseries\Large Authors}
-\begin{multicols}{2}
+\text{\sffamily\bfseries\large Authors}
+%\begin{multicols}{2} %%Compile error 
 \begin{itemize}
- \item \text{\sffamily\bfseries\normalsize V\'{a}clav \v{S}milauer}\\ \text{\sffamily\small Freelance consultant (http://woodem.eu)}
- \item \text{\sffamily\bfseries\normalsize Emanuele Catalano}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
- \item \text{\sffamily\bfseries\normalsize Bruno Chareyre}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
- \item \text{\sffamily\bfseries\normalsize Sergei Dorofeenko}\\ \text{\sffamily\small IPCP RAS, Chernogolovka}
- \item \text{\sffamily\bfseries\normalsize J\'er\^ome Duriez}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
- \item \text{\sffamily\bfseries\normalsize Nolan Dyck}\\ \text{\sffamily\small Univ. of Western Ontario}
- \item \text{\sffamily\bfseries\normalsize Jan Eliáš}\\ \text{\sffamily\small Brno University of Technology}
- \item \text{\sffamily\bfseries\normalsize Burak Er}\\ \text{\sffamily\small Bursa Technical University}
- \item \text{\sffamily\bfseries\normalsize Alexander Eulitz}\\ \text{\sffamily\small TU Berlin / Institute for Machine Tools}\\ \text{\sffamily\small and Factory Management}
- \item \text{\sffamily\bfseries\normalsize Anton Gladky}\\ \text{\sffamily\small TU Bergakademie Freiberg}
- \item \text{\sffamily\bfseries\normalsize Ning Guo}\\ \text{\sffamily\small Hong Kong Univ. of Science and Tech.}
- \item \text{\sffamily\bfseries\normalsize Christian Jakob}\\ \text{\sffamily\small TU Bergakademie Freiberg}
- \item \text{\sffamily\bfseries\normalsize François Kneib}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR / Irstea Grenoble}
- \item \text{\sffamily\bfseries\normalsize Janek Kozicki}\\ \text{\sffamily\small Gdansk University of Technology}
- \item \text{\sffamily\bfseries\normalsize Donia Marzougui}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
- \item \text{\sffamily\bfseries\normalsize Raphaël Maurin}\\ \text{\sffamily\small Irstea Grenoble}
- \item \text{\sffamily\bfseries\normalsize Chiara Modenese}\\ \text{\sffamily\small University of Oxford}
- \item \text{\sffamily\bfseries\normalsize Luc Scholt\`{e}s}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
- \item \text{\sffamily\bfseries\normalsize Luc Sibille}\\ \text{\sffamily\small University of Nantes, lab. GeM}
- \item \text{\sffamily\bfseries\normalsize Jan Str\'{a}nsk\'{y}}\\ \text{\sffamily\small CVUT Prague}
- \item \text{\sffamily\bfseries\normalsize Thomas Sweijen}\\ \text{\sffamily\small Utrecht University}
- \item \text{\sffamily\bfseries\normalsize Klaus Thoeni}\\ \text{\sffamily\small The University of Newcastle (Australia)}
- \item \text{\sffamily\bfseries\normalsize Chao Yuan} \\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
+ \item \text{\sffamily\bfseries\normalsize V\'{a}clav \v{S}milauer} \text{\sffamily\small Freelance consultant (http://woodem.eu)}
+ \item \text{\sffamily\bfseries\normalsize Emanuele Catalano} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
+ \item \text{\sffamily\bfseries\normalsize Bruno Chareyre} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
+ \item \text{\sffamily\bfseries\normalsize Sergei Dorofeenko} \text{\sffamily\small IPCP RAS, Chernogolovka}
+ \item \text{\sffamily\bfseries\normalsize J\'er\^ome Duriez} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
+ \item \text{\sffamily\bfseries\normalsize Nolan Dyck} \text{\sffamily\small Univ. of Western Ontario}
+ \item \text{\sffamily\bfseries\normalsize Jan Eliáš} \text{\sffamily\small Brno University of Technology}
+ \item \text{\sffamily\bfseries\normalsize Burak Er} \text{\sffamily\small Bursa Technical University}
+ \item \text{\sffamily\bfseries\normalsize Alexander Eulitz} \text{\sffamily\small TU Berlin / Institute for Machine Tools}\\ \text{\sffamily\small and Factory Management}
+ \item \text{\sffamily\bfseries\normalsize Anton Gladky} \text{\sffamily\small TU Bergakademie Freiberg}
+ \item \text{\sffamily\bfseries\normalsize Ning Guo} \text{\sffamily\small Hong Kong Univ. of Science and Tech.}
+ \item \text{\sffamily\bfseries\normalsize Christian Jakob} \text{\sffamily\small TU Bergakademie Freiberg}
+ \item \text{\sffamily\bfseries\normalsize François Kneib} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR / Irstea Grenoble}
+ \item \text{\sffamily\bfseries\normalsize Janek Kozicki} \text{\sffamily\small Gdansk University of Technology}
+ \item \text{\sffamily\bfseries\normalsize Donia Marzougui} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
+ \item \text{\sffamily\bfseries\normalsize Raphaël Maurin} \text{\sffamily\small Irstea Grenoble}
+ \item \text{\sffamily\bfseries\normalsize Chiara Modenese} \text{\sffamily\small University of Oxford}
+ \item \text{\sffamily\bfseries\normalsize Luc Scholt\`{e}s} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
+ \item \text{\sffamily\bfseries\normalsize Luc Sibille} \text{\sffamily\small University of Nantes, lab. GeM}
+ \item \text{\sffamily\bfseries\normalsize Jan Str\'{a}nsk\'{y}} \text{\sffamily\small CVUT Prague}
+ \item \text{\sffamily\bfseries\normalsize Thomas Sweijen} \text{\sffamily\small Utrecht University}
+ \item \text{\sffamily\bfseries\normalsize Klaus Thoeni} \text{\sffamily\small The University of Newcastle (Australia)}
+ \item \text{\sffamily\bfseries\normalsize Chao Yuan} \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
 \end{itemize}
-\end{multicols}
+%\end{multicols}
 
 \text{\sffamily\bfseries\large Citing this document}\\
-In order to let users cite Yade consistently in publications, we provide a list of bibliographic references for the different parts of the documentation. This way of acknowledging Yade is also a way to make developments and documentation of Yade more attractive for researchers, who are evaluated on the basis of citations of their work by others. We therefore kindly ask users to cite Yade as accurately as possible in their papers, as explained in http://yade-dem/doc/citing.html.
+In order to let users cite Yade consistently in publications, we provide a list of bibliographic references for the different parts of the documentation. We therefore kindly ask users to cite Yade as accurately as possible in their papers, as explained at http://yade-dem/doc/citing.html.
 
 '''
 
