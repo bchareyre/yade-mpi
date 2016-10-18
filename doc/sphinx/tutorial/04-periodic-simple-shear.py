@@ -41,9 +41,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_L3Geom()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_L3Geom_FrictPhys_ElPerfPl()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	NewtonIntegrator(damping=.4),
 	# run checkStress function (defined below) every second
