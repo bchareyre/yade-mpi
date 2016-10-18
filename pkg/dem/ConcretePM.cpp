@@ -355,7 +355,6 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 
 	#ifdef CPM_MATERIAL_MODEL
-		Vector3r& epsTPl(phys->epsTPl);
 		const Real& dt = scene->dt;
 		const Real& dmgTau(phys->dmgTau);
 		const Real& plTau(phys->plTau);
