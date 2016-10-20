@@ -253,7 +253,7 @@ The compilation process can take a considerable amount of time, be patient.
 If you are using a multi-core systems you can use the parameter ``-j`` to speed-up the compilation
 and split the compilation onto many cores. For example, on 4-core machines
 it would be reasonable to set the parameter ``-j4``. Note, Yade requires
-approximately 2GB RAM per core for compilation, otherwise the swap-file will be used
+approximately 3GB RAM per core for compilation, otherwise the swap-file will be used
 and compilation time dramatically increases.
 
 The installation is performed with the following command::
@@ -288,6 +288,21 @@ upon detecting the C and C++ compiler to use::
 Clang does not support OpenMP-parallelizing for the moment, that is why the 
 feature will be disabled.
 
+Speed-up compilation
+^^^^^^^^^^^^^^^^^^^^
+When spliting the compilation on many cores (``make -jN``), ``N`` is limited by the available cores and memory. It is possible to use more cores if remote computers are available, ditributing the compilation with `ditscc <https://wiki.archlinux.org/index.php/Distcc>`_  (see distcc documentation for configuring slaves and master):
+	export CC=distcc gcc
+	export CXX=distcc g++
+	cmake [options as usual]
+	make -jN
+
+In addition, and independently of distcc, caching previous compilations with `ccache <https://ccache.samba.org/>`_ can speed up re-compilation:
+	export CC=ccache gcc
+	export CXX=ccache g++
+	cmake [options as usual]
+	
+The two tools can be combined very simply, adding to the above exports 
+	export CCACHE_PREFIX="distcc"
 
 Yubuntu
 ------------
