@@ -75,7 +75,6 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Vector3r normal [6];
 		bool currentTes;
 		bool metisForced;
-		int idOffset;
 		double epsVolCumulative;
 		int ReTrg;
 		int ellapsedIter;
@@ -165,6 +164,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Real volumeCellTripleFictious (Cellhandle cell);
 		template<class Cellhandle>
 		Real volumeCell (Cellhandle cell);
+		Real surfaceSolidThroatInPore(int cellId, int throatIndex) {return solver->surfaceSolidThroatInPore(solver->T[solver->currentTes].cellHandles[cellId], throatIndex, false, false);}
 		template<class Cellhandle>
 		Vector3r cellBarycenterFromHandle (Cellhandle cell) {return makeVector3r(solver->cellBarycenter(cell));}
 		Vector3r cellBarycenterFromId (unsigned long id) {
@@ -197,6 +197,11 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			solver->T[solver->currentTes].cellHandles[id]->info().blocked=true;
 			solver->T[solver->currentTes].cellHandles[id]->info().Pcondition=blockPressure;
 		}
+		
+		Vector3r getBoundaryNormal(int index) {
+		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); return normal[max(0,min(5,index))];}
+		void setBoundaryNormal(int index, Vector3r v) {
+		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); normal[max(0,min(5,index))]=v;}
 		
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
@@ -233,6 +238,8 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		YADE_CLASS_PYCLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(TemplateFlowEngine_@TEMPLATE_FLOW_NAME@,@TEMPLATE_FLOW_NAME@,PartialEngine,"A generic engine from wich more specialized engines can inherit. It is defined for the sole purpose of inserting the right data classes CellInfo and VertexInfo in the triangulation, and it should not be used directly. Instead, look for specialized engines, e.g. :yref:`FlowEngine`, :yref:`PeriodicFlowEngine`, or :yref:`DFNFlowEngine`.",
 		((bool,isActivated,true,,"Activates Flow Engine"))
 		((bool,first,true,,"Controls the initialization/update phases"))
+		((int,idOffset,0,,"If the bounding walls of the fluid mesh are not walls of the scene (i.e. are not elements of O.bodies), the offset should be set equal to the size of O.bodies. If the bounding walls are bodies of the scene but are not numbered as 0-5 then offset should be the number of bodies comming before the walls. Set offset<0 to get it set equal to O.bodies.size(), it will also update :yref:`FlowEngine::wallIds`."))
+		((bool,convertClumps,true,,"If true the clumps will be temptatively converted into equivalent spheres in the triangulation, and clump members are skipped. Else clumps are ignored and spherical clump members are triangulated as independent bodies."))
 		((bool,doInterpolate,false,,"Force the interpolation of cell's info while remeshing. By default, interpolation would be done only for compressible fluids. It can be forced with this flag."))
 		((double, fluidBulkModulus, 0.,,"Bulk modulus of fluid (inverse of compressibility) K=-dP*V/dV [Pa]. Flow is compressible if fluidBulkModulus > 0, else incompressible."))
 		((Real, dt, 0,,"timestep [s]"))
@@ -258,7 +265,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((double,permeabilityFactor,1.0,,"permability multiplier"))
 		((double,viscosity,1.0,,"viscosity of the fluid"))
 		((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
-		((int, useSolver, 0,, "Solver to use 0=G-Seidel, 1=Taucs, 2-Pardiso, 3-CHOLMOD"))
+		((int, useSolver, 0,, "Solver to use. 0:Gauss-Seidel, >0: Cholesky factorization (sparse CHOLMOD)"))
 		((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
 		((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
 		((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
@@ -320,6 +327,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("getConstrictions",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getConstrictions,(boost::python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 		.def("getConstrictionsFull",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getConstrictionsFull,(boost::python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 		.def("edgeSize",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::edgeSize,"Return the number of interactions.")
+		.def("surfaceSolidThroatInPore",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::surfaceSolidThroatInPore,(boost::python::arg("cellId"),boost::python::arg("throatIndex")),"returns solid area in the throat (index 0-3), keeping only that part of the throat in cell.")
 		.def("OSI",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::OSI,"Return the number of interactions only between spheres.")
 		.def("saveVtk",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 		.def("avFlVelOnSph",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::avFlVelOnSph,(boost::python::arg("idSph")),"compute a sphere-centered average fluid velocity")
@@ -360,6 +368,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("compTessVolumes",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::compTessVolumes,"Like TesselationWrapper::computeVolumes()")
 		.def("volume",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getVolume,(boost::python::arg("id")=0),"Returns the volume of Voronoi's cell of a sphere.")
 		.def("averageVelocity",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::averageVelocity,"measure the mean velocity in the period")
+		.def("setBoundaryNormal",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::setBoundaryNormal,"define the unit outward-pointing normal of a boundary (0<=index<=5).")
 		)
 };
 
