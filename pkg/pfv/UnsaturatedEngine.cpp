@@ -211,7 +211,7 @@ void UnsaturatedEngine::invasionSingleCell(CellHandle cell)
 	    nCell->info().saturation=localSaturation;
 	    nCell->info().hasInterface=false;
 	    if(solver->debugOut) {cerr<<"drainage"<<endl;}
-	    invasionSingleCell(nCell);
+	    if (recursiveInvasion) invasionSingleCell(nCell);
 	  }
 ////FIXME:Introduce cell.hasInterface	  
 // 	  else if( (localPressure-nCell->info().p()>nPcThroat) && (localPressure-nCell->info().p()<nPcBody) && (cell->info().hasInterface==false) && (nCell->info().hasInterface==false) ) {
@@ -227,7 +227,7 @@ void UnsaturatedEngine::invasionSingleCell(CellHandle cell)
 	    nCell->info().p() = localPressure;
 	    nCell->info().saturation=localSaturation;
 	    if(solver->debugOut) {cerr<<"imbibition"<<endl;}
-	    invasionSingleCell(nCell);
+	    if (recursiveInvasion) invasionSingleCell(nCell);
 	  }
 //// FIXME:Introduce cell.hasInterface	  
 // 	  else if ( (nCell->info().p()-localPressure<nPcBody) && (nCell->info().p()-localPressure>nPcThroat) /*&& (cell->info().hasInterface==false) && (nCell->info().hasInterface==false)*/ ) {
