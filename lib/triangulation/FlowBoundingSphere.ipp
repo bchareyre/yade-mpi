@@ -747,7 +747,7 @@ double FlowBoundingSphere<Tesselation>::computeHydraulicRadius(CellHandle cell, 
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
 	double Vpore = this->volumePoreVoronoiFraction(cell, j);
-	double Ssolid = this->surfaceSolidPore(cell, j, slipBoundary, /*reuse the same facet data*/ true);
+	double Ssolid = this->surfaceSolidThroat(cell, j, slipBoundary, /*reuse the same facet data*/ true);
 
 	//handle symmetry (tested ok)
 	if (slipBoundary && facetNFictious>0) {
