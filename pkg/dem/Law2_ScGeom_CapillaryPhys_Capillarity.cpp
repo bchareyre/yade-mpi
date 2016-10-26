@@ -15,6 +15,7 @@
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <lib/base/Math.hpp>
+#include <pkg/common/Sphere.hpp>
 
 YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 
@@ -95,11 +96,11 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			/// definition of interacting objects (not necessarily in contact)
 			ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->geom.get());
 			
-			/// interaction geometry search (this test is to compute capillarity only between spheres (probably a better way to do that)
-			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!
+			/// test of interacting bodies geometries since capillarity will be computed between spheres only
+			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex();
 			int geometryIndex2 = (*bodies)[id2]->shape->getClassIndex();
-			if (!(geometryIndex1 == geometryIndex2)) { // such interactions won't have a meniscus
-				if(currentContactGeometry->penetrationDepth < 0) // thus we will ask for the interaction to be erased, as we do w. sphere-sphere interactions below:
+			if ( (geometryIndex1 != geometryIndex2) || (geometryIndex1!=Sphere::getClassIndexStatic()) ) { // such interactions won't have a meniscus
+				if(currentContactGeometry->penetrationDepth < 0) // thus we will ask for the interaction to be erased in this distant case, as we do w. sphere-sphere interactions below:
 					scene->interactions->requestErase(interaction);
 				continue;}
 
