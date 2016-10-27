@@ -63,6 +63,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	if (!scene) cerr << "scene not defined!";
 	if (!capillary) postLoad(*this);//when the script does not define arguments, postLoad is never called
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
+	int sphereIndex = Sphere::getClassIndexStatic();
 	
 	//check for contact model once (assuming that contact model does not change)
 	if (!hertzInitialized){//NOTE: We are assuming that only one type is used in one simulation here
@@ -99,12 +100,10 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 			/// test of interacting bodies geometries since capillarity will be computed between spheres only
 			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex();
 			int geometryIndex2 = (*bodies)[id2]->shape->getClassIndex();
-			if ( (geometryIndex1 != geometryIndex2) || (geometryIndex1!=Sphere::getClassIndexStatic()) ) { // such interactions won't have a meniscus
-				if(currentContactGeometry->penetrationDepth < 0) // thus we will ask for the interaction to be erased in this distant case, as we do w. sphere-sphere interactions below:
-					scene->interactions->requestErase(interaction);
+			if ( !(geometryIndex1 == sphereIndex && geometryIndex2 == sphereIndex) ) { // such interactions won't have a meniscus
+				 // thus we will ask for the interaction to be erased in this distant case, as we do w. sphere-sphere interactions below:
+				if(currentContactGeometry->penetrationDepth < 0) scene->interactions->requestErase(interaction);
 				continue;}
-
-
 			/// Interacting Grains:
 			// If you want to define a ratio between YADE sphere size and real sphere size
 			Real alpha=1;
@@ -115,7 +114,6 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 
 			/// intergranular distance
 			Real D = - alpha * currentContactGeometry->penetrationDepth;
-
 			if ( D<0 || createDistantMeniscii) { //||(scene->iter < 1) ) // a simplified way to define meniscii everywhere
 				D=max(0.,D); // defines fCap when spheres interpenetrate. D<0 leads to wrong interpolation as D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
 				if (!hertzOn) {
