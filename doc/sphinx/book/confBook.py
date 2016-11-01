@@ -364,10 +364,12 @@ if 1:
 	else:
 		if 12<=yade.runtime.ipython_version<13:
 			import ipython_directive012 as id
-                elif 13<=yade.runtime.ipython_version<200:
+		elif 13<=yade.runtime.ipython_version<200:
 			import ipython_directive013 as id
-                else:
+		elif 200<=yade.runtime.ipython_version<500:
 			import ipython_directive200 as id
+		else:
+			import ipython_directive500 as id
 
 	#The next four lines are for compatibility with IPython 0.13.1
 	ipython_rgxin =re.compile(r'(?:In |Yade )\[(\d+)\]:\s?(.*)\s*')
@@ -414,10 +416,12 @@ if yade.runtime.ipython_version<12:
 else:
 	if 12<=yade.runtime.ipython_version<13:
 		extensions.append('ipython_directive012')
-        elif 13<=yade.runtime.ipython_version<200:
+	elif 13<=yade.runtime.ipython_version<200:
 		extensions.append('ipython_directive013')
-        else:
+	elif 200<=yade.runtime.ipython_version<500:
 		extensions.append('ipython_directive200')
+	else:
+		extensions.append('ipython_directive500')
 
 # the sidebar extension
 if False:
