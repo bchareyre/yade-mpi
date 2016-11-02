@@ -61,7 +61,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	fluidBulkModulus = 0;
 	tessBasedForce = true;
 	for (int i=0;i<6;i++) boundsIds[i] = 0;
-	minPermLength=-1;
+	minPermLength=1e-6;// multiplier applied on throat radius to define a minimal throat length (escaping coincident points)
 	slipBoundary = false;//no-slip/symmetry conditions on lateral boundaries
 	tolerance = 1e-07;
 	relax = 1.9;
@@ -530,14 +530,12 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 				Sphere& v0 = W[0]->point();
 				Sphere& v1 = W[1]->point();
 				Sphere& v2 = W[2]->point();
-
 				cell->info().facetSphereCrossSections[j]=CVector(
 				   W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
 				   W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
 				   W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
 				//FIXME: it should be possible to skip completely blocked cells, currently the problem is it segfault for undefined areas
 // 				if (cell->info().blocked) continue;//We don't need permeability for blocked cells, it will be set to zero anyway
-
 				pass+=1;
 				CVector l = p1 - p2;
 				distance = sqrt(l.squared_length());
@@ -550,7 +548,7 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 				}
 				Real fluidArea=0;
 				if (distance!=0) {
-					if (minPermLength>0 && distanceCorrection) distance=max(minPermLength,distance);
+					if (minPermLength>0 && distanceCorrection) distance=max(minPermLength*radius,distance);
 					const CVector& Surfk = cell->info().facetSurfaces[j];
 					Real area = sqrt(Surfk.squared_length());
 					const CVector& crossSections = cell->info().facetSphereCrossSections[j];
@@ -561,16 +559,16 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 					//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
 					fluidArea=std::abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
 					cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
-					k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
-					 meanDistance += distance;
-					 meanRadius += radius;
-					 meanK +=  k*kFactor;
-
-				if (k<0 && debugOut) {surfneg+=1;
-				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<endl;}				     
+					// kFactor<0 means we replace Poiseuille by Darcy localy, yielding a particle size-independent bulk conductivity
+					if (kFactor>0) cell->info().kNorm()[j]= kFactor*(fluidArea * pow(radius,2)) / (8*viscosity*distance);
+					else cell->info().kNorm()[j]= -kFactor * area / distance;						
+					meanDistance += distance;
+					meanRadius += radius;
+					meanK +=  (cell->info().kNorm())[j];
+					
+					if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
+					if (k<0 && debugOut) {surfneg+=1; cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<endl;}
 				} else  {cout <<"infinite K1!"<<endl; k = infiniteK;}//Will be corrected in the next loop
-
-				(cell->info().kNorm())[j]= k*kFactor;
 				if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
 			}
 		}

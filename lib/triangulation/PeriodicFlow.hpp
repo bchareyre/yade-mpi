@@ -221,7 +221,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 					Real fluidArea=0;
 					int test=0;
 					if (distance!=0) {
-						if (minPermLength>0 && distanceCorrection) distance=max(minPermLength,distance);
+						if (minPermLength>0 && distanceCorrection) distance=max(minPermLength*radius,distance);
 						const CVector& Surfk = cell->info().facetSurfaces[j];
 						Real area = sqrt(Surfk.squared_length());
 						const CVector& crossSections = cell->info().facetSphereCrossSections[j];
@@ -232,17 +232,16 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 						//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
 						fluidArea=abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
 						cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
-						k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
+						// kFactor<0 means we replace Poiseuille by Darcy localy, yielding a particle size-independent bulk conductivity
+						if (kFactor>0) cell->info().kNorm()[j]= kFactor*(fluidArea * pow(radius,2)) / (8*viscosity*distance);
+						else cell->info().kNorm()[j]= -kFactor * area / distance;						
 						meanDistance += distance;
 						meanRadius += radius;
-						meanK += k*kFactor;
+						meanK +=  (cell->info().kNorm())[j];
 
-					if (k<0 && debugOut) {surfneg+=1;
-					cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
-					     
+						if (k<0 && debugOut) {surfneg+=1; cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<test<<endl;}
 					} else  {cout <<"infinite K2! surfaces will be missing (FIXME)"<<endl; k = infiniteK;}
 					//Will be corrected in the next loop
-					(cell->info().kNorm())[j]= k*kFactor;
 					if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
 					//The following block is correct but not very usefull, since all values are clamped below with MIN and MAX, skip for now
 // 					else {//find the real neighbor connected to our cell through periodicity
