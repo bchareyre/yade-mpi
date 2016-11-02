@@ -281,6 +281,9 @@ void UnsaturatedEngine::invasion1()
 	if ( cell->info().isTrapNW) {cell->info().p()=bndCondValue[2]+cell->info().trapCapP;}
    }
     if(solver->debugOut) {cout<<"----invasion1.update trapped W-phase/NW-phase Pressure----"<<endl;}
+
+    if(isCellLabelActivated) updateCellLabel();
+    if(solver->debugOut) {cout<<"----update cell labels----"<<endl;}
 }
 
 ///search trapped W-phase or NW-phase, define trapCapP=Pn-Pw. assign isTrapW/isTrapNW info.

@@ -39,6 +39,7 @@ void TwoPhaseFlowEngine::initialization()
 		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
 		computeSolidLine();//save cell->info().solidLine[j][y]
 		initializeReservoirs();//initial pressure, reservoir flags and local pore saturation
+		if(isCellLabelActivated) updateReservoirLabel();
 		solver->noCache = true;
 }
 
@@ -410,6 +411,13 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 		if (isDrawable){vtkfile.write_data(cell->info().saturation);}
 	}
 	vtkfile.end_data();
+
+	vtkfile.begin_data("Label",CELL_DATA,SCALARS,FLOAT);
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(cell->info().label);}
+	}
+	vtkfile.end_data();
 }
 void TwoPhaseFlowEngine::computePoreThroatRadiusTrickyMethod1()
 {
@@ -652,6 +660,57 @@ void TwoPhaseFlowEngine:: computePoreCapillaryPressure(CellHandle cell)
   Pc = surfaceTension / (Re * (1.0-exp(-6.83 * cell->info().saturation)));
   Pg = std::max(bndCondValue[2],bndCondValue[3]);
   cell->info().p() = Pg - Pc; */
+}
+
+void TwoPhaseFlowEngine:: updateReservoirLabel()
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+      if (cell->info().isNWRes) cell->info().label=0;
+      else if (cell->info().isWRes) cell->info().label=1;
+      else if (cell->info().label>1) continue;
+      else cell->info().label=-1;
+    }
+}
+
+void TwoPhaseFlowEngine:: updateCellLabel()
+{
+    int currentLabel = getMaxCellLabel();
+    updateReservoirLabel();
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+        if (cell->info().label==-1) {
+            updateSingleCellLabelRecursion(cell,currentLabel+1);
+            currentLabel++;
+        }
+    }
+}
+
+int TwoPhaseFlowEngine:: getMaxCellLabel()
+{
+    int maxLabel=-1;
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
+        if (cell->info().label>maxLabel) maxLabel=cell->info().label;
+    }
+    return maxLabel;
+}
+
+void TwoPhaseFlowEngine:: updateSingleCellLabelRecursion(CellHandle cell, int label)
+{
+    cell->info().label=label;
+    for (int facet = 0; facet < 4; facet ++) {
+        CellHandle nCell = cell->neighbor(facet);
+        if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
+//         if (nCell->info().Pcondition) continue;
+//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
+        //TODO:the following condition may relax to relate to nCell->info().hasInterface
+        if ( (nCell->info().saturation==cell->info().saturation) && (nCell->info().label!=cell->info().label) )
+            updateSingleCellLabelRecursion(nCell,label);
+    }
 }
 
 #endif //TwoPhaseFLOW

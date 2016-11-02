@@ -34,6 +34,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	int windowsID;//a temp cell info for experiment comparison(used by chao)
 	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for facet "i" and sphere (facetVertices)"[i][j]". Last component [i][3] for 1/sumLines in the facet "i" (used by chao).
 	
+	int label;//for marking disconnected clusters. initally all set to -1; first update -> connect to NW-res: 0; connect to W-res: 1; then label disconnected W-clusters by 2,3,4...
 	TwoPhaseCellInfo (void)
 	{
 		isWRes = true; isNWRes = false; isTrapW = false; isTrapNW = false;
@@ -45,6 +46,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 		poreBodyVolume = 0;
 		windowsID = 0;
 		for (int k=0; k<4;k++) for (int l=0; l<4;l++) solidLine[k][l]=0;
+		label=-1;
 	}
 	
 };
@@ -91,7 +93,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreThroatRadiusMethod3();
 	void savePoreNetwork();
 	
-	
+	void updateReservoirLabel();
+	void updateCellLabel();
+	void updateSingleCellLabelRecursion(CellHandle cell, int label);
+	int getMaxCellLabel();
+
 	
 	boost::python::list cellporeThroatRadius(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
 	  boost::python::list ids;
@@ -124,6 +130,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	CELL_SCALAR_GETTER(Real,.poreBodyRadius,cellInSphereRadius) //Temporary function to allow for simulations in Python	
 	CELL_SCALAR_GETTER(Real,.poreBodyVolume,cellVoidVolume) //Temporary function to allow for simulations in Python	
 	CELL_SCALAR_SETTER(bool,.hasInterface,setCellHasInterface) //Temporary function to allow for simulations in Python
+	CELL_SCALAR_GETTER(int,.label,cellLabel)
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
@@ -135,6 +142,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((double,dtDynTPF,0.0,,"Parameter which stores the smallest time step, based on the residence time"))
 	((int,entryPressureMethod,1,,"integer to define the method used to determine the pore throat radii and the according entry pressures. 1)radius of entry pore throat based on MS-P method; 2) radius of the inscribed circle; 3) radius of the circle with equivalent surface area of the pore throat."))
 	((double,partiallySaturatedPores,false,,"Include partially saturated pores or not?"))
+	((bool, isCellLabelActivated, false,, "Activate cell labels for marking disconnected wetting clusters. NW-reservoir label 0; W-reservoir label 1; disconnected W-clusters label from 2. "))
 
 	,/*TwoPhaseFlowEngineT()*/,
 	,
@@ -157,6 +165,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getCellVoidVolume",&TwoPhaseFlowEngine::cellVoidVolume,"get the volume of pore space in each pore unit")
 	.def("setCellHasInterface",&TwoPhaseFlowEngine::setCellHasInterface,"change wheter a cell has a NW-W interface")
 	.def("savePoreNetwork",&TwoPhaseFlowEngine::savePoreNetwork,"Extract the pore network of the granular material")
+	.def("getCellLabel",&TwoPhaseFlowEngine::cellLabel,"get cell label. 0 for NW-reservoir; 1 for W-reservoir; others for disconnected W-clusters.")
 	
 	)
 	DECLARE_LOGGER;
