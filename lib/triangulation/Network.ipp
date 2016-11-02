@@ -108,7 +108,7 @@ double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, c
 {
         double A [3], B[3];
 
-        Boundary &bi1 =  boundaries [SV1->info().id()];
+        Boundary &bi1 =  boundary(SV1->info().id());
 	
         for (int m=0;m<3;m++) {A[m]= (SV2->point())[m];}
         for (int m=0;m<3;m++) {B[m]= (SV3->point())[m];}
