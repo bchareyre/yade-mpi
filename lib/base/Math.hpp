@@ -177,7 +177,8 @@ using Mathr = Math<Real>;
 template<typename MatrixT>
 void Matrix_computeUnitaryPositive(const MatrixT& in, MatrixT* unitary, MatrixT* positive){
 	assert(unitary); assert(positive);
-	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	//Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	Eigen::JacobiSVD<MatrixT> svd(in, Eigen::ComputeFullU | Eigen::ComputeFullV);
 	MatrixT mU, mV, mS;
 	mU = svd.matrixU();
 		mV = svd.matrixV();
