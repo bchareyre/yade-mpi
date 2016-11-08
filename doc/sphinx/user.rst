@@ -1518,6 +1518,17 @@ Another opportunity to display spheres is an using *PointSprite* plugin. This te
 * "Point Sprite -> Scale By -> radii"
 * "Edit Radius Transfer Function -> Proportional -> Multiplier = 1.0 -> Close"
 
+Rendering interactions as force chain
+"""""""""""""""""""""""""""""""""""""""""""
+
+Data saved by ``VTKRecorder`` (the steps below generates cones rahter than tubes) or ``export.VTKExporter(...).exportInteractions(what=[('forceN','i.phys.normalForce().norm()')])`` (the steps below generates per interaction tubes with constant radius):
+
+* Load interactions VTP or VTK files
+* Filters -> Cell Data To Point Data
+* Filters -> Tube
+* Set color by "forceN"
+* Set "Vary Radius" to "By Scalar"
+* Set "Radius" and "Radius Factor" such that the result looks OK (in 3D postprocessing tutorial script, Radius=0.0005 and Radius Factor=100 looks reasonably)
 
 Facet transparency
 """""""""""""""""""
