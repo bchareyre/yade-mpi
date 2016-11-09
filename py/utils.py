@@ -1008,7 +1008,7 @@ class UnstructuredGrid:
 			if isinstance(e.shape,Facet):
 				#e.shape.vertices = [self.vertices[j] for j in c]
 				vs = [Vector3(self.vertices[j]) for j in c]
-				cc = sum(vs,Vector3.Zero)/3.
+				cc = inscribedCircleCenter(*vs)
 				for v in vs: v -= cc
 				e.state.pos = cc
 				e.shape.setVertices(vs)
