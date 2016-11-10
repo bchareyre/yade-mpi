@@ -1011,7 +1011,7 @@ class UnstructuredGrid:
 				cc = inscribedCircleCenter(*vs)
 				for v in vs: v -= cc
 				e.state.pos = cc
-				e.shape.setVertices(vs)
+				e.shape.setVertices(*vs)
 			elif isinstance(e.shape,Tetra):
 				e.shape.v = [self.vertices[j] for j in c]
 			else:
