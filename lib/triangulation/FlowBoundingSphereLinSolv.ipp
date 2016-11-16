@@ -160,7 +160,6 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 			if (!cell->info().Pcondition && !cell->info().blocked) ++ncols;}
 //		//Segfault on 14.10, and useless overall since SuiteSparse has preconditionners (including metis)
 // 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
-
 		T_cells.clear();
 		T_index=0;
 		isLinearSystemSet=false;
@@ -273,12 +272,8 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		#ifdef EIGENSPARSE_LIB
 		} else if (useSolver==3){
 			tripletList.clear(); tripletList.resize(T_nnz);
-			for(int k=0;k<T_nnz;k++) {
-// 				if (is[k]<js[k]) cerr<<"not the good relation"<<endl;
-// 				else cerr<< "comp " <<is[k]-1<<" "<<js[k]-1<<" "<<vs[k]<<endl;
-				tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
-			}
-			A.resize(ncols,ncols);
+			for(int k=0;k<T_nnz;k++) tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
+ 			A.resize(ncols,ncols);
 			A.setFromTriplets(tripletList.begin(), tripletList.end());
 		#endif
 		}
@@ -526,7 +521,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 		eSolver.compute(A);
 		//Check result
 		if (eSolver.cholmod().status>0) {
-			cerr << "something went wrong in Cholesky factorization, use LDLt as fallback this time" << endl;
+			cerr << "something went wrong in Cholesky factorization, use LDLt as fallback this time" << eSolver.cholmod().status << endl;
 			eSolver.setMode(Eigen::CholmodLDLt);
 			eSolver.compute(A);
 		}

@@ -578,7 +578,9 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
-	Real globalK=kFactor*meanDistance*vPoral/(sSolidTot*8.*viscosity);//An approximate value of macroscopic permeability, for clamping local values below
+	Real globalK;
+	if (kFactor>0) globalK=kFactor*meanDistance*vPoral/(sSolidTot*8.*viscosity);//An approximate value of macroscopic permeability, for clamping local values below
+	else globalK=meanK;
 	if (debugOut) {
 		cout << "PassCompK = " << pass << endl;
 		cout << "meanK = " << meanK << endl;

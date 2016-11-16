@@ -75,7 +75,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	Vector3r force;
 	Vector3r torque;
         FiniteVerticesIterator verticesEnd = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
-	int maxBodyId = scene->bodies->size();
+	int bodiesLength = scene->bodies->size();
         for ( FiniteVerticesIterator vIt = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); vIt !=  verticesEnd; vIt++ ) {
 		int vId = vIt->info().id();
 		force = pressureForce ? Vector3r ( vIt->info().forces[0],vIt->info().forces[1],vIt->info().forces[2] ): Vector3r(0,0,0);
@@ -88,7 +88,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		}
 		if (twistTorque) torque = torque + solver->twistLubricationTorques[vId];
 		if (normalLubrication) force = force + solver-> normalLubricationForce[vId];
-		if (vIt->info().id() < maxBodyId) {
+		if (vIt->info().id() < bodiesLength) {
 			scene->forces.addForce ( vId, force);
 			scene->forces.addTorque ( vId, torque);}
         }
@@ -329,8 +329,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                         flow.zMax = max ( flow.zMax, z+rad );
                 }
         }
-	//FIXME idOffset must be set correctly, not the case here (always 0), then we need walls first or it will fail
-        idOffset = flow.tesselation().maxId+1;
+	//set idOffset if<0, in that case overwrite wallIds and assign values out of range scene->bodies
+        if (idOffset<0) {
+	  idOffset = scene->bodies->size();
+	  for (int i=0; i<6; ++i){wallIds[i]=i+idOffset;}
+	}
         flow.idOffset = idOffset;
         flow.sectionArea = ( flow.xMax - flow.xMin ) * ( flow.zMax-flow.zMin );
         flow.vTotal = ( flow.xMax-flow.xMin ) * ( flow.yMax-flow.yMin ) * ( flow.zMax-flow.zMin );

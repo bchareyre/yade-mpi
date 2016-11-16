@@ -14,6 +14,11 @@
 // #endif
 
 
+/* TODO:
+- remove computePermeability(), mostly a duplicate of the non-periodic version
+
+*/
+
 namespace CGT{
 
 // 	typedef CGT::FlowBoundingSphere<PeriFlowTesselation> PeriodicFlowBoundingSphere;
