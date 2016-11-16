@@ -56,7 +56,7 @@ class SimpleCellInfo : public Point {
 	// Care to initialize it if you need it, there is no magic numbering to rely on
 	unsigned int id;
 	Real s;
-	bool isFictious;
+	bool isFictious;//true if the cell has at least one fictious bounding sphere as a vertex
 	SimpleCellInfo (void) {isFictious=false; s=0;}
 	SimpleCellInfo& setPoint(const Point &p) { Point::operator= (p); return *this; }
 	SimpleCellInfo& setScalar(const Real &scalar) { s=scalar; return *this; }

@@ -272,17 +272,17 @@ double FlowBoundingSphere<Tesselation>::averageSlicePressure(double Y)
   return P_ave;
 }
 template <class Tesselation> 
-double FlowBoundingSphere<Tesselation>::averagePressure()
+double FlowBoundingSphere<Tesselation>::averagePressure(bool includeBoundaries)
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
   double P = 0.f, Ppond=0.f, Vpond=0.f;
   int n = 0;
   for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
-	P+=cell->info().p();
-	n++;
-	Ppond+=cell->info().p()*cell->info().volume();
-	Vpond+=cell->info().volume();
-  }
+	if (includeBoundaries || cell->info().isReal()){
+		P+=cell->info().p();
+		n++;
+		Ppond+=cell->info().p()*cell->info().volume();
+		Vpond+=cell->info().volume();}}
   P/=n;
   Ppond/=Vpond;
   return Ppond;
