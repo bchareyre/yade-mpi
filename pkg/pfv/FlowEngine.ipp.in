@@ -446,7 +446,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                                 CGT::CVector branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
                                 pos_av_facet = ( CGT::Point ) cell->info() + ( branch*Surfk ) *Surfk;
                                 volume_facet_translation += Vel_av*cell->info().facetSurfaces[i];
-                                cell->info().averageVelocity() = cell->info().averageVelocity() - volume_facet_translation/cell->info().volume() * ( pos_av_facet-CGAL::ORIGIN );
+                                cell->info().averageVelocity() = cell->info().averageVelocity() - volume_facet_translation/std::abs(cell->info().volume()) * ( pos_av_facet-CGAL::ORIGIN );
                         }
                 }
         }
@@ -585,7 +585,8 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	const Vector3r& p1 = positionBufferCurrent[cell->vertex ( 1 )->info().id()].pos;
 	const Vector3r& p2 = positionBufferCurrent[cell->vertex ( 2 )->info().id()].pos;
 	const Vector3r& p3 = positionBufferCurrent[cell->vertex ( 3 )->info().id()].pos;
-	Real volume = inv6 * ((p0-p1).cross(p0-p2)).dot(p0-p3);
+	Real volume = -inv6 * ((p0-p1).cross(p0-p2)).dot(p0-p3);
+	if (/*debug && */volume<0) cerr<<"negative volume for an ordinary pore (temp warning, should still be safe)"<<endl; 
         if ( ! ( cell->info().volumeSign ) ) cell->info().volumeSign= ( volume>0 ) ?1:-1;
         return volume;
 }

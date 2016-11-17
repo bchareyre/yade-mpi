@@ -164,8 +164,8 @@ void FlowBoundingSphere<Tesselation>::averageFluidVelocity()
 	{
 	  if (cell->info().fictious()==0){
 	    for (int i=0;i<4;i++){
-	      velocityVolumes[cell->vertex(i)->info().id()] =  velocityVolumes[cell->vertex(i)->info().id()] + cell->info().averageVelocity()*cell->info().volume();
-	      volumes[cell->vertex(i)->info().id()] = volumes[cell->vertex(i)->info().id()] + cell->info().volume();}
+	      velocityVolumes[cell->vertex(i)->info().id()] =  velocityVolumes[cell->vertex(i)->info().id()] + cell->info().averageVelocity()*std::abs(cell->info().volume());
+	      volumes[cell->vertex(i)->info().id()] = volumes[cell->vertex(i)->info().id()] + std::abs(cell->info().volume());}
 	  }}	    
 	
 	std::ofstream fluid_vel ("Velocity", std::ios::out);
@@ -204,8 +204,8 @@ vector<Real> FlowBoundingSphere<Tesselation>::averageFluidVelocityOnSphere(unsig
 	  if (cell->info().fictious()==0){
 	    for (unsigned int i=0;i<4;i++){
 	      if (cell->vertex(i)->info().id()==Id_sph){
-		velocityVolumes = velocityVolumes + cell->info().averageVelocity()*cell->info().volume();
-		volumes = volumes + cell->info().volume();}}}}
+		velocityVolumes = velocityVolumes + cell->info().averageVelocity()*std::abs(cell->info().volume());
+		volumes = volumes + std::abs(cell->info().volume());}}}}
 		
 	for (int i=0;i<3;i++) result[i] += velocityVolumes[i]/volumes;
 	return result;
@@ -272,17 +272,16 @@ double FlowBoundingSphere<Tesselation>::averageSlicePressure(double Y)
   return P_ave;
 }
 template <class Tesselation> 
-double FlowBoundingSphere<Tesselation>::averagePressure(bool includeBoundaries)
+double FlowBoundingSphere<Tesselation>::averagePressure()
 {
   RTriangulation& Tri = T[currentTes].Triangulation();
   double P = 0.f, Ppond=0.f, Vpond=0.f;
   int n = 0;
   for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
-	if (includeBoundaries || cell->info().isReal()){
-		P+=cell->info().p();
-		n++;
-		Ppond+=cell->info().p()*cell->info().volume();
-		Vpond+=cell->info().volume();}}
+	P+=cell->info().p();
+	n++;
+	Ppond+=cell->info().p()*std::abs(cell->info().volume());
+	Vpond+=std::abs(cell->info().volume());}
   P/=n;
   Ppond/=Vpond;
   return Ppond;

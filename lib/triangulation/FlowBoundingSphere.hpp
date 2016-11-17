@@ -156,7 +156,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double getPorePressure (double X, double Y, double Z);
 		void measurePressureProfile(double WallUpy, double WallDowny);
 		double averageSlicePressure(double Y);
-		double averagePressure(bool includeBoundaries);
+		double averagePressure();
 		int getCell (double X,double Y,double Z);
 		double boundaryFlux(unsigned int boundaryId);
 		void setBlocked(CellHandle& cell);

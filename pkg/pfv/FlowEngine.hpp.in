@@ -204,7 +204,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); normal[max(0,min(5,index))]=v;}
 		
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
-		double averagePressure(bool includeBoundaries){return solver->averagePressure(includeBoundaries);}
+		double averagePressure(){return solver->averagePressure();}
 
 		void emulateAction(){
 			scene = Omega::instance().getScene().get();
@@ -342,7 +342,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("pressureProfile",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::pressureProfile,(boost::python::arg("wallUpY"),boost::python::arg("wallDownY")),"Measure pore pressure in 6 equally-spaced points along the height of the sample")
 		.def("getPorePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getPorePressure,(boost::python::arg("pos")),"Measure pore pressure in position pos[0],pos[1],pos[2]")
 		.def("averageSlicePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::averageSlicePressure,(boost::python::arg("posY")),"Measure slice-averaged pore pressure at height posY")
-		.def("averagePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::averagePressure,(boost::python::arg("includeBoundaries")=true),"Measure averaged pore pressure in the entire volume, the cells adjacent to the boundaries are ignored if includeBoundaries=False")
+		.def("averagePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::averagePressure,"Measure averaged pore pressure in the entire volume, the cells adjacent to the boundaries are ignored if includeBoundaries=False")
 		.def("updateBCs",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::updateBCs,"tells the engine to update it's boundary conditions before running (especially useful when changing boundary pressure - should not be needed for point-wise imposed pressure)")
 		.def("emulateAction",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::emulateAction,"get scene and run action (may be used to manipulate an engine outside the timestepping loop).")
 		.def("getCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getCell,(boost::python::arg("pos")),"get id of the cell containing (X,Y,Z).")
