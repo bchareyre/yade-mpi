@@ -1,4 +1,3 @@
- 
 /*************************************************************************
 *  Copyright (C) 2014 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
 *  Copyright (C) 2013 by Thomas. Sweijen <T.sweijen@uu.nl>               *
@@ -67,38 +66,75 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	//if we overload action() like this, this engine is doing nothing in a standard timestep, it can still have useful functions
 	virtual void action() {};
 	
-	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine
-	//if it is useful for everyone
-	void computePoreBodyVolume();	
- 	void computePoreBodyRadius();
-// 	void computePoreThroatCircleRadius();
-	double computePoreSatAtInterface(int ID);
-	void computePoreCapillaryPressure(CellHandle cell);
-	void savePhaseVtk(const char* folder);
-// 	void computePoreThroatRadius();
-// 	void computePoreThroatRadiusTricky();//set the radius of pore throat between side pores negative.
-	
+	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine if it is useful for everyone
+
+	//compute pore body radius
+	void computePoreBodyVolume();
+	void computePoreBodyRadius();
+	void computeSolidLine();
+
+	//compute entry pore throat radius (drainage)
+	void computePoreThroatRadiusMethod1();//MS-P method
+	void computePoreThroatRadiusTrickyMethod1();//set the radius of pore throat between side pores negative.
 	double computeEffPoreThroatRadius(CellHandle cell, int j);
 	double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
 	double bisection(CellHandle cell, int j, double a, double b);
 	double computeTriRadian(double a, double b, double c);
 	double computeDeltaForce(CellHandle cell,int j, double rC);
+
+	void computePoreThroatRadiusMethod2();//radius of the inscribed circle
+	void computePoreThroatRadiusMethod3();//radius of area-equivalent circle
+	
+	///begin of invasion (mainly drainage) model
 	void initialization();
-	void computeSolidLine();
 	void initializeReservoirs();
-	
-	void computePoreThroatRadiusMethod1();
-	void computePoreThroatRadiusTrickyMethod1();//set the radius of pore throat between side pores negative.
-	void computePoreThroatRadiusMethod2();
-	void computePoreThroatRadiusMethod3();
-	void savePoreNetwork();
-	
+
+	void invasion();//functions can be shared by two modes
+	void invasionSingleCell(CellHandle cell);
+	void updatePressure();
+	double getMinDrainagePc();
+	double getMaxImbibitionPc();
+	double getSaturation(bool isSideBoundaryIncluded=false);
+
+	void invasion1();//with-trap
+	void updateReservoirs1();
+	void WResRecursion(CellHandle cell);
+	void NWResRecursion(CellHandle cell);
+	void checkTrap(double pressure);
 	void updateReservoirLabel();
 	void updateCellLabel();
 	void updateSingleCellLabelRecursion(CellHandle cell, int label);
 	int getMaxCellLabel();
 
+	void invasion2();//without-trap
+	void updateReservoirs2();
+	///end of invasion model
+
+	//compute forces
+	void computeFacetPoreForcesWithCache(bool onlyCache=false);	
+	void computeCapillaryForce() {computeFacetPoreForcesWithCache(false);}
 	
+	//combine with pendular model
+	boost::python::list getPotentialPendularSpheresPair() {
+	  RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+	  boost::python::list bridgeIds;
+	  FiniteEdgesIterator ed_it = Tri.finite_edges_begin();
+	  for ( ; ed_it!=Tri.finite_edges_end(); ed_it++ ) {
+	    if (detectBridge(ed_it)==true) {
+	      const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
+	      const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
+	      const int& id1 = vi1.id();
+	      const int& id2 = vi2.id();
+	      bridgeIds.append(boost::python::make_tuple(id1,id2));}}
+	  return bridgeIds;
+	}
+	bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
+	
+	//post-processing
+	void savePoreNetwork();
+	void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
+	void savePhaseVtk(const char* folder);
+		
 	boost::python::list cellporeThroatRadius(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
 	  boost::python::list ids;
 	  if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
@@ -112,7 +148,10 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	  for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->neighbor(i)->info().id);
 	return ids;
 	}
-	
+
+	//TODO
+	double computePoreSatAtInterface(int ID);
+	void computePoreCapillaryPressure(CellHandle cell);
 	
 	//FIXME, needs to trigger initSolver() Somewhere, else changing flow.debug or other similar things after first calculation has no effect
 	//FIXME, I removed indexing cells from inside UnsatEngine (SoluteEngine shouldl be ok (?)) in order to get pressure computed, problem is they are not indexed at all if flow is not calculated
@@ -143,7 +182,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((int,entryPressureMethod,1,,"integer to define the method used to determine the pore throat radii and the according entry pressures. 1)radius of entry pore throat based on MS-P method; 2) radius of the inscribed circle; 3) radius of the circle with equivalent surface area of the pore throat."))
 	((double,partiallySaturatedPores,false,,"Include partially saturated pores or not?"))
 	((bool, isCellLabelActivated, false,, "Activate cell labels for marking disconnected wetting clusters. NW-reservoir label 0; W-reservoir label 1; disconnected W-clusters label from 2. "))
+	((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
+	((bool, isDrainageActivated, true,, "Activates drainage."))
+	((bool, isImbibitionActivated, false,, "Activates imbibition."))
 
+	
 	,/*TwoPhaseFlowEngineT()*/,
 	,
 	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"Check the connection between pore and boundary. If true, pore throat connects the boundary.")
@@ -166,6 +209,13 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("setCellHasInterface",&TwoPhaseFlowEngine::setCellHasInterface,"change wheter a cell has a NW-W interface")
 	.def("savePoreNetwork",&TwoPhaseFlowEngine::savePoreNetwork,"Extract the pore network of the granular material")
 	.def("getCellLabel",&TwoPhaseFlowEngine::cellLabel,"get cell label. 0 for NW-reservoir; 1 for W-reservoir; others for disconnected W-clusters.")
+	.def("getMinDrainagePc",&TwoPhaseFlowEngine::getMinDrainagePc,"Get the minimum entry capillary pressure for the next drainage step.")
+	.def("getMaxImbibitionPc",&TwoPhaseFlowEngine::getMaxImbibitionPc,"Get the maximum entry capillary pressure for the next imbibition step.")
+	.def("getSaturation",&TwoPhaseFlowEngine::getSaturation,(boost::python::arg("isSideBoundaryIncluded")),"Get saturation of entire packing. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
+	.def("invasion",&TwoPhaseFlowEngine::invasion,"Run the drainage invasion.")
+	.def("computeCapillaryForce",&TwoPhaseFlowEngine::computeCapillaryForce,"Compute capillary force. ")
+	.def("saveVtk",&TwoPhaseFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
+	.def("getPotentialPendularSpheresPair",&TwoPhaseFlowEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
 	
 	)
 	DECLARE_LOGGER;
