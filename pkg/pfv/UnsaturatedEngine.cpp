@@ -357,5 +357,61 @@ double UnsaturatedEngine::getSphericalSubdomainSaturation(Vector3r pos, double r
 //--------------end of comparison with experiment----------------------------
 
 
+//#########################################################
+//         CONVECTIVE DRYING EXTENSION
+//#########################################################
+
+class PhaseCluster : public Serializable
+{
+  		double totalCellVolume;
+	public :
+
+				
+		virtual ~PhaseCluster();
+		vector<TwoPhaseFlowEngine::CellHandle> pores;
+		TwoPhaseFlowEngine::RTriangulation* tri;
+
+		
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
+		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
+		((double,volume,0,,"cumulated volume of all pores."))
+		((double,entryPc,0,,"smallest entry capillary pressure."))
+		((int,entryPore,0,,"the pore of the cluster incident to the throat with smallest entry Pc."))
+		((double,interfacialArea,0,,"interfacial area of the cluster"))
+					,,,
+		)
+};
+
+REGISTER_SERIALIZABLE(PhaseCluster);
+YADE_PLUGIN((PhaseCluster));
+
+PhaseCluster::~PhaseCluster(){}
+
+
+class DryingEngine : public UnsaturatedEngine
+{
+	public :
+		virtual ~DryingEngine();
+		vector<shared_ptr<PhaseCluster> > clusters;
+		
+		boost::python::list pyClusters() {
+			boost::python::list ret;
+			for(vector<shared_ptr<PhaseCluster> >::iterator it=clusters.begin(); it!=clusters.end(); ++it) ret.append(*it);
+			return ret;}
+	
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DryingEngine,UnsaturatedEngine,"Extended TwoPhaseFlowEngine for application to convective drying.",
+// 		((shared_ptr<PhaseCluster> , cluster,new PhaseCluster,,"The list of clusters"))
+					,,,
+		.def("getClusters",&DryingEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Save pressure field in vtk format. Specify a folder name for output.")
+		)
+		DECLARE_LOGGER;
+};
+
+DryingEngine::~DryingEngine(){};
+
+REGISTER_SERIALIZABLE(DryingEngine);
+YADE_PLUGIN((DryingEngine));
+
+
 #endif //TWOPHASEFLOW
 #endif //FLOW_ENGINE
