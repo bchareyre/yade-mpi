@@ -62,22 +62,23 @@ REGISTER_SERIALIZABLE(TwoPhaseFlowEngineT);
 class PhaseCluster : public Serializable
 {
 		double totalCellVolume;
+// 		CellHandle entryPoreHandle;
 	public :
 		virtual ~PhaseCluster();
-		vector<TwoPhaseFlowEngineT::CellHandle>* pores;
+		vector<TwoPhaseFlowEngineT::CellHandle> pores;
 		TwoPhaseFlowEngineT::RTriangulation* tri;
+		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear();}
+		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
 		((double,volume,0,,"cumulated volume of all pores."))
-		((double,entryPc,0,,"smallest entry capillary pressure."))
-		((int,entryPore,0,,"the pore of the cluster incident to the throat with smallest entry Pc."))
+		((double,entryRadius,0,,"smallest entry capillary pressure."))
+		((int,entryPore,-1,,"the pore of the cluster incident to the throat with smallest entry Pc."))
 		((double,interfacialArea,0,,"interfacial area of the cluster"))
 		,,,
 		)
 };
 REGISTER_SERIALIZABLE(PhaseCluster);
-YADE_PLUGIN((PhaseCluster));
-PhaseCluster::~PhaseCluster(){}
 
 class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 {
@@ -126,7 +127,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void checkTrap(double pressure);
 	void updateReservoirLabel();
 	void updateCellLabel();
-	void updateSingleCellLabelRecursion(CellHandle cell, int label, std::vector<CellHandle> *outputVector=NULL);
+	void updateSingleCellLabelRecursion(CellHandle cell, int label, PhaseCluster* cluster);
 	int getMaxCellLabel();
 
 	void invasion2();//without-trap
@@ -153,6 +154,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	}
 	bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
 	
+	boost::python::list pyClusters() { boost::python::list ret;
+		for(vector<shared_ptr<PhaseCluster> >::iterator it=clusters.begin(); it!=clusters.end(); ++it) ret.append(*it);
+		return ret;}
+	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet);//update cluster inetrfacial area and max entry radius wrt to a facet
+		
 	//post-processing
 	void savePoreNetwork();
 	void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
@@ -210,7 +216,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((bool, isImbibitionActivated, false,, "Activates imbibition."))
 
 	
-	,/*TwoPhaseFlowEngineT()*/,
+	,/*clusters.resize(2);*//*TwoPhaseFlowEngineT()*/,
 	,
 	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"Check the connection between pore and boundary. If true, pore throat connects the boundary.")
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
@@ -239,6 +245,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("computeCapillaryForce",&TwoPhaseFlowEngine::computeCapillaryForce,"Compute capillary force. ")
 	.def("saveVtk",&TwoPhaseFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 	.def("getPotentialPendularSpheresPair",&TwoPhaseFlowEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
+	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
 	
 	)
 	DECLARE_LOGGER;

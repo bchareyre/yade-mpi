@@ -37,27 +37,7 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		double getSpecificInterfacialArea();
 
 		void printSomething();
-
-		boost::python::list getPotentialPendularSpheresPair() {
-			RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-			boost::python::list bridgeIds;
-			FiniteEdgesIterator ed_it = Tri.finite_edges_begin();
-			for ( ; ed_it!=Tri.finite_edges_end(); ed_it++ ) {
-			  if (detectBridge(ed_it)==true) {
-			    const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
-			    const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
-			    const int& id1 = vi1.id();
-			    const int& id2 = vi2.id();
-			    bridgeIds.append(boost::python::make_tuple(id1,id2));}}
-			    return bridgeIds;}
-  		bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
-		
-		boost::python::list pyClusters() { boost::python::list ret;
-			for(vector<shared_ptr<PhaseCluster> >::iterator it=clusters.begin(); it!=clusters.end(); ++it) ret.append(*it);
-			return ret;}
-				
 		virtual ~UnsaturatedEngine();
-
 		virtual void action();
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,TwoPhaseFlowEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.(deprecated engine, use TwoPhaseFlowEngine instead)",
@@ -74,8 +54,6 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(boost::python::arg("windowsID"),boost::python::arg("isSideBoundaryIncluded")), "get saturation of subdomain with windowsID. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
 		.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temporary function for comparison with experiments, will delete soon")
 		.def("printSomething",&UnsaturatedEngine::printSomething,"print debug.")
-		.def("getPotentialPendularSpheresPair",&UnsaturatedEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
-		.def("getClusters",&UnsaturatedEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
 		)
 		DECLARE_LOGGER;
 };

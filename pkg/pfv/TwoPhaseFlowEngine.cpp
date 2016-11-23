@@ -17,6 +17,9 @@
 #ifdef TWOPHASEFLOW
 YADE_PLUGIN((TwoPhaseFlowEngineT));
 YADE_PLUGIN((TwoPhaseFlowEngine));
+YADE_PLUGIN((PhaseCluster));
+
+PhaseCluster::~PhaseCluster(){}
 
 void TwoPhaseFlowEngine::initialization()
 {
@@ -618,24 +621,35 @@ void TwoPhaseFlowEngine:: updateReservoirLabel()
 {
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    clusters[0]->reset(); clusters[1]->reset(); 
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if (cell->info().isNWRes) cell->info().label=0;
-      else if (cell->info().isWRes) cell->info().label=1;
+      if (cell->info().isNWRes) {cell->info().label=0; clusters[0]->pores.push_back(cell);}
+      else if (cell->info().isWRes) {cell->info().label=1; clusters[1]->pores.push_back(cell);
+	      for (int facet = 0; facet < 4; facet ++) if (!cell->neighbor(facet)->info().isWRes) clusterGetFacet(clusters[1].get(),cell,facet);}
       else if (cell->info().label>1) continue;
       else cell->info().label=-1;
     }
 }
 
-void TwoPhaseFlowEngine:: updateCellLabel()
+void TwoPhaseFlowEngine::clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet) {
+	cell->info().hasInterface = true;
+	cluster->interfacialArea += cell->info().poreThroatRadius[facet];//FIXME: define area correctly
+	if (cluster->entryRadius < cell->info().poreThroatRadius[facet]){
+		cluster->entryRadius = cell->info().poreThroatRadius[facet];
+		cluster->entryPore = cell->info().index;
+	}
+}
+
+void TwoPhaseFlowEngine::updateCellLabel()
 {
-    int currentLabel = getMaxCellLabel();
+    int currentLabel = getMaxCellLabel();//FIXME: A loop on cells for each new label?? is it serious??
     updateReservoirLabel();
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (cell->info().label==-1) {
-	    clusters.push_back(shared_ptr<PhaseCluster>(new PhaseCluster));
-	    updateSingleCellLabelRecursion(cell,currentLabel+1,clusters.back()->pores);
+	    clusters.push_back(shared_ptr<PhaseCluster> (new PhaseCluster()));
+	    updateSingleCellLabelRecursion(cell,currentLabel+1,clusters.back().get());
             currentLabel++;
         }
     }
@@ -652,10 +666,10 @@ int TwoPhaseFlowEngine:: getMaxCellLabel()
     return maxLabel;
 }
 
-void TwoPhaseFlowEngine:: updateSingleCellLabelRecursion(CellHandle cell, int label, std::vector<CellHandle> *outputVector)
+void TwoPhaseFlowEngine::updateSingleCellLabelRecursion(CellHandle cell, int label, PhaseCluster* cluster)
 {
     cell->info().label=label;
-    if (outputVector) outputVector->push_back(cell);
+    cluster->pores.push_back(cell);
     for (int facet = 0; facet < 4; facet ++) {
         CellHandle nCell = cell->neighbor(facet);
         if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
@@ -663,7 +677,10 @@ void TwoPhaseFlowEngine:: updateSingleCellLabelRecursion(CellHandle cell, int la
 //         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         //TODO:the following condition may relax to relate to nCell->info().hasInterface
         if ( (nCell->info().saturation==cell->info().saturation) && (nCell->info().label!=cell->info().label) )
-            updateSingleCellLabelRecursion(nCell,label,outputVector);
+		updateSingleCellLabelRecursion(nCell,label,cluster);
+	else {
+		clusterGetFacet(cluster,cell,facet);
+	}
     }
 }
 
