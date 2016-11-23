@@ -13,13 +13,13 @@
 //when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
 #ifdef TWOPHASEFLOW
 
+
+
+
 class UnsaturatedEngine : public TwoPhaseFlowEngine
 {
-		double totalCellVolume;
-	protected:
-// 		void initialization();		
-
 	public :
+		double totalCellVolume;
 		double computeCellInterfacialArea(CellHandle cell, int j, double rC);
 
 // 		void computeSolidLine();
@@ -37,6 +37,24 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		double getSpecificInterfacialArea();
 
 		void printSomething();
+
+		boost::python::list getPotentialPendularSpheresPair() {
+			RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+			boost::python::list bridgeIds;
+			FiniteEdgesIterator ed_it = Tri.finite_edges_begin();
+			for ( ; ed_it!=Tri.finite_edges_end(); ed_it++ ) {
+			  if (detectBridge(ed_it)==true) {
+			    const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
+			    const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
+			    const int& id1 = vi1.id();
+			    const int& id2 = vi2.id();
+			    bridgeIds.append(boost::python::make_tuple(id1,id2));}}
+			    return bridgeIds;}
+  		bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
+		
+		boost::python::list pyClusters() { boost::python::list ret;
+			for(vector<shared_ptr<PhaseCluster> >::iterator it=clusters.begin(); it!=clusters.end(); ++it) ret.append(*it);
+			return ret;}
 				
 		virtual ~UnsaturatedEngine();
 
@@ -56,6 +74,8 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(boost::python::arg("windowsID"),boost::python::arg("isSideBoundaryIncluded")), "get saturation of subdomain with windowsID. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
 		.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temporary function for comparison with experiments, will delete soon")
 		.def("printSomething",&UnsaturatedEngine::printSomething,"print debug.")
+		.def("getPotentialPendularSpheresPair",&UnsaturatedEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
+		.def("getClusters",&UnsaturatedEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
 		)
 		DECLARE_LOGGER;
 };
@@ -355,63 +375,6 @@ double UnsaturatedEngine::getSphericalSubdomainSaturation(Vector3r pos, double r
 }
 
 //--------------end of comparison with experiment----------------------------
-
-
-//#########################################################
-//         CONVECTIVE DRYING EXTENSION
-//#########################################################
-
-class PhaseCluster : public Serializable
-{
-  		double totalCellVolume;
-	public :
-
-				
-		virtual ~PhaseCluster();
-		vector<TwoPhaseFlowEngine::CellHandle> pores;
-		TwoPhaseFlowEngine::RTriangulation* tri;
-
-		
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
-		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
-		((double,volume,0,,"cumulated volume of all pores."))
-		((double,entryPc,0,,"smallest entry capillary pressure."))
-		((int,entryPore,0,,"the pore of the cluster incident to the throat with smallest entry Pc."))
-		((double,interfacialArea,0,,"interfacial area of the cluster"))
-					,,,
-		)
-};
-
-REGISTER_SERIALIZABLE(PhaseCluster);
-YADE_PLUGIN((PhaseCluster));
-
-PhaseCluster::~PhaseCluster(){}
-
-
-class DryingEngine : public UnsaturatedEngine
-{
-	public :
-		virtual ~DryingEngine();
-		vector<shared_ptr<PhaseCluster> > clusters;
-		
-		boost::python::list pyClusters() {
-			boost::python::list ret;
-			for(vector<shared_ptr<PhaseCluster> >::iterator it=clusters.begin(); it!=clusters.end(); ++it) ret.append(*it);
-			return ret;}
-	
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DryingEngine,UnsaturatedEngine,"Extended TwoPhaseFlowEngine for application to convective drying.",
-// 		((shared_ptr<PhaseCluster> , cluster,new PhaseCluster,,"The list of clusters"))
-					,,,
-		.def("getClusters",&DryingEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Save pressure field in vtk format. Specify a folder name for output.")
-		)
-		DECLARE_LOGGER;
-};
-
-DryingEngine::~DryingEngine(){};
-
-REGISTER_SERIALIZABLE(DryingEngine);
-YADE_PLUGIN((DryingEngine));
-
 
 #endif //TWOPHASEFLOW
 #endif //FLOW_ENGINE

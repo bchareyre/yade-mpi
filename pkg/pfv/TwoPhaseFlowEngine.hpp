@@ -58,10 +58,33 @@ class TwoPhaseVertexInfo : public FlowVertexInfo_TwoPhaseFlowEngineT {
 typedef TemplateFlowEngine_TwoPhaseFlowEngineT<TwoPhaseCellInfo,TwoPhaseVertexInfo> TwoPhaseFlowEngineT;
 REGISTER_SERIALIZABLE(TwoPhaseFlowEngineT);
 
-class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
+// A class to represent isolated single-phase cluster (main application in convective drying at the moment)
+class PhaseCluster : public Serializable
 {
 		double totalCellVolume;
 	public :
+		virtual ~PhaseCluster();
+		vector<TwoPhaseFlowEngineT::CellHandle>* pores;
+		TwoPhaseFlowEngineT::RTriangulation* tri;
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
+		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
+		((double,volume,0,,"cumulated volume of all pores."))
+		((double,entryPc,0,,"smallest entry capillary pressure."))
+		((int,entryPore,0,,"the pore of the cluster incident to the throat with smallest entry Pc."))
+		((double,interfacialArea,0,,"interfacial area of the cluster"))
+		,,,
+		)
+};
+REGISTER_SERIALIZABLE(PhaseCluster);
+YADE_PLUGIN((PhaseCluster));
+PhaseCluster::~PhaseCluster(){}
+
+class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
+{
+	public :
+	double totalCellVolume;
+	vector<shared_ptr<PhaseCluster> > clusters; // the list of clusters
+
 	//We can overload every functions of the base engine to make it behave differently
 	//if we overload action() like this, this engine is doing nothing in a standard timestep, it can still have useful functions
 	virtual void action() {};
@@ -103,7 +126,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void checkTrap(double pressure);
 	void updateReservoirLabel();
 	void updateCellLabel();
-	void updateSingleCellLabelRecursion(CellHandle cell, int label);
+	void updateSingleCellLabelRecursion(CellHandle cell, int label, std::vector<CellHandle> *outputVector=NULL);
 	int getMaxCellLabel();
 
 	void invasion2();//without-trap

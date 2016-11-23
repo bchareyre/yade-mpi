@@ -125,47 +125,12 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
 	r3 = sqrt(cell -> vertex(3) -> point().weight());	
 	
 	//Fill coefficient matrix
-	M(0,0) = 0.0;
-	M(1,0) = d01;
-	M(2,0) = d02;
-	M(3,0) = d03;
-	M(4,0) = pow((r0+Rin),2);
-	M(5,0) = 1.0;
-	
-	M(0,1) = d01;
-	M(1,1) = 0.0;
-	M(2,1) = d12;
-	M(3,1) = d13;
-	M(4,1) = pow((r1+Rin),2);
-	M(5,1) = 1.0;
-	
-	M(0,2) = d02; 
-	M(1,2) = d12;
-	M(2,2) = 0.0;
-	M(3,2) = d23;
-	M(4,2) = pow((r2+Rin),2);
-	M(5,2) = 1.0;
-	
-	M(0,3) = d03;
-	M(1,3) = d13;
-	M(2,3) = d23;
-	M(3,3) = 0.0;
-	M(4,3) = pow((r3+Rin),2);
-	M(5,3) = 1.0;
-	
-	M(0,4) = pow((r0+Rin),2);
-	M(1,4) = pow((r1+Rin),2);
-	M(2,4) = pow((r2+Rin),2);
-	M(3,4) = pow((r3+Rin),2);
-	M(4,4) = 0.0;
-	M(5,4) = 1.0;
-	
-	M(0,5) = 1.0;
-	M(1,5) = 1.0;
-	M(2,5) = 1.0;
-	M(3,5) = 1.0;
-	M(4,5) = 1.0;
-	M(5,5) = 0.0;
+	M(0,0) = 0.0; M(1,0) = d01; M(2,0) = d02; M(3,0) = d03; M(4,0) = pow((r0+Rin),2); M(5,0) = 1.0;
+	M(0,1) = d01; M(1,1) = 0.0; M(2,1) = d12; M(3,1) = d13; M(4,1) = pow((r1+Rin),2); M(5,1) = 1.0;
+	M(0,2) = d02; M(1,2) = d12; M(2,2) = 0.0; M(3,2) = d23; M(4,2) = pow((r2+Rin),2); M(5,2) = 1.0;
+	M(0,3) = d03; M(1,3) = d13; M(2,3) = d23; M(3,3) = 0.0; M(4,3) = pow((r3+Rin),2); M(5,3) = 1.0;
+	M(0,4) = pow((r0+Rin),2); M(1,4) = pow((r1+Rin),2); M(2,4) = pow((r2+Rin),2); M(3,4) = pow((r3+Rin),2); M(4,4) = 0.0; M(5,4) = 1.0;
+	M(0,5) = 1.0; M(1,5) = 1.0; M(2,5) = 1.0; M(3,5) = 1.0; M(4,5) = 1.0; M(5,5) = 0.0;
 	
 	i = 0;
 	check = false;
@@ -669,7 +634,8 @@ void TwoPhaseFlowEngine:: updateCellLabel()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (cell->info().label==-1) {
-            updateSingleCellLabelRecursion(cell,currentLabel+1);
+	    clusters.push_back(shared_ptr<PhaseCluster>(new PhaseCluster));
+	    updateSingleCellLabelRecursion(cell,currentLabel+1,clusters.back()->pores);
             currentLabel++;
         }
     }
@@ -686,9 +652,10 @@ int TwoPhaseFlowEngine:: getMaxCellLabel()
     return maxLabel;
 }
 
-void TwoPhaseFlowEngine:: updateSingleCellLabelRecursion(CellHandle cell, int label)
+void TwoPhaseFlowEngine:: updateSingleCellLabelRecursion(CellHandle cell, int label, std::vector<CellHandle> *outputVector)
 {
     cell->info().label=label;
+    if (outputVector) outputVector->push_back(cell);
     for (int facet = 0; facet < 4; facet ++) {
         CellHandle nCell = cell->neighbor(facet);
         if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
@@ -696,7 +663,7 @@ void TwoPhaseFlowEngine:: updateSingleCellLabelRecursion(CellHandle cell, int la
 //         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
         //TODO:the following condition may relax to relate to nCell->info().hasInterface
         if ( (nCell->info().saturation==cell->info().saturation) && (nCell->info().label!=cell->info().label) )
-            updateSingleCellLabelRecursion(nCell,label);
+            updateSingleCellLabelRecursion(nCell,label,outputVector);
     }
 }
 
