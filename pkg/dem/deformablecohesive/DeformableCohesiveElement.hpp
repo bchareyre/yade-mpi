@@ -46,6 +46,8 @@ class DeformableCohesiveElement: public DeformableElement {
 				    if (node1.get() > param.node1.get()) return false;
 				    if (node2.get() < param.node2.get()) return true;
 				    if (node2.get() > param.node2.get()) return false;
+				    LOG_ERROR("Incomplete 'if' sequence");
+				    return false;
 				}
 			};
 
