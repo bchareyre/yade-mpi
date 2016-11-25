@@ -68,6 +68,9 @@ class PhaseCluster : public Serializable
 		vector<TwoPhaseFlowEngineT::CellHandle> pores;
 		TwoPhaseFlowEngineT::RTriangulation* tri;
 		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear();}
+		vector<int> getPores() { vector<int> res;
+			for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
+			return res;}
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
@@ -76,6 +79,7 @@ class PhaseCluster : public Serializable
 		((int,entryPore,-1,,"the pore of the cluster incident to the throat with smallest entry Pc."))
 		((double,interfacialArea,0,,"interfacial area of the cluster"))
 		,,,
+		.def("getPores",&PhaseCluster::getPores,"get the list of pores by index")
 		)
 };
 REGISTER_SERIALIZABLE(PhaseCluster);
@@ -127,8 +131,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void checkTrap(double pressure);
 	void updateReservoirLabel();
 	void updateCellLabel();
-	void updateSingleCellLabelRecursion(CellHandle cell, int label, PhaseCluster* cluster);
-	int getMaxCellLabel();
+	void updateSingleCellLabelRecursion(CellHandle cell, PhaseCluster* cluster);
+	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet);//update cluster inetrfacial area and max entry radius wrt to a facet
+	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//add pore to cluster, updating flags and cluster volume
+	boost::python::list pyClusters();
+// 	int getMaxCellLabel();
 
 	void invasion2();//without-trap
 	void updateReservoirs2();
@@ -154,10 +161,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	}
 	bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
 	
-	boost::python::list pyClusters() { boost::python::list ret;
-		for(vector<shared_ptr<PhaseCluster> >::iterator it=clusters.begin(); it!=clusters.end(); ++it) ret.append(*it);
-		return ret;}
-	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet);//update cluster inetrfacial area and max entry radius wrt to a facet
+
 		
 	//post-processing
 	void savePoreNetwork();
@@ -216,7 +220,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((bool, isImbibitionActivated, false,, "Activates imbibition."))
 
 	
-	,/*clusters.resize(2);*//*TwoPhaseFlowEngineT()*/,
+	,/*TwoPhaseFlowEngineT()*/,
+	clusters.resize(2); clusters[0]=shared_ptr<PhaseCluster>(new PhaseCluster); clusters[1]=shared_ptr<PhaseCluster>(new PhaseCluster);
 	,
 	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"Check the connection between pore and boundary. If true, pore throat connects the boundary.")
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
