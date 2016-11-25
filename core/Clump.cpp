@@ -144,17 +144,18 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	(some parts copied from woo: http://bazaar.launchpad.net/~eudoxos/woo/trunk/view/head:/pkg/dem/Clump.cpp)
 	*/
 	if(intersecting){	
-		//get boundaries and minimum radius of clump:
-		Real rMin=1./0.; AlignedBox3r aabb;
+		//get boundaries of clump:
+		AlignedBox3r aabb;
 		FOREACH(MemberMap::value_type& mm, clump->members){
 			const shared_ptr<Body> subBody = Body::byId(mm.first);
 			if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
 				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
 				aabb.extend(subBody->state->pos + Vector3r::Constant(sphere->radius));
 				aabb.extend(subBody->state->pos - Vector3r::Constant(sphere->radius));
-				rMin=min(rMin,sphere->radius);
 			}
 		}
+		Real rMin=min(aabb.diagonal()[0],min(aabb.diagonal()[1],aabb.diagonal()[2])); 
+		
 		//get volume and inertia tensor using regular cubic cell array inside bounding box of the clump:
 		Real dx = rMin/discretization; 	//edge length of cell
 		Real dv = pow(dx,3);		//volume of cell
@@ -182,8 +183,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 				}
 			}
 		}
-	}
-	if(!intersecting){
+	} else {//not intersecting
 		FOREACH(MemberMap::value_type& mm, clump->members){
 			// mm.first is Body::id_t, mm.second is Se3r of that body
 			const shared_ptr<Body> subBody=Body::byId(mm.first);
