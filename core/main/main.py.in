@@ -228,9 +228,14 @@ def userSession(gui='none',qapp=None):
 			from IPython.terminal.embed import InteractiveShellEmbed
 		else:
 			from IPython.frontend.terminal.embed import InteractiveShellEmbed
-		from IPython.config.loader import Config
-		cfg = Config()
-		prompt_config = cfg.PromptManager
+		if yade.runtime.ipython_version>=500:
+			from traitlets.config.loader import Config
+			cfg = Config()
+			prompt_config = cfg.TerminalInteractiveShell.prompts_class
+		else:
+			from IPython.config.loader import Config
+			cfg = Config()
+			prompt_config = cfg.PromptManager
 		prompt_config.in_template = ipconfig['prompt_in1']
 		prompt_config.in2_template = ipconfig['prompt_in2']
 		prompt_config.out_template = ipconfig['prompt_out']
