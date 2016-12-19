@@ -634,7 +634,10 @@ void TwoPhaseFlowEngine:: updateReservoirLabel()
 
 void TwoPhaseFlowEngine::clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet) {
 	cell->info().hasInterface = true;
-	cluster->interfacialArea += std::abs(cell->info().poreThroatRadius[facet]);//FIXME: define area correctly
+	double interfArea = sqrt((cell->info().facetSurfaces[facet]*cell->info().facetFluidSurfacesRatio[facet]).squared_length());
+	cluster->interfaces.push_back(std::pair<std::pair<unsigned int,unsigned int>,double>(
+		std::pair<unsigned int,unsigned int>(cell->info().id,cell->neighbor(facet)->info().id),interfArea));
+	cluster->interfacialArea += interfArea;
 	if (cluster->entryRadius < cell->info().poreThroatRadius[facet]){
 		cluster->entryRadius = cell->info().poreThroatRadius[facet];
 		cluster->entryPore = cell->info().id;}

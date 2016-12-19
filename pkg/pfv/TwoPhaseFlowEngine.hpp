@@ -66,12 +66,20 @@ class PhaseCluster : public Serializable
 	public :
 		virtual ~PhaseCluster();
 		vector<TwoPhaseFlowEngineT::CellHandle> pores;
+		vector<std::pair<std::pair<unsigned int,unsigned int>,double> > interfaces;
 		TwoPhaseFlowEngineT::RTriangulation* tri;
-		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear();}
+		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear(); interfaces.clear();}
 		vector<int> getPores() { vector<int> res;
 			for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
 			return res;}
-		
+			
+		boost::python::list getInterfaces(unsigned int clusterId){
+			boost::python::list ints;
+			for (vector<std::pair<std::pair<unsigned int,unsigned int>,double> >::iterator it =  interfaces.begin(); it!=interfaces.end(); it++)
+				ints.append(boost::python::make_tuple(it->first.first,it->first.second,it->second));
+			return ints;
+		}
+
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
 		((double,volume,0,,"cumulated volume of all pores."))
@@ -80,6 +88,7 @@ class PhaseCluster : public Serializable
 		((double,interfacialArea,0,,"interfacial area of the cluster"))
 		,,,
 		.def("getPores",&PhaseCluster::getPores,"get the list of pores by index")
+		.def("getInterfaces",&PhaseCluster::getInterfaces,"get the list of interfacial pore-throats associated to a cluster, listed as [id1,id2,area] where id2 is the neighbor pore outside the cluster.")
 		)
 };
 REGISTER_SERIALIZABLE(PhaseCluster);
