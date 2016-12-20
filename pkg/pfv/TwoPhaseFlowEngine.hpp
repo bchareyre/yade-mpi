@@ -73,7 +73,7 @@ class PhaseCluster : public Serializable
 			for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
 			return res;}
 			
-		boost::python::list getInterfaces(unsigned int clusterId){
+		boost::python::list getInterfaces(){
 			boost::python::list ints;
 			for (vector<std::pair<std::pair<unsigned int,unsigned int>,double> >::iterator it =  interfaces.begin(); it!=interfaces.end(); it++)
 				ints.append(boost::python::make_tuple(it->first.first,it->first.second,it->second));
