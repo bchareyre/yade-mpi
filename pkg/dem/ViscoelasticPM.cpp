@@ -19,7 +19,7 @@ ViscElMat::~ViscElMat(){}
 /* ViscElPhys */
 ViscElPhys::~ViscElPhys(){}
 
-Real Ip2_ViscElMat_ViscElMat_ViscElPhys::epsilon = 1.0e-15;
+Real Ip2_ViscElMat_ViscElMat_ViscElPhys::epsilon = 1.0e-8;
 
 /* Ip2_ViscElMat_ViscElMat_ViscElPhys */
 void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
@@ -291,13 +291,16 @@ Real find_cn_from_en(const Real& en, const Real& m, const Real& kn, const shared
 	Real en_temp=get_en_from_cn(cn,m ,kn);
 	int i =0;
 	Real error = 1.0/eps;
-	while (error > 1.0e-2){
+	while (error > 1.0e-2 or error!=error){
 		if(i>15){
+			cn = 0.;
+			en_temp = 1.;
 			cerr<<"Warning in ViscoelasticPM.cpp : Newton-Raphson algorithm did not converged within 15 iterations for contact between "<<interaction->id1<<" and "<<interaction->id2<<". Continue with values : cn="<<cn<<" en="<<en_temp<<endl;
 			break;
 		}
 		i++;
 		Real deriv=(get_en_from_cn(cn-eps,m ,kn)-get_en_from_cn(cn+eps,m ,kn))/(-2.*eps);
+		deriv = fabs(deriv)>1e-15?deriv:1e-15;
 		cn = cn - (en_temp-en)/deriv;
 		en_temp=get_en_from_cn(cn,m ,kn);
 		error = fabs(en_temp-en)/en;
