@@ -19,13 +19,13 @@ all the newly added features.
 To install the daily-version you need to add the repository to your
 /etc/apt/sources.list, add the PGP-key AA915EEB as trusted and install ``yadedaily``::
 
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trusty/" >> /etc/apt/sources.list'
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
 	sudo apt-get update
 	sudo apt-get install yadedaily
 
 If you have another distribution, not Ubuntu Trusty (Version 14.04 LTS), be sure to use the
-correct name in the first line (for instance, trusty, jessie or wheezy). For the list
+correct name in the first line (for instance, xenial, stretch or jessie). For the list
 of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
 After that you can normally start Yade using the command ``yadedaily`` or ``yadedaily-batch``.
@@ -33,7 +33,7 @@ After that you can normally start Yade using the command ``yadedaily`` or ``yade
 versions, shipped with particular distribution. 
 
 The Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
-Each branch corresponds to one distribution, e.g., trusty, jessie etc.
+Each branch corresponds to one distribution, e.g., xenial, stretch etc.
 The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`__. 
 It uses "pbuilder" to build packages, so all packages are built in a clean environment.
 
