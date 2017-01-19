@@ -39,6 +39,7 @@
 
 #include <core/Timing.hpp>
 #include <lib/serialization/ObjectIO.hpp>
+#include <csignal>
 
 namespace py = boost::python;
 
