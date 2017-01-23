@@ -116,6 +116,8 @@ class HydroForceEngine: public PartialEngine{
 		((vector<Real>,simplifiedReynoldStresses,,,"Vector of size equal to :yref:`nCell<HydroForceEngine.nCell>` containing the Reynolds stresses divided by the fluid density in function of the depth. simplifiedReynoldStresses(z) $=  <u_x'u_z'>(z)^2$"))
 		((Real,bedElevation,,,"Elevation of the bed above which the fluid flow is turbulent and the particles undergo turbulent velocity fluctuation."))
 		((vector<Real>,fluctTime,,,"Vector containing the time of life of the fluctuations associated to each particles."))
+		((vector<Real>,convAcc,0,,"Convective acceleration, depth dependent"))
+		((Real,convAccOption,false,,"To activate the convective acceleration"))
 		((Real,dtFluct,,,"Execution time step of the turbulent fluctuation model."))
 
 	,/*ctor*/

@@ -97,6 +97,7 @@ void HydroForceEngine::action(){
 			if ((p<nCell)&&(p>=0)) {
 				Vector3r liftForce = Vector3r::Zero();
 				Vector3r dragForce = Vector3r::Zero();
+				Vector3r convAccForce = Vector3r::Zero();
 				Vector3r vRel = Vector3r(vxFluid[p]+vFluctX[id],vFluctY[id],vFluctZ[id]) -  b->state->vel;//fluid-particle relative velocity
 				//Drag force calculation
 				if (vRel.norm()!=0.0) {
@@ -111,8 +112,9 @@ void HydroForceEngine::action(){
 				}
 				//buoyant weight force calculation
 				Vector3r buoyantForce = -4.0/3.0*Mathr::PI*pow(sphere->radius,3.0)*densFluid*gravity;
+				if (convAccOption==true){convAccForce[0] = - convAcc[p];}
 				//add the hydro forces to the particle
-				scene->forces.addForce(id,dragForce+liftForce+buoyantForce);		
+				scene->forces.addForce(id,dragForce+liftForce+buoyantForce+convAccForce);		
 			}
 		}
 	}
