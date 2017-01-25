@@ -30,6 +30,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	std::vector<double> poreThroatRadius;
 	double poreBodyRadius;
 	double poreBodyVolume;
+	double porosity;
 	int windowsID;//a temp cell info for experiment comparison(used by chao)
 	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for facet "i" and sphere (facetVertices)"[i][j]". Last component [i][3] for 1/sumLines in the facet "i" (used by chao).
 	
