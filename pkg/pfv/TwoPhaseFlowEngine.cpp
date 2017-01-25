@@ -38,7 +38,7 @@ void TwoPhaseFlowEngine::initialization()
 		else if(entryPressureMethod > 3){cout << endl << "ERROR - Method for determining the entry pressure does not exist";}
 		
 		computePoreBodyRadius();//save pore body radius before imbibition
-		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation
+		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation. Also save the porosity of each cell.
 		computeSolidLine();//save cell->info().solidLine[j][y]
 		initializeReservoirs();//initial pressure, reservoir flags and local pore saturation
 // 		if(isCellLabelActivated) updateReservoirLabel();
@@ -52,6 +52,7 @@ void TwoPhaseFlowEngine::computePoreBodyVolume()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
         cell->info().poreBodyVolume = std::abs( cell->info().volume() ) - std::abs(solver->volumeSolidPore(cell));
+	cell->info().porosity = cell->info().poreBodyVolume/std::abs( cell->info().volume() );
     }
 }
 
@@ -366,6 +367,13 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
 		if (isDrawable){vtkfile.write_data(cell->info().saturation);}
+	}
+	vtkfile.end_data();
+
+	vtkfile.begin_data("Porosity",CELL_DATA,SCALARS,FLOAT);
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(cell->info().porosity);}
 	}
 	vtkfile.end_data();
 
