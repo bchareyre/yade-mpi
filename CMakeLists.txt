@@ -73,7 +73,7 @@ ELSE()
   ENDIF()
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11 -fext-numeric-literals")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11")
 
 IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
@@ -96,6 +96,7 @@ MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
 MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
+ADD_DEFINITIONS(-DBOOST_MATH_DISABLE_FLOAT128=1)
 
 #===========================================================
 FIND_PACKAGE(NumPy REQUIRED)
