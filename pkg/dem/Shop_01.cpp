@@ -70,7 +70,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 
  	// adjust Interaction::cellDist for interactions;
 	Matrix3r invFlip = (Matrix3r::Identity() + flipFloat).inverse();
-	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = invFlip*i->cellDist;
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = (invFlip*(i->cellDist.cast<Real>())).cast<int>();
 
 	// force reinitialization of the collider
 	bool colliderFound=false;
