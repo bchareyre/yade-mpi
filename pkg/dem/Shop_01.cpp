@@ -48,63 +48,29 @@
 
 CREATE_LOGGER(Shop);
 
-/*! Flip periodic cell by given number of cells.
-
-Still broken, some interactions are missed. Should be checked.
-*/
-
+/*! Flip periodic cell for shearing indefinitely.*/
 Matrix3r Shop::flipCell(const Matrix3r& _flip){
-	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell); const Matrix3r& trsf(cell->trsf);
-	Vector3r size=cell->getSize();
-	Matrix3r flip;
+	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell);
+	Matrix3r& hSize = cell->hSize;
+	Matrix3i flip;
 	if(_flip==Matrix3r::Zero()){
 		bool hasNonzero=false;
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
 			if(i==j){ flip(i,j)=0; continue; }
-			flip(i,j)=-floor(.5+trsf(i,j)/(size[j]/size[i]));
+			flip(i,j)=-floor(hSize.col(j).dot(hSize.col(i))/hSize.col(i).dot(hSize.col(i)));
 			if(flip(i,j)!=0) hasNonzero=true;
 		}
 		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::Zero();}
-		LOG_DEBUG("Computed flip matrix: upper "<<flip(0,1)<<","<<flip(0,2)<<","<<flip(1,2)<<"; lower "<<flip(1,0)<<","<<flip(2,0)<<","<<flip(2,1));
 	} else {
-		flip=_flip;
+		flip=_flip.cast<int>();
 	}
-
-	// current cell coords of bodies
-	vector<Vector3i > oldCells; oldCells.resize(scene->bodies->size());
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b) continue; cell->wrapShearedPt(b->state->pos,oldCells[b->getId()]);
-	}
-
-	// change cell trsf here
-	Matrix3r trsfInc;
-	for(int i=0; i<3; i++) for(int j=0; j<3; j++){
-		if(i==j) { if(flip(i,j)!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); trsfInc(i,j)=0; continue; }
-		// make sure non-diagonal entries are "integers"
-		if(flip(i,j)!=double(int(flip(i,j)))) LOG_WARN("Flip matrix entry "<<flip(i,j)<<" at ["<<i<<","<<j<<"] not integer?! (will be rounded)");
-		trsfInc(i,j)=int(flip(i,j))*size[j]/size[i];
-	}
-	cell->trsf+=trsfInc;
+	Matrix3r flipFloat = flip.cast<Real>();
+	cell->hSize+=cell->hSize*flipFloat;
 	cell->postLoad(*cell);
 
-	// new cell coords of bodies
-	vector<Vector3i > newCells; newCells.resize(scene->bodies->size());
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b) continue;
-		cell->wrapShearedPt(b->state->pos,newCells[b->getId()]);
-	}
-
-	// remove all potential interactions
-	scene->interactions->eraseNonReal();
-	// adjust Interaction::cellDist for real interactions;
-	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
-		Body::id_t id1=i->getId1(),id2=i->getId2();
-		// this must be the same for both old and new interaction: cell2-cell1+cellDist
-		// c₂-c₁+c₁₂=k; c'₂+c₁'+c₁₂'=k   (new cell coords have ')
-		// c₁₂'=(c₂-c₁+c₁₂)-(c₂'-c₁')
-		i->cellDist=(oldCells[id2]-oldCells[id1]+i->cellDist)-(newCells[id2]-newCells[id1]);
-	}
-
+ 	// adjust Interaction::cellDist for interactions;
+	Matrix3r invFlip = (Matrix3r::Identity() + flipFloat).inverse();
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = invFlip*i->cellDist;
 
 	// force reinitialization of the collider
 	bool colliderFound=false;
@@ -113,7 +79,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		if(c){ colliderFound=true; c->invalidatePersistentData(); }
 	}
 	if(!colliderFound) LOG_WARN("No collider found while flipping cell; continuing simulation might give garbage results.");
-	return flip;
+	return flipFloat;
 }
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
