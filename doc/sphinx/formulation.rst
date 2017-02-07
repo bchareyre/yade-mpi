@@ -777,7 +777,7 @@ After the definition of the initial cell's geometry, $\mat{H}$ should generally 
 
 Deformations handling
 ---------------------
-The deformation of the cell over time is defined via a matrix representing the gradient of an homogeneous velocity field $\nabla \vec{v}$ (:yref:`Cell.velGrad`). This gradient represents arbitrary combinations of rotations and stretches. It can be imposed externaly or updated by :yref:`boundary controllers <BoundaryController>` (see :yref:`PeriTriaxController` or :yref:`Peri3dController`) in order to reach target strain values or to maintain some prescribed stress.
+The deformation of the cell over time is defined via a tensor representing the gradient of an homogeneous velocity field $\nabla \vec{v}$ (:yref:`Cell.velGrad`). This gradient represents arbitrary combinations of rotations and stretches. It can be imposed externaly or updated by :yref:`boundary controllers <BoundaryController>` (see :yref:`PeriTriaxController` or :yref:`Peri3dController`) in order to reach target strain values or to maintain some prescribed stress.
 
 The velocity gradient is integrated automatically over time, and the cumulated transformation is reflected in the transformation matrix $\mat{F}$ (:yref:`Cell.trsf`) and the current shape of the cell $\mat{H}$. The per-step transformation update reads (it is similar for $\mat{H}$), with $I$ the identity matrix:
 

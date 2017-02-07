@@ -70,7 +70,8 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 
  	// adjust Interaction::cellDist for interactions;
 	Matrix3r invFlip = (Matrix3r::Identity() + flipFloat).inverse();
-	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = (invFlip*(i->cellDist.cast<Real>())).cast<int>();
+	// FIXME: is Matrix3i.cast<Real>().cast<int>() really preserving the integer numbers?? problem: there is no inverse() for Matrix3i, even though in this case the inverse _seems_ to be always an integer matrix
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = invFlip.cast<int>()*i->cellDist;
 
 	// force reinitialization of the collider
 	bool colliderFound=false;
