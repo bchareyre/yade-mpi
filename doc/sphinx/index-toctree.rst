@@ -20,6 +20,8 @@ Welcome to Yade's documentation!
 
   installation.rst
 
+  amazonEC2.rst
+
   github.rst
 
   formulation.rst

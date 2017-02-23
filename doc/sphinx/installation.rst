@@ -315,3 +315,8 @@ If you are not running Ubuntu nor Debian, there is a way to create a Yubuntu `li
 
 More informations about this alternative are available `here <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_ (see the README file first).
 
+
+Cloud Computing
+----------------
+
+It is possible to exploit cloud computing services to run Yade. The combo Yade/Amazon Web Service has been found to work well, namely. Detailed instructions for migrating to amazon can be found in the section :ref:`CloudComputing`.
