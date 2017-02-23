@@ -663,10 +663,9 @@ vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> constrictions;
 	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		//in the periodic case, we skip facets with lowest id out of the base period
-		if ( ((f_it->first->info().index <= f_it->first->neighbor(f_it->second)->info().index) && f_it->first->info().isGhost)
-		||  ((f_it->first->info().index >= f_it->first->neighbor(f_it->second)->info().index) && f_it->first->neighbor(f_it->second)->info().isGhost)
-		|| f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
+		//in the periodic case, we retain only the facets incident to at least one non-ghost cell 
+		if ( (f_it->first->neighbor(f_it->second)->info().isGhost && f_it->first->info().isGhost)
+		||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
 		constrictions.push_back(computeEffectiveRadius(f_it->first, f_it->second));
 	}
 	return constrictions;
