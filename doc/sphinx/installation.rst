@@ -144,7 +144,7 @@ need root privileges.
 		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
 		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
-		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse \
+		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg\
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
 		
