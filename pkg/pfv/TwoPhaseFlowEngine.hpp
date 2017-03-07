@@ -201,6 +201,17 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	//FIXME, I removed indexing cells from inside UnsatEngine (SoluteEngine shouldl be ok (?)) in order to get pressure computed, problem is they are not indexed at all if flow is not calculated
 	void computeOnePhaseFlow() {scene = Omega::instance().getScene().get(); if (!solver) cerr<<"no solver!"<<endl; solver->gaussSeidel(scene->dt);initSolver(*solver);}
 	
+	///manipulate/get/set on pore geometry
+	bool isCellNeighbor(unsigned int cell1, unsigned int cell2);
+	void setPoreThroatRadius(unsigned int cell1, unsigned int cell2, double radius);
+	double getPoreThroatRadius(unsigned int cell1, unsigned int cell2);
+
+	double computeEffRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC);
+	double computeMSPRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC);
+	double bisectionTmp(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double a, double b);
+	double computeDeltaForceTmp(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double r);
+
+	
 	CELL_SCALAR_GETTER(bool,.isWRes,cellIsWRes)
 	CELL_SCALAR_GETTER(bool,.isNWRes,cellIsNWRes)
 	CELL_SCALAR_GETTER(bool,.isTrapW,cellIsTrapW)
@@ -215,6 +226,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	CELL_SCALAR_GETTER(Real,.porosity,cellPorosity)
 	CELL_SCALAR_SETTER(bool,.hasInterface,setCellHasInterface) //Temporary function to allow for simulations in Python
 	CELL_SCALAR_GETTER(int,.label,cellLabel)
+	CELL_SCALAR_GETTER(Real,.volume(),cellVolume) //Temporary function to allow for simulations in Python	
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
@@ -247,7 +259,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("computeOnePhaseFlow",&TwoPhaseFlowEngine::computeOnePhaseFlow,"compute pressure and fluxes in the W-phase")
 	.def("initialization",&TwoPhaseFlowEngine::initialization,"Initialize invasion setup. Build network, compute pore geometry info and initialize reservoir boundary conditions. ")
 	.def("computePoreSatAtInterface",&TwoPhaseFlowEngine::computePoreSatAtInterface,(boost::python::arg("ID")),"compute pressure and fluxes in the W-phase")
-	.def("getPoreThroatRadius",&TwoPhaseFlowEngine::cellporeThroatRadius,"get 4 pore throat radii")
+	.def("getPoreThroatRadiusList",&TwoPhaseFlowEngine::cellporeThroatRadius,(boost::python::arg("cell_ID")),"get 4 pore throat radii of a cell.")
 	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,"get 4 neigboring cells")
 	.def("getCellHasInterface",&TwoPhaseFlowEngine::cellHasInterface,"indicates whether a NW-W interface is present within the cell")
 	.def("getCellInSphereRadius",&TwoPhaseFlowEngine::cellInSphereRadius,"get the radius of the inscribed sphere in a pore unit")
@@ -264,6 +276,12 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("saveVtk",&TwoPhaseFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 	.def("getPotentialPendularSpheresPair",&TwoPhaseFlowEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
 	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
+	.def("getCellVolume",&TwoPhaseFlowEngine::cellVolume,"get the volume of each cell")
+	.def("isCellNeighbor",&TwoPhaseFlowEngine::isCellNeighbor,(boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID")),"check if cell1 and cell2 are neigbors.")
+	.def("setPoreThroatRadius",&TwoPhaseFlowEngine::setPoreThroatRadius, (boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID"), boost::python::arg("radius")), "set the pore throat radius between cell1 and cell2.")
+	.def("getPoreThroatRadius",&TwoPhaseFlowEngine::getPoreThroatRadius, (boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID")), "get the pore throat radius between cell1 and cell2.")
+	.def("getEffRcByPosRadius",&TwoPhaseFlowEngine::computeEffRcByPosRadius, (boost::python::arg("position1"),boost::python::arg("radius1"),boost::python::arg("position2"),boost::python::arg("radius2"),boost::python::arg("position3"),boost::python::arg("radius3")), "get effective radius by three spheres position and radius.(inscribed sphere)")
+	.def("getMSPRcByPosRadius",&TwoPhaseFlowEngine::computeMSPRcByPosRadius, (boost::python::arg("position1"),boost::python::arg("radius1"),boost::python::arg("position2"),boost::python::arg("radius2"),boost::python::arg("position3"),boost::python::arg("radius3")), "get entry radius wrt MSP method by three spheres position and radius.")
 	
 	)
 	DECLARE_LOGGER;
