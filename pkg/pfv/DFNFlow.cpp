@@ -170,11 +170,12 @@ void DFNFlowEngine::setPositionsBuffer(bool current)
 
 void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, Real aperture, Real residualAperture)
 {
+	const RTriangulation::Facet& currentFacet = *facet; // seems verbose but facet->first was declaring a junk cell and crashing program (https://bugs.launchpad.net/yade/+bug/1666339)
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-	const CellHandle& cell1 = facet->first;
-	const CellHandle& cell2 = facet->first->neighbor(facet->second);
+	const CellHandle& cell1 = currentFacet.first;
+	const CellHandle& cell2 = currentFacet.first->neighbor(facet->second);
 	if ( Tri.is_infinite(cell1) || Tri.is_infinite(cell2)) cerr<<"Infinite cell found in trickPermeability, should be handled somehow, maybe"<<endl;
-	cell1->info().kNorm()[facet->second]=cell2->info().kNorm()[Tri.mirror_index(cell1, facet->second)] = pow((aperture+residualAperture),3)/(12*viscosity);
+	cell1->info().kNorm()[currentFacet.second]=cell2->info().kNorm()[Tri.mirror_index(cell1, currentFacet.second)] = pow((aperture+residualAperture),3)/(12*viscosity);
 	//For vtk recorder:
 	cell1->info().crack= 1;
 	cell2->info().crack= 1;
