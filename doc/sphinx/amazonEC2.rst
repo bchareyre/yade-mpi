@@ -5,7 +5,7 @@ Using YADE with cloud computing on Amazon EC2
 =============================================
 
 .. role:: math(raw)
-   :format: html latex
+	:format: html latex
 
 (Note: we thank Robert Caulk for preparing and sharing this guide)
 
@@ -26,11 +26,10 @@ Launching an EC2 instance
 
 .. _fig-console:
 .. figure:: fig/launchinstance.*
-   :scale: 60 %
-   :align: center
-   
-   Amazon Web Services (AWS) Console
+	:scale: 60 %
+	:align: center
 
+	Amazon Web Services (AWS) Console
 
 Start by signing into the console on `Amazon
 EC2 <https://aws.amazon.com/?nc2=h_lgl>`__. This will require an
@@ -43,10 +42,10 @@ Machine Image (AMI): \`\`Ubuntu Server 16.04 LTS\`\` (Fig.
 
 .. _fig-ubuntu:
 .. figure:: fig/ubunut.*
-   :scale: 60 %
-   :align: center
-   
-   Select Ubuntu server 16.04 LTS AMI
+	:scale: 60 %
+	:align: center
+
+	Select Ubuntu server 16.04 LTS AMI
 
 You will now select the instance type. It is worth looking at the
 `specifications for each of the
@@ -65,10 +64,10 @@ scale YADE simulations.
 
 .. _fig-type:
 .. figure:: fig/instancetype.*
-   :scale: 60 %
-   :align: center
-    
-    Compute optimized (C3) instance tier
+	:scale: 60 %
+	:align: center
+
+	 Compute optimized (C3) instance tier
 
 
 Before launching, you will be asked to \`\`select an existing key pair
@@ -78,14 +77,14 @@ file by navigating to the same directory in the terminal and typing:
 
 ::
 
-    chmod 400 KeyPair.pem
+	chmod 400 KeyPair.pem
 
 Now the instance is launched, you will need to connect to it via SSH. On
 unix systems this is as easy as typing:
 
 ::
 
-    ssh -i path/to/KeyPair.pem ubuntu@ec2-XX-XXX-XX-XX.us-west-2.compute.amazon.com
+	ssh -i path/to/KeyPair.pem ubuntu@ec2-XX-XXX-XX-XX.us-west-2.compute.amazon.com
 
 into the terminal. There are other options such as using PuTTY, or even
 a java based terminal on the AWS website. You can find the necessary
@@ -96,10 +95,10 @@ console. Right click on the instance as shown in Fig.
 
 .. _fig-connect:
 .. figure:: fig/connect.*
-   :scale: 60 %
-   :align: center
-   
-   Connecting to the instance
+	:scale: 60 %
+	:align: center
+
+	Connecting to the instance
 
 You will be presented with the public DNS, which should look something
 like Fig. :ref:`fig-dns`.
@@ -107,10 +106,10 @@ like Fig. :ref:`fig-dns`.
 
 .. _fig-dns:
 .. figure:: fig/publicdns.*
-   :scale: 60 %
-   :align: center
-   
-   Public DNS
+	:scale: 100 %
+	:align: center
+
+	Public DNS
 
 
 Installing YADE and managing files
@@ -122,18 +121,18 @@ yadedaily, python, and some other useful tools:
 
 ::
 
-    #install yadedaily 
-    sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial/" >> /etc/apt/sources.list'
-    wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
-    sudo apt-get update
-    sudo apt-get install -y yadedaily
+	#install yadedaily 
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial/" >> /etc/apt/sources.list'
+	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
+	sudo apt-get update
+	sudo apt-get install -y yadedaily
 
-    # install python 
-    sudo apt-get -y install python
-    sudo apt-get -y install python-pip python-dev build-essential
+	# install python 
+	sudo apt-get -y install python
+	sudo apt-get -y install python-pip python-dev build-essential
 
-    # install htop
-    sudo apt-get -y install htop
+	# install htop
+	sudo apt-get -y install htop
 
 | Note that \`\`..packages/ xenial/" should match the Ubuntu
 distribution. 16.04 LTS is Xenial, but if you chose to start Ubuntu
@@ -146,14 +145,14 @@ command:
 
 ::
 
-    scp -r -i path/to/KeyYADEbox.pem path/to/yadeSimulation ubuntu@ec2-XX-XXX-XX-XX.us-west-2.compute.amazonaws.com:~/yadeSimulation
+	scp -r -i path/to/KeyYADEbox.pem path/to/yadeSimulation ubuntu@ec2-XX-XXX-XX-XX.us-west-2.compute.amazonaws.com:~/yadeSimulation
 
 You should now be able to run your simulation by changing to the proper
 directory and typing:
 
 ::
 
-    yadedaily nameOfSimulation.py 
+	yadedaily nameOfSimulation.py 
 
 In order to retrieve the output files (folder titled ‘out’ below) for
 post processing purposes, you will use the same command that you used to
@@ -162,7 +161,7 @@ reversed:
 
 ::
 
-    scp -r -i path/to/KeyYADEbox.pem ubuntu@ec2-XX-XXX-XX-XX.us-west-2.compute.amazonaws.com:~/yadeSimulation/out/ path/to/yadeSimulation/out
+	scp -r -i path/to/KeyYADEbox.pem ubuntu@ec2-XX-XXX-XX-XX.us-west-2.compute.amazonaws.com:~/yadeSimulation/out/ path/to/yadeSimulation/out
 
 Plotting output in the terminal
 ===============================
@@ -175,9 +174,9 @@ the subfolder where the simulation is saving its output and typing:
 
 ::
 
-    gnuplot
-    set terminal dumb
-    plot ``data.txt" using 1:2 with lines
+	gnuplot
+	set terminal dumb
+	plot ``data.txt" using 1:2 with lines
 
 Where ‘1:2’ refers to the columns in data.txt that you wish to plot
 against one another. Your output should look something like this:
@@ -185,10 +184,10 @@ against one another. Your output should look something like this:
 
 .. _fig-gnuplot:
 .. figure:: fig/gnuplot.*
-   :scale: 60 %
-   :align: center
-   
-   Gnuplot output
+	:scale: 60 %
+	:align: center
+
+	Gnuplot output
 
 Comments
 ========
