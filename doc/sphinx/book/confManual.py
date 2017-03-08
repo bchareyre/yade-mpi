@@ -661,7 +661,7 @@ htmlhelp_basename = 'Yadedoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-my_maketitle=r'''
+my_maketitle=u'''
 \begin{titlepage}
 
 \begin{flushright}
