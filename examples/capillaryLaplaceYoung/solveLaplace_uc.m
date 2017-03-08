@@ -59,7 +59,7 @@ nonDvSol = physSol(isfinite(physSol(:,3)),:);
 % disp(['We had to suppress ',num2str((1-nNonDvSol/nPhysSol)*100),' % of diverged "solutions"'])
 
 % Get rid of unstable physical solutions:(those with biggest volumes)
-% We use volume values for this purpose, see e.g. Duriez2016
+% We use volume values for this purpose, see e.g. Duriez2017
 distRupt = max(nonDvSol(:,1));
 % eRupt = nonDvSol(nonDvSol(:,1)==distRupt,7); % does not work since eRupt can be a global maximum
 % (when two branches are increasing with d*)

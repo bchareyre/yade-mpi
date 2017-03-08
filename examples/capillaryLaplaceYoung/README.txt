@@ -21,7 +21,7 @@ Also, three .m files are herein provided in order to enable users to build their
 - solveLiqBridge.m solves the Laplace-Young equation for one given bridge, defined in terms of the input attributes of the solveLiqBridge function (see therein). The solveLiqBridge function is usually called by other files (see below) during capillary files generation, however it can also be executed on its own in order to study (e.g. plot) capillary bridge profile.
 
 Code comments include references to:
- * Duriez2016: J. Duriez and R. Wan, Contact angle mechanical influence for wet granular soils, Acta Geotechnica, 2016, doi:10.1007/s11440-016-0500-6
+ * Duriez2017: J. Duriez and R. Wan, Contact angle mechanical influence for wet granular soils, Acta Geotechnica, 12, 2017
  * Lian1993: G. Lian and C. Thornton and M. J. Adams, A Theoretical Study of the Liquid Bridge Forces between Two Rigid Spherical Bodies, Journal of Colloid and Interface Science, 161(1), 1993
  * Scholtes2008 (french): L. Scholtes, Modelisation Micro-Mecanique des Milieux Granulaires Partiellement Satures, PhD Thesis from Institut polytechnique de Grenoble, 2008
  * Soulie2005 (french): F. Soulie, Cohesion par capillarite et comportement mecanique de milieux granulaires, PhD Thesis from Universite Montpellier II, 2005

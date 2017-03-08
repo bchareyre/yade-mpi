@@ -24,7 +24,7 @@ function [dist,vol,force,delta1,delta2,eStar,nn11,nn33,out] = solveLiqBridge(rRa
 % close all
 global cstC
 % cstC is the dimensionless capillary force: constant all along the profile
-% see [9] Lian1993, (6) Duriez2016, or (2.51) Soulie2005 ~ (10) Soulie2006..
+% see [9] Lian1993, (6) Duriez2017, or (2.51) Soulie2005 ~ (10) Soulie2006..
 cstC = 1/rRatio * sin(radians(delta1)) * sin(radians(delta1+theta)) + 1/2 * uStar * rRatio^-2 * sin(radians(delta1))^2;
 
 % Use of cstC to get the right filling angle delta2:
@@ -45,7 +45,7 @@ rhoRight = sin(radians(delta2));
 
 %-------------------------------------------------------------------------
 % Finite diff. scheme to compute whole profile ie compute rho and rhoPrime
-% See Lian1993, Duriez2016, etc..
+% See Lian1993, Duriez2017, etc..
 
 % Some remarks about next loop:
 % - this loop may extend the size of rho without problem
@@ -70,7 +70,7 @@ rho = rho(rho>0);
 d1 = radians(delta1); d2 = radians(delta2);
 
 % Inter particle dimensionless distance:
-% see (7) Duriez2016, (33) Scholtes2008, etc. (not (5) Soulie2006..)
+% see (7) Duriez2017, (33) Scholtes2008, etc. (not (5) Soulie2006..)
 lastZ = deltaZ*(length(rho) -1);
 dist = lastZ - 1/rRatio * ( 1-cos(d1) ) - ( 1-cos(d2) );
 
@@ -78,13 +78,13 @@ dist = lastZ - 1/rRatio * ( 1-cos(d1) ) - ( 1-cos(d2) );
 force = cstC;
 
 % Dimensionless volume:
-% Cf (4) Soulie2006, (34) Appendix Scholtes2008, (8) Duriez2016 etc. :
+% Cf (4) Soulie2006, (34) Appendix Scholtes2008, (8) Duriez2017 etc. :
 vol = pi*sum(rho(2:length(rho)).^2)*deltaZ;
 vol = vol - pi/3 * rRatio^(-3) * ( 1-cos(d1) )^2 * ( 2+cos(d1) );
 vol = vol - pi/3 * ( 1-cos(d2) )^2 * ( 2+cos(d2) );
 
 % Capillary bridge dimensionless free energy:
-% (12) Duriez2016 rather than [35] Lian1993 (was for cst volume stability)
+% (12) Duriez2017 rather than [35] Lian1993 (was for cst volume stability)
 dArea = rho .* ( 1+rhoPrime.^2).^(1/2); % ~ infinitesimal liquid gas area
 eStar = 2*pi * sum(dArea(2:length(dArea))) * deltaZ + uStar * vol; %+/- uStar changes the values but not the shape
 eStar = eStar - 2*pi*cos(radians(theta)) * ( (1-cos(d1))/rRatio^2 + 1 - cos(d2) );
@@ -148,14 +148,14 @@ end
 
 
 function drho = drho(rho,prevRho,deltaZ,rho2d)
-% returns rhoPrime at i+1, see (4) Duriez2016
+% returns rhoPrime at i+1, see (4) Duriez2017
 
 %drho = sqrt( ( rho/(cstK - 1/2*uStar*rho^2) )^2 - 1 );% [11] Lian1993 always positiv, which is not true
 drho = (rho - prevRho) / deltaZ + 1/2*deltaZ * rho2d; % NB: the rho2d term has a real influence
 end
 
 function rho2d = rhoSecond(rho,rhoP,uStar)
-% see e.g. (5) Duriez2016
+% see e.g. (5) Duriez2017
 rho2d = (1+rhoP^2) / rho + uStar*(1+rhoP^2)^1.5;
 end
 
