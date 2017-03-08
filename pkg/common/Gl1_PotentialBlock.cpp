@@ -460,7 +460,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 			functionBool = new vtkSmartPointer<ImpFuncPB> [clump->ids.size()];
 			ImplicitBoolNo = clump->ids.size();
 			
-			for (int i=0; i<clump->ids.size();i++){
+			for (unsigned i=0; i<clump->ids.size();i++){
 				const shared_ptr<Body>  clumpMember = Body::byId(clump->ids[i],scene);
 				const PotentialBlock* pbShape =dynamic_cast<PotentialBlock*>(clumpMember->shape.get()); 
 				functionBool[i] = vtkSmartPointer<ImpFuncPB>::New();
