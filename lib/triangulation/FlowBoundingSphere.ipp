@@ -663,9 +663,9 @@ vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> constrictions;
 	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		//in the periodic case, we retain only the facets incident to at least one non-ghost cell 
-		if ( (f_it->first->neighbor(f_it->second)->info().isGhost && f_it->first->info().isGhost)
-		||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
+		// in the periodic case, we retain only the facets incident to at least one non-ghost cell
+		// plus if one cell is ghost it must be facet->first (else they would appear twice) 
+		if ( f_it->first->info().isGhost ||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
 		constrictions.push_back(computeEffectiveRadius(f_it->first, f_it->second));
 	}
 	return constrictions;
@@ -678,8 +678,7 @@ vector<Constriction> FlowBoundingSphere<Tesselation>::getConstrictionsFull()
 	vector<Constriction> constrictions;
 	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
 		//in the periodic case, we retain only the facets incident to at least one non-ghost cell 
-		if ( (f_it->first->neighbor(f_it->second)->info().isGhost && f_it->first->info().isGhost)
-		||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
+		if ( f_it->first->info().isGhost ||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
 		vector<double> rn;
 		const CVector& normal = f_it->first->info().facetSurfaces[f_it->second];
 		if (!normal[0] && !normal[1] && !normal[2]) continue;

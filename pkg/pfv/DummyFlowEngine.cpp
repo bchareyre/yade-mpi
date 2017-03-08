@@ -9,7 +9,7 @@
 // This is an example of how to derive a new FlowEngine with additional data and possibly completely new behaviour.
 // Every functions of the base engine can be overloaded, and new functions can be added
 
-//keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
+//keep this #ifdef as long as you don't really want to release a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDUMMYFLOW to cmake, or just uncomment the following line
 // #define DUMMYFLOW
 #ifdef DUMMYFLOW
