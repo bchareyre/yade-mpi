@@ -218,46 +218,94 @@ double TwoPhaseFlowEngine::computeEffPoreThroatRadiusFine(CellHandle cell, int j
 
     Vector3r pos[3]; //solid pos
     double r[3]; //solid radius
-    double e[3]; //edges of triangulation
-    double g[3]; //gap radius between solid
     
     for (int i=0; i<3; i++) {
       pos[i] = makeVector3r(cell->vertex(facetVertices[j][i])->point().point());
       r[i] = sqrt(cell->vertex(facetVertices[j][i])->point().weight());
     }
+    return computeMSPRcByPosRadius(pos[0],r[0],pos[1],r[1],pos[2],r[2]);
+}   
+double TwoPhaseFlowEngine::computeMSPRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC)
+{
+    double e[3]; //edges of triangulation
+    double g[3]; //gap radius between solid
+        
+    e[0] = (posB-posC).norm();
+    e[1] = (posC-posA).norm();
+    e[2] = (posB-posA).norm();
+    g[0] = ((e[0]-rB-rC)>0) ? 0.5*(e[0]-rB-rC):0 ;
+    g[1] = ((e[1]-rC-rA)>0) ? 0.5*(e[1]-rC-rA):0 ;
+    g[2] = ((e[2]-rA-rB)>0) ? 0.5*(e[2]-rA-rB):0 ;
     
-    e[0] = (pos[1]-pos[2]).norm();
-    e[1] = (pos[2]-pos[0]).norm();
-    e[2] = (pos[1]-pos[0]).norm();
-    g[0] = ((e[0]-r[1]-r[2])>0) ? 0.5*(e[0]-r[1]-r[2]):0 ;
-    g[1] = ((e[1]-r[2]-r[0])>0) ? 0.5*(e[1]-r[2]-r[0]):0 ;
-    g[2] = ((e[2]-r[0]-r[1])>0) ? 0.5*(e[2]-r[0]-r[1]):0 ;
+    double rmin= (std::max(g[0],std::max(g[1],g[2]))==0) ? 1.0e-11:std::max(g[0],std::max(g[1],g[2])) ;
+    double rmax= computeEffRcByPosRadius(posA, rA, posB, rB, posC, rC);
+    if(rmin>rmax) { cerr<<"WARNING! rmin>rmax. rmin="<<rmin<<" ,rmax="<<rmax<<endl; }
     
-    double rmin= (std::max(g[0],std::max(g[1],g[2]))==0) ? 1.0e-10:std::max(g[0],std::max(g[1],g[2])) ;
-    double rmax = std::abs(solver->computeEffectiveRadius(cell, j));
-//     if(rmin>rmax) { cerr<<"WARNING! rmin>rmax. rmin="<<rmin<<" ,rmax="<<rmax<<endl; }
-    
-    double deltaForceRMin = computeDeltaForce(cell,j,rmin);
-    double deltaForceRMax = computeDeltaForce(cell,j,rmax);
+    double deltaForceRMin = computeDeltaForce(posA, rA, posB, rB, posC, rC, rmin);
+    double deltaForceRMax = computeDeltaForce(posA, rA, posB, rB, posC, rC, rmax);
     double effPoreRadius;
     
     if(deltaForceRMin>deltaForceRMax) { effPoreRadius=rmax; }
     else if(deltaForceRMax<0) { effPoreRadius=rmax; }
     else if(deltaForceRMin>0) { effPoreRadius=rmin; }
-    else { effPoreRadius=bisection(cell,j,rmin,rmax); }
+    else { effPoreRadius=bisection(posA, rA, posB, rB, posC, rC, rmin,rmax); }
     return effPoreRadius;
 }
-double TwoPhaseFlowEngine::bisection(CellHandle cell, int j, double a, double b)
+double TwoPhaseFlowEngine::bisection(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double a, double b)
 {
     double m = 0.5*(a+b);
-    if (std::abs(b-a)>std::abs((solver->computeEffectiveRadius(cell, j)*1.0e-6))) {
-        if ( computeDeltaForce(cell,j,m) * computeDeltaForce(cell,j,a) < 0 ) {
-            b = m;
-            return bisection(cell,j,a,b);}
-        else {
-            a = m;
-            return bisection(cell,j,a,b);}}
-    else return m;
+    if (std::abs(b-a)>computeEffRcByPosRadius(posA, rA, posB, rB, posC, rC)*1.0e-6) {
+        if ( computeDeltaForce(posA, rA, posB, rB, posC, rC,m) * computeDeltaForce(posA, rA, posB, rB, posC, rC,a) < 0 ) {
+            b = m; return bisection(posA, rA, posB, rB, posC, rC, a,b);}
+        else {a = m; return bisection(posA, rA, posB, rB, posC, rC, a,b);}
+    }
+    else {return m;}
+}
+double TwoPhaseFlowEngine::computeDeltaForce(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double r)
+{
+    double rRc[3]; //r[i] + r (r: capillary radius)
+    double e[3]; //edges of triangulation
+    double rad[4][3]; //angle in radian
+
+    rRc[0] = rA+r;
+    rRc[1] = rB+r;
+    rRc[2] = rC+r;
+
+    e[0] = (posB-posC).norm();
+    e[1] = (posC-posA).norm();
+    e[2] = (posB-posA).norm();
+
+    rad[3][0]=acos(((posB-posA).dot(posC-posA))/(e[2]*e[1]));
+    rad[3][1]=acos(((posC-posB).dot(posA-posB))/(e[0]*e[2]));
+    rad[3][2]=acos(((posA-posC).dot(posB-posC))/(e[1]*e[0]));
+
+    rad[0][0]=computeTriRadian(e[0],rRc[1],rRc[2]);
+    rad[0][1]=computeTriRadian(rRc[2],e[0],rRc[1]);
+    rad[0][2]=computeTriRadian(rRc[1],rRc[2],e[0]);
+
+    rad[1][0]=computeTriRadian(rRc[2],e[1],rRc[0]);
+    rad[1][1]=computeTriRadian(e[1],rRc[0],rRc[2]);
+    rad[1][2]=computeTriRadian(rRc[0],rRc[2],e[1]);
+
+    rad[2][0]=computeTriRadian(rRc[1],e[2],rRc[0]);
+    rad[2][1]=computeTriRadian(rRc[0],rRc[1],e[2]);
+    rad[2][2]=computeTriRadian(e[2],rRc[0],rRc[1]);
+
+    double lNW = (rad[0][0]+rad[1][1]+rad[2][2])*r;
+    double lNS = (rad[3][0]-rad[1][0]-rad[2][0])*rA + (rad[3][1]-rad[2][1]-rad[0][1])*rB + (rad[3][2]-rad[1][2]-rad[0][2])*rC ;
+    double lInterface=lNW+lNS;
+
+    double sW0=0.5*rRc[1]*rRc[2]*sin(rad[0][0])-0.5*rad[0][0]*pow(r,2)-0.5*rad[0][1]*pow(rB,2)-0.5*rad[0][2]*pow(rC,2) ;
+    double sW1=0.5*rRc[2]*rRc[0]*sin(rad[1][1])-0.5*rad[1][1]*pow(r,2)-0.5*rad[1][2]*pow(rC,2)-0.5*rad[1][0]*pow(rA,2) ;
+    double sW2=0.5*rRc[0]*rRc[1]*sin(rad[2][2])-0.5*rad[2][2]*pow(r,2)-0.5*rad[2][0]*pow(rA,2)-0.5*rad[2][1]*pow(rB,2) ;
+    double sW=sW0+sW1+sW2;
+
+    CVector facetSurface = 0.5*CGAL::cross_product(makeCgVect(posA-posC),makeCgVect(posB-posC));
+    double sVoid = sqrt(facetSurface.squared_length()) - (0.5*rad[3][0]*pow(rA,2) + 0.5*rad[3][1]*pow(rB,2) + 0.5*rad[3][2]*pow(rC,2));
+    double sInterface=sVoid-sW;
+
+    double deltaF = lInterface - sInterface/r;//deltaF=surfaceTension*(perimeterPore - areaPore/rCap)
+    return deltaF;
 }
 //calculate radian with law of cosines. (solve $\alpha$)
 double TwoPhaseFlowEngine::computeTriRadian(double a, double b, double c)
@@ -266,58 +314,6 @@ double TwoPhaseFlowEngine::computeTriRadian(double a, double b, double c)
   if (cosAlpha>1.0) {cosAlpha=1.0;} if (cosAlpha<-1.0) {cosAlpha=-1.0;}
   double alpha = acos(cosAlpha);
   return alpha;
-}
-
-double TwoPhaseFlowEngine::computeDeltaForce(CellHandle cell,int j, double rC)
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    if (tri.is_infinite(cell->neighbor(j))) return 0;
-    
-    Vector3r pos[3]; //solid pos
-    double r[3]; //solid radius
-    double rRc[3]; //r[i] + rC (rC: capillary radius)
-    double e[3]; //edges of triangulation
-    double rad[4][3]; //angle in radian
-    
-    for (int i=0; i<3; i++) {
-      pos[i] = makeVector3r(cell->vertex(facetVertices[j][i])->point().point());
-      r[i] = sqrt(cell->vertex(facetVertices[j][i])->point().weight());
-      rRc[i] = r[i]+rC;
-    }
-    
-    e[0] = (pos[1]-pos[2]).norm();
-    e[1] = (pos[2]-pos[0]).norm();
-    e[2] = (pos[1]-pos[0]).norm();
-    
-    rad[3][0]=acos(((pos[1]-pos[0]).dot(pos[2]-pos[0]))/(e[2]*e[1]));
-    rad[3][1]=acos(((pos[2]-pos[1]).dot(pos[0]-pos[1]))/(e[0]*e[2]));
-    rad[3][2]=acos(((pos[0]-pos[2]).dot(pos[1]-pos[2]))/(e[1]*e[0]));
-    
-    rad[0][0]=computeTriRadian(e[0],rRc[1],rRc[2]);
-    rad[0][1]=computeTriRadian(rRc[2],e[0],rRc[1]);
-    rad[0][2]=computeTriRadian(rRc[1],rRc[2],e[0]);
-
-    rad[1][0]=computeTriRadian(rRc[2],e[1],rRc[0]);
-    rad[1][1]=computeTriRadian(e[1],rRc[0],rRc[2]);
-    rad[1][2]=computeTriRadian(rRc[0],rRc[2],e[1]);
-    
-    rad[2][0]=computeTriRadian(rRc[1],e[2],rRc[0]);
-    rad[2][1]=computeTriRadian(rRc[0],rRc[1],e[2]);
-    rad[2][2]=computeTriRadian(e[2],rRc[0],rRc[1]);
-    
-    double lNW = (rad[0][0]+rad[1][1]+rad[2][2])*rC;
-    double lNS = (rad[3][0]-rad[1][0]-rad[2][0])*r[0] + (rad[3][1]-rad[2][1]-rad[0][1])*r[1] + (rad[3][2]-rad[1][2]-rad[0][2])*r[2] ;
-    double lInterface=lNW+lNS;
-    
-    double sW0=0.5*rRc[1]*rRc[2]*sin(rad[0][0])-0.5*rad[0][0]*pow(rC,2)-0.5*rad[0][1]*pow(r[1],2)-0.5*rad[0][2]*pow(r[2],2) ;
-    double sW1=0.5*rRc[2]*rRc[0]*sin(rad[1][1])-0.5*rad[1][1]*pow(rC,2)-0.5*rad[1][2]*pow(r[2],2)-0.5*rad[1][0]*pow(r[0],2) ;
-    double sW2=0.5*rRc[0]*rRc[1]*sin(rad[2][2])-0.5*rad[2][2]*pow(rC,2)-0.5*rad[2][0]*pow(r[0],2)-0.5*rad[2][1]*pow(r[1],2) ;
-    double sW=sW0+sW1+sW2;
-    double sVoid=sqrt(cell->info().facetSurfaces[j].squared_length()) * cell->info().facetFluidSurfacesRatio[j];
-    double sInterface=sVoid-sW;
-
-    double deltaF = lInterface - sInterface/rC;//deltaF=surfaceTension*(perimeterPore - areaPore/rCap)
-    return deltaF;
 }
 
 void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
@@ -1152,133 +1148,6 @@ double TwoPhaseFlowEngine::getPoreThroatRadius(unsigned int cell1, unsigned int 
                 r = solver->T[solver->currentTes].cellHandles[cell1]->info().poreThroatRadius[i];}}
     return r;
 }
-
-////compute entry pc independently
-double TwoPhaseFlowEngine::computeEffRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC)
-{
-	CVector B = makeCgVect(posB - posA);
-	CVector x = B/sqrt(B.squared_length());
-	CVector C = makeCgVect(posC - posA);
-	CVector z = CGAL::cross_product(x,C);
-	CVector y = CGAL::cross_product(x,z);
-	y = y/sqrt(y.squared_length());
-
-	double b1[2]; b1[0] = B*x; b1[1] = B*y;
-	double c1[2]; c1[0] = C*x; c1[1] = C*y;
-
-	double A = ((pow(rA,2))*(1-c1[0]/b1[0])+((pow(rB,2)*c1[0])/b1[0])-pow(rC,2)+pow(c1[0],2)+pow(c1[1],2)-((pow(b1[0],2)+pow(b1[1],2))*c1[0]/b1[0]))/(2*c1[1]-2*b1[1]*c1[0]/b1[0]);
-	double BB = (rA-rC-((rA-rB)*c1[0]/b1[0]))/(c1[1]-b1[1]*c1[0]/b1[0]);
-	double CC = (pow(rA,2)-pow(rB,2)+pow(b1[0],2)+pow(b1[1],2))/(2*b1[0]);
-	double D = (rA-rB)/b1[0];
-	double E = b1[1]/b1[0];
-	double F = pow(CC,2)+pow(E,2)*pow(A,2)-2*CC*E*A;
-
-	double c = -F-pow(A,2)+pow(rA,2);
-	double b = 2*rA-2*(D-BB*E)*(CC-E*A)-2*A*BB;
-	double a = 1-pow((D-BB*E),2)-pow(BB,2);
-
-	if ((pow(b,2)-4*a*c)<0){cout << "NEGATIVE DETERMINANT" << endl; }
-	double reff = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
-	if (reff<0) return 0;//happens very rarely, with bounding spheres most probably
-	//if the facet involves one ore more bounding sphere, we return R with a minus sign
-// 	if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious) return -reff;
-	else return reff;
-}
-double TwoPhaseFlowEngine::computeMSPRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC)
-{
-//     Vector3r pos[3]; //solid pos
-//     double r[3]; //solid radius
-    double e[3]; //edges of triangulation
-    double g[3]; //gap radius between solid
-        
-    e[0] = (posB-posC).norm();
-    e[1] = (posC-posA).norm();
-    e[2] = (posB-posA).norm();
-    g[0] = ((e[0]-rB-rC)>0) ? 0.5*(e[0]-rB-rC):0 ;
-    g[1] = ((e[1]-rC-rA)>0) ? 0.5*(e[1]-rC-rA):0 ;
-    g[2] = ((e[2]-rA-rB)>0) ? 0.5*(e[2]-rA-rB):0 ;
-    
-    double rmin= (std::max(g[0],std::max(g[1],g[2]))==0) ? 1.0e-10:std::max(g[0],std::max(g[1],g[2])) ;
-    double rmax = std::abs(computeEffRcByPosRadius(posA, rA, posB, rB, posC, rC));
-//     if(rmin>rmax) { cerr<<"WARNING! rmin>rmax. rmin="<<rmin<<" ,rmax="<<rmax<<endl; }
-    
-    double deltaForceRMin = computeDeltaForceTmp(posA, rA, posB, rB, posC, rC, rmin);
-    double deltaForceRMax = computeDeltaForceTmp(posA, rA, posB, rB, posC, rC, rmax);
-    double effPoreRadius;
-    
-    if(deltaForceRMin>deltaForceRMax) { effPoreRadius=rmax; }
-    else if(deltaForceRMax<0) { effPoreRadius=rmax; }
-    else if(deltaForceRMin>0) { effPoreRadius=rmin; }
-    else { effPoreRadius=bisectionTmp(posA, rA, posB, rB, posC, rC, rmin,rmax); }
-    return effPoreRadius;
-}
-double TwoPhaseFlowEngine::bisectionTmp(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double a, double b)
-{
-    double m = 0.5*(a+b);
-    if (std::abs(b-a)>std::abs((computeEffRcByPosRadius(posA, rA, posB, rB, posC, rC)*1.0e-6))) {
-        if ( computeDeltaForceTmp(posA, rA, posB, rB, posC, rC,m) * computeDeltaForceTmp(posA, rA, posB, rB, posC, rC,a) < 0 ) {
-            b = m;
-//             if(solve->debugOut) {cerr<<"deltaF(m)="<<computeDeltaForceTmp(posA, rA, posB, rB, posC, rC,m)<<",m="<<m<<endl;}
-            return bisectionTmp(posA, rA, posB, rB, posC, rC, a,b);}
-        else {
-            a = m;
-//             if(solve->debugOut) {cerr<<"deltaF(m)="<<computeDeltaForceTmp(posA, rA, posB, rB, posC, rC,m)<<",m="<<m<<endl;}
-            return bisectionTmp(posA, rA, posB, rB, posC, rC, a,b);}
-    }
-    else {
-//         if(solve->debugOut) {cerr<<"deltaF(m)="<<computeDeltaForceTmp(posA, rA, posB, rB, posC, rC,m)<<",m="<<m<<endl;}
-        return m;}
-}
-double TwoPhaseFlowEngine::computeDeltaForceTmp(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double r)
-{
-//     Vector3r pos[3]; //solid pos
-//     double r[3]; //solid radius
-    double rRc[3]; //r[i] + r (r: capillary radius)
-    double e[3]; //edges of triangulation
-    double rad[4][3]; //angle in radian
-    
-    rRc[0] = rA+r;
-    rRc[1] = rB+r;
-    rRc[2] = rC+r;
-        
-    e[0] = (posB-posC).norm();
-    e[1] = (posC-posA).norm();
-    e[2] = (posB-posA).norm();
-    
-    rad[3][0]=acos(((posB-posA).dot(posC-posA))/(e[2]*e[1]));
-    rad[3][1]=acos(((posC-posB).dot(posA-posB))/(e[0]*e[2]));
-    rad[3][2]=acos(((posA-posC).dot(posB-posC))/(e[1]*e[0]));
-    
-    rad[0][0]=computeTriRadian(e[0],rRc[1],rRc[2]);
-    rad[0][1]=computeTriRadian(rRc[2],e[0],rRc[1]);
-    rad[0][2]=computeTriRadian(rRc[1],rRc[2],e[0]);
-
-    rad[1][0]=computeTriRadian(rRc[2],e[1],rRc[0]);
-    rad[1][1]=computeTriRadian(e[1],rRc[0],rRc[2]);
-    rad[1][2]=computeTriRadian(rRc[0],rRc[2],e[1]);
-    
-    rad[2][0]=computeTriRadian(rRc[1],e[2],rRc[0]);
-    rad[2][1]=computeTriRadian(rRc[0],rRc[1],e[2]);
-    rad[2][2]=computeTriRadian(e[2],rRc[0],rRc[1]);
-    
-    double lNW = (rad[0][0]+rad[1][1]+rad[2][2])*r;
-    double lNS = (rad[3][0]-rad[1][0]-rad[2][0])*rA + (rad[3][1]-rad[2][1]-rad[0][1])*rB + (rad[3][2]-rad[1][2]-rad[0][2])*rC ;
-    double lInterface=lNW+lNS;
-    
-    double sW0=0.5*rRc[1]*rRc[2]*sin(rad[0][0])-0.5*rad[0][0]*pow(r,2)-0.5*rad[0][1]*pow(rB,2)-0.5*rad[0][2]*pow(rC,2) ;
-    double sW1=0.5*rRc[2]*rRc[0]*sin(rad[1][1])-0.5*rad[1][1]*pow(r,2)-0.5*rad[1][2]*pow(rC,2)-0.5*rad[1][0]*pow(rA,2) ;
-    double sW2=0.5*rRc[0]*rRc[1]*sin(rad[2][2])-0.5*rad[2][2]*pow(r,2)-0.5*rad[2][0]*pow(rA,2)-0.5*rad[2][1]*pow(rB,2) ;
-    double sW=sW0+sW1+sW2;
-    
-    
-    CVector facetSurface = 0.5*CGAL::cross_product(makeCgVect(posA-posC),makeCgVect(posB-posC));
-    double sVoid = sqrt(facetSurface.squared_length()) - (0.5*rad[3][0]*pow(rA,2) + 0.5*rad[3][1]*pow(rB,2) + 0.5*rad[3][2]*pow(rC,2));
-    double sInterface=sVoid-sW;
-
-    double deltaF = lInterface - sInterface/r;//deltaF=surfaceTension*(perimeterPore - areaPore/rCap)
-    return deltaF;
-}
-
 
 #endif //TwoPhaseFLOW
  

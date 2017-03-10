@@ -123,6 +123,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		double dotProduct ( CVector x, CVector y );
 		double computeEffectiveRadius(CellHandle cell, int j);
+		double computeEffectiveRadiusByPosRadius(const Point& posA, const double& rA, const Point& posB, const double& rB, const Point& posC, const double& rC);
 		double computeEquivalentRadius(CellHandle cell, int j);
 		//return the list of constriction values
 		vector<double> getConstrictions();

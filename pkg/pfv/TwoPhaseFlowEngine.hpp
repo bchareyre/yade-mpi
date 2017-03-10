@@ -117,9 +117,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreThroatRadiusTrickyMethod1();//set the radius of pore throat between side pores negative.
 	double computeEffPoreThroatRadius(CellHandle cell, int j);
 	double computeEffPoreThroatRadiusFine(CellHandle cell, int j);
-	double bisection(CellHandle cell, int j, double a, double b);
+	double computeMSPRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC);
 	double computeTriRadian(double a, double b, double c);
-	double computeDeltaForce(CellHandle cell,int j, double rC);
+	double computeEffRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC){double reff=solver->computeEffectiveRadiusByPosRadius(makeCgPoint(posA),rA,makeCgPoint(posB),rB,makeCgPoint(posC),rC); return reff<0?1.0e-10:reff;};
+	double bisection(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double a, double b);
+	double computeDeltaForce(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double r);
 
 	void computePoreThroatRadiusMethod2();//radius of the inscribed circle
 	void computePoreThroatRadiusMethod3();//radius of area-equivalent circle
@@ -205,11 +207,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	bool isCellNeighbor(unsigned int cell1, unsigned int cell2);
 	void setPoreThroatRadius(unsigned int cell1, unsigned int cell2, double radius);
 	double getPoreThroatRadius(unsigned int cell1, unsigned int cell2);
-
-	double computeEffRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC);
-	double computeMSPRcByPosRadius(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC);
-	double bisectionTmp(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double a, double b);
-	double computeDeltaForceTmp(const Vector3r& posA, const double& rA, const Vector3r& posB, const double& rB, const Vector3r& posC, const double& rC, double r);
 
 	
 	CELL_SCALAR_GETTER(bool,.isWRes,cellIsWRes)

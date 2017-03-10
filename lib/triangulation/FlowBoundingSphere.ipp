@@ -698,19 +698,31 @@ double FlowBoundingSphere<Tesselation>::computeEffectiveRadius(CellHandle cell, 
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
 
-	CVector B = cell->vertex(facetVertices[j][1])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
+	Point pos[3]; //spheres pos
+	double r[3]; //spheres radius
+	for (int i=0; i<3; i++) {
+	  pos[i] = cell->vertex(facetVertices[j][i])->point().point();
+	  r[i] = sqrt(cell->vertex(facetVertices[j][i])->point().weight());}
+	
+	double reff=computeEffectiveRadiusByPosRadius(pos[0],r[0],pos[1],r[1],pos[2],r[2]);
+	if (reff<0) return 0;//happens very rarely, with bounding spheres most probably
+	//if the facet involves one ore more bounding sphere, we return R with a minus sign
+	if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious) return -reff;
+	else return reff;
+}
+////compute inscribed radius independently by position and radius
+template <class Tesselation> 
+double FlowBoundingSphere<Tesselation>::computeEffectiveRadiusByPosRadius(const Point& posA, const double& rA, const Point& posB, const double& rB, const Point& posC, const double& rC)
+{
+	CVector B = posB - posA;
 	CVector x = B/sqrt(B.squared_length());
-	CVector C = cell->vertex(facetVertices[j][2])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
+	CVector C = posC - posA;
 	CVector z = CGAL::cross_product(x,C);
 	CVector y = CGAL::cross_product(x,z);
 	y = y/sqrt(y.squared_length());
 
 	double b1[2]; b1[0] = B*x; b1[1] = B*y;
 	double c1[2]; c1[0] = C*x; c1[1] = C*y;
-
-	double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
-	double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
-	double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
 
 	double A = ((pow(rA,2))*(1-c1[0]/b1[0])+((pow(rB,2)*c1[0])/b1[0])-pow(rC,2)+pow(c1[0],2)+pow(c1[1],2)-((pow(b1[0],2)+pow(b1[1],2))*c1[0]/b1[0]))/(2*c1[1]-2*b1[1]*c1[0]/b1[0]);
 	double BB = (rA-rC-((rA-rB)*c1[0]/b1[0]))/(c1[1]-b1[1]*c1[0]/b1[0]);
@@ -725,10 +737,7 @@ double FlowBoundingSphere<Tesselation>::computeEffectiveRadius(CellHandle cell, 
 
 	if ((pow(b,2)-4*a*c)<0){cout << "NEGATIVE DETERMINANT" << endl; }
 	double reff = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
-	if (reff<0) return 0;//happens very rarely, with bounding spheres most probably
-	//if the facet involves one ore more bounding sphere, we return R with a minus sign
-	if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious) return -reff;
-	else return reff;
+	return reff;
 }
 
 template <class Tesselation> 
