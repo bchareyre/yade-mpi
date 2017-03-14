@@ -662,12 +662,13 @@ vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> constrictions;
-	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		// in the periodic case, we retain only the facets incident to at least one non-ghost cell
-		// plus if one cell is ghost it must be facet->first (else they would appear twice) 
-		if ( f_it->first->info().isGhost ||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
-		constrictions.push_back(computeEffectiveRadius(f_it->first, f_it->second));
-	}
+	CellHandle neighbourCell; const FiniteCellsIterator& cellEnd = Tri.finite_cells_end();
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+			if (cell->info().isGhost) continue;// retain only the cells with barycenter in the (0,0,0) period
+			for (int j=0; j<4; j++) {
+				neighbourCell = cell->neighbor(j);
+				if (cell->info().id < neighbourCell->info().id)
+					constrictions.push_back(computeEffectiveRadius(cell, j));}}
 	return constrictions;
 }
 
@@ -676,18 +677,21 @@ vector<Constriction> FlowBoundingSphere<Tesselation>::getConstrictionsFull()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<Constriction> constrictions;
-	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		//in the periodic case, we retain only the facets incident to at least one non-ghost cell 
-		if ( f_it->first->info().isGhost ||  f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
-		vector<double> rn;
-		const CVector& normal = f_it->first->info().facetSurfaces[f_it->second];
-		if (!normal[0] && !normal[1] && !normal[2]) continue;
-		rn.push_back(computeEffectiveRadius(f_it->first, f_it->second));
-		rn.push_back(normal[0]);
-		rn.push_back(normal[1]);
-		rn.push_back(normal[2]);
-		Constriction cons (pair<int,int>(f_it->first->info().id,f_it->first->neighbor(f_it->second)->info().id),rn);
-		constrictions.push_back(cons);
+	CellHandle neighbourCell; const FiniteCellsIterator& cellEnd = Tri.finite_cells_end();
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+			if (cell->info().isGhost) continue;// retain only the cells with barycenter in the (0,0,0) period
+			for (int j=0; j<4; j++) {
+				neighbourCell = cell->neighbor(j);
+				if (cell->info().id < neighbourCell->info().id) {
+					vector<double> rn;
+					const CVector& normal = cell->info().facetSurfaces[j];
+					if (!normal[0] && !normal[1] && !normal[2]) continue;
+					rn.push_back(computeEffectiveRadius(cell, j));
+					rn.push_back(normal[0]);
+					rn.push_back(normal[1]);
+					rn.push_back(normal[2]);
+					Constriction cons (pair<int,int>(cell->info().id,neighbourCell->info().id),rn);
+					constrictions.push_back(cons);}}
 	}
 	return constrictions;
 }
