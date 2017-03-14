@@ -14,7 +14,7 @@
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
 
-#define DFNFLOW
+// #define DFNFLOW
 
 #ifdef DFNFLOW
 #include "FlowEngine_DFNFlowEngineT.hpp"
