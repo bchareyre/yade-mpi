@@ -208,7 +208,7 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Finite_edges_iterator& edg
 	RTriangulation::Facet_circulator facet1 = Tri.incident_facets(*edge);
 	RTriangulation::Facet_circulator facet0=facet1++;
 	trickPermeability(facet0, aperture,residualAperture, edge);
-	while ( facet1!=facet0 ) trickPermeability(facet1, aperture, residualAperture, edge); facet1++;
+	while ( facet1!=facet0 ) {trickPermeability(facet1, aperture, residualAperture, edge); facet1++;}
 	/// Needs the fracture surface for this edge?
 // 	double edgeArea = solver->T[solver->currentTes].computeVFacetArea(edge); cout<<"edge area="<<edgeArea<<endl;
 }
