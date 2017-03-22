@@ -211,3 +211,13 @@ Comments
    you always dedicate 8 cores to each simulation and ensure 100% of the
    processor is running.
 
+-  Create a tmux session to avoid ending YADE simulations upon
+   disconnecting from the server.
+
+::
+
+      tmux  # starts a new session
+      tmux attach -t 0  # attach session 0
+      tmux kill -t 0  # kill session
+      ## cntrl - b - d to move back to home
+      ## cntrl - b - [ to navigate within the session
