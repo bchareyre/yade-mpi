@@ -661,7 +661,7 @@ htmlhelp_basename = 'Yadedoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-my_maketitle=u'''
+my_maketitle=r'''
 \begin{titlepage}
 
 \begin{flushright}
@@ -676,7 +676,7 @@ my_maketitle=u'''
 \vspace{20 mm}
 %\vspace{70 mm}
 \begin{sffamily}\bfseries\Large
-V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, J\'er\^ome Duriez, Nolan Dyck, Jan Eliáš, Burak Er, Alexander Eulitz, Anton Gladky, Christian Jakob, Fran\c{c}ois Kneib, Janek Kozicki, Donia Marzougui, Rapha\"el Maurin, Chiara Modenese, Luc Scholt\`{e}s, Luc Sibille, Jan Str\'{a}nsk\'{y}, Thomas Sweijen, Klaus Thoeni, Chao Yuan
+V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, J\'er\^ome Duriez, Nolan Dyck, Jan Eli\'{a}\v{s}, Burak Er, Alexander Eulitz, Anton Gladky, Christian Jakob, Fran\c{c}ois Kneib, Janek Kozicki, Donia Marzougui, Rapha\"el Maurin, Chiara Modenese, Luc Scholt\`{e}s, Luc Sibille, Jan Str\'{a}nsk\'{y}, Thomas Sweijen, Klaus Thoeni, Chao Yuan
 \end{sffamily}
 \vspace{20 mm}
 \hrule{}

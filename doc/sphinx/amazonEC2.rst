@@ -4,9 +4,6 @@
 Using YADE with cloud computing on Amazon EC2
 =============================================
 
-.. role:: math(raw)
-	:format: html latex
-
 (Note: we thank Robert Caulk for preparing and sharing this guide)
 
 Summary
@@ -31,14 +28,15 @@ Launching an EC2 instance
 
 	Amazon Web Services (AWS) Console
 
+
 Start by signing into the console on `Amazon
 EC2 <https://aws.amazon.com/?nc2=h_lgl>`__. This will require an
 existing or new Amazon account. Once you’ve signed in, you should find
 the EC2 console by clicking on ‘services’ in the upper left hand corner
 of the AWS homepage. Start by clicking on the \`\`launch an instance“
-blue button (Fig. :ref:`fig-console`). Select the Amazon
+blue button (Fig. `fig-console`_). Select the Amazon
 Machine Image (AMI): \`\`Ubuntu Server 16.04 LTS\`\` (Fig.
-:ref:`fig-ubuntu`).
+`fig-ubuntu`_).
 
 .. _fig-ubuntu:
 .. figure:: fig/ubunut.*
@@ -58,7 +56,7 @@ will help you decide. However, the instance type is an important
 selection. The \`\`Compute Optimized" instances are necessary for most
 YADE simulations because they provide access to high performing
 processors and guaranteed computing power. The C3.2xlarge (Fig.
-:ref:`fig-type`) is equivalent to an 8 core 2.8ghz Xeon E5
+`fig-type`_) is equivalent to an 8 core 2.8ghz Xeon E5
 with 25 mb of cache, which is likely the best option for medium-large
 scale YADE simulations.
 
@@ -90,7 +88,7 @@ into the terminal. There are other options such as using PuTTY, or even
 a java based terminal on the AWS website. You can find the necessary
 information by navigating to \`\`Instances" in the left menu of the AWS
 console. Right click on the instance as shown in Fig.
-:ref:`fig-connect` and click connect.
+`fig-connect`_ and click connect.
 
 
 .. _fig-connect:
@@ -101,7 +99,7 @@ console. Right click on the instance as shown in Fig.
 	Connecting to the instance
 
 You will be presented with the public DNS, which should look something
-like Fig. :ref:`fig-dns`.
+like Fig. `fig-dns`_.
 
 
 .. _fig-dns:
@@ -121,13 +119,13 @@ yadedaily, python, and some other useful tools:
 
 ::
 
-	#install yadedaily 
+	#install yadedaily
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
 	sudo apt-get update
 	sudo apt-get install -y yadedaily
 
-	# install python 
+	# install python
 	sudo apt-get -y install python
 	sudo apt-get -y install python-pip python-dev build-essential
 
@@ -152,7 +150,7 @@ directory and typing:
 
 ::
 
-	yadedaily nameOfSimulation.py 
+	yadedaily nameOfSimulation.py
 
 In order to retrieve the output files (folder titled ‘out’ below) for
 post processing purposes, you will use the same command that you used to

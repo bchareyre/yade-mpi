@@ -670,7 +670,7 @@ htmlhelp_basename = 'Yadedoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-my_maketitle=u'''
+my_maketitle=r'''
 \begin{titlepage}
 
 \begin{flushright}
@@ -706,16 +706,16 @@ V\'{a}clav \v{S}milauer, Emanuele Catalano, Bruno Chareyre, Sergei Dorofeenko, J
  \item \text{\sffamily\bfseries\normalsize Sergei Dorofeenko}\\ \text{\sffamily\small IPCP RAS, Chernogolovka}
  \item \text{\sffamily\bfseries\normalsize J\'er\^ome Duriez}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
  \item \text{\sffamily\bfseries\normalsize Nolan Dyck}\\ \text{\sffamily\small Univ. of Western Ontario}
- \item \text{\sffamily\bfseries\normalsize Jan Eliáš}\\ \text{\sffamily\small Brno University of Technology}
+ \item \text{\sffamily\bfseries\normalsize Eli\'{a}\v{s}}\\ \text{\sffamily\small Brno University of Technology}
  \item \text{\sffamily\bfseries\normalsize Burak Er}\\ \text{\sffamily\small Bursa Technical University}
  \item \text{\sffamily\bfseries\normalsize Alexander Eulitz}\\ \text{\sffamily\small TU Berlin / Institute for Machine Tools}\\ \text{\sffamily\small and Factory Management}
  \item \text{\sffamily\bfseries\normalsize Anton Gladky}\\ \text{\sffamily\small TU Bergakademie Freiberg}
  \item \text{\sffamily\bfseries\normalsize Ning Guo}\\ \text{\sffamily\small Hong Kong Univ. of Science and Tech.}
  \item \text{\sffamily\bfseries\normalsize Christian Jakob}\\ \text{\sffamily\small TU Bergakademie Freiberg}
- \item \text{\sffamily\bfseries\normalsize François Kneib}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR / Irstea Grenoble}
+ \item \text{\sffamily\bfseries\normalsize Fran\c{c}ois Kneib}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR / Irstea Grenoble}
  \item \text{\sffamily\bfseries\normalsize Janek Kozicki}\\ \text{\sffamily\small Gdansk University of Technology}
  \item \text{\sffamily\bfseries\normalsize Donia Marzougui}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
- \item \text{\sffamily\bfseries\normalsize Raphaël Maurin}\\ \text{\sffamily\small Irstea Grenoble}
+ \item \text{\sffamily\bfseries\normalsize Rapha\"el Maurin}\\ \text{\sffamily\small Irstea Grenoble}
  \item \text{\sffamily\bfseries\normalsize Chiara Modenese}\\ \text{\sffamily\small University of Oxford}
  \item \text{\sffamily\bfseries\normalsize Luc Scholt\`{e}s}\\ \text{\sffamily\small Grenoble INP, UJF, CNRS, lab. 3SR}
  \item \text{\sffamily\bfseries\normalsize Luc Sibille}\\ \text{\sffamily\small University of Nantes, lab. GeM}
