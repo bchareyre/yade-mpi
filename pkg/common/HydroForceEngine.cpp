@@ -1,5 +1,3 @@
-// 2004 © Janek Kozicki <cosurgi@berlios.de> 
-// 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 // 2014 © Raphael Maurin <raphael.maurin@irstea.fr> 
 
 #include"HydroForceEngine.hpp"

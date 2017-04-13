@@ -404,6 +404,9 @@ Real InsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real 
 	return (xNorm-floor(xNorm))*(x1-x0);
 }
 
+//NOTE: possible improvements:
+// 1) (not only periodic) keep a mask defining overlaps in directions 1,2,3, and compare the sum instead of checking overlap in three directions everytime there is an inversion. (maybe not possible? does it need a N² table?!!)
+// 2) use norm() only when needed (first and last elements, mainly, can be treated as special cases)
 void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 	assert(periodic);
 	long &loIdx=v.loIdx; const long &size=v.size;
