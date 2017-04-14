@@ -410,8 +410,10 @@ Real InsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real 
 void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 	assert(periodic);
 	long &loIdx=v.loIdx; const long &size=v.size;
-	for(long _i=0; _i<size; _i++){
-		const long i=v.norm(_i);
+	/* We have to visit each bound at least once (first condition), but this is not enough. The correct ordering in the begining of the list needs a second pass to connect begin and end consistently (the second condition). Strictly the second condition should include "+ (v.norm(j+1)==loIdx ? v.cellDim : 0)" but it is ok as is since the shift is added inside the loop. */
+	long _i=0;
+	for(; (_i<size) || (v[v.norm(_i)].coord <  v[v.norm(_i-1)].coord); _i++){
+		const long i=v.norm(_i);//FIXME: useless, and many others can probably be removed
 		const long i_1=v.norm(i-1);
 		//switch period of (i) if the coord is below the lower edge cooridnate-wise and just above the split
 		if(i==loIdx && v[i].coord<0){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
