@@ -376,13 +376,11 @@ void InsertionSortCollider::action(){
 				for(long i=0; i<2*nBodies; i++){
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
-					long cnt=0;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
 					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
 						const Body::id_t& jid=V[j].id;
 						if(!(V[j].flags.isMin && V[j].flags.hasBB)) continue;
 						handleBoundInversionPeri(iid,jid,interactions,scene);
-						if(cnt++>2*(long)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
 					}
 				}
 			}
@@ -411,8 +409,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 	assert(periodic);
 	long &loIdx=v.loIdx; const long &size=v.size;
 	/* We have to visit each bound at least once (first condition), but this is not enough. The correct ordering in the begining of the list needs a second pass to connect begin and end consistently (the second condition). Strictly the second condition should include "+ (v.norm(j+1)==loIdx ? v.cellDim : 0)" but it is ok as is since the shift is added inside the loop. */
-	long _i=0;
-	for(; (_i<size) || (v[v.norm(_i)].coord <  v[v.norm(_i-1)].coord); _i++){
+	for(long _i=0; (_i<size) || (v[v.norm(_i)].coord <  v[v.norm(_i-1)].coord); _i++){
 		const long i=v.norm(_i);//FIXME: useless, and many others can probably be removed
 		const long i_1=v.norm(i-1);
 		//switch period of (i) if the coord is below the lower edge cooridnate-wise and just above the split
@@ -435,7 +432,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 				// this condition is not strictly necessary, but the loop of insertionSort would have to run more times.
 				// Since size of particle is required to be < .5*cellDim, this would mean simulation explosion anyway
 				LOG_FATAL("Body #"<<v[j].id<<" going faster than 1 cell in one step? Not handled.");
-				throw runtime_error(__FILE__ ": body mmoving too fast (skipped 1 cell).");
+				throw runtime_error(__FILE__ ": body moving too fast (skipped 1 cell).");
 			}
 			Bounds& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
 			vNew=v[j];
