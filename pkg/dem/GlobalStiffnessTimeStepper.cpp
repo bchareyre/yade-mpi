@@ -40,7 +40,9 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	}
 	
 	if(!sdec || stiffness==Vector3r::Zero()){
-		if (densityScaling) sdec->densityScaling = min(1.0001*sdec->densityScaling, timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0));
+		if (densityScaling) {
+			if (sdec->densityScaling<=0)  sdec->densityScaling = timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0);
+			else sdec->densityScaling = max(0.99*sdec->densityScaling, timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0));}
 		return; // not possible to compute!
 	}
 
@@ -92,9 +94,9 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 		dt = std::min(dt,dt_visc);
 	}
 
-	//if there is a target dt, then we apply density scaling on the body, the inertia used in Newton will be mass*scaling, the weight is unmodified
+	//if there is a target dt, then we apply density scaling on the body, the inertia used in Newton will be mass/scaling, the weight is unmodified
 	if (densityScaling) {
-		sdec->densityScaling = min(sdec->densityScaling,timestepSafetyCoefficient*pow(dt /targetDt,2.0));
+		sdec->densityScaling = min(sdec->densityScaling*1.01, pow(dt /targetDt,2.0));
 		newDt=targetDt;
 	}
 	//else we update dt normaly
