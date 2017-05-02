@@ -150,9 +150,10 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 {
 	if (useSolver<1) {LOG_ERROR("background calculations not available for Gauss-Seidel"); return;}
         buildTriangulation ( pZero,*backgroundSolver );
-	//FIXME: GS is computing too much, we need only matrix factorization in fact
+	backgroundSolver->factorizeOnly = true;
 	backgroundSolver->gaussSeidel(scene->dt);
-	//FIXME(2): and here we need only cached variables, not forces
+	backgroundSolver->factorizeOnly = false;
+	//FIXME(2): and here we need only cached variables, not forces <- this appears to be fixed already inside computeFacetForcesWithCache
 	backgroundSolver->computeFacetForcesWithCache(/*onlyCache?*/ true);
 // 	boost::this_thread::sleep(boost::posix_time::seconds(5));
  	backgroundCompleted = true;
@@ -279,6 +280,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
         boundaryConditions ( flow );
         flow.initializePressure ( pZero );
+	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (https://bugs.launchpad.net/yade/+bug/1687355)
 	
         if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate)) flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
         if ( waveAction ) flow.applySinusoidalPressure ( flow.tesselation().Triangulation(), sineMagnitude, sineAverage, 30 );
