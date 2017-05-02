@@ -54,6 +54,7 @@ public:
 	using FlowType::resetNetwork;
 	using FlowType::tesselation;
 	using FlowType::resetRHS;
+	using FlowType::factorizeOnly;  // used for backgroundAction()
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
@@ -61,7 +62,6 @@ public:
 	bool isFullLinearSystemGSSet;
 	bool areCellsOrdered;//true when orderedCells is filled, turn it false after retriangulation
 	bool updatedRHS;
-	bool factorizeOnly;  // used for backgroundAction()
 	
 	#ifdef EIGENSPARSE_LIB
 	//Eigen's sparse matrix and solver

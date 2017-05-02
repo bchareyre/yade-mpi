@@ -45,6 +45,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
 		int errorCode;
+		bool factorizeOnly;
 		
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
