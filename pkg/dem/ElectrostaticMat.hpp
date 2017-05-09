@@ -61,6 +61,7 @@ class Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys: public Ip2_FrictM
                         ((Real,Temp,20,,"Temperature into the fluid [°C]"))
                         ((Real,RelPerm,1,,"Relative permittivity of the fluid [-]"))
                         ((Real,A,1e-19,,"Hamaker constant [J]"))
+                        ((Real,Z,0,,"Interaction constant [N]. If 0, will be calculated from termal properties"))
                         ((vector<Vector2r>,Ions,vector<Vector2r>({Vector2r(-1,1),Vector2r(1,1)}),,"List of ions's charge and concentration (default is: 1mol/l Na(+1)Cl(-1): [(+1,1),(-1,1)]"))
                     ,,
 		);

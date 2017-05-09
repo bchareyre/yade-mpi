@@ -25,12 +25,16 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
         interaction->phys = phys;
 
         // Electrostatic behaviour
+        const Real kB(1.38064852e-23); /* J/K Boltzmann*/
+        const Real nA(6.02214086e26); /* 1/kg Avogadro*/
+        const Real e(1.60217662e-19); /* A.s Electron charge*/
+        const Real VacPerm(8.854187817e-12); /* F/m Permittivity of vacuum*/
+        
+        Real sc(0); // Sum of charges
+        Temp += 273.15; // to Kelvin
 
         if(DebyeLength == 0)
         {
-            Real sc(0);
-            Temp += 273.15; // to Kelvin
-
             for(vector<Vector2r>::const_iterator it=Ions.begin();it < Ions.end();it++)
             {
                 sc += it->x()*it->x()*it->y();
@@ -43,23 +47,28 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
             }
             else
             {
-                const Real kB(1.38064852e-23); /* J/K */
-                const Real nA(6.02214086e26); /* 1/kg */
-                const Real e(1.60217662e-19); /* A.s */
-                const Real VacPerm(8.854187817e-12); /* F/m */
-
-
                 Real tmp = RelPerm*VacPerm*kB*Temp/(e*e*nA*sc);
                 phys->DebyeLength = pow(tmp,-0.5);
             }
-
-            //std::cout << "Debye length^-1: " << phys->DebyeLength << std::endl;
-
-            phys->InterConst = 1e-15*Temp*Temp*pow(tanh(SurfCharge/(0.3456*Temp)),2);
-            phys->A = A;
-
-            //std::cout << "K: " << phys->InterConst << std::endl;
         }
+        else
+        {
+            phys->DebyeLength = DebyeLength;
+        }
+        
+        phys->A = A;
+        
+        if(A == 0)
+            LOG_ERROR("Hamaker constant (A) is null. Van Der Waals force will not be calculated");
+        
+        //std::cout << "Debye length^-1: " << phys->DebyeLength << std::endl;
+        if(Z == 0)
+            phys->InterConst = 1e-15*Temp*Temp*pow(tanh(SurfCharge/(0.3456*Temp)),2);
+        else
+            phys->InterConst = Z;
+        
+        if(phys->InterConst == 0)
+            LOG_ERROR("Interaction constant is null. Set SurfCharge and Temp or Z. Double Layer Electrostatic Interaction will not be calculated.");
 }
 
 
@@ -74,38 +83,39 @@ CREATE_LOGGER(Law2_ScGeom_ElectrostaticPhys);
 bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction){
 
 
-        // Inheritance
-        Law2_ScGeom_FrictPhys_CundallStrack::go(iGeom,iPhys,interaction);
+    // Inheritance
+    Law2_ScGeom_FrictPhys_CundallStrack::go(iGeom,iPhys,interaction);
 
         // Geometric
 	ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
-        ElectrostaticPhys* phys=static_cast<ElectrostaticPhys*>(iPhys.get());
+    ElectrostaticPhys* phys=static_cast<ElectrostaticPhys*>(iPhys.get());
 
-        // Get bodies properties
+    // Get bodies properties
 	Body::id_t id1 = interaction->getId1();
  	Body::id_t id2 = interaction->getId2();
 	const shared_ptr<Body> b1 = Body::byId(id1,scene);
 	const shared_ptr<Body> b2 = Body::byId(id2,scene);
-        State* s1 = b1->state.get();
-        State* s2 = b2->state.get();
+    State* s1 = b1->state.get();
+    State* s2 = b2->state.get();
 
-        // Terms in the force
-        Real& a1(geom->radius1);
-        Real& a2(geom->radius2);
-        Real r((s1->se3.position-s2->se3.position).norm());
-        Real K(phys->DebyeLength);
-        Vector3r& normalForce(phys->normalForce);
+    // Terms in the force
+    Real& a1(geom->radius1);
+    Real& a2(geom->radius2);
+    Real r((s1->se3.position-s2->se3.position).norm());
+    Real D(r-a1-a2);
+    Real K(1/phys->DebyeLength);
+    Vector3r& normalForce(phys->normalForce);
 
 
-        /* constitutive law */
-        Real DLEF(phys->DebyeLength*phys->InterConst); // Double Layer Electrostatic Force
-        Real VdW(0.);
+    /* constitutive law */
+    Real DLEF(0.); // Double Layer Electrostatic Force
+    Real VdW(0.);  // Van Der Waals Force
 
-        if(geom->penetrationDepth <= 0.)
-        {
-            DLEF*=exp(-K*(r-a1-a2));
-            VdW = -phys->A/(6*pow(r-a1-a2,2));
-        }
+    if(geom->penetrationDepth <= 0.)
+    {
+        DLEF = phys->InterConst*K*exp(-K*D);
+        VdW = -phys->A/(6*pow(D,2));
+    }
 
         normalForce = (DLEF+VdW)*a1*a2/(a1+a2)*geom->normal;
 
