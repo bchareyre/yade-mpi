@@ -6,7 +6,7 @@
 YADE_PLUGIN((ElectrostaticMat)(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys)(ElectrostaticPhys)(Law2_ScGeom_ElectrostaticPhys))
 
 
-ElectrostaticPhys::ElectrostaticPhys(const FrictPhys & obj) : FrictPhys(obj), DebyeLength(1e-6), InterConst(1e-10), A(1e-19)
+ElectrostaticPhys::ElectrostaticPhys(const FrictPhys & obj) : FrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19)
 {
 }
 
@@ -29,6 +29,7 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
         const Real nA(6.02214086e26); /* 1/kg Avogadro*/
         const Real e(1.60217662e-19); /* A.s Electron charge*/
         const Real VacPerm(8.854187817e-12); /* F/m Permittivity of vacuum*/
+        const Real pi(acos(-1));
         
         Real sc(0); // Sum of charges
         Temp += 273.15; // to Kelvin
@@ -48,7 +49,7 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
             else
             {
                 Real tmp = RelPerm*VacPerm*kB*Temp/(e*e*nA*sc);
-                phys->DebyeLength = pow(tmp,-0.5);
+                phys->DebyeLength = pow(tmp,0.5);
             }
         }
         else
@@ -63,7 +64,7 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
         
         //std::cout << "Debye length^-1: " << phys->DebyeLength << std::endl;
         if(Z == 0)
-            phys->InterConst = 1e-15*Temp*Temp*pow(tanh(SurfCharge/(0.3456*Temp)),2);
+            phys->InterConst = 64.*pi*RelPerm*VacPerm*pow(kB*Temp/e*tanh(z*e*SurfCharge/(4.*kB*Temp)),2);
         else
             phys->InterConst = Z;
         
@@ -103,7 +104,7 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     Real& a2(geom->radius2);
     Real r((s1->se3.position-s2->se3.position).norm());
     Real D(r-a1-a2);
-    Real K(1/phys->DebyeLength);
+    Real K(1./phys->DebyeLength);
     Vector3r& normalForce(phys->normalForce);
 
 
@@ -111,13 +112,28 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     Real DLEF(0.); // Double Layer Electrostatic Force
     Real VdW(0.);  // Van Der Waals Force
 
+
     if(geom->penetrationDepth <= 0.)
     {
-        DLEF = phys->InterConst*K*exp(-K*D);
-        VdW = -phys->A/(6*pow(D,2));
+        DLEF = -phys->InterConst*K*exp(-K*D);
+        VdW = phys->A/(6.*pow(D,2));
+
+        Real f_VdW = VdW*a1*a2/(a1+a2);
+        Real f_DLE = DLEF*a1*a2/(a1+a2);
+
+        normalForce = (f_VdW + f_DLE)*geom->normal;
+/*
+        LOG_ERROR("DLEF: "+std::to_string(DLEF*1e10));
+        LOG_ERROR("K: "+std::to_string(K));
+        LOG_ERROR("Z: "+std::to_string(phys->InterConst*1e10));
+        LOG_ERROR("D: "+std::to_string(D*1e10));//*/
+
+    }
+    else
+    {
+        normalForce = 0.*geom->normal;
     }
 
-        normalForce = (DLEF+VdW)*a1*a2/(a1+a2)*geom->normal;
 
 	if (!scene->isPeriodic) {
                 applyForceAtContactPoint(normalForce, geom->contactPoint , id1, s1->se3.position, id2, s2->se3.position);

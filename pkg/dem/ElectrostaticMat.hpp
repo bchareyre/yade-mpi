@@ -34,12 +34,14 @@ class ElectrostaticPhys: public FrictPhys {
                 ElectrostaticPhys(FrictPhys const& ); // "copy" constructor
                 virtual ~ElectrostaticPhys();
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ElectrostaticPhys,FrictPhys,"IPhys class containing parameters of ElectrostaticMat. Used by Law2_ScGeom_ElectrostaticPhys.",
-                        //((Real,DebyeCoef,0.05,,"Proportion of the radius that is the Debye length"))/*OLD*/
-                        ((Real,DebyeLength,1e-6,,"Debye Length [m]"))/*OLD*/
-                        ((Real,InterConst,1e-10,,"Double layer interaction constant"))/*OLD*/
+                        ((Real,DebyeLength,1e-6,,"Debye Length [m]"))
+                        ((Real,InterConst,1e-10,,"Double layer interaction constant [J]"))
                         ((Real,A,1e-19,,"Hamaker constant [J]"))
 			, // ctors
                         createIndex();,
+                        .def_readonly("DebyeLength",&ElectrostaticPhys::DebyeLength,"Debye Length \kappa^-1 [m]")
+                        .def_readonly("InterConst",&ElectrostaticPhys::InterConst,"Interaction Constant Z [J]")
+                        .def_readonly("A",&ElectrostaticPhys::A,"Hamaker Constant A [J]")
 		);
 		DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(ElectrostaticPhys,FrictPhys);
@@ -62,6 +64,7 @@ class Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys: public Ip2_FrictM
                         ((Real,RelPerm,1,,"Relative permittivity of the fluid [-]"))
                         ((Real,A,1e-19,,"Hamaker constant [J]"))
                         ((Real,Z,0,,"Interaction constant [N]. If 0, will be calculated from termal properties"))
+                        ((Real,z,0,,"Surface ion valency [-]"))
                         ((vector<Vector2r>,Ions,vector<Vector2r>({Vector2r(-1,1),Vector2r(1,1)}),,"List of ions's charge and concentration (default is: 1mol/l Na(+1)Cl(-1): [(+1,1),(-1,1)]"))
                     ,,
 		);
@@ -74,8 +77,14 @@ class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom_FrictPhys_CundallStrack{
 	public:
 		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
                 FUNCTOR2D(GenericSpheresContact,ElectrostaticPhys);
-                YADE_CLASS_BASE_DOC(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_FrictPhys_CundallStrack,"Material law for electrostatic interaction according to [Mari2013]_."
-		);
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_FrictPhys_CundallStrack,"Material law for electrostatic interaction according to [Mari2013]_.",,,
+//                  ((Real,f_VdW,0,,"Computed Van Der Waals Force"))
+//                  ((Real,f_DLE,0,,"Computed Double Layer Electrostatic Force")),,
+//                            .def_readonly("f_VdW",&Law2_ScGeom_ElectrostaticPhys::f_VdW,"Computed VanDerWaals Force")
+//                            .def_readonly("f_DLE",&Law2_ScGeom_ElectrostaticPhys::f_DLE,"Computed Double Layer Electrostatic Force")
+//		ONLY FOR DEBUGGING PURPOSE BETWEEN 2 PARTICLES
+                );
 		DECLARE_LOGGER;
+
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ElectrostaticPhys);
