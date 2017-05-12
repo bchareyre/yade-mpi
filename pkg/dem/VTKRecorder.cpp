@@ -102,7 +102,6 @@ void VTKRecorder::action(){
 	// liquid control needs interactions
 	if(recActive[REC_LIQ]) recActive[REC_INTR]=true;
 
-
 	// spheres
 	vtkSmartPointer<vtkPoints> spheresPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> spheresCells = vtkSmartPointer<vtkCellArray>::New();
@@ -341,12 +340,12 @@ void VTKRecorder::action(){
 	cpmStress->SetName("cpmStress");
 
 	// extras for JCFpm
-	vtkSmartPointer<vtkDoubleArray> damage = vtkSmartPointer<vtkDoubleArray>::New();
-	damage->SetNumberOfComponents(1);
-	damage->SetName("damage");
-	vtkSmartPointer<vtkDoubleArray> damageRel = vtkSmartPointer<vtkDoubleArray>::New();
-	damageRel->SetNumberOfComponents(1);
-	damageRel->SetName("damageRel");
+	vtkSmartPointer<vtkDoubleArray> nbCracks = vtkSmartPointer<vtkDoubleArray>::New();
+	nbCracks->SetNumberOfComponents(1);
+	nbCracks->SetName("nbCracks");
+	vtkSmartPointer<vtkDoubleArray> jcfpmDamage = vtkSmartPointer<vtkDoubleArray>::New();
+	jcfpmDamage->SetNumberOfComponents(1);
+	jcfpmDamage->SetName("damage");
 	vtkSmartPointer<vtkDoubleArray> intrIsCohesive = vtkSmartPointer<vtkDoubleArray>::New();
 	intrIsCohesive->SetNumberOfComponents(1);
 	intrIsCohesive->SetName("isCohesive");
@@ -357,18 +356,24 @@ void VTKRecorder::action(){
 	// extras for cracks
 	vtkSmartPointer<vtkPoints> crackPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> crackCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkDoubleArray> iter = vtkSmartPointer<vtkDoubleArray>::New();
-	iter->SetNumberOfComponents(1);
-	iter->SetName("iter");
+	vtkSmartPointer<vtkDoubleArray> crackIter = vtkSmartPointer<vtkDoubleArray>::New();
+	crackIter->SetNumberOfComponents(1);
+	crackIter->SetName("iter");
+        vtkSmartPointer<vtkDoubleArray> crackTime = vtkSmartPointer<vtkDoubleArray>::New();
+	crackTime->SetNumberOfComponents(1);
+	crackTime->SetName("time");
 	vtkSmartPointer<vtkDoubleArray> crackType = vtkSmartPointer<vtkDoubleArray>::New();
 	crackType->SetNumberOfComponents(1);
-	crackType->SetName("crackType");
+	crackType->SetName("type");
 	vtkSmartPointer<vtkDoubleArray> crackSize = vtkSmartPointer<vtkDoubleArray>::New();
 	crackSize->SetNumberOfComponents(1);
-	crackSize->SetName("crackSize");
+	crackSize->SetName("size");
 	vtkSmartPointer<vtkDoubleArray> crackNorm = vtkSmartPointer<vtkDoubleArray>::New();
 	crackNorm->SetNumberOfComponents(3);
-	crackNorm->SetName("crackNorm");
+	crackNorm->SetName("norm");
+        vtkSmartPointer<vtkDoubleArray> crackNrg = vtkSmartPointer<vtkDoubleArray>::New();
+	crackNrg->SetNumberOfComponents(1);
+	crackNrg->SetName("nrg");
 	
 #ifdef YADE_LIQMIGRATION
 	vtkSmartPointer<vtkDoubleArray> liqVol = vtkSmartPointer<vtkDoubleArray>::New();
@@ -624,8 +629,8 @@ void VTKRecorder::action(){
 				}
 				
 				if (recActive[REC_JCFPM]){
-					damage->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreak + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreak);
-					damageRel->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->tensBreakRel + YADE_PTR_CAST<JCFpmState>(b->state)->shearBreakRel);
+					nbCracks->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->nbBrokenBonds);
+					jcfpmDamage->InsertNextValue(YADE_PTR_CAST<JCFpmState>(b->state)->damageIndex);
 				}
 				if (recActive[REC_COORDNUMBER]){
 					spheresCoordNumb->InsertNextValue(b->coordNumber());
@@ -847,7 +852,8 @@ void VTKRecorder::action(){
 		}
 
 		if (recActive[REC_JCFPM]) {
-			spheresUg->GetPointData()->AddArray(damage);
+                        spheresUg->GetPointData()->AddArray(nbCracks);
+			spheresUg->GetPointData()->AddArray(jcfpmDamage);
 		}
 		if (recActive[REC_BSTRESS]) 
 		{
@@ -1014,17 +1020,19 @@ void VTKRecorder::action(){
 		if(file){
 			 while ( !file.eof() ){
 				std::string line;
-				Real i,p0,p1,p2,t,s,n0,n1,n2;
+				Real iter,time,p0,p1,p2,type,size,n0,n1,n2,nrg;
 				while ( std::getline(file, line)) {/* writes into string "line", a line of file "file". To go along diff. lines*/
-					file >> i >> p0 >> p1 >> p2 >> t >> s >> n0 >> n1 >> n2;
+					file >> iter >> time >> p0 >> p1 >> p2 >> type >> size >> n0 >> n1 >> n2 >> nrg;
 					vtkIdType pid[1];
 					pid[0] = crackPos->InsertNextPoint(p0, p1, p2);
 					crackCells->InsertNextCell(1,pid);
-					crackType->InsertNextValue(t);
-					crackSize->InsertNextValue(s);
-					iter->InsertNextValue(i);
+                                        crackIter->InsertNextValue(iter);
+                                        crackTime->InsertNextValue(time);
+					crackType->InsertNextValue(type);
+					crackSize->InsertNextValue(size);					
 					Real n[3] = { n0, n1, n2 };
 					crackNorm->InsertNextTupleValue(n);
+                                        crackNrg->InsertNextValue(nrg);
 				}
 			}
 			 file.close();
@@ -1032,10 +1040,12 @@ void VTKRecorder::action(){
 // 
 		crackUg->SetPoints(crackPos);
 		crackUg->SetCells(VTK_VERTEX, crackCells);
-		crackUg->GetPointData()->AddArray(iter);
+		crackUg->GetPointData()->AddArray(crackIter);
+                crackUg->GetPointData()->AddArray(crackTime);
 		crackUg->GetPointData()->AddArray(crackType);
 		crackUg->GetPointData()->AddArray(crackSize);
 		crackUg->GetPointData()->AddArray(crackNorm); //see https://www.mail-archive.com/paraview@paraview.org/msg08166.html to obtain Paraview 2D glyphs conforming to this normal 
+                crackUg->GetPointData()->AddArray(crackNrg);
 		
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);

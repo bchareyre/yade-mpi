@@ -27,7 +27,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	/// Defines the interparticular distance used for computation
 	Real D = 0;
 
-	/*this is for setting the equilibrium distance between all cohesive elements in the first contact detection*/
+	/*this is for setting the equilibrium distance between all cohesive elements at the first contact detection*/
 	if ( contact->isFresh(scene) ) { 
 	  phys->normalForce = Vector3r::Zero(); 
 	  phys->shearForce = Vector3r::Zero();
@@ -49,7 +49,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      phys->isCohesive =0;
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
-	      return true; // do we need this? -> yes if it ends the loop (avoid the following calculations)
+	      return true;
 	      }
 	  } else { 
 	    D = phys->initD - std::abs((b1->state->pos - b2->state->pos).dot(phys->jointNormal)); 
@@ -70,29 +70,34 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      phys->isCohesive =0;
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
-	      return true; // do we need this? not sure -> yes, it ends the loop (avoid the following calculations)
+	      return true;
 	    }
 	  }
 	  
 	  if ( phys->isCohesive && (phys->FnMax>0) && (std::abs(D)>Dtensile) ) {
 	    
-	    // update body state with the number of broken bonds
+	    nbTensCracks++;
+            // update body state with the number of broken bonds -> do we really need that?
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
-	    st1->tensBreak+=1;
-	    st2->tensBreak+=1;
-	    st1->tensBreakRel+=1.0/st1->noIniLinks;
-	    st2->tensBreakRel+=1.0/st2->noIniLinks;
+            st1->nbBrokenBonds++;
+	    st2->nbBrokenBonds++;
+	    st1->damageIndex+=1.0/st1->nbInitBonds;
+	    st2->damageIndex+=1.0/st2->nbInitBonds;
+            
+            Real scalarNF=phys->normalForce.norm();
+	    Real scalarSF=phys->shearForce.norm();
+	    totalTensCracksE+=0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) );
 	    
-    	    // create a text file to record properties of the broken bond (iteration, position, type (tensile), cross section and contact normal orientation)
 	    if (recordCracks){
 	      std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
-	      if(file.tellp()==0){ file <<"i p0 p1 p2 t s norm0 norm1 norm2"<<endl; }
+	      if(file.tellp()==0){ file <<"iter time p0 p1 p2 type size norm0 norm1 norm2 nrg"<<endl; }
 	      Vector3r crackNormal=Vector3r::Zero();
 	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
-	      file << boost::lexical_cast<string> ( scene->iter )<<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 0 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) << endl;
+	      file << boost::lexical_cast<string> ( scene->iter ) << " " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( 0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) ) ) <<endl;
 	    }
 	    cracksFileExist=true;
+            
 	    /// Timos
 	    if (!neverErase) return false; 
 	    else {
@@ -102,9 +107,8 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      phys->FnMax = 0;
 	      phys->FsMax = 0;
 	      phys->isBroken = true;
-	      return true; // do we need this? not sure -> yes, it ends the loop (avoid the following calculations)
+	      return true;
 	    }
-// 	    return true; // do we need this? no
 	  }
 	}
 	
@@ -145,42 +149,60 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  else
 	    shearForce=Vector3r::Zero();
 	  if ((smoothJoint) && (phys->isOnJoint)) {phys->dilation=phys->jointCumulativeSliding*phys->tanDilationAngle-D; phys->initD+=(jointSliding*phys->tanDilationAngle);}
-	  // take into account shear cracking -> are those lines critical? -> TODO testing with and without
+
+// 	  if (!phys->isCohesive) {
+// 	    
+//             nbSlips++;
+//             totalSlipE+=((1./phys->ks)*(trialForce-shearForce))/*plastic disp*/.dot(shearForce)/*active force*/;
+//             
+// 	    if ( (recordSlips) && (maxFs!=0) ) {
+// 	    std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
+// 	    if(file.tellp()==0){ file <<"iter time p0 p1 p2 type size norm0 norm1 norm2 nrg"<<endl; }
+// 	    Vector3r crackNormal=Vector3r::Zero();
+// 	    if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
+// 	    file << boost::lexical_cast<string> ( scene->iter ) <<" " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 0 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( ((1./phys->ks)*(trialForce-shearForce)).dot(shearForce) ) << endl;
+// 	    }
+// 	    cracksFileExist=true;    
+// 	  }
+
 	  if ( phys->isCohesive ) { 
 
-	    // update body state with the number of broken bonds
+	    nbShearCracks++;
+	    // update body state with the number of broken bonds -> do we really need that?
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
-	    st1->shearBreak+=1;
-	    st2->shearBreak+=1;
-	    st1->shearBreakRel+=1.0/st1->noIniLinks;
-	    st2->shearBreakRel+=1.0/st2->noIniLinks;
-
-	    // create a text file to record properties of the broken bond (iteration, position, type (shear), cross section and contact normal orientation)
+	    st1->nbBrokenBonds++;
+	    st2->nbBrokenBonds++;
+	    st1->damageIndex+=1.0/st1->nbInitBonds;
+	    st2->damageIndex+=1.0/st2->nbInitBonds;
+          
+	    Real scalarNF=phys->normalForce.norm();
+	    Real scalarSF=phys->shearForce.norm();
+	    totalShearCracksE+=0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) );
+    
 	    if (recordCracks){
 	      std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
-	      if(file.tellp()==0){ file <<"i p0 p1 p2 t s norm0 norm1 norm2"<<endl; }
+	      if(file.tellp()==0){ file <<"iter time p0 p1 p2 type size norm0 norm1 norm2 nrg"<<endl; }
 	      Vector3r crackNormal=Vector3r::Zero();
 	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
-	      file << boost::lexical_cast<string> ( scene->iter )<<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) << endl;
+	      file << boost::lexical_cast<string> ( scene->iter ) << " " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 2 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( 0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) ) ) <<endl;
 	    }
 	    cracksFileExist=true;
-	    
+
 	    // set the contact properties to friction if in compression, delete contact if in tension
 	    phys->isBroken = true;
 	    phys->isCohesive = 0;
 	    phys->FnMax = 0;
 	    phys->FsMax = 0;
-// 	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep?
+//	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep?
 	    if ( D < 0 ) { // spheres do not touch
 	      if (!neverErase) return false;
 	      else {
 		phys->shearForce = Vector3r::Zero();
 		phys->normalForce = Vector3r::Zero();
-		return true; // do we need this? not sure -> yes, it ends the loop (avoid the following calculations)
+		return true;
 	      }
 	    }
-// 	    return true; // do we need this one? no
 	  }
 	}
 	
@@ -252,8 +274,8 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	///to set if the contact is cohesive or not
 	if ( ((cohesiveTresholdIteration < 0) || (scene->iter < cohesiveTresholdIteration)) && (std::min(SigT1,SigT2)>0 || std::min(Coh1,Coh2)>0) && (yade1->type == yade2->type)){ 
 	  contactPhysics->isCohesive=true;
-	  st1->noIniLinks++;
-	  st2->noIniLinks++;
+	  st1->nbInitBonds++;
+	  st2->nbInitBonds++;
 	}
 	
 	if ( contactPhysics->isCohesive ) {
@@ -308,15 +330,15 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 		  
 			///to set if the contact is cohesive or not
 			if ( ((cohesiveTresholdIteration < 0) || (scene->iter < cohesiveTresholdIteration)) && (std::min(jcoh1,jcoh2)>0 || std::min(jSigT1,jSigT2)>0) ) {
-			  contactPhysics->isCohesive=true;
-			  st1->noIniLinks++;
-			  st2->noIniLinks++;
+                            contactPhysics->isCohesive=true;
+                            st1->nbInitBonds++;
+                            st2->nbInitBonds++;
 			} 
 			else { contactPhysics->isCohesive=false; contactPhysics->FnMax=0; contactPhysics->FsMax=0; }
 		  
 			if ( contactPhysics->isCohesive ) {
-				contactPhysics->FnMax = std::min(jSigT1,jSigT2)*contactPhysics->crossSection;
-				contactPhysics->FsMax = std::min(jcoh1,jcoh2)*contactPhysics->crossSection;
+                            contactPhysics->FnMax = std::min(jSigT1,jSigT2)*contactPhysics->crossSection;
+                            contactPhysics->FsMax = std::min(jcoh1,jcoh2)*contactPhysics->crossSection;
 			}
 	}
 	interaction->phys = contactPhysics;
