@@ -462,9 +462,10 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 // called by the insertion sort if 2 bodies swapped their bounds
 void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(periodic);
-	Vector3i periods;
+	if (interactions->found(id1,id2)) return;// we want to _create_ new ones, we don't care about existing ones
+	Vector3i periods(Vector3i::Zero());
 	bool overlap=spatialOverlapPeri(id1,id2,scene,periods);
-	if (overlap && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()) && !interactions->found(id1,id2)){
+	if (overlap && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get())){
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
 		newI->cellDist=periods;
 		interactions->insert(newI);
