@@ -113,7 +113,7 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     Real VdW(0.);  // Van Der Waals Force
 
 
-    if(geom->penetrationDepth <= 0.)
+    if(D > 0.)
     {
         DLEF = -phys->InterConst*K*exp(-K*D);
         VdW = phys->A/(6.*pow(D,2));
@@ -121,13 +121,7 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
         Real f_VdW = VdW*a1*a2/(a1+a2);
         Real f_DLE = DLEF*a1*a2/(a1+a2);
 
-        normalForce = (f_VdW + f_DLE)*geom->normal;
-/*
-        LOG_ERROR("DLEF: "+std::to_string(DLEF*1e10));
-        LOG_ERROR("K: "+std::to_string(K));
-        LOG_ERROR("Z: "+std::to_string(phys->InterConst*1e10));
-        LOG_ERROR("D: "+std::to_string(D*1e10));//*/
-
+        normalForce = (f_VdW + f_DLE)*geom->normal/geom->normal.norm();
     }
     else
     {
