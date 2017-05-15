@@ -15,7 +15,9 @@
 #ifdef YADE_SPH
 #include<pkg/common/SPHEngine.hpp>
 #endif
-
+#ifdef YADE_DEFORM
+#include <core/PartialEngine.hpp>
+#endif
 
 /* Simple viscoelastic model */
 
@@ -40,6 +42,9 @@ class ViscElMat : public FrictMat {
 		((int,KernFunctionPressure,Lucy,, "Kernel function for pressure calculation (by default - Lucy). The following kernel functions are available: Lucy=1."))
 		((int,KernFunctionVisco,   Lucy,, "Kernel function for viscosity calculation (by default - Lucy). The following kernel functions are available: Lucy=1."))
 #endif
+#ifdef YADE_DEFORM
+		((bool,DeformEnabled,false,,"True, if particle deformation is needed. Off by default."))
+#endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_.")),
 		createIndex();
 	);
@@ -62,6 +67,9 @@ class ViscElPhys : public FrictPhys{
 		((bool,SPHmode,false,,"True, if SPH-mode is enabled."))
 		((Real,h,-1,,    "Core radius. See Mueller [Mueller2003]_ ."))                                            // [Mueller2003], (1)
 		((Real,mu,-1,,   "Viscosity. See Mueller [Mueller2003]_ ."))                                              // [Mueller2003], (14)
+#endif
+#ifdef YADE_DEFORM
+		((bool,DeformEnabled,false,,"True, if particle deformation mechanism is needed."))
 #endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_")),
 		createIndex();
@@ -137,3 +145,19 @@ bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 
 Real get_en_from_cn(const Real& cn, const Real& m, const Real& kn);
 Real find_cn_from_en(const Real& en, const Real& m, const Real& kn, const shared_ptr<Interaction>& interaction);
+
+
+
+#ifdef YADE_DEFORM
+class DeformControl: public PartialEngine{
+	public:
+		virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DeformControl,PartialEngine,"This engine implements particle deformation with const. volume . ",
+		// Attrs
+		,/* ctor */
+		,/* py */
+  );
+};
+
+REGISTER_SERIALIZABLE(DeformControl);
+#endif

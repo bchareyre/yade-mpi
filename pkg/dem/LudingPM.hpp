@@ -13,6 +13,7 @@ class LudingMat : public Material {
     ((Real,k1,NaN,,"Slope of loading plastic branch"))
     ((Real,kp,NaN,,"Slope of unloading and reloading limit elastic branch"))
     ((Real,kc,NaN,,"Slope of irreversible, tensile adhesive branch"))
+    ((Real,ks,NaN,,"Shear stiffness"))
     ((Real,PhiF,NaN,,"Dimensionless plasticity depth"))
     ((Real,G0,NaN,,"Viscous damping"))
     ((Real,frictionAngle,NaN,,"Friction angle [rad]")),
