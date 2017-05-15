@@ -455,6 +455,8 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 		}
 		v[v.norm(j+1)]=vi;
 	}
+	//Keep coord's in [0,cellDim] by clamping the largest values
+	for(long i=v.norm(loIdx-1); v[i].coord > v.cellDim; i= v.norm(--i)) {v[i].period+=1; v[i].coord-=v.cellDim; loIdx=i;}
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
