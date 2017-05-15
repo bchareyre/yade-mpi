@@ -130,7 +130,8 @@ class InsertionSortCollider: public Collider{
 	std::vector<Real> maxima, minima;
 	//! Whether the Scene was periodic (to detect the change, which shouldn't happen, but shouldn't crash us either)
 	bool periodic;
-
+	//! Store inverse sizes to avoid repeated divisions within loops 
+	Vector3r invSizes;
 	// return python representation of the BB struct, as ([...],[...],[...]).
   boost::python::tuple dumpBounds();
 

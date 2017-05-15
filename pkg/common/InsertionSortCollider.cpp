@@ -227,7 +227,9 @@ void InsertionSortCollider::action(){
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
-		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene);
+		if(periodic)  {
+			for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene);
+			invSizes=Vector3r(1./scene->cell->getSize()[0],1./scene->cell->getSize()[1],1./scene->cell->getSize()[2]);}
 
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();
@@ -475,10 +477,6 @@ void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t 
 	periodicity information; both values could be passed down as a parameters, avoiding 1 of 3 loops here.
 	We do some floats math here, so the speedup could noticeable; doesn't concertn the non-periodic variant,
 	where it is only plain comparisons taking place.
-
-	In the same way, handleBoundInversion is passed only id1 and id2, but again insertionSort already knows in which sense
-	the inversion happens; if the boundaries get apart (min getting up over max), it wouldn't have to check for overlap
-	at all, for instance.
 */
 //! return true if bodies bb overlap in all 3 dimensions
 bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Scene* scene, Vector3i& periods) const {
@@ -489,31 +487,24 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		// LOG_DEBUG("dim["<<axis<<"]="<<dim);
 		// too big bodies
 		if (!allowBiggerThanPeriod){ assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);}
-		// find body of which minimum when taken as period start will make the gap smaller
-		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
-		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
-		int pmn1,pmx1,pmn2,pmx2;
-		Real mn1=cellWrap(m1,wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
-		Real mn2=cellWrap(m2,wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
-		if((pmn1!=pmx1) || (pmn2!=pmx2)){
-			if (allowBiggerThanPeriod) {
-				// If both bodies are bigger, we place them in the (0,0,0) period
-				if((pmn1!=pmx1) && (pmn2!=pmx2)) {periods[axis]=0;}
-				// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
-				else {
-					//FIXME: not sure what to do here...
-// 					periods[axis]=(pmn1==pmx1)? pmn1 : -pmn2;
-					periods[axis]=0;
-// 					return true;
-				}
-			} else {
-				Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
-				LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<", see flag allowBiggerThanPeriod)");
+
+		// define normalized positions relative to id1->max, and with +1 shift for id1->min so that body1's bounds cover an interval [shiftedMin; 1] at the end of a b1-centric period 
+		Real lmin = (minima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
+		Real lmax = (maxima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
+		Real shiftedMin = (minima[3*id1+axis]-maxima[3*id1+axis])*invSizes[axis]+1.;
+		if((lmax-lmin)>1 || shiftedMin<0){
+			if (allowBiggerThanPeriod) {periods[axis]=0; continue;}
+			else {
+				LOG_FATAL("Body #"<<((lmax-lmin)>1?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
 				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
-		}		
-		else {
-			periods[axis]=(int)(pmn1-pmn2);
-			if(!(mn1<=mx2 && mx1 >= mn2)) return false;}
+		}
+		int period1 = floor(lmax); 
+		//overlap around zero, on the "+" side
+		if ((lmin-period1) <= overlapTolerance) {periods[axis]=-period1; continue;}
+		 //overlap around 1, on the "-" side
+		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]=-period1-1; continue;}
+		// none of the above, exit
+		return false;
 	}
 	return true;
 }
