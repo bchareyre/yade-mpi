@@ -18,8 +18,9 @@ void Ip2_LudingMat_LudingMat_LudingPhys::go(const shared_ptr<Material>& b1, cons
   LudingMat* mat2 = static_cast<LudingMat*>(b2.get());
   
   const Real k11 = mat1->k1; const Real k12 = mat2->k1;
-  const Real kp1 = mat1->kp; const Real kp2 = mat2->kp; 
+  const Real kp1 = mat1->kp; const Real kp2 = mat2->kp;
   const Real kc1 = mat1->kc; const Real kc2 = mat2->kc;
+  const Real ks1 = mat1->ks; const Real ks2 = mat2->ks;
   const Real G01 = mat1->G0; const Real G02 = mat2->G0;
   const Real PhiF1 = mat1->PhiF; const Real PhiF2 = mat2->PhiF;
 
@@ -28,6 +29,7 @@ void Ip2_LudingMat_LudingMat_LudingPhys::go(const shared_ptr<Material>& b1, cons
   phys->k1 = this->reduced(k11, k12);
   phys->kp = this->reduced(kp1, kp2);
   phys->kc = this->reduced(kc1, kc2);
+  phys->ks = this->reduced(ks1, ks2);
   phys->PhiF = this->reduced(PhiF1, PhiF2);
   phys->k2 = 0.0;
   phys->G0 = this->reduced(G01, G02);
@@ -37,13 +39,33 @@ void Ip2_LudingMat_LudingMat_LudingPhys::go(const shared_ptr<Material>& b1, cons
   Real a2 = 0.0;
   Sphere* s1=dynamic_cast<Sphere*>(Body::byId(interaction->getId1())->shape.get());
   Sphere* s2=dynamic_cast<Sphere*>(Body::byId(interaction->getId2())->shape.get());
+
+  Real a1dR = 0.;
+  Real a2dR = 0.;
+
+#ifdef YADE_DEFORM
+  State* de1 = dynamic_cast<State*>(Body::byId(interaction->getId1())->state.get());
+  State* de2 = dynamic_cast<State*>(Body::byId(interaction->getId2())->state.get());
+
+  if (de1 and de2) {
+      a1dR = de1->dR ;
+      a2dR = de2->dR ;
+  }
+  else if (de1 and not(de2)) {
+      a1dR = de1->dR ;
+  }
+  else {
+      a2dR = de2->dR ;
+  }
+#endif
+
   if (s1 and s2) {
-    a1 = s1->radius;
-    a2 = s2->radius;
+    a1 = s1->radius + a1dR;
+    a2 = s2->radius + a2dR;
   } else if (s1 and not(s2)) {
-    a1 = s1->radius;
+    a1 = s1->radius + a1dR;
   } else {
-    a2 = s2->radius;
+    a2 = s2->radius + a2dR;
   }
     
   if (phys->k1 >= phys->kp) {
@@ -78,16 +100,19 @@ bool Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
 
   const int id1 = I->getId1();
   const int id2 = I->getId2();
-  
-  const Real Delt = geom.penetrationDepth;
-  
-  if (Delt<0) {
-   return false;
-  };
 
   const BodyContainer& bodies = *scene->bodies;
-  
-  
+  const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
+  const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
+  Real addDR = 0. ;
+
+#ifdef YADE_DEFORM
+  addDR = de1.dR + de2.dR;
+#endif
+
+  const Real Delt = geom.penetrationDepth + addDR;
+  if (Delt  < 0 ) return false;
+
   Real forceHys = 0.0;
   
   if (phys.DeltMax/phys.DeltPMax >= 1.0) {                           // [Luding2008], equation (8)
@@ -141,8 +166,6 @@ bool Law2_ScGeom_LudingPhys_Basic::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys
   //===================================================================
   // Copy-paste from ViscoElasticPM
   
-  const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
-  const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
 
   Vector3r& shearForce = phys.shearForce;
   if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);

@@ -156,6 +156,12 @@ void VTKRecorder::action(){
 	spheresCoordNumbSPH->SetName("SPH_Neigh");
 #endif
 
+#ifdef YADE_DEFORM
+	vtkSmartPointer<vtkDoubleArray> spheresRealRad = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresRealRad->SetNumberOfComponents(1);
+	spheresRealRad->SetName("RealRad");
+#endif
+
 #ifdef YADE_LIQMIGRATION
 	vtkSmartPointer<vtkDoubleArray> spheresLiqVol = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresLiqVol->SetNumberOfComponents(1);
@@ -640,6 +646,12 @@ void VTKRecorder::action(){
 				spheresPressSPH->InsertNextValue(b->state->press); 
 				spheresCoordNumbSPH->InsertNextValue(b->coordNumber()); 
 #endif
+
+#ifdef YADE_DEFORM
+				const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+				spheresRealRad->InsertNextValue(b->state->dR + sphere->radius);
+#endif
+
 #ifdef YADE_LIQMIGRATION
 				if (recActive[REC_LIQ]) {
 					spheresLiqVol->InsertNextValue(b->state->Vf);
@@ -828,6 +840,11 @@ void VTKRecorder::action(){
 		spheresUg->GetPointData()->AddArray(spheresPressSPH);
 		spheresUg->GetPointData()->AddArray(spheresCoordNumbSPH);
 #endif
+
+#ifdef YADE_DEFORM
+		spheresUg->GetPointData()->AddArray(spheresRealRad);
+#endif
+
 #ifdef YADE_LIQMIGRATION
 		if (recActive[REC_LIQ]) {
 			spheresUg->GetPointData()->AddArray(spheresLiqVol);

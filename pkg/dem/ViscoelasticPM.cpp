@@ -10,6 +10,10 @@
 #include<pkg/common/SPHEngine.hpp>
 #endif
 
+#ifdef YADE_DEFORM
+#include<boost/math/tools/roots.hpp>
+#endif
+
 using std::isfinite;
 YADE_PLUGIN((ViscElMat)(ViscElPhys)(Ip2_ViscElMat_ViscElMat_ViscElPhys)(Law2_ScGeom_ViscElPhys_Basic));
 
@@ -27,6 +31,12 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, cons
 	if(interaction->phys) return;
 	shared_ptr<ViscElPhys> phys (new ViscElPhys());
 	Calculate_ViscElMat_ViscElMat_ViscElPhys(b1, b2, interaction, phys);
+
+#ifdef YADE_DEFORM
+	const ViscElMat* mat1 = static_cast<ViscElMat*>(b1.get());
+	const ViscElMat* mat2 = static_cast<ViscElMat*>(b2.get());
+	phys->DeformEnabled = mat1->DeformEnabled && mat2->DeformEnabled;
+#endif
 	interaction->phys = phys;
 }
 
@@ -66,15 +76,26 @@ bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 
 	const int id1 = I->getId1();
 	const int id2 = I->getId2();
-	
-	if (geom.penetrationDepth<0) {
+
+	Real addDR = 0.;
+#ifdef YADE_DEFORM
+	const BodyContainer& bodies = *scene->bodies;
+	const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
+	const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
+	addDR = de1.dR + de2.dR;
+#endif
+
+	if ((geom.penetrationDepth + addDR)<0) {
 		return false;
 	} else {
+#ifndef YADE_DEFORM
+		// These 3 lines were duplicated (see above) not to loose
+		// runtime performance, if YADE_DEFORM is disabled and no
+		// contact detected
 		const BodyContainer& bodies = *scene->bodies;
-	
 		const State& de1 = *static_cast<State*>(bodies[id1]->state.get());
 		const State& de2 = *static_cast<State*>(bodies[id2]->state.get());
-	
+#endif
 		Vector3r& shearForce = phys.shearForce;
 		if (I->isFresh(scene)) shearForce=Vector3r(0,0,0);
 		const Real& dt = scene->dt;
@@ -101,7 +122,7 @@ bool computeForceTorqueViscEl(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys
 		// Prevent appearing of attraction forces due to a viscous component
 		// [Radjai2011], page 3, equation [1.7]
 		// [Schwager2007]
-		phys.Fn = phys.kn * geom.penetrationDepth;
+		phys.Fn = phys.kn * (geom.penetrationDepth + addDR);
 		phys.Fv = phys.cn * normalVelocity;
 		const Real normForceReal = phys.Fn + phys.Fv;
 		if (normForceReal < 0) {
@@ -325,3 +346,105 @@ Real get_en_from_cn(const Real& cn, const Real& m, const Real& kn){
 	else return 0;
 }
 
+
+#ifdef YADE_DEFORM
+
+// functor with Raji1999 Eq. 2.52
+template <class T>
+struct fkt_functor
+{
+  fkt_functor(T Radius, T tdR, vector<T>& distanceVector) : R(Radius), dR(tdR), coef(distanceVector) {}
+
+  pair<T, T> operator()(T const& Rs)
+  {
+    // solve for radius of deformed sphere Rs
+    T funktion = -R*R*R + Rs*Rs*Rs;        // Raji1999 Eq. 2.52 - Part outside of the sum
+    T dfunktion = 3*Rs*Rs;                 // Derivation of Raji1999 Eq. 2.52 - Part outside of the sum
+
+    // Summation over every contact distance dsi (C++11)
+    for(auto const& dsi : coef)
+    {
+      funktion  += -0.25 * (Rs - dsi)*(Rs - dsi) * (2 * Rs + dsi) ;      // Raji1999 Eq. 2.51 - part in the sum
+      dfunktion += 3.0/2.0 * ( Rs*Rs - Rs*dsi ) ;                        // Derivation of Raji1999 Eq. 2.52 - part in the sum
+    }
+
+        return make_pair(funktion, dfunktion);
+  }
+  private:
+    T R;                    // radius of the undeformed sphere
+    T dR;                   // dR of sphere
+    vector <T> coef;        // vector of all contact distances dsi
+};
+
+// function for easy calling of Newton-Raphson method
+template <class T>
+T fkt(T R, T dR, vector<T> z)
+{
+  double guess = R + dR;       // start guess
+  double min = guess * 0.99;   // minimum
+  double max = guess * 1.05 ;  // maximum
+  int digits = std::numeric_limits<T>::digits ;
+
+  // use Newton-Raphson method for numerical solution
+  return boost::math::tools::newton_raphson_iterate(fkt_functor<T>(R, dR, z), guess, min, max, digits);
+}
+
+
+YADE_PLUGIN((DeformControl));
+void DeformControl::action()
+{
+  Scene* scene=Omega::instance().getScene().get();
+  const BodyContainer& b = *scene->bodies;
+
+  for(int i = 0; i < b.size(); ++i)
+  {
+    vector<double> dsi;
+    if ( Sphere* s1 = dynamic_cast<Sphere*>(b[i]->shape.get()) )
+    {
+      double s1Rad = s1->radius ;
+      State* s1_state = static_cast<State*>(b[i]->state.get());
+      double s1dR  = s1_state->dR ;
+
+      for(Body::MapId2IntrT::iterator it=b[i]->intrs.begin(),end=b[i]->intrs.end(); it!=end; ++it)
+      {
+        if(!it->second->isReal()) continue;
+
+        unsigned int partnerID;
+        if( it->second->getId1() == i )
+        {
+          partnerID = it->second->getId2();
+        } else
+        {
+          partnerID = it->second->getId1();
+        }
+
+        // Sphere - Sphere contact
+        if(Sphere* s2 = dynamic_cast<Sphere*>(b[partnerID]->shape.get() ))
+        {
+          double s2Rad = s2->radius;
+          State* s2_state = static_cast<State*>(b[partnerID]->state.get());
+          double s2dR  = s2_state->dR;
+
+          if ( ScGeom* scg = dynamic_cast<ScGeom*>(it->second->geom.get())  )
+          {
+            double L = s1Rad + s2Rad - scg->penetrationDepth;
+            double s1RdR = s1Rad + s1dR;
+            double s2RdR = s2Rad + s2dR;
+            double ds = (L*L + s1RdR*s1RdR - s2RdR*s2RdR) / (2.0 * L);
+            dsi.push_back( ds );
+          }
+        }
+        else   // Sphere - Facet / Wall contact
+        {
+          if ( ScGeom* scg = dynamic_cast<ScGeom*>(it->second->geom.get())  )
+          {
+            double ds = s1Rad - scg->penetrationDepth ;
+            dsi.push_back( ds );
+          }
+        }
+      }
+      s1_state->dR = fkt(s1Rad, s1dR, dsi) - s1Rad;
+    }
+  }
+}
+#endif

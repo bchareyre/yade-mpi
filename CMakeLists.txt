@@ -20,6 +20,7 @@
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
 #  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
+#  ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
@@ -135,6 +136,7 @@ OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which c
 OPTION(ENABLE_POTENTIAL_PARTICLES "Enable potential particles" OFF)
 OPTION(USE_QT5 "USE Qt5 for GUI" ON)
 OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" OFF)
+OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -339,6 +341,13 @@ IF(ENABLE_SPH)
 ELSE(ENABLE_SPH)
   SET(DISABLED_FEATS "${DISABLED_FEATS} SPH")
 ENDIF(ENABLE_SPH)
+#===============================================
+IF(ENABLE_DEFORM)
+  ADD_DEFINITIONS("-DYADE_DEFORM")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} DEFORM")
+ELSE(ENABLE_DEFORM)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} DEFORM")
+ENDIF(ENABLE_DEFORM)
 #===============================================
 IF(ENABLE_LIQMIGRATION)
   ADD_DEFINITIONS("-DYADE_LIQMIGRATION")
