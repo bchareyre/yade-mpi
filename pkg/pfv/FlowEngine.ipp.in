@@ -14,6 +14,7 @@
 #endif
 //For pyRunString
 #include<lib/pyutil/gil.hpp>
+#include<pkg/dem/JointedCohesiveFrictionalPM.hpp>
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::~TemplateFlowEngine_@TEMPLATE_FLOW_NAME@() {}
@@ -60,6 +61,24 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
 		(defTolerance>0 && epsVolCumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
+
+// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
+	if (breakControlledRemesh){
+	bool foundBreak = false;
+		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+			if (!I || !I->phys.get()) continue;
+			if (I->isReal() && JCFpmPhys::getClassIndexStatic()==I->phys->getClassIndex()) {
+				JCFpmPhys* jcfpmphys = YADE_CAST<JCFpmPhys*>(I->phys.get());
+				if (!jcfpmphys) continue;
+				if (jcfpmphys->breakOccurred && !foundBreak){
+					updateTriangulation = true;
+					jcfpmphys->breakOccurred = false;
+					foundBreak = true;
+				}
+			else if (jcfpmphys->breakOccurred && foundBreak) jcfpmphys->breakOccurred = false;
+			}
+		}
+	}
 
         ///compute flow and and forces here
 	if (pressureForce){
