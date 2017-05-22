@@ -69,6 +69,7 @@ class JCFpmPhys: public NormShearPhys {
 			((Real,tanDilationAngle,0,,"tangent of the angle defining the dilatancy of the joint surface (auto. computed from :yref:`JCFpmMat.jointDilationAngle`). [-]"))
 			((Real,dilation,0,,"defines the normal displacement in the joint after sliding treshold. [m]"))
 			((Real,crackJointAperture,0,,"Relative displacement between 2 spheres (in case of a crack it is equivalent of the crack aperture)"))
+			((bool, breakOccurred,0,,"Flag used to trigger retriangulation as soon as a cohesive bond breaks in FlowEngine (for DFNFlow use only)"))
 			,
 			createIndex();
 			,

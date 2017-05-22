@@ -80,6 +80,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
             // update body state with the number of broken bonds -> do we really need that?
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
+            phys->breakOccurred = true;  // flag to trigger remesh for DFNFlowEngine
             st1->nbBrokenBonds++;
 	    st2->nbBrokenBonds++;
 	    st1->damageIndex+=1.0/st1->nbInitBonds;
@@ -171,6 +172,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    // update body state with the number of broken bonds -> do we really need that?
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
+            phys->breakOccurred = true;  // flag to trigger remesh for DFNFlowEngine
 	    st1->nbBrokenBonds++;
 	    st2->nbBrokenBonds++;
 	    st1->damageIndex+=1.0/st1->nbInitBonds;
