@@ -6,7 +6,7 @@
 YADE_PLUGIN((ElectrostaticMat)(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys)(ElectrostaticPhys)(Law2_ScGeom_ElectrostaticPhys))
 
 
-ElectrostaticPhys::ElectrostaticPhys(const FrictPhys & obj) : FrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19)
+ElectrostaticPhys::ElectrostaticPhys(const FrictPhys & obj) : CohFrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19)
 {
 }
 
@@ -16,7 +16,7 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
 	if (interaction->phys) return;
 
         // Inheritance
-        Ip2_FrictMat_FrictMat_FrictPhys::go(material1,material2,interaction);
+        Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(material1,material2,interaction);
 
         FrictPhys* ph = YADE_CAST<FrictPhys*>(interaction->phys.get());
 
@@ -85,7 +85,7 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
 
 
     // Inheritance
-    Law2_ScGeom_FrictPhys_CundallStrack::go(iGeom,iPhys,interaction);
+    Law2_ScGeom_CohFrictPhys_CohesionMoment::go(iGeom,iPhys,interaction);
 
         // Geometric
 	ScGeom* geom=static_cast<ScGeom*>(iGeom.get());

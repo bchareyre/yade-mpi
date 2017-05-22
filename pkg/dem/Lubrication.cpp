@@ -2,27 +2,33 @@
 
 #include "Lubrication.hpp"
 
-YADE_PLUGIN((Ip2_Material_Material_LubricationPhys)(LubricationPhys)(Law2_ScGeom_LubricationPhys))
+YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_LubricationPhys))
 
 
 LubricationPhys::LubricationPhys(const NormShearPhys &obj) :
     NormShearPhys(obj),
     eta(1.)
 {
+    createIndex();
+}
+
+LubricationPhys::~LubricationPhys()
+{
 
 }
 
-Ip2_Material_Material_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
-{
-    // Inheritance
-    NormShearPhys* ph = YADE_CAST<NormShearPhys*>(interaction->phys.get());
+CREATE_LOGGER(LubricationPhys);
 
+void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
+{
     // Cast to Lubrication
-    shared_ptr<LubricationPhys> phys(new LubricationPhys(*ph));
+    shared_ptr<LubricationPhys> phys(new LubricationPhys());
     phys->eta = eta;
     interaction->phys = phys;
 }
-Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
+CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
+
+bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
 {
     // Physic
     LubricationPhys* phys=static_cast<LubricationPhys*>(iPhys.get());
@@ -39,14 +45,19 @@ Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPh
     State* s1 = b1->state.get();
     State* s2 = b2->state.get();
 
-    Real a((geom->radius1+geom.radius2)/2.);
+    Real a((geom->radius1+geom->radius2)/2.);
     Real h((s1->se3.position-s2->se3.position).norm());
 
-    Vector3r relvel(s1->vel-s2->vel);
+    Vector3r relvel(b1->state.get()->vel-b2->state.get()->vel);
 
     relvel = relvel.dot(norm)*norm; // projection to normal
 
     Vector3r normalForce = 3./2.*3.141596*phys->eta*a*a/h*relvel;
+
+    m_force = normalForce;
+    m_speed = relvel;
+    m_speed1 = s1->vel;
+    m_speed2 = s2->vel;
 
     if (!scene->isPeriodic) {
             applyForceAtContactPoint(normalForce, geom->contactPoint , id1, s1->se3.position, id2, s2->se3.position);
@@ -56,6 +67,6 @@ Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPh
     }
     return true;
 }
-
+CREATE_LOGGER(Law2_ScGeom_LubricationPhys);
 
 
