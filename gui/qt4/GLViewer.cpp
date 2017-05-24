@@ -384,12 +384,11 @@ void GLViewer::postSelection(const QPoint& point)
 	LOG_DEBUG("Selection is "<<selectedName());
 	int selection = selectedName();
 	if(selection<0){
+		Omega::instance().getScene()->selectedBody = -1;
 		if (last>=0) {
-			Body::byId(Body::id_t(last))->state->blockedDOFs=initBlocked; last=-1; Omega::instance().getScene()->selectedBody = -1;}
+			Body::byId(Body::id_t(last))->state->blockedDOFs=initBlocked; last=-1;}
 		if(isMoving){
-			displayMessage("Moving finished"); mouseMovesCamera(); isMoving=false;
-			Omega::instance().getScene()->selectedBody = -1;
-		}
+			displayMessage("Moving finished"); mouseMovesCamera(); isMoving=false;}
 		return;
 	}
 	if(selection>=0 && (*(Omega::instance().getScene()->bodies)).exists(selection)){
@@ -397,7 +396,7 @@ void GLViewer::postSelection(const QPoint& point)
 		if (last>=0) {Body::byId(Body::id_t(last))->state->blockedDOFs=initBlocked; last=-1;}
 		if(Body::byId(Body::id_t(selection))->isClumpMember()){ // select clump (invisible) instead of its member
 			LOG_DEBUG("Clump member #"<<selection<<" selected, selecting clump instead.");
-			selection=Body::byId(Body::id_t(selection))->clumpId;			
+			selection=Body::byId(Body::id_t(selection))->clumpId;
 		}
 		
 		setSelectedName(selection);
