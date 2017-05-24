@@ -426,10 +426,10 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 		// if will be placed in the list only at the end, to avoid extra copying
 		int j=i_1; Bounds vi=v[i];  const bool viHasBB=vi.flags.hasBB;
 		const bool isMin=v[i].flags.isMin; 
-		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
-			long j1=v.norm(j+1);
+
 		//For the first pass, the bounds are not travelling down past v[0] (j<_i above prevents that), otherwise we would not know which part of the list has been correctly sorted. Only after the first pass, we sort end vs. begining of the list.
 		while((j<_i) and v[j].coord>(vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0))){
+			int j1=v.norm(j+1);
 			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
 			// this can happen without any side-effects
 			if (false && v[j].coord>2*v.cellDim){
