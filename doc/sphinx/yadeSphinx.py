@@ -121,7 +121,6 @@ Class reference (yade.wrapper module)
 
 
 .. currentmodule:: yade.wrapper
-.. autosummary::
 
 """+
 	sect('Bodies','',['Body','Shape','State','Material','Bound'])+
@@ -167,7 +166,7 @@ def makeBaseClassesClickable(f,writer):
 			bbb=' → '.join(['<a class="reference external" href="yade.wrapper.html#yade.wrapper.%s">%s</a>'%(b,b) for b in bb])
 			out.append(m.group(1)+bbb+m.group(3))
 		elif writer=='latex':
-			if not (r'\pysiglinewithargsret{\strong{class }\code{yade.wrapper.}\bfcode{' in l and r'\emph{inherits' in l):
+			if not (r'\pysiglinewithargsret{\sphinxstrong{class }\code{yade.wrapper.}\bfcode{' in l and r'\emph{inherits' in l):
 				out.append(l)
 				continue
 			#print l
