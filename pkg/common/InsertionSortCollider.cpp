@@ -426,8 +426,10 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 		// if will be placed in the list only at the end, to avoid extra copying
 		int j=i_1; Bounds vi=v[i];  const bool viHasBB=vi.flags.hasBB;
 		const bool isMin=v[i].flags.isMin; 
-		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
-			long j1=v.norm(j+1);
+
+		//For the first pass, the bounds are not travelling down past v[0] (j<_i above prevents that), otherwise we would not know which part of the list has been correctly sorted. Only after the first pass, we sort end vs. begining of the list.
+		while((j<_i) and v[j].coord>(vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0))){
+			int j1=v.norm(j+1);
 			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
 			// this can happen without any side-effects
 			if (false && v[j].coord>2*v.cellDim){
@@ -438,19 +440,11 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 			}
 			Bounds& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
 			vNew=v[j];
-			// inversions close the the split need special care
+			// inversions close to the split need special care
 			if(j==loIdx && vi.coord<0) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
-			if(isMin && !v[j].flags.isMin && (doCollide && viHasBB && v[j].flags.hasBB)){
-				// see https://bugs.launchpad.net/yade/+bug/669095 and similar problem in aperiodic insertionSort
-				#if 0
-				if(vi.id==vNew.id){
-					LOG_FATAL("Inversion of body's #"<<vi.id<<" boundary with its other boundary, "<<v[j].coord<<" meets "<<vi.coord);
-					throw runtime_error(__FILE__ ": Body's boundary metting its opposite boundary.");
-				}
-				#endif
+			if(isMin && !v[j].flags.isMin && (doCollide && viHasBB && v[j].flags.hasBB))
 				if((vi.id!=vNew.id)) handleBoundInversionPeri(vi.id,vNew.id,interactions,scene);
-			}
 			j=v.norm(j-1);
 		}
 		v[v.norm(j+1)]=vi;

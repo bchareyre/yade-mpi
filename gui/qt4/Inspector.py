@@ -75,7 +75,7 @@ class BodyInspector(QWidget):
 		self.idGlSync=self.bodyId
 		self.bodyLinkCallback,self.intrLinkCallback=bodyLinkCallback,intrLinkCallback
 		self.bodyIdBox=QSpinBox(self)
-		self.bodyIdBox.setMinimum(0)
+		self.bodyIdBox.setMinimum(-1)
 		self.bodyIdBox.setMaximum(100000000)
 		self.bodyIdBox.setValue(self.bodyId)
 		self.intrWithCombo=QComboBox(self);
@@ -166,13 +166,14 @@ class BodyInspector(QWidget):
 		try: O.bodies[self.bodyId]
 		except: self.bodyId=-1 # invalidate deleted body
 		# no body shown yet, try to get the first one...
-		if self.bodyId<0 and len(O.bodies)>0:
-			try:
-				print 'SET ZERO'
-				b=O.bodies[0]; self.bodyIdBox.setValue(0)
-			except IndexError: pass
+		#if self.bodyId<0 and len(O.bodies)>0:
+			#try:
+				#print 'SET ZERO'
+				#b=O.bodies[0]; self.bodyIdBox.setValue(0)
+			#except IndexError: pass
 		v=yade.qt.views()
 		if len(v)>0 and v[0].selection!=self.bodyId:
+			print v[0].selection,self.bodyId,self.idGlSync
 			if self.idGlSync==self.bodyId: # changed in the viewer, reset ourselves
 				self.bodyId=self.idGlSync=v[0].selection; self.changeIdSlot(self.bodyId)
 				return

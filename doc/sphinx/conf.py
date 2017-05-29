@@ -771,3 +771,6 @@ latex_logo = 'fig/yade-logo.png'
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+# This option fixes PDF compilation failure on sphinx>1.4.9
+latex_keep_old_macro_names = False
