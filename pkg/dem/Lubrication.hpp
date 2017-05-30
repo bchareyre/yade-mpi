@@ -1,4 +1,3 @@
- 
 // 2017 © William Chèvremont <william.chevremont@univ-grenoble-alpes.fr>
 
 #pragma once
@@ -12,6 +11,8 @@
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/dem/ElasticContactLaw.hpp>
+
+#define ln(x) log(x)
 
 namespace py=boost::python;
 
@@ -32,16 +33,16 @@ class LubricationPhys: public NormShearPhys {
 REGISTER_SERIALIZABLE(LubricationPhys);
 
 
-class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
+class Ip2_ElastMat_ElastMat_LubricationPhys: public IPhysFunctor{
         public:
                 virtual void go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction);
-                FUNCTOR2D(FrictMat,FrictMat);
+                FUNCTOR2D(ElastMat,ElastMat);
                 DECLARE_LOGGER;
-                YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
+                YADE_CLASS_BASE_DOC_ATTRS(Ip2_ElastMat_ElastMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
                 );
 };
-REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_LubricationPhys);
+REGISTER_SERIALIZABLE(Ip2_ElastMat_ElastMat_LubricationPhys);
 
 
 class Law2_ScGeom_LubricationPhys: public LawFunctor{
@@ -49,14 +50,8 @@ class Law2_ScGeom_LubricationPhys: public LawFunctor{
                 bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
                 FUNCTOR2D(GenericSpheresContact,LubricationPhys);
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_LubricationPhys,LawFunctor,"Material law for lubrication between two spheres.",
-                    ((Vector3r,m_force,,,"Computed Force"))
-                    ((Vector3r,m_speed,,,"Normal speed"))
-                    ((Vector3r,m_speed1,,,"id1 speed"))
-                    ((Vector3r,m_speed2,,,"id2 speed")),,
-                    .def_readonly("force",&Law2_ScGeom_LubricationPhys::m_force,"Computed force [N]")
-                    .def_readonly("nSpeed",&Law2_ScGeom_LubricationPhys::m_speed,"Normal Speed [m/s]")
-                    .def_readonly("Speed1",&Law2_ScGeom_LubricationPhys::m_speed1,"id1 Speed [m/s]")
-                    .def_readonly("Speed2",&Law2_ScGeom_LubricationPhys::m_speed2,"id2 Speed [m/s]")
+                    ((bool,activateLubrication,false,,"Activate lubrication (default: false)")),,
+                    .def_readwrite("activateLubrication",&Law2_ScGeom_LubricationPhys::activateLubrication,"Activate lubrication (default: false)")
                 );
                 DECLARE_LOGGER;
 

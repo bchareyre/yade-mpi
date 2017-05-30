@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include<pkg/common/CohesiveFrictionalContactLaw.hpp>
+#include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
 #include<pkg/common/Dispatching.hpp>
 #include<pkg/common/Sphere.hpp>
 #include<pkg/common/PeriodicEngines.hpp>
@@ -22,7 +22,7 @@ class ElectrostaticMat: public CohFrictMat {
                         //((Real,charge,0,,"Surface potential [mV]"))/*OLD*/
                         //((Real,DebyeCoef,0.05,,"Proportion of the radius that is the Debye length"))/*OLD*/
 			,
-			createIndex();
+                        createIndex();
 		);
                 REGISTER_CLASS_INDEX(ElectrostaticMat,CohFrictMat);
 };
@@ -73,11 +73,11 @@ REGISTER_SERIALIZABLE(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys);
 
 
 
-class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom_CohFrictPhys_CohesionMoment{
+class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom6D_CohFrictPhys_CohesionMoment{
 	public:
 		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
                 FUNCTOR2D(GenericSpheresContact,ElectrostaticPhys);
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_CohFrictPhys_CohesionMoment,"Material law for electrostatic interaction according to [Mari2013]_.",,,
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom6D_CohFrictPhys_CohesionMoment,"Material law for electrostatic interaction according to [Mari2013]_.",,,
 //                  ((Real,f_VdW,0,,"Computed Van Der Waals Force"))
 //                  ((Real,f_DLE,0,,"Computed Double Layer Electrostatic Force")),,
 //                            .def_readonly("f_VdW",&Law2_ScGeom_ElectrostaticPhys::f_VdW,"Computed VanDerWaals Force")

@@ -6,7 +6,7 @@
 YADE_PLUGIN((ElectrostaticMat)(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys)(ElectrostaticPhys)(Law2_ScGeom_ElectrostaticPhys))
 
 
-ElectrostaticPhys::ElectrostaticPhys(const FrictPhys & obj) : CohFrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19)
+ElectrostaticPhys::ElectrostaticPhys(const CohFrictPhys & obj) : CohFrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19)
 {
 }
 
@@ -18,7 +18,7 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
         // Inheritance
         Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(material1,material2,interaction);
 
-        FrictPhys* ph = YADE_CAST<FrictPhys*>(interaction->phys.get());
+        CohFrictPhys* ph = YADE_CAST<CohFrictPhys*>(interaction->phys.get());
 
         // Cast to Electrostatic
         shared_ptr<ElectrostaticPhys> phys(new ElectrostaticPhys(*ph));
@@ -85,17 +85,17 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
 
 
     // Inheritance
-    Law2_ScGeom_CohFrictPhys_CohesionMoment::go(iGeom,iPhys,interaction);
+    Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(iGeom,iPhys,interaction);
 
-        // Geometric
-	ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
+    // Geometric
+    ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
     ElectrostaticPhys* phys=static_cast<ElectrostaticPhys*>(iPhys.get());
 
     // Get bodies properties
-	Body::id_t id1 = interaction->getId1();
- 	Body::id_t id2 = interaction->getId2();
-	const shared_ptr<Body> b1 = Body::byId(id1,scene);
-	const shared_ptr<Body> b2 = Body::byId(id2,scene);
+    Body::id_t id1 = interaction->getId1();
+    Body::id_t id2 = interaction->getId2();
+    const shared_ptr<Body> b1 = Body::byId(id1,scene);
+    const shared_ptr<Body> b2 = Body::byId(id2,scene);
     State* s1 = b1->state.get();
     State* s2 = b2->state.get();
 
@@ -106,6 +106,10 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     Real D(r-a1-a2);
     Real K(1./phys->DebyeLength);
     Vector3r& normalForce(phys->normalForce);
+
+    // No longer interact if distance is 10*DebyeLenght
+    if(D > 10*phys->DebyeLength)
+        return false;
 
 
     /* constitutive law */

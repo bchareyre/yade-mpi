@@ -2,14 +2,13 @@
 
 #include "Lubrication.hpp"
 
-YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_LubricationPhys))
+YADE_PLUGIN((Ip2_ElastMat_ElastMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_LubricationPhys))
 
 
 LubricationPhys::LubricationPhys(const NormShearPhys &obj) :
     NormShearPhys(obj),
     eta(1.)
 {
-    createIndex();
 }
 
 LubricationPhys::~LubricationPhys()
@@ -19,17 +18,21 @@ LubricationPhys::~LubricationPhys()
 
 CREATE_LOGGER(LubricationPhys);
 
-void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
+void Ip2_ElastMat_ElastMat_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
 {
     // Cast to Lubrication
     shared_ptr<LubricationPhys> phys(new LubricationPhys());
     phys->eta = eta;
     interaction->phys = phys;
 }
-CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
+CREATE_LOGGER(Ip2_ElastMat_ElastMat_LubricationPhys);
 
 bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
 {
+    // If not activated, do not compute the force
+    if(!activateLubrication)
+        return true;
+
     // Physic
     LubricationPhys* phys=static_cast<LubricationPhys*>(iPhys.get());
 
@@ -45,26 +48,34 @@ bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys>
     State* s1 = b1->state.get();
     State* s2 = b2->state.get();
 
+    // geometric parameters
     Real a((geom->radius1+geom->radius2)/2.);
-    Real h((s1->se3.position-s2->se3.position).norm());
+    Real h((s1->se3.position-s2->se3.position).norm()-2.*a);
+    const Real pi(3.141596);
 
-    Vector3r relvel(b1->state.get()->vel-b2->state.get()->vel);
+    // Speeds
+    Vector3r normVel((s1->vel-s2->vel).dot(norm)*norm);
+    Vector3r normRot((s1->vel-s2->vel).cross(norm)/(2.*a+h));
+    Vector3r shearVel((geom->radius1*(s1->angVel-normRot)+geom->radius2*(s2->angVel-normRot)).cross(norm));
 
-    relvel = relvel.dot(norm)*norm; // projection to normal
 
-    Vector3r normalForce = 3./2.*3.141596*phys->eta*a*a/h*relvel;
+    // Forces and torques
+    Vector3r FLn = pi*phys->eta*3./2.*a*a/h*normVel;
+    Vector3r FLs = pi*phys->eta/2.*(-2.*a+(2.*a+h)*ln((2.*a+h)/h))*shearVel;
+    Vector3r Cr  = pi*phys->eta*a*a*a*(3./2.*ln(a/h)+63./500.*h/a*ln(a/h))*((s1->angVel-s2->angVel)-((s1->angVel-s2->angVel).dot(norm))*norm);
+    Vector3r Ct  = pi*phys->eta*a*h*ln(a/h)*(s1->angVel-s2->angVel).dot(norm)*norm;
 
-    m_force = normalForce;
-    m_speed = relvel;
-    m_speed1 = s1->vel;
-    m_speed2 = s2->vel;
+    // total torque
+    Vector3r C1 = (geom->radius1+h/2.)*FLs.cross(norm)+Cr+Ct;
+    Vector3r C2 = (geom->radius2+h/2.)*FLs.cross(norm)-Cr-Ct;
 
-    if (!scene->isPeriodic) {
-            applyForceAtContactPoint(normalForce, geom->contactPoint , id1, s1->se3.position, id2, s2->se3.position);
-    } else {
-            scene->forces.addForce(id1,normalForce);
-            scene->forces.addForce(id2,-normalForce);
-    }
+    // Apply!
+    scene->forces.addForce(id1,FLn+FLs);
+    scene->forces.addTorque(id1,C1);
+
+    scene->forces.addForce(id2,-FLn-FLs);
+    scene->forces.addTorque(id2,C2);
+
     return true;
 }
 CREATE_LOGGER(Law2_ScGeom_LubricationPhys);
