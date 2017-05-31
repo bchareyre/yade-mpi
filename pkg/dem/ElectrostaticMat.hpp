@@ -34,8 +34,8 @@ class ElectrostaticPhys: public CohFrictPhys {
                 ElectrostaticPhys(CohFrictPhys const& ); // "copy" constructor
                 virtual ~ElectrostaticPhys();
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ElectrostaticPhys,CohFrictPhys,"IPhys class containing parameters of ElectrostaticMat. Used by Law2_ScGeom_ElectrostaticPhys.",
-                        ((Real,DebyeLength,1e-6,,"Debye Length [m]"))
-                        ((Real,InterConst,1e-10,,"Double layer interaction constant [J]"))
+                        ((Real,DebyeLength,1e-8,,"Debye Length [m]"))
+                        ((Real,InterConst,1e-12,,"Double layer interaction constant [J]"))
                         ((Real,A,1e-19,,"Hamaker constant [J]"))
 			, // ctors
                         createIndex();,

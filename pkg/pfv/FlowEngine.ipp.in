@@ -658,6 +658,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 				O2CVector = -(O1O2Vector - O1CVector);
 				meanRad = (r2 + r1)/2.;
 				Rh = (r1 < r2)? surfaceDist + 0.45 * r1 : surfaceDist + 0.45 * r2;
+
 				deltaV = (sph2->state->vel + sph2->state->angVel.cross(-r2 * normal)) - (sph1->state->vel+ sph1->state->angVel.cross(r1 * normal));
 				angVel1 = sph1->state->angVel;
 				angVel2 = sph2->state->angVel;
