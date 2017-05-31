@@ -20,8 +20,18 @@ CREATE_LOGGER(LubricationPhys);
 
 void Ip2_ElastMat_ElastMat_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
 {
+    if (interaction->phys)
+        return;
+
     // Cast to Lubrication
     shared_ptr<LubricationPhys> phys(new LubricationPhys());
+
+    if(otherPhysFunctor)
+    {
+        otherPhysFunctor->go(material1,material2,interaction);
+        phys->otherPhys = interaction->phys;
+    }
+
     phys->eta = eta;
     interaction->phys = phys;
 }
@@ -29,12 +39,14 @@ CREATE_LOGGER(Ip2_ElastMat_ElastMat_LubricationPhys);
 
 bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
 {
-    // If not activated, do not compute the force
-    if(!activateLubrication)
-        return true;
-
     // Physic
     LubricationPhys* phys=static_cast<LubricationPhys*>(iPhys.get());
+
+    otherLawFunctor->scene = scene;
+
+    // If not activated, only compute other law
+    if(!activateLubrication)
+            return (otherLawFunctor) ? otherLawFunctor->go(iGeom,phys->otherPhys,interaction) : false;
 
     // Geometry
     ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
@@ -54,8 +66,8 @@ bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys>
     const Real pi(3.141596);
 
     // Speeds
-    Vector3r normVel((s1->vel-s2->vel).dot(norm)*norm);
-    Vector3r normRot((s1->vel-s2->vel).cross(norm)/(2.*a+h));
+    Vector3r normVel((s2->vel-s1->vel).dot(norm)*norm);
+    Vector3r normRot((s2->vel-s1->vel).cross(norm)/(2.*a+h));
     Vector3r shearVel((geom->radius1*(s1->angVel-normRot)+geom->radius2*(s2->angVel-normRot)).cross(norm));
 
 
@@ -69,12 +81,18 @@ bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys>
     Vector3r C1 = (geom->radius1+h/2.)*FLs.cross(norm)+Cr+Ct;
     Vector3r C2 = (geom->radius2+h/2.)*FLs.cross(norm)-Cr-Ct;
 
+    //cout << "FL (" << FLn << ") FLs (" << FLs << ") Cr ("<< Cr << ") Ct (" << Ct << ")\n";
+
     // Apply!
     scene->forces.addForce(id1,FLn+FLs);
     scene->forces.addTorque(id1,C1);
 
     scene->forces.addForce(id2,-FLn-FLs);
     scene->forces.addTorque(id2,C2);
+
+    // Compute other law
+    if(otherLawFunctor)
+        otherLawFunctor->go(iGeom, phys->otherPhys,interaction);
 
     return true;
 }
