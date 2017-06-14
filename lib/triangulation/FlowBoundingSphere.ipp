@@ -1383,6 +1383,20 @@ Real FlowBoundingSphere<Tesselation>::computeNormalLubricationForce(const Real& 
 	}
 }
 
+template <class Tesselation> 
+double FlowBoundingSphere<Tesselation>::fractionalSolidArea(CellHandle cell, int j)
+{
+    double area;
+    int k=0,l=0,m=0;
+    if(j==0){k=1; l=2; m=3;}
+    if(j==1){k=0; l=2; m=3;}
+    if(j==2){k=1; l=0; m=3;}
+    if(j==3){k=1; l=2; m=0;}
+    area = this->fastSphericalTriangleArea(cell->vertex(j)->point(), cell->vertex(k)->point(), cell->vertex(l)-> point(), cell->vertex(m)-> point());
+    return area;
+}
+
+
 } //namespace CGT
 
 #endif //FLOW_ENGINE

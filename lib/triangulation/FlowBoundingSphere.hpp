@@ -166,6 +166,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector<Real> averageFluidVelocityOnSphere(unsigned int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1:CHOLMOD)
+		double fractionalSolidArea(CellHandle cell, int j);
 };
 
 } //namespace CGT
