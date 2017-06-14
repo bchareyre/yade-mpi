@@ -24,10 +24,11 @@ class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 	public:
 	Real anotherVariable;
 	bool crack;
+	Real crackArea;// the volume of cracks
 // 	bool preExistingJoint;
 // 	void anotherFunction() {};
 // 	DFNCellInfo() : FlowCellInfo(),crack(false)  {}
-	DFNCellInfo() : crack(false)  {}
+	DFNCellInfo() : crack(false), crackArea(0) {}
 };
 
 class DFNVertexInfo : public FlowVertexInfo_DFNFlowEngineT {
@@ -127,19 +128,20 @@ class DFNFlowEngine : public DFNFlowEngineT
 {
 	public :
 	void trickPermeability();
-	void trickPermeability (RTriangulation::Facet_circulator& facet,Real aperture, Real residualAperture);
+	void trickPermeability (RTriangulation::Facet_circulator& facet,Real aperture, Real residualAperture, RTriangulation::Finite_edges_iterator& edge);
 	void trickPermeability (RTriangulation::Finite_edges_iterator& edge,Real aperture, Real residualAperture);
 	void setPositionsBuffer(bool current);
 // 	void computeTotalFractureArea(Real totalFracureArea,bool printFractureTotalArea);/// Trying to get fracture's surface
 	Real totalFracureArea; /// Trying to get fracture's surface
+	CELL_SCALAR_GETTER(double,.crackArea,crackArea)
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"This is an enhancement of the FlowEngine for intact and fractured rocks that takes into acount pre-existing discontinuities and bond breakage between particles. The local conductivity around the broken link is calculated according to parallel plates model",
 	((Real, jointResidual, 0,,"calibration parameter for residual aperture of joints"))
 	((bool, updatePositions, false,,"update particles positions when rebuilding the mesh (experimental)"))
  	((bool, printFractureTotalArea, 0,,"The final fracture area computed through the network")) /// Trying to get fracture's surface
-	,
-	,
-	,
+	((bool, calcCrackArea, true,,"The amount of crack per pore () is updated if calcCrackArea=True")) /// Trying to get fracture's surface
+	,,,
+	.def("getCrackArea",&DFNFlowEngine::crackArea,(boost::python::arg("id")),"get the cracked area within cell 'id'.")
 // 	.def("computeTotalFractureArea",&DFNFlowEngineT::computeTotalFractureArea," Compute and print the total fracture area of the network") /// Trying to get fracture's surface
 // 	.def("trickPermeability",&DFNFlowEngineT::trickPermeability,"measure the mean trickPermeability in the period")
 	)
@@ -168,13 +170,14 @@ void DFNFlowEngine::setPositionsBuffer(bool current)
 	}
 }
 
-void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, Real aperture, Real residualAperture)
+void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, Real aperture, Real residualAperture, RTriangulation::Finite_edges_iterator& ed_it)
 {
+	const RTriangulation::Facet& currentFacet = *facet; // seems verbose but facet->first was declaring a junk cell and crashing program (https://bugs.launchpad.net/yade/+bug/1666339)
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-	const CellHandle& cell1 = facet->first;
-	const CellHandle& cell2 = facet->first->neighbor(facet->second);
+	const CellHandle& cell1 = currentFacet.first;
+	const CellHandle& cell2 = currentFacet.first->neighbor(facet->second);
 	if ( Tri.is_infinite(cell1) || Tri.is_infinite(cell2)) cerr<<"Infinite cell found in trickPermeability, should be handled somehow, maybe"<<endl;
-	cell1->info().kNorm()[facet->second]=cell2->info().kNorm()[Tri.mirror_index(cell1, facet->second)] = pow((aperture+residualAperture),3)/(12*viscosity);
+	cell1->info().kNorm()[currentFacet.second]=cell2->info().kNorm()[Tri.mirror_index(cell1, currentFacet.second)] = pow((aperture+residualAperture),3)/(12*viscosity);
 	//For vtk recorder:
 	cell1->info().crack= 1;
 	cell2->info().crack= 1;
@@ -187,15 +190,25 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, R
 	totalFracureArea += networkFractureArea; /// Trying to get fracture's surface 
 // 	cout <<" ------------------ The total surface area up to here is --------------------" << totalFracureArea << endl;
 // 	printFractureTotalArea = totalFracureArea; /// Trying to get fracture's surface 
+	if (calcCrackArea) {
+			CVector edge = ed_it->first->vertex(ed_it->second)->point().point() - ed_it->first->vertex(ed_it->third)->point().point();
+			CVector unitV = edge*(1./sqrt(edge.squared_length()));
+			Point p3 = ed_it->first->vertex(ed_it->third)->point().point() + unitV*(cell1->info() - ed_it->first->vertex(ed_it->third)->point().point())*unitV;
+			Real halfCrackArea = 0.25*sqrt(std::abs(cross_product(CellCentre1-p3,CellCentre2-p3).squared_length()));//
+			cell1->info().crackArea += halfCrackArea;
+			cell2->info().crackArea += halfCrackArea;
+		}
 }
 
 void DFNFlowEngine::trickPermeability(RTriangulation::Finite_edges_iterator& edge, Real aperture, Real residualAperture)
 {
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+	
+	
 	RTriangulation::Facet_circulator facet1 = Tri.incident_facets(*edge);
 	RTriangulation::Facet_circulator facet0=facet1++;
-	trickPermeability(facet0, aperture,residualAperture);
-	while ( facet1!=facet0 ) {trickPermeability(facet1, aperture, residualAperture); facet1++;}
+	trickPermeability(facet0, aperture,residualAperture, edge);
+	while ( facet1!=facet0 ) {trickPermeability(facet1, aperture, residualAperture, edge); facet1++;}
 	/// Needs the fracture surface for this edge?
 // 	double edgeArea = solver->T[solver->currentTes].computeVFacetArea(edge); cout<<"edge area="<<edgeArea<<endl;
 }

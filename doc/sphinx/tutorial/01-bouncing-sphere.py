@@ -19,9 +19,9 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()]),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_L3Geom()],        # collision geometry 
+		[Ig2_Sphere_Sphere_ScGeom()],        # collision geometry
 		[Ip2_FrictMat_FrictMat_FrictPhys()], # collision "physics"
-		[Law2_L3Geom_FrictPhys_ElPerfPl()]   # contact law -- apply forces
+		[Law2_ScGeom_FrictPhys_CundallStrack()]   # contact law -- apply forces
 	),
 	# Apply gravity force to particles. damping: numerical dissipation of energy.
 	NewtonIntegrator(gravity=(0,0,-9.81),damping=0.1)

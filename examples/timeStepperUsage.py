@@ -26,8 +26,8 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	GlobalStiffnessTimeStepper(label='ts'),
-	PeriTriaxController(dynCell=True,mass=0.2,maxUnbalanced=0.001, relStressTol=0.01,goal=(-1e4,-1e4,0),stressMask=3,globUpdate=5, maxStrainRate=(10.,10.,10.),doneHook='triaxDone()',label='triax'),
+	GlobalStiffnessTimeStepper(timeStepUpdateInterval=10,label='ts'),
+	PeriTriaxController(dynCell=True,mass=0.2,maxUnbalanced=0.01, relStressTol=0.01,goal=(-1e4,-1e4,0),stressMask=3,globUpdate=5, maxStrainRate=(10.,10.,10.),doneHook='triaxDone()',label='triax'),
 	NewtonIntegrator(damping=.2,label="newton"),
 ]
 
@@ -69,51 +69,51 @@ O.dt=1000000 #or whatever
 #We force dt=1. The inertia of bodies will adjusted automatically...
 newton.densityScaling=True
 #... but not that of cell, hence we have to adjust it or the problem becomes unstable
-triax.mass=triax.mass*(1e4)**2
+triax.mass /= (0.8*PWaveTimeStep())**2
+triax.maxStrainRate *= 0.8*PWaveTimeStep()
 O.run(1000000,True);
 print "--------------------------------------------------------------------"
 print "dt dynamicaly set with GlobalStiffness timesteper + density scaling:"
 print "--------------------------------------------------------------------"
 timing.stats()
 
-
 #_____ TYPICAL RESULTS (n=1000)____
-
 #--------------------------------
 #Fixed dt = 0.8 * PWave timestep:
 #--------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#ForceResetter                                     77246             326813us                0.24%
-#InsertionSortCollider                             23571           29447986us               21.73%
-#InteractionLoop                                   77246           65954607us               48.67%
+#ForceResetter                                     58166             455809us                0.82%
+#InsertionSortCollider                             23641           17777093us               31.92%
+#InteractionLoop                                   58166           21812997us               39.17%
 #"ts"                                                  0                  0us                0.00%
-#"triax"                                           77246           11876934us                8.76%
-#"newton"                                          77246           27914757us               20.60%
-#TOTAL                                                            135521099us              100.00%
+#"triax"                                           58166            4329739us                7.77%
+#"newton"                                          58166           11314162us               20.32%
+#TOTAL                                                             55689802us              100.00%
 
 #--------------------------------------------------
 #dt dynamicaly set with GlobalStiffness timesteper:
 #--------------------------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#ForceResetter                                     45666             193813us                0.23%
-#InsertionSortCollider                              6727            9456709us               11.09%
-#InteractionLoop                                   45666           44245384us               51.87%
-#"ts"                                              45666            6267682us                7.35%
-#"triax"                                           45666            8234896us                9.65%
-#"newton"                                          45666           16906118us               19.82%
-#TOTAL                                                             85304605us              100.00%
+#ForceResetter                                     37471             296255us                0.82%
+#InsertionSortCollider                              6589            5608966us               15.57%
+#InteractionLoop                                   37471           18167532us               50.44%
+#"ts"                                               3785             477777us                1.33%
+#"triax"                                           37471            3801429us               10.55%
+#"newton"                                          37471            7664305us               21.28%
+#TOTAL                                                             36016267us              100.00%
 
+#WARN  /home/3S-LAB/bchareyre/yade/yade-git/trunk/pkg/dem/NewtonIntegrator.cpp:282 set_densityScaling: GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the timestepper if you don't want the scaling adjusted automatically.
 #--------------------------------------------------------------------
 #dt dynamicaly set with GlobalStiffness timesteper + density scaling:
 #--------------------------------------------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#ForceResetter                                     23936             102435us                0.25%
-#InsertionSortCollider                               305             534572us                1.29%
-#InteractionLoop                                   23936           23748011us               57.11%
-#"ts"                                              23936            3520397us                8.47%
-#"triax"                                           23936            4623106us               11.12%
-#"newton"                                          23936            9051032us               21.77%
-#TOTAL                                                             41579556us              100.00%
+#ForceResetter                                     31666             251568us                1.55%
+#InsertionSortCollider                               429             429116us                2.64%
+#InteractionLoop                                   31666            8135458us               50.06%
+#"ts"                                               3168             244340us                1.50%
+#"triax"                                           31666            1282567us                7.89%
+#"newton"                                          31666            5909985us               36.36%
+#TOTAL                                                             16253037us              100.00%

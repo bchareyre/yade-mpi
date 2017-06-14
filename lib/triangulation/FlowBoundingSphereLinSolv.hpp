@@ -54,6 +54,7 @@ public:
 	using FlowType::resetNetwork;
 	using FlowType::tesselation;
 	using FlowType::resetRHS;
+	using FlowType::factorizeOnly;  // used for backgroundAction()
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;

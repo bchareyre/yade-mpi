@@ -6,4 +6,4 @@ Theoretical background
   :maxdepth: 2
   
   formulation.rst
-  fullPublications.rst
+  publications.rst

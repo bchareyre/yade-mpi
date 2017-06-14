@@ -30,7 +30,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		//painfull, but we need that for templates inheritance...
 		using _N::T; using _N::xMin; using _N::xMax; using _N::yMin; using _N::yMax; using _N::zMin; using _N::zMax; using _N::Rmoy; using _N::sectionArea; using _N::Height; using _N::vTotal; using _N::currentTes; using _N::debugOut; using _N::nOfSpheres; using _N::xMinId; using _N::xMaxId; using _N::yMinId; using _N::yMaxId; using _N::zMinId; using _N::zMaxId; using _N::boundsIds; using _N::cornerMin; using _N::cornerMax;  using _N::VSolidTot; using _N::Vtotalissimo; using _N::vPoral; using _N::sSolidTot; using _N::vPoralPorosity; using _N::vTotalPorosity; using _N::boundaries; using _N::idOffset; using _N::vtkInfiniteVertices; using _N::vtkInfiniteCells; using _N::num_particles; using _N::boundingCells; using _N::facetVertices; using _N::facetNFictious;
 		//same for functions
-		using _N::defineFictiousCells; using _N::addBoundingPlanes; using _N::boundary; using _N::tesselation;
+		using _N::defineFictiousCells; using _N::addBoundingPlanes; using _N::boundary; using _N::tesselation; using _N::surfaceSolidThroatInPore;
 
 		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
@@ -45,6 +45,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool computedOnce;//flag for checking if current triangulation has been computed at least once
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
 		int errorCode;
+		bool factorizeOnly;
 		
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
@@ -123,6 +124,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		double dotProduct ( CVector x, CVector y );
 		double computeEffectiveRadius(CellHandle cell, int j);
+		double computeEffectiveRadiusByPosRadius(const Point& posA, const double& rA, const Point& posB, const double& rB, const Point& posC, const double& rC);
 		double computeEquivalentRadius(CellHandle cell, int j);
 		//return the list of constriction values
 		vector<double> getConstrictions();

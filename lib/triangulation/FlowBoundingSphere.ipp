@@ -61,7 +61,7 @@ FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	fluidBulkModulus = 0;
 	tessBasedForce = true;
 	for (int i=0;i<6;i++) boundsIds[i] = 0;
-	minPermLength=-1;
+	minPermLength=1e-6;// multiplier applied on throat radius to define a minimal throat length (escaping coincident points)
 	slipBoundary = false;//no-slip/symmetry conditions on lateral boundaries
 	tolerance = 1e-07;
 	relax = 1.9;
@@ -164,8 +164,8 @@ void FlowBoundingSphere<Tesselation>::averageFluidVelocity()
 	{
 	  if (cell->info().fictious()==0){
 	    for (int i=0;i<4;i++){
-	      velocityVolumes[cell->vertex(i)->info().id()] =  velocityVolumes[cell->vertex(i)->info().id()] + cell->info().averageVelocity()*cell->info().volume();
-	      volumes[cell->vertex(i)->info().id()] = volumes[cell->vertex(i)->info().id()] + cell->info().volume();}
+	      velocityVolumes[cell->vertex(i)->info().id()] =  velocityVolumes[cell->vertex(i)->info().id()] + cell->info().averageVelocity()*std::abs(cell->info().volume());
+	      volumes[cell->vertex(i)->info().id()] = volumes[cell->vertex(i)->info().id()] + std::abs(cell->info().volume());}
 	  }}	    
 	
 	std::ofstream fluid_vel ("Velocity", std::ios::out);
@@ -204,8 +204,8 @@ vector<Real> FlowBoundingSphere<Tesselation>::averageFluidVelocityOnSphere(unsig
 	  if (cell->info().fictious()==0){
 	    for (unsigned int i=0;i<4;i++){
 	      if (cell->vertex(i)->info().id()==Id_sph){
-		velocityVolumes = velocityVolumes + cell->info().averageVelocity()*cell->info().volume();
-		volumes = volumes + cell->info().volume();}}}}
+		velocityVolumes = velocityVolumes + cell->info().averageVelocity()*std::abs(cell->info().volume());
+		volumes = volumes + std::abs(cell->info().volume());}}}}
 		
 	for (int i=0;i<3;i++) result[i] += velocityVolumes[i]/volumes;
 	return result;
@@ -280,9 +280,8 @@ double FlowBoundingSphere<Tesselation>::averagePressure()
   for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
 	P+=cell->info().p();
 	n++;
-	Ppond+=cell->info().p()*cell->info().volume();
-	Vpond+=cell->info().volume();
-  }
+	Ppond+=cell->info().p()*std::abs(cell->info().volume());
+	Vpond+=std::abs(cell->info().volume());}
   P/=n;
   Ppond/=Vpond;
   return Ppond;
@@ -530,14 +529,12 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 				Sphere& v0 = W[0]->point();
 				Sphere& v1 = W[1]->point();
 				Sphere& v2 = W[2]->point();
-
 				cell->info().facetSphereCrossSections[j]=CVector(
 				   W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
 				   W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
 				   W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
 				//FIXME: it should be possible to skip completely blocked cells, currently the problem is it segfault for undefined areas
 // 				if (cell->info().blocked) continue;//We don't need permeability for blocked cells, it will be set to zero anyway
-
 				pass+=1;
 				CVector l = p1 - p2;
 				distance = sqrt(l.squared_length());
@@ -550,7 +547,7 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 				}
 				Real fluidArea=0;
 				if (distance!=0) {
-					if (minPermLength>0 && distanceCorrection) distance=max(minPermLength,distance);
+					if (minPermLength>0 && distanceCorrection) distance=max(minPermLength*radius,distance);
 					const CVector& Surfk = cell->info().facetSurfaces[j];
 					Real area = sqrt(Surfk.squared_length());
 					const CVector& crossSections = cell->info().facetSphereCrossSections[j];
@@ -561,16 +558,16 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 					//take absolute value, since in rare cases the surface can be negative (overlaping spheres)
 					fluidArea=std::abs(area-crossSections[0]-crossSections[1]-crossSections[2]+S0);
 					cell->info().facetFluidSurfacesRatio[j]=fluidArea/area;
-					k=(fluidArea * pow(radius,2)) / (8*viscosity*distance);
-					 meanDistance += distance;
-					 meanRadius += radius;
-					 meanK +=  k*kFactor;
-
-				if (k<0 && debugOut) {surfneg+=1;
-				cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<endl;}				     
+					// kFactor<0 means we replace Poiseuille by Darcy localy, yielding a particle size-independent bulk conductivity
+					if (kFactor>0) cell->info().kNorm()[j]= kFactor*(fluidArea * pow(radius,2)) / (8*viscosity*distance);
+					else cell->info().kNorm()[j]= -kFactor * area / distance;						
+					meanDistance += distance;
+					meanRadius += radius;
+					meanK +=  (cell->info().kNorm())[j];
+					
+					if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
+					if (k<0 && debugOut) {surfneg+=1; cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<endl;}
 				} else  {cout <<"infinite K1!"<<endl; k = infiniteK;}//Will be corrected in the next loop
-
-				(cell->info().kNorm())[j]= k*kFactor;
 				if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
 			}
 		}
@@ -580,7 +577,9 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 	meanK /= pass;
 	meanRadius /= pass;
 	meanDistance /= pass;
-	Real globalK=kFactor*meanDistance*vPoral/(sSolidTot*8.*viscosity);//An approximate value of macroscopic permeability, for clamping local values below
+	Real globalK;
+	if (kFactor>0) globalK=kFactor*meanDistance*vPoral/(sSolidTot*8.*viscosity);//An approximate value of macroscopic permeability, for clamping local values below
+	else globalK=meanK;
 	if (debugOut) {
 		cout << "PassCompK = " << pass << endl;
 		cout << "meanK = " << meanK << endl;
@@ -663,13 +662,13 @@ vector<double> FlowBoundingSphere<Tesselation>::getConstrictions()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<double> constrictions;
-	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		//in the periodic case, we skip facets with lowest id out of the base period
-		if ( ((f_it->first->info().index <= f_it->first->neighbor(f_it->second)->info().index) && f_it->first->info().isGhost)
-		||  ((f_it->first->info().index >= f_it->first->neighbor(f_it->second)->info().index) && f_it->first->neighbor(f_it->second)->info().isGhost)
-		|| f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
-		constrictions.push_back(computeEffectiveRadius(f_it->first, f_it->second));
-	}
+	CellHandle neighbourCell; const FiniteCellsIterator& cellEnd = Tri.finite_cells_end();
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+			if (cell->info().isGhost) continue;// retain only the cells with barycenter in the (0,0,0) period
+			for (int j=0; j<4; j++) {
+				neighbourCell = cell->neighbor(j);
+				if (cell->info().id < neighbourCell->info().id)
+					constrictions.push_back(computeEffectiveRadius(cell, j));}}
 	return constrictions;
 }
 
@@ -678,20 +677,21 @@ vector<Constriction> FlowBoundingSphere<Tesselation>::getConstrictionsFull()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<Constriction> constrictions;
-	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		//in the periodic case, we skip facets with lowest id out of the base period
- 		 if ( ((f_it->first->info().index <= f_it->first->neighbor(f_it->second)->info().index) && f_it->first->info().isGhost)
-		||  ((f_it->first->info().index >= f_it->first->neighbor(f_it->second)->info().index) && f_it->first->neighbor(f_it->second)->info().isGhost)
-		|| f_it->first->info().index == 0 || f_it->first->neighbor(f_it->second)->info().index == 0) continue;
-		vector<double> rn;
-		const CVector& normal = f_it->first->info().facetSurfaces[f_it->second];
-		if (!normal[0] && !normal[1] && !normal[2]) continue;
-		rn.push_back(computeEffectiveRadius(f_it->first, f_it->second));
-		rn.push_back(normal[0]);
-		rn.push_back(normal[1]);
-		rn.push_back(normal[2]);
-		Constriction cons (pair<int,int>(f_it->first->info().id,f_it->first->neighbor(f_it->second)->info().id),rn);
-		constrictions.push_back(cons);
+	CellHandle neighbourCell; const FiniteCellsIterator& cellEnd = Tri.finite_cells_end();
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+			if (cell->info().isGhost) continue;// retain only the cells with barycenter in the (0,0,0) period
+			for (int j=0; j<4; j++) {
+				neighbourCell = cell->neighbor(j);
+				if (cell->info().id < neighbourCell->info().id) {
+					vector<double> rn;
+					const CVector& normal = cell->info().facetSurfaces[j];
+					if (!normal[0] && !normal[1] && !normal[2]) continue;
+					rn.push_back(computeEffectiveRadius(cell, j));
+					rn.push_back(normal[0]);
+					rn.push_back(normal[1]);
+					rn.push_back(normal[2]);
+					Constriction cons (pair<int,int>(cell->info().id,neighbourCell->info().id),rn);
+					constrictions.push_back(cons);}}
 	}
 	return constrictions;
 }
@@ -702,19 +702,31 @@ double FlowBoundingSphere<Tesselation>::computeEffectiveRadius(CellHandle cell, 
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
 
-	CVector B = cell->vertex(facetVertices[j][1])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
+	Point pos[3]; //spheres pos
+	double r[3]; //spheres radius
+	for (int i=0; i<3; i++) {
+	  pos[i] = cell->vertex(facetVertices[j][i])->point().point();
+	  r[i] = sqrt(cell->vertex(facetVertices[j][i])->point().weight());}
+	
+	double reff=computeEffectiveRadiusByPosRadius(pos[0],r[0],pos[1],r[1],pos[2],r[2]);
+	if (reff<0) return 0;//happens very rarely, with bounding spheres most probably
+	//if the facet involves one ore more bounding sphere, we return R with a minus sign
+	if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious) return -reff;
+	else return reff;
+}
+////compute inscribed radius independently by position and radius
+template <class Tesselation> 
+double FlowBoundingSphere<Tesselation>::computeEffectiveRadiusByPosRadius(const Point& posA, const double& rA, const Point& posB, const double& rB, const Point& posC, const double& rC)
+{
+	CVector B = posB - posA;
 	CVector x = B/sqrt(B.squared_length());
-	CVector C = cell->vertex(facetVertices[j][2])->point().point()-cell->vertex(facetVertices[j][0])->point().point();
+	CVector C = posC - posA;
 	CVector z = CGAL::cross_product(x,C);
 	CVector y = CGAL::cross_product(x,z);
 	y = y/sqrt(y.squared_length());
 
 	double b1[2]; b1[0] = B*x; b1[1] = B*y;
 	double c1[2]; c1[0] = C*x; c1[1] = C*y;
-
-	double rA = sqrt(cell->vertex(facetVertices[j][0])->point().weight());
-	double rB = sqrt(cell->vertex(facetVertices[j][1])->point().weight());
-	double rC = sqrt(cell->vertex(facetVertices[j][2])->point().weight());
 
 	double A = ((pow(rA,2))*(1-c1[0]/b1[0])+((pow(rB,2)*c1[0])/b1[0])-pow(rC,2)+pow(c1[0],2)+pow(c1[1],2)-((pow(b1[0],2)+pow(b1[1],2))*c1[0]/b1[0]))/(2*c1[1]-2*b1[1]*c1[0]/b1[0]);
 	double BB = (rA-rC-((rA-rB)*c1[0]/b1[0]))/(c1[1]-b1[1]*c1[0]/b1[0]);
@@ -729,10 +741,7 @@ double FlowBoundingSphere<Tesselation>::computeEffectiveRadius(CellHandle cell, 
 
 	if ((pow(b,2)-4*a*c)<0){cout << "NEGATIVE DETERMINANT" << endl; }
 	double reff = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
-	if (reff<0) return 0;//happens very rarely, with bounding spheres most probably
-	//if the facet involves one ore more bounding sphere, we return R with a minus sign
-	if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious) return -reff;
-	else return reff;
+	return reff;
 }
 
 template <class Tesselation> 
@@ -747,7 +756,7 @@ double FlowBoundingSphere<Tesselation>::computeHydraulicRadius(CellHandle cell, 
 	RTriangulation& Tri = T[currentTes].Triangulation();
         if (Tri.is_infinite(cell->neighbor(j))) return 0;
 	double Vpore = this->volumePoreVoronoiFraction(cell, j);
-	double Ssolid = this->surfaceSolidPore(cell, j, slipBoundary, /*reuse the same facet data*/ true);
+	double Ssolid = this->surfaceSolidThroat(cell, j, slipBoundary, /*reuse the same facet data*/ true);
 
 	//handle symmetry (tested ok)
 	if (slipBoundary && facetNFictious>0) {

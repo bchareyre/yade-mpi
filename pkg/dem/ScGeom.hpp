@@ -36,6 +36,8 @@ class ScGeom: public GenericSpheresContact {
 
 		//! Rotates a "shear" vector to keep track of contact orientation. Returns reference of the updated vector.
 		Vector3r& rotate(Vector3r& tangentVector) const;
+		Vector3r& rotateNonSpherical(Vector3r& tangentVector) const; //FIXME
+
 		const Vector3r& shearIncrement() const {return shearInc;}
 
 		// Add method which returns the relative velocity (then, inside the contact law, this can be split into shear and normal component). Handle periodicity.

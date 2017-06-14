@@ -108,7 +108,7 @@ double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, c
 {
         double A [3], B[3];
 
-        Boundary &bi1 =  boundaries [SV1->info().id()];
+        Boundary &bi1 =  boundary(SV1->info().id());
 	
         for (int m=0;m<3;m++) {A[m]= (SV2->point())[m];}
         for (int m=0;m<3;m++) {B[m]= (SV3->point())[m];}
@@ -251,7 +251,7 @@ Real Network<Tesselation>::fastSolidAngle(const Point& STA1, const Point& PTA1, 
 }
 
 template<class Tesselation>
-double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipBoundary, bool reuseFacetData)
+double Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool slipBoundary, bool reuseFacetData)
 {
   if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
@@ -355,6 +355,70 @@ double Network<Tesselation>::surfaceSolidPore(CellHandle cell, int j, bool slipB
 
     return Ssolid;
 
+}
+
+template<class Tesselation>
+double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bool slipBoundary, bool reuseFacetData)
+{
+  if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
+  Point& p1 = cell->info();
+  Point& p2 = cell->neighbor(j)->info();
+  double Ssolid1= 0, Ssolid2= 0, Ssolid3= 0;
+  Sphere v [3];
+  VertexHandle W [3];
+
+  for (int kk=0; kk<3; kk++) {
+	  W[kk] = cell->vertex(facetVertices[j][kk]);
+	  v[kk] = cell->vertex(facetVertices[j][kk])->point();}
+
+  switch (facetNFictious) {
+    case (0) : {
+		VertexHandle& SV1 = W[0];
+                VertexHandle& SV2 = W[1];
+                VertexHandle& SV3 = W[2];
+
+		Ssolid1 = fastSphericalTriangleArea(SV1->point(), SV2->point(), p1, SV3->point());
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point(),p1, SV3->point());
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, SV1->point());
+    }; break;
+    case (1) : {
+		VertexHandle SV1 = cell->vertex(facetVertices[j][facetF1]);
+		VertexHandle SV2 = cell->vertex(facetVertices[j][facetRe1]);
+		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe2]);
+
+		Boundary &bi1 =  boundary(SV1->info().id());
+                Ssolid1 = 0;
+		if (bi1.flowCondition && ! slipBoundary) Ssolid1 = abs(0.5*CGAL::cross_product(p1-SV2->point(), SV2->point()-SV3->point())[bi1.coordinate]);
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV3->point(),p1, SV2->point()+bi1.normal);
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, SV3->point()+bi1.normal);
+    }; break;
+    case (2) : {
+		double A [3], B[3], C[3];
+		VertexHandle SV1 = cell->vertex(facetVertices[j][facetF1]);
+		VertexHandle SV2 = cell->vertex(facetVertices[j][facetF2]);
+		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe1]);
+		Boundary &bi1 =  boundary(SV1->info().id());
+                Boundary &bi2 =  boundary(SV2->info().id());
+                for (int m=0;m<3;m++) {A[m]=B[m]=C[m]= (SV3->point())[m];}
+                A[bi1.coordinate]=bi1.p[bi1.coordinate];
+                B[bi2.coordinate]=bi2.p[bi2.coordinate];
+                C[bi1.coordinate]=bi1.p[bi1.coordinate];
+                C[bi2.coordinate]=bi2.p[bi2.coordinate];
+                Point AA(A[0],A[1],A[2]);
+                Point BB(B[0],B[1],B[2]);
+                Point CC(C[0],C[1],C[2]);
+
+                Sphere A1(AA, 0);
+                Sphere B1(BB, 0);
+                Sphere C1(CC, 0);
+                //FIXME : we are computing triangle area twice here, because its computed in volume_double_fictious already -> optimize
+                Ssolid1 = 0.5*(fastSphericalTriangleArea(SV3->point(), AA, p1, p2)+ fastSphericalTriangleArea(SV3->point(), BB, p1, p2));
+                CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
+                if (bi1.flowCondition && ! slipBoundary) Ssolid2 = 0.5*abs(p1p2v1Surface[bi1.coordinate]);
+                if (bi2.flowCondition && ! slipBoundary) Ssolid3 = 0.5*abs(p1p2v1Surface[bi2.coordinate]); 
+    }; break;
+    }
+    return Ssolid1+Ssolid2+Ssolid3;
 }
 
 template<class Tesselation>

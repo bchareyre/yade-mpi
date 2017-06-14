@@ -205,7 +205,7 @@ def userSession(gui='none',qapp=None):
 				'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
 		]
 	)
-	
+
 	# show python console
 	# handle both ipython 0.10 and 0.11 (incompatible API)
 	if yade.runtime.ipython_version==10:
@@ -228,9 +228,14 @@ def userSession(gui='none',qapp=None):
 			from IPython.terminal.embed import InteractiveShellEmbed
 		else:
 			from IPython.frontend.terminal.embed import InteractiveShellEmbed
-		from IPython.config.loader import Config
-		cfg = Config()
-		prompt_config = cfg.PromptManager
+		if yade.runtime.ipython_version>=500:
+			from traitlets.config.loader import Config
+			cfg = Config()
+			prompt_config = cfg.TerminalInteractiveShell.prompts_class
+		else:
+			from IPython.config.loader import Config
+			cfg = Config()
+			prompt_config = cfg.PromptManager
 		prompt_config.in_template = ipconfig['prompt_in1']
 		prompt_config.in2_template = ipconfig['prompt_in2']
 		prompt_config.out_template = ipconfig['prompt_out']
@@ -239,6 +244,9 @@ def userSession(gui='none',qapp=None):
 		InteractiveShellEmbed.config=cfg
 		InteractiveShellEmbed.banner1=banner+'\n'
 		ipshell=InteractiveShellEmbed()
+		# If IPython > 5 one need to initialize graphic gui
+		if ((gui == "qt5" or gui == "qt4")and yade.runtime.ipython_version>=500):
+			ipshell.enable_gui(gui)
 		ipshell()
 
 ## run userSession in a way corresponding to the features we use:
@@ -256,7 +264,7 @@ if gui:
 		# contrary to display.Display, _BaseDisplay does not check for extensions and that avoids spurious message "Xlib.protocol.request.QueryExtension" (bug?)
 		Xlib.display._BaseDisplay();
 		yade.runtime.hasDisplay=True
-	except: 
+	except:
 		# usually Xlib.error.DisplayError, but there can be Xlib.error.XauthError etc as well
 		# let's just pretend any exception means the display would not work
 		gui=None

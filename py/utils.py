@@ -792,8 +792,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 
 	All parameters (default as well as settable) are saved using :yref:`yade.utils.saveVars`\ ``('table')``.
 
-	:param tableFile: text file (with one value per blank-separated columns)
-	:param int tableLine: number of line where to get the values from
+	:param tableFileLine: string attribute to define which line number (as seen in a text editor) from wich text file (with one value per blank-separated columns) to get the values from. A ':' should appear between the two informations, e.g. 'file.table:4' to read the 4th line from file.table file
 	:param bool noTableOk: if False, raise exception if the file cannot be open; use default values otherwise
 	:param bool unknownOk: do not raise exception if unknown column name is found in the file, and assign it as well
 	:return: number of assigned parameters
@@ -1009,10 +1008,10 @@ class UnstructuredGrid:
 			if isinstance(e.shape,Facet):
 				#e.shape.vertices = [self.vertices[j] for j in c]
 				vs = [Vector3(self.vertices[j]) for j in c]
-				cc = sum(vs,Vector3.Zero)/3.
+				cc = inscribedCircleCenter(*vs)
 				for v in vs: v -= cc
 				e.state.pos = cc
-				e.shape.setVertices(vs)
+				e.shape.setVertices(*vs)
 			elif isinstance(e.shape,Tetra):
 				e.shape.v = [self.vertices[j] for j in c]
 			else:

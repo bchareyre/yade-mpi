@@ -33,9 +33,9 @@ REGISTER_SERIALIZABLE(KinematicEngine);
 struct TranslationEngine: public KinematicEngine{
 	virtual void apply(const vector<Body::id_t>& ids);
 	void postLoad(TranslationEngine&){ translationAxis.normalize(); }
-	YADE_CLASS_BASE_DOC_ATTRS(TranslationEngine,KinematicEngine,"This engine is the base class for different engines, which require any kind of motion.",
-		((Real,velocity,,,"Velocity [m/s]"))
-		((Vector3r,translationAxis,,Attr::triggerPostLoad,"Direction [Vector3]"))
+	YADE_CLASS_BASE_DOC_ATTRS(TranslationEngine,KinematicEngine,"Engine applying translation motion (by setting linear velocity) to subscribed bodies.",
+		((Real,velocity,,,"Scalar value of the imposed velocity [m/s]. Imposed vector velocity is :yref:`velocity<TranslationEngine.velocity>` * :yref:`axis<TranslationEngine.translationAxis>`"))
+		((Vector3r,translationAxis,,Attr::triggerPostLoad,"Direction of imposed translation [Vector3]"))
 	);
 };
 REGISTER_SERIALIZABLE(TranslationEngine);

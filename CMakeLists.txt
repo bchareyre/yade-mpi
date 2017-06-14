@@ -20,6 +20,7 @@
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
 #  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
+#  ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
@@ -43,6 +44,7 @@ INCLUDE(FindNumPy)
 INCLUDE(FindLoki)
 INCLUDE(FindPythonModule)
 INCLUDE(GNUInstallDirs)
+
 
 INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 
@@ -72,7 +74,7 @@ ELSE()
   ENDIF()
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11 ")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11")
 
 IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
@@ -95,6 +97,7 @@ MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
 MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
+ADD_DEFINITIONS(-DBOOST_MATH_DISABLE_FLOAT128=1)
 
 #===========================================================
 FIND_PACKAGE(NumPy REQUIRED)
@@ -132,6 +135,8 @@ OPTION(ENABLE_MASK_ARBITRARY "Enable arbitrary precision of bitmask variables (o
 OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)" OFF)
 OPTION(ENABLE_POTENTIAL_PARTICLES "Enable potential particles" OFF)
 OPTION(USE_QT5 "USE Qt5 for GUI" ON)
+OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" OFF)
+OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 
 #===========================================================
 # Use Eigen3 by default
@@ -169,7 +174,7 @@ ENDIF((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
      ((Boost_MINOR_VERSION EQUAL 53) OR (Boost_MINOR_VERSION GREATER 53)))
 #===========================================================
 IF(ENABLE_VTK)
-  FIND_PACKAGE(VTK COMPONENTS vtkCommonCore vtkIOImage vtkIOXML)
+  FIND_PACKAGE(VTK COMPONENTS vtkCommonCore vtkIOImage vtkIOXML vtkFiltersCore vtkImagingCore vtkRenderingCore vtkImagingGeneral vtkImagingHybrid)
   IF(VTK_FOUND)
     INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
     LINK_DIRECTORIES( ${VTK_LIBRARY_DIRS} )
@@ -337,6 +342,13 @@ ELSE(ENABLE_SPH)
   SET(DISABLED_FEATS "${DISABLED_FEATS} SPH")
 ENDIF(ENABLE_SPH)
 #===============================================
+IF(ENABLE_DEFORM)
+  ADD_DEFINITIONS("-DYADE_DEFORM")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} DEFORM")
+ELSE(ENABLE_DEFORM)
+  SET(DISABLED_FEATS "${DISABLED_FEATS} DEFORM")
+ENDIF(ENABLE_DEFORM)
+#===============================================
 IF(ENABLE_LIQMIGRATION)
   ADD_DEFINITIONS("-DYADE_LIQMIGRATION")
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} LIQMIGRATION")
@@ -413,6 +425,30 @@ ELSE(ENABLE_POTENTIAL_PARTICLES)
   SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialParticles")
 ENDIF(ENABLE_POTENTIAL_PARTICLES)
 #===========================================================
+
+
+#===========================================================
+IF(ENABLE_POTENTIAL_BLOCKS)  
+  INCLUDE(FindCLP)
+  FIND_PACKAGE(OpenBlas REQUIRED)
+  FIND_PACKAGE(LAPACK REQUIRED)
+  IF(CLP_FOUND AND OPENBLAS_FOUND AND LAPACK_FOUND) 
+    ADD_DEFINITIONS("-DYADE_POTENTIAL_BLOCKS")
+    INCLUDE_DIRECTORIES(${CLP_INCLUDE_DIR} ${CLP2_INCLUDE_DIR} )
+    SET(LINKLIBS  "${LINKLIBS};${CLP_LIBRARY};${CLP2_LIBRARY};${CLP3_LIBRARY};${OPENBLAS_LIBRARY};${LAPACK_LIBRARY}")
+    MESSAGE(STATUS "Found CLP")
+    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PotentialBlocks")
+  ELSE(CLP_FOUND AND OPENBLAS_FOUND AND LAPACK_FOUND) 
+    MESSAGE(STATUS "CLP NOT found")
+    SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialBlocks")
+    SET(ENABLE_POTENTIAL_BLOCKS OFF)
+  ENDIF(CLP_FOUND AND OPENBLAS_FOUND AND LAPACK_FOUND) 
+ELSE(ENABLE_POTENTIAL_BLOCKS)  
+  SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialBlocks")
+ENDIF(ENABLE_POTENTIAL_BLOCKS)  
+#===========================================================
+
+
 
 IF (INSTALL_PREFIX)
   SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
@@ -625,3 +661,5 @@ ADD_CUSTOM_COMMAND(
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
                   )
 #===========================================================
+
+

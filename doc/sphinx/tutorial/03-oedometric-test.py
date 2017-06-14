@@ -28,9 +28,9 @@ O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()]),
 	InteractionLoop(
 		# the loading plate is a wall, we need to handle sphere+sphere, sphere+facet, sphere+wall
-		[Ig2_Sphere_Sphere_L3Geom(),Ig2_Facet_Sphere_L3Geom(),Ig2_Wall_Sphere_L3Geom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_L3Geom_FrictPhys_ElPerfPl()]
+		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	NewtonIntegrator(gravity=(0,0,-9.81),damping=0.5),
 	# the label creates an automatic variable referring to this engine

@@ -83,7 +83,7 @@ REGISTER_SERIALIZABLE(Ip2_MortarMat_MortarMat_MortarPhys);
 
 class Law2_ScGeom_MortarPhys_Lourenco: public LawFunctor{
 	public:
-		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
+		virtual bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
 		FUNCTOR2D(GenericSpheresContact,MortarPhys);
 		YADE_CLASS_BASE_DOC(Law2_ScGeom_MortarPhys_Lourenco,LawFunctor,"Material law for mortar layer according to [Lourenco1994]_. The contact behaves elastic until brittle failure when reaching strength envelope. The envelope has three parts.\n\nTensile with condition $\\sigma_N-f_t$.\n\nShear part with Mohr-Coulomb condition $|\\sigma_T|+\\sigma_N\\tan\\varphi-c$.\n\nCompressive part with condition $\\sigma_N^2+A^2\\sigma_T^2-f_c^2$\n\nThe main idea is to begin simulation with this model and when the contact is broken, to use standard non-cohesive Law2_PolyhedraGeom_PolyhedraPhys_Volumetric."
 		);

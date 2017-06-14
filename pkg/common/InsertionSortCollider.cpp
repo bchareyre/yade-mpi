@@ -221,10 +221,15 @@ void InsertionSortCollider::action(){
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
 		assert((size_t)BB[0].size==2*scene->bodies->size());
+		
+		//Increase the size of force container.
+		scene->forces.addMaxId(2*scene->bodies->size());
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
-		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene);
+		if(periodic)  {
+			for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene);
+			invSizes=Vector3r(1./scene->cell->getSize()[0],1./scene->cell->getSize()[1],1./scene->cell->getSize()[2]);}
 
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();
@@ -373,13 +378,11 @@ void InsertionSortCollider::action(){
 				for(long i=0; i<2*nBodies; i++){
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
-					long cnt=0;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
 					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
 						const Body::id_t& jid=V[j].id;
 						if(!(V[j].flags.isMin && V[j].flags.hasBB)) continue;
 						handleBoundInversionPeri(iid,jid,interactions,scene);
-						if(cnt++>2*(long)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
 					}
 				}
 			}
@@ -401,11 +404,15 @@ Real InsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real 
 	return (xNorm-floor(xNorm))*(x1-x0);
 }
 
+//NOTE: possible improvements:
+// 1) (not only periodic) keep a mask defining overlaps in directions 1,2,3, and compare the sum instead of checking overlap in three directions everytime there is an inversion. (maybe not possible? does it need a N² table?!!)
+// 2) use norm() only when needed (first and last elements, mainly, can be treated as special cases)
 void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 	assert(periodic);
 	long &loIdx=v.loIdx; const long &size=v.size;
-	for(long _i=0; _i<size; _i++){
-		const long i=v.norm(_i);
+	/* We have to visit each bound at least once (first condition), but this is not enough. The correct ordering in the begining of the list needs a second pass to connect begin and end consistently (the second condition). Strictly the second condition should include "+ (v.norm(j+1)==loIdx ? v.cellDim : 0)" but it is ok as is since the shift is added inside the loop. */
+	for(long _i=0; (_i<size) || (v[v.norm(_i)].coord <  v[v.norm(_i-1)].coord); _i++){
+		const long i=v.norm(_i);//FIXME: useless, and many others can probably be removed
 		const long i_1=v.norm(i-1);
 		//switch period of (i) if the coord is below the lower edge cooridnate-wise and just above the split
 		if(i==loIdx && v[i].coord<0){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
@@ -419,43 +426,40 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 		// if will be placed in the list only at the end, to avoid extra copying
 		int j=i_1; Bounds vi=v[i];  const bool viHasBB=vi.flags.hasBB;
 		const bool isMin=v[i].flags.isMin; 
-		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
-			long j1=v.norm(j+1);
+
+		//For the first pass, the bounds are not travelling down past v[0] (j<_i above prevents that), otherwise we would not know which part of the list has been correctly sorted. Only after the first pass, we sort end vs. begining of the list.
+		while((j<_i) and v[j].coord>(vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0))){
+			int j1=v.norm(j+1);
 			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
 			// this can happen without any side-effects
 			if (false && v[j].coord>2*v.cellDim){
 				// this condition is not strictly necessary, but the loop of insertionSort would have to run more times.
 				// Since size of particle is required to be < .5*cellDim, this would mean simulation explosion anyway
 				LOG_FATAL("Body #"<<v[j].id<<" going faster than 1 cell in one step? Not handled.");
-				throw runtime_error(__FILE__ ": body mmoving too fast (skipped 1 cell).");
+				throw runtime_error(__FILE__ ": body moving too fast (skipped 1 cell).");
 			}
 			Bounds& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
 			vNew=v[j];
-			// inversions close the the split need special care
+			// inversions close to the split need special care
 			if(j==loIdx && vi.coord<0) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
-			if(isMin && !v[j].flags.isMin && (doCollide && viHasBB && v[j].flags.hasBB)){
-				// see https://bugs.launchpad.net/yade/+bug/669095 and similar problem in aperiodic insertionSort
-				#if 0
-				if(vi.id==vNew.id){
-					LOG_FATAL("Inversion of body's #"<<vi.id<<" boundary with its other boundary, "<<v[j].coord<<" meets "<<vi.coord);
-					throw runtime_error(__FILE__ ": Body's boundary metting its opposite boundary.");
-				}
-				#endif
+			if(isMin && !v[j].flags.isMin && (doCollide && viHasBB && v[j].flags.hasBB))
 				if((vi.id!=vNew.id)) handleBoundInversionPeri(vi.id,vNew.id,interactions,scene);
-			}
 			j=v.norm(j-1);
 		}
 		v[v.norm(j+1)]=vi;
 	}
+	//Keep coord's in [0,cellDim] by clamping the largest values
+	for(long i=v.norm(loIdx-1); v[i].coord > v.cellDim; i= v.norm(--i)) {v[i].period+=1; v[i].coord-=v.cellDim; loIdx=i;}
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
 void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t id2, InteractionContainer* interactions, Scene*){
 	assert(periodic);
-	Vector3i periods;
+	if (interactions->found(id1,id2)) return;// we want to _create_ new ones, we don't care about existing ones
+	Vector3i periods(Vector3i::Zero());
 	bool overlap=spatialOverlapPeri(id1,id2,scene,periods);
-	if (overlap && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get()) && !interactions->found(id1,id2)){
+	if (overlap && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get())){
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
 		newI->cellDist=periods;
 		interactions->insert(newI);
@@ -470,10 +474,6 @@ void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t 
 	periodicity information; both values could be passed down as a parameters, avoiding 1 of 3 loops here.
 	We do some floats math here, so the speedup could noticeable; doesn't concertn the non-periodic variant,
 	where it is only plain comparisons taking place.
-
-	In the same way, handleBoundInversion is passed only id1 and id2, but again insertionSort already knows in which sense
-	the inversion happens; if the boundaries get apart (min getting up over max), it wouldn't have to check for overlap
-	at all, for instance.
 */
 //! return true if bodies bb overlap in all 3 dimensions
 bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Scene* scene, Vector3i& periods) const {
@@ -484,31 +484,24 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		// LOG_DEBUG("dim["<<axis<<"]="<<dim);
 		// too big bodies
 		if (!allowBiggerThanPeriod){ assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);}
-		// find body of which minimum when taken as period start will make the gap smaller
-		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
-		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
-		int pmn1,pmx1,pmn2,pmx2;
-		Real mn1=cellWrap(m1,wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
-		Real mn2=cellWrap(m2,wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
-		if((pmn1!=pmx1) || (pmn2!=pmx2)){
-			if (allowBiggerThanPeriod) {
-				// If both bodies are bigger, we place them in the (0,0,0) period
-				if((pmn1!=pmx1) && (pmn2!=pmx2)) {periods[axis]=0;}
-				// else we define period with the position of the small body (we assume the big one sits in period (0,0,0), keep that in mind if velGrad(.,axis) is not a null vector)
-				else {
-					//FIXME: not sure what to do here...
-// 					periods[axis]=(pmn1==pmx1)? pmn1 : -pmn2;
-					periods[axis]=0;
-// 					return true;
-				}
-			} else {
-				Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
-				LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<", see flag allowBiggerThanPeriod)");
+
+		// define normalized positions relative to id1->max, and with +1 shift for id1->min so that body1's bounds cover an interval [shiftedMin; 1] at the end of a b1-centric period 
+		Real lmin = (minima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
+		Real lmax = (maxima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
+		Real shiftedMin = (minima[3*id1+axis]-maxima[3*id1+axis])*invSizes[axis]+1.;
+		if((lmax-lmin)>1 || shiftedMin<0){
+			if (allowBiggerThanPeriod) {periods[axis]=0; continue;}
+			else {
+				LOG_FATAL("Body #"<<((lmax-lmin)>1?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
 				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
-		}		
-		else {
-			periods[axis]=(int)(pmn1-pmn2);
-			if(!(mn1<=mx2 && mx1 >= mn2)) return false;}
+		}
+		int period1 = floor(lmax); 
+		//overlap around zero, on the "+" side
+		if ((lmin-period1) <= overlapTolerance) {periods[axis]=-period1; continue;}
+		 //overlap around 1, on the "-" side
+		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]=-period1-1; continue;}
+		// none of the above, exit
+		return false;
 	}
 	return true;
 }

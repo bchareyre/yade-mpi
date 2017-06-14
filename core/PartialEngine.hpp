@@ -14,8 +14,8 @@
 class PartialEngine: public Engine{
 	public:
 		virtual ~PartialEngine() {};
-	YADE_CLASS_BASE_DOC_ATTRS(PartialEngine,Engine,"Engine affecting only particular bodies in the simulation, defined by *ids*.",
-		((std::vector<int>,ids,,,":yref:`Ids<Body::id>` of bodies affected by this PartialEngine."))
+	YADE_CLASS_BASE_DOC_ATTRS(PartialEngine,Engine,"Engine affecting only particular bodies in the simulation, defined by :yref:`ids attribute<PartialEngine::ids>`.",
+		((std::vector<int>,ids,,,":yref:`Ids<Body::id>` list of bodies affected by this PartialEngine."))
 	);
 };
 REGISTER_SERIALIZABLE(PartialEngine);

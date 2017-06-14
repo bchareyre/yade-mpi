@@ -174,6 +174,78 @@ if not (noPredicate):
       inf=float('inf'); return Vector3(inf,inf,inf)
     def __call__(self,pt,pad): return True
 
+  class inHalfSpace(Predicate):
+    """Predicate returning True  any points, with infinite bounding box."""
+    def __init__(self, _center=Vector3().Zero, _dir=Vector3(1,0,0)):
+      self._center = Vector3(_center)
+      self._dir = Vector3(_dir)
+      assert self._dir.norm() > 0., "Direction has to be nonzero vector"
+      self._dir.normalize()
+      self._d = -self._dir.dot(self._center)
+    def aabb(self):
+      d,c = self._dir, self._center
+      inf=float('inf')
+      min = Vector3(-inf,-inf,-inf)
+      max = Vector3(+inf,+inf,+inf)
+      for i in xrange(3):
+        j = (i+1)%3
+        k = (i+2)%3
+        if d[i]==0 and d[j]==0:
+          if d[k] > 0: min[k] = c[k]
+          else: max[k] = c[k]
+      return min,max
+    def center(self):
+      return self._center
+    def dim(self):
+      inf=float('inf')
+      return Vector3(inf,inf,inf)
+    def __call__(self,pt,pad):
+      v = self._dir.dot(pt) + self._d
+      return v > pad
+
+  class inConvexPolyhedron(Predicate):
+    def __init__(self,planes):
+      self._inHalfSpaces = [inHalfSpace(c,d) for c,d in planes]
+      self._min, self._max = self._computeAabb()
+    def _computeAabb(self):
+      try:
+        import scipy.optimize
+      except ImportError:
+        raise ImportError, "scipy (package python-scipy) needed for pack.inConvexPolyhedron"
+      min,max = Vector3.Zero, Vector3.Zero
+      A,b = [],[]
+      for h in self._inHalfSpaces:
+        A.append(tuple(-h._dir))
+        b.append(h._d)
+      inf = float('inf')
+      for i in xrange(3):
+        c = Vector3.Zero
+        #
+        c[i] = 1
+        opt = scipy.optimize.linprog(c,A_ub=A,b_ub=b,bounds=(-inf,inf))
+        errmsg = "Something wrong in pack.inConvexPolyhedron defining planes.\nThe scipy.optimize.linprog output:\n{}\n"
+        if not opt.success:
+          raise ValueError, errmsg.format(opt)
+        min[i] = opt.x[i]
+        #
+        c[i] = -1
+        opt = scipy.optimize.linprog(c,A_ub=A,b_ub=b,bounds=(-inf,inf))
+        if not opt.success:
+          raise ValueError, errmsg.format(opt)
+        max[i] = opt.x[i]
+      return min,max
+    def aabb(self):
+      return Vector3(self._min), Vector3(self._max)
+    def center(self):
+      return .5*(self._min + self._max)
+    def dim(self):
+      return self._max - self._min
+    def __call__(self,pt,pad):
+      for p in self._inHalfSpaces:
+        if not p(pt,pad):
+          return False
+      return True
+
 #####
 ## surface construction and manipulation
 #####

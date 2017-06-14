@@ -13,6 +13,7 @@ namespace CGT {
 //Since template inheritance does not automatically give access to the members of the base class, this macro can be used to declare all members at once. 
 #define DECLARE_TESSELATION_TYPES(baseType)\
 		typedef typename baseType::RTriangulation		 	RTriangulation;\
+		typedef typename baseType::AlphaShape		 		AlphaShape;\
 		typedef typename baseType::VertexInfo				VertexInfo;\
 		typedef typename baseType::CellInfo				CellInfo;\
 		typedef typename baseType::VertexIterator			VertexIterator;\
@@ -43,6 +44,7 @@ class _Tesselation
 {
 public:
 	typedef typename TT::RTriangulation							RTriangulation;
+	typedef typename TT::AlphaShape						 		AlphaShape;
 	typedef typename TT::Vertex_Info							VertexInfo;
 	typedef typename TT::Cell_Info								CellInfo;
 	typedef typename RTriangulation::Vertex_iterator		 			VertexIterator;

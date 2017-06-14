@@ -19,13 +19,13 @@ all the newly added features.
 To install the daily-version you need to add the repository to your
 /etc/apt/sources.list, add the PGP-key AA915EEB as trusted and install ``yadedaily``::
 
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ trusty/" >> /etc/apt/sources.list'
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial/" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
 	sudo apt-get update
 	sudo apt-get install yadedaily
 
 If you have another distribution, not Ubuntu Trusty (Version 14.04 LTS), be sure to use the
-correct name in the first line (for instance, trusty, jessie or wheezy). For the list
+correct name in the first line (for instance, xenial, stretch or jessie). For the list
 of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
 After that you can normally start Yade using the command ``yadedaily`` or ``yadedaily-batch``.
@@ -33,7 +33,7 @@ After that you can normally start Yade using the command ``yadedaily`` or ``yade
 versions, shipped with particular distribution. 
 
 The Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
-Each branch corresponds to one distribution, e.g., trusty, jessie etc.
+Each branch corresponds to one distribution, e.g., xenial, stretch etc.
 The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`__. 
 It uses "pbuilder" to build packages, so all packages are built in a clean environment.
 
@@ -144,7 +144,7 @@ need root privileges.
 		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
 		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
-		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse \
+		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
 		
@@ -253,7 +253,7 @@ The compilation process can take a considerable amount of time, be patient.
 If you are using a multi-core systems you can use the parameter ``-j`` to speed-up the compilation
 and split the compilation onto many cores. For example, on 4-core machines
 it would be reasonable to set the parameter ``-j4``. Note, Yade requires
-approximately 2GB RAM per core for compilation, otherwise the swap-file will be used
+approximately 3GB RAM per core for compilation, otherwise the swap-file will be used
 and compilation time dramatically increases.
 
 The installation is performed with the following command::
@@ -288,6 +288,25 @@ upon detecting the C and C++ compiler to use::
 Clang does not support OpenMP-parallelizing for the moment, that is why the 
 feature will be disabled.
 
+Speed-up compilation
+^^^^^^^^^^^^^^^^^^^^^
+
+When spliting the compilation on many cores (``make -jN``), ``N`` is limited by the available cores and memory. It is possible to use more cores if remote computers are available, ditributing the compilation with `ditscc <https://wiki.archlinux.org/index.php/Distcc>`_  (see distcc documentation for configuring slaves and master)::
+
+	export CC=distcc gcc
+	export CXX=distcc g++
+	cmake [options as usual]
+	make -jN
+
+In addition, and independently of distcc, caching previous compilations with `ccache <https://ccache.samba.org/>`_ can speed up re-compilation::
+
+	export CC=ccache gcc
+	export CXX=ccache g++
+	cmake [options as usual]
+	
+The two tools can be combined very simply, adding to the above exports::
+
+	export CCACHE_PREFIX="distcc"
 
 Yubuntu
 ------------
@@ -296,3 +315,8 @@ If you are not running Ubuntu nor Debian, there is a way to create a Yubuntu `li
 
 More informations about this alternative are available `here <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_ (see the README file first).
 
+
+Cloud Computing
+----------------
+
+It is possible to exploit cloud computing services to run Yade. The combo Yade/Amazon Web Service has been found to work well, namely. Detailed instructions for migrating to amazon can be found in the section :ref:`CloudComputing`.

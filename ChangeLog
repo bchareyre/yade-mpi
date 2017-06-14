@@ -1,4 +1,112 @@
 ==================================================
+yade-2017.01a
+Thu, Jan 19 22:07:25 2017 +0100
+Anton Gladky (20):
+      Remove RELEASE file.
+      Add some notes about how to make releases.
+      Make Yade compatible with VTK7.
+      Use C++11 constructions for InteractionLoop.
+      Optimize using of ndarray.
+      Partly fix webpage help show. LP:1598174
+      Final fix for LP:1598174
+      Add missing dependency on python-pyqt5.qtwebkit.
+      Fix load/save in GUI-QT5.
+      Drop unused typedef.
+      Disable LAW2_SCGEOM_CAPILLARYPHYS_Capillarity1 by default.
+      Remove some deprecated scripts.
+      Increase the size of force container.
+      +1 paper.
+      Provide a proper functioning with IPython5.
+      Add -fext-numeric-literals to fix FTBFS against boost_1.62
+      Fix yade with IPython5.
+      Update distro names in documentation
+      Add missing header include <csignal>
+      Add RELEASE file.
+
+Bruno Chareyre (12):
+      +2 articles (thanks to Bettina Suhr)
+      + 1 proceedings (thanks to Bettina Suhr)
+      Update citing_yade.bib
+      revert the revert ca0e29ac57
+      list authors of the doc as in doi:10.5281/zenodo.34073
+      a note on using distcc and ccache
+      minor editing of installation page
+      Master thesis Morales2012a
+      Introduce Network::surfaceSolidThroatInPore() for partial solid surfaces per half-throat
+      make the recursion conditional for invasion in multiphase flow
+      push a file missing in commit e91ff135b7
+      Yade bibtex: "and others" invalid for less than 9 authors
+
+Chao Yuan (4):
+      Add cell label for phase cluster. NW-res label 0, W-res label 1, disconnected w-clusters start from 2. label can be saved in savePhaseVtk.
+      fix comment on label.
+      clean UnsaturatedEngine, move all functions to TwoPhaseFlowEngine.
+      Revert DryingEngine.
+
+Francois Kneib (1):
+      Fix O.engines in examples/cylinders/cylinderconnection-roots.py
+
+Jan Stránský (11):
+      fixed a small bug in shear force computation in CPM model
+      Added PolyhedraSplitter example
+      Changed L3Geom to ScGeom in tutorial example scripts
+      fixed a minor compilation issue in ConcretePM
+      Fixed call of _utils.interactionAnglesHistogram with default arduments
+      making all Law2::go virtual
+      Matrix_computeUnitaryPositive, changed computeThinX to computeFullX flags
+      User's manual, added how to visualize force chain in Paraview
+      UnstructuredGrid: fiexd little bug in manual setting of facet position from vertices
+      added pack.inHalfSpace and pack.inConvexPolygon + example script
+      fixed another little bug in utils.UnstructuredGrid
+
+Jerome Duriez (11):
+      Doc clarification for TriaxialStressController.externalWork (http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg12083.html)
+      Doc of utils.readParamsFromTable() hopefully improved
+      Friendlier BibTex entries for 2015 doc. To avoid Smilauer and et al in manuscripts
+      Doc Getting help section updated to reflect current practice
+      Including interface orientation data in CapillaryPhys code
+      Capillary scripts commit (http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg12103.html). Located in a new examples/capillaryLaplaceYoung folder intended to illustrates capillary Law2. With one new simulation script example and another old one, moved here
+      Typo and minor corrections of previous capillary commit
+      Capillary law2: erasing when necessary sphere-non sphere interactions (bug LP: #1628273) + minor changes
+      Capillary law2: restricting test shape. Plus minor change in capillaryLaplaceYoung/README text file
+      Doc: small updates in PartialEngine and KinematicEngines
+      References .bib files: including new entries
+
+Raphael Maurin (4):
+      HydroForceEngine: add a condition to ignore particles fixed on the sideWalls.
+      Add an example for the use of HydroForceEngine
+      HydroForceEngine: new fluctuation model for the example script + small correction Add new simple discrete random walk fluctuation model, to be used with the new example script fluidizedBed.py Change the condition for applying the fluid force from p>0 to p>=0, which is more appropriate
+      Add two example scripts for the use of HydroForceEngine One simple example to get familiar with the application of buoyancy (buoyantParticles.py). One example simulating a fluidized bed configuration to get familiar with both the application of a fluid velocity profile and of turbulent fluctuation with the DRW models (fluidizedBed.py)
+
+bchareyre (19):
+      fix invalid pointer, thanks Jerome (https://lists.launchpad.net/yade-dev/msg12791.html)
+      (doc) clarify the meaning of TriaxialStressController::externalWork
+      fix 1 compile warning
+      reordering bib references
+      remove latex/multicolumn from sphinx conf.py (compile error on some systems)
+      Law2_ScGeom_CapillaryPhys_Capillarity: cache getClassIndex() for use in a loop
+      fix wrong access to a Network::boundary by index
+      FlowEngine: enable the definition of continuum scale permeability independent of particle sizes
+      Introduce DryingEngine (two phase flow with convection in one phase)
+      Implement Darcy scale permeability in FlowEngine, introduce alphaShapes (commented), some code cleaning and smallfixes
+      (FlowEngine) optionaly include/skip bounding cells when calculating the average pore pressure
+      fix negative volumes issue in triangulation cells, consistentlyy remove the includeBoundary option (a workaround) in averageVelocity
+      TwoPhaseFlowEngine: better integration of fluid clusters
+      merging PhaseCluster code with r3975
+      fix compile warnings
+      small optimization in Clump::updateProperties
+      update phaseCluster attributes: volume, interfacial area, etc. + various smallfixes in the cluster labelling
+      further improvement of the cluster labeling in multiphase model
+      2PFLOW engine: remove useless int from getInterfaces()'s parameters
+
+booncw (2):
+      Pushing Potential Blocks based on CWBoonEtAl2012 Computers&Geotechnics/CWBoon 2013 PhD thesis, but using CLP as linear programming Solver.  CLP can be downloaded from Synaptic Package Manager: coinor-clp, coinor-libclp-dev, coinor-libclp1, coinor-libosi1v5.  To enable this, set ENABLE_POTENTIAL_BLOCKS to ON in CMakeLists.txt"
+      revising Potential Blocks to the latest version to run slope analysis
+
+raphm1 (1):
+      ViscoelasticPM : fix resolution problem in find_cn_from_en function Change the value of the initial perturbation for the resolution of the equation to obtain the damping from the restitution coefficient. Allows for a much wider range of resolution in terms of mass, stiffness and restitution coefficient. Put a limiter to avoid division by zero and force the loop to print the warning message if "error" goes to nan (no warning in these cases previously)
+
+==================================================
 yade-2016.06a
 Tue, Jun 14 20:30:53 2016 +0200
 

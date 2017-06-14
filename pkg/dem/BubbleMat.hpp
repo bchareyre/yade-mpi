@@ -74,7 +74,7 @@ class Law2_ScGeom_BubblePhys_Bubble : public LawFunctor{
 	  Real c1; //Coeff used for many contacts
   
 	public:
-	bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* interaction);
+	virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* interaction);
 	FUNCTOR2D(GenericSpheresContact,BubblePhys);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_BubblePhys_Bubble,LawFunctor,"Constitutive law for Bubble model.",
 		((Real,pctMaxForce,0.1,,"Chan[2011] states the contact law is valid only for small interferences; therefore an exponential force-displacement curve models the contact stiffness outside that regime (large penetration). This artificial stiffening ensures that bubbles will not pass through eachother or completely overlap during the simulation. The maximum force is Fmax = (2*pi*surfaceTension*rAvg). pctMaxForce is the percentage of the maximum force dictates the separation threshold, Dmax, for each contact. Penetrations less than Dmax calculate the reaction force from the derived contact law, while penetrations equal to or greater than Dmax calculate the reaction force from the artificial exponential curve."))

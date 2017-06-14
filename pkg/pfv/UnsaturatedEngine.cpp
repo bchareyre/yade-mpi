@@ -13,39 +13,16 @@
 //when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
 #ifdef TWOPHASEFLOW
 
+
+
+
 class UnsaturatedEngine : public TwoPhaseFlowEngine
 {
-		double totalCellVolume;
-	protected:
-// 		void initialization();		
-
 	public :
+		double totalCellVolume;
 		double computeCellInterfacialArea(CellHandle cell, int j, double rC);
 
 // 		void computeSolidLine();
-		void computeFacetPoreForcesWithCache(bool onlyCache=false);	
-		void computeCapillaryForce() {computeFacetPoreForcesWithCache(false);}
-		
-		
-		void invasion();
-		///functions can be shared by two modes
-		void invasionSingleCell(CellHandle cell);
-		void updatePressure();
-		double getMinDrainagePc();
-		double getMaxImbibitionPc();
-		double getSaturation(bool isSideBoundaryIncluded=false);
-		double getSpecificInterfacialArea();
-
-		void invasion1();
-		void updateReservoirs1();
-		void WResRecursion(CellHandle cell);
-		void NWResRecursion(CellHandle cell);
-		void checkTrap(double pressure);
-
-		void invasion2();
-		void updateReservoirs2();
-
-		void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
 
 		//record and test functions
 		void checkLatticeNodeY(double y);
@@ -57,40 +34,17 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		double getSphericalSubdomainSaturation(Vector3r pos, double radius);
 		double getCuboidSubdomainSaturation(Vector3r pos1, Vector3r pos2, bool isSideBoundaryIncluded);
 		double getCuboidSubdomainPorosity(Vector3r pos1, Vector3r pos2, bool isSideBoundaryIncluded);
+		double getSpecificInterfacialArea();
 
 		void printSomething();
-		boost::python::list getPotentialPendularSpheresPair() {
-			RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-			boost::python::list bridgeIds;
-			FiniteEdgesIterator ed_it = Tri.finite_edges_begin();
-			for ( ; ed_it!=Tri.finite_edges_end(); ed_it++ ) {
-			  if (detectBridge(ed_it)==true) {
-			    const VertexInfo& vi1=(ed_it->first)->vertex(ed_it->second)->info();
-			    const VertexInfo& vi2=(ed_it->first)->vertex(ed_it->third)->info();
-			    const int& id1 = vi1.id();
-			    const int& id2 = vi2.id();
-			    bridgeIds.append(boost::python::make_tuple(id1,id2));}}
-			    return bridgeIds;}
-  		bool detectBridge(RTriangulation::Finite_edges_iterator& edge);
-				
 		virtual ~UnsaturatedEngine();
-
 		virtual void action();
 		
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,TwoPhaseFlowEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.",
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,TwoPhaseFlowEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.(deprecated engine, use TwoPhaseFlowEngine instead)",
 
-		((bool, computeForceActivated, true,,"Activate capillary force computation. WARNING: turning off means capillary force is not computed at all, but the drainage can still work."))
 		((int, windowsNo, 10,, "Number of genrated windows(or zoomed samples)."))
-		((bool, isDrainageActivated, true,, "Activates drainage."))
-		((bool, isImbibitionActivated, false,, "Activates imbibition."))
 					,,,
-		.def("saveVtk",&UnsaturatedEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
-		.def("getMinDrainagePc",&UnsaturatedEngine::getMinDrainagePc,"Get the minimum entry capillary pressure for the next drainage step.")
-		.def("getMaxImbibitionPc",&UnsaturatedEngine::getMaxImbibitionPc,"Get the maximum entry capillary pressure for the next imbibition step.")
-		.def("getSaturation",&UnsaturatedEngine::getSaturation,(boost::python::arg("isSideBoundaryIncluded")),"Get saturation of entire packing. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
 		.def("getSpecificInterfacialArea",&UnsaturatedEngine::getSpecificInterfacialArea,"get specific interfacial area (defined as the amount of fluid-fluid interfacial area per unit volume pf the porous medium).")
-		.def("invasion",&UnsaturatedEngine::invasion,"Run the drainage invasion.")
-		.def("computeCapillaryForce",&UnsaturatedEngine::computeCapillaryForce,"Compute capillary force. ")
 		.def("checkLatticeNodeY",&UnsaturatedEngine::checkLatticeNodeY,(boost::python::arg("y")),"Check the slice of lattice nodes for yNormal(y). 0: out of sphere; 1: inside of sphere.")
 		.def("getInvadeDepth",&UnsaturatedEngine::getInvadeDepth,"Get NW-phase invasion depth. (the distance from NW-reservoir to front of NW-W interface.)")
 		.def("getSphericalSubdomainSaturation",&UnsaturatedEngine::getSphericalSubdomainSaturation,(boost::python::arg("pos"),boost::python::arg("radius")),"Get saturation of spherical subdomain defined by (pos, radius). The subdomain exclude boundary pores.")
@@ -100,7 +54,6 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		.def("getWindowsSaturation",&UnsaturatedEngine::getWindowsSaturation,(boost::python::arg("windowsID"),boost::python::arg("isSideBoundaryIncluded")), "get saturation of subdomain with windowsID. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
 		.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temporary function for comparison with experiments, will delete soon")
 		.def("printSomething",&UnsaturatedEngine::printSomething,"print debug.")
-		.def("getPotentialPendularSpheresPair",&UnsaturatedEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
 		)
 		DECLARE_LOGGER;
 };
@@ -161,307 +114,9 @@ void UnsaturatedEngine::action()
         scene->forces.addForce ( V_it->info().id(), force); }}
 */}
 
-void UnsaturatedEngine::updatePressure()
-{
-    boundaryConditions(*solver);
-    solver->pressureChanged=true;
-    solver->reApplyBoundaryConditions();
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if (cell->info().isWRes==true) {cell->info().p()=bndCondValue[2];}
-      if (cell->info().isNWRes==true) {cell->info().p()=bndCondValue[3];}
-      if (isPhaseTrapped) {
-	if ( cell->info().isTrapW ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
-	if ( cell->info().isTrapNW) {cell->info().p()=bndCondValue[2]+cell->info().trapCapP;}
-	//check cell reservoir info.
-	if ( !cell->info().isWRes && !cell->info().isNWRes && !cell->info().isTrapW && !cell->info().isTrapNW ) {cerr<<"ERROR! NOT FIND Cell Info!";}
-// 	{cell->info().p()=bndCondValue[2]; if (isInvadeBoundary) cerr<<"Something wrong in updatePressure.(isInvadeBoundary)";}
-      }
-    } 
-}
 
-void UnsaturatedEngine::invasion()
-{
-    if (isPhaseTrapped) invasion1();
-    else invasion2();
-}
 
-///mode1 and mode2 can share the same invasionSingleCell(), invasionSingleCell() ONLY change neighbor pressure and neighbor saturation, independent of reservoirInfo.
-void UnsaturatedEngine::invasionSingleCell(CellHandle cell)
-{
-    double localPressure=cell->info().p();
-    double localSaturation=cell->info().saturation;
-    for (int facet = 0; facet < 4; facet ++) {
-        CellHandle nCell = cell->neighbor(facet);
-        if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
-        if (nCell->info().Pcondition) continue;//FIXME:defensive
-//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-	if (cell->info().poreThroatRadius[facet]<0) continue;
 
-	if ( (nCell->info().saturation==localSaturation) && (nCell->info().p() != localPressure) && ((nCell->info().isTrapNW)||(nCell->info().isTrapW)) ) {
-	  nCell->info().p() = localPressure;
-	  if(solver->debugOut) {cerr<<"merge trapped phase"<<endl;}
-	  invasionSingleCell(nCell);} ///here we merge trapped phase back to reservoir 
-	else if ( (nCell->info().saturation>localSaturation) ) {
-	  double nPcThroat=surfaceTension/cell->info().poreThroatRadius[facet];
-	  double nPcBody=surfaceTension/nCell->info().poreBodyRadius;
-	  if( (localPressure-nCell->info().p()>nPcThroat) && (localPressure-nCell->info().p()>nPcBody) ) {
-	    nCell->info().p() = localPressure;
-	    nCell->info().saturation=localSaturation;
-	    nCell->info().hasInterface=false;
-	    if(solver->debugOut) {cerr<<"drainage"<<endl;}
-	    invasionSingleCell(nCell);
-	  }
-////FIXME:Introduce cell.hasInterface	  
-// 	  else if( (localPressure-nCell->info().p()>nPcThroat) && (localPressure-nCell->info().p()<nPcBody) && (cell->info().hasInterface==false) && (nCell->info().hasInterface==false) ) {
-// 	    if(solver->debugOut) {cerr<<"invasion paused into pore interface "<<endl;}
-// 	    nCell->info().hasInterface=true;
-// 	  }
-// 	  else continue;
-	}
-	else if ( (nCell->info().saturation<localSaturation) ) {
-	  double nPcThroat=surfaceTension/cell->info().poreThroatRadius[facet];
-	  double nPcBody=surfaceTension/nCell->info().poreBodyRadius;
-	  if( (nCell->info().p()-localPressure<nPcBody) && (nCell->info().p()-localPressure<nPcThroat) ) {
-	    nCell->info().p() = localPressure;
-	    nCell->info().saturation=localSaturation;
-	    if(solver->debugOut) {cerr<<"imbibition"<<endl;}
-	    invasionSingleCell(nCell);
-	  }
-//// FIXME:Introduce cell.hasInterface	  
-// 	  else if ( (nCell->info().p()-localPressure<nPcBody) && (nCell->info().p()-localPressure>nPcThroat) /*&& (cell->info().hasInterface==false) && (nCell->info().hasInterface==false)*/ ) {
-// 	    nCell->info().p() = localPressure;
-// 	    nCell->info().saturation=localSaturation;
-// 	    if(solver->debugOut) {cerr<<"imbibition paused pore interface"<<endl;}
-// 	    nCell->info().hasInterface=true;
-// 	  }
-// 	  else continue;
-	}
-	else continue;
-    }
-}
-///invasion mode 1: withTrap
-void UnsaturatedEngine::invasion1()
-{
-    if(solver->debugOut) {cout<<"----start invasion1----"<<endl;}
-
-    ///update Pw, Pn according to reservoirInfo.
-    updatePressure();
-    if(solver->debugOut) {cout<<"----invasion1.updatePressure----"<<endl;}
-    
-    ///invasionSingleCell by Pressure difference, change Pressure and Saturation.
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    if(isDrainageActivated) {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if(cell->info().isNWRes)
-                invasionSingleCell(cell);
-        }
-    }
-    if(isImbibitionActivated) {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if(cell->info().isWRes)
-                invasionSingleCell(cell);
-        }
-    }
-    if(solver->debugOut) {cout<<"----invasion1.invasionSingleCell----"<<endl;}
-
-    ///update W, NW reservoirInfo according to cell->info().saturation
-    updateReservoirs1();
-    if(solver->debugOut) {cout<<"----invasion1.update W, NW reservoirInfo----"<<endl;}
-    
-    ///search new trapped W-phase/NW-phase, assign trapCapP, isTrapW/isTrapNW flag for new trapped phases. But at this moment, the new trapped W/NW cells.P= W/NW-Res.P. They will be updated in next updatePressure() func.
-    checkTrap(bndCondValue[3]-bndCondValue[2]);
-    if(solver->debugOut) {cout<<"----invasion1.checkWTrap----"<<endl;}
-
-    ///update trapped W-phase/NW-phase Pressure //FIXME: is this necessary?
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
- 	if ( cell->info().isTrapW ) {cell->info().p()=bndCondValue[3]-cell->info().trapCapP;}
-	if ( cell->info().isTrapNW) {cell->info().p()=bndCondValue[2]+cell->info().trapCapP;}
-   }
-    if(solver->debugOut) {cout<<"----invasion1.update trapped W-phase/NW-phase Pressure----"<<endl;}
-}
-
-///search trapped W-phase or NW-phase, define trapCapP=Pn-Pw. assign isTrapW/isTrapNW info.
-void UnsaturatedEngine::checkTrap(double pressure)
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-//       if( (cell->info().isFictious) && (!cell->info().Pcondition) && (!isInvadeBoundary) ) continue;
-      if( (cell->info().isWRes) || (cell->info().isNWRes) || (cell->info().isTrapW) || (cell->info().isTrapNW) ) continue;
-      cell->info().trapCapP=pressure;
-      if(cell->info().saturation==1.0) cell->info().isTrapW=true;
-      if(cell->info().saturation==0.0) cell->info().isTrapNW=true;
-    }
-}
-
-void UnsaturatedEngine::updateReservoirs1()
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-      if(cell->info().Pcondition) continue;
-        cell->info().isWRes = false;
-        cell->info().isNWRes = false;
-    }
-    
-    for (FlowSolver::VCellIterator it = solver->boundingCells[2].begin(); it != solver->boundingCells[2].end(); it++) {
-        if ((*it)==NULL) continue;
-        WResRecursion(*it);
-    }
-    
-    for (FlowSolver::VCellIterator it = solver->boundingCells[3].begin(); it != solver->boundingCells[3].end(); it++) {
-        if ((*it)==NULL) continue;
-        NWResRecursion(*it);
-    }
-}
-
-void UnsaturatedEngine::WResRecursion(CellHandle cell)
-{
-    for (int facet = 0; facet < 4; facet ++) {
-        CellHandle nCell = cell->neighbor(facet);
-        if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
-        if (nCell->info().Pcondition) continue;
-//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-        if (nCell->info().saturation != 1.0) continue;
-        if (nCell->info().isWRes==true) continue;
-        nCell->info().isWRes = true;
-        nCell->info().isNWRes = false;
-        nCell->info().isTrapW = false;
-	nCell->info().trapCapP=0.0;	
-        WResRecursion(nCell);
-    }
-}
-
-void UnsaturatedEngine::NWResRecursion(CellHandle cell)
-{
-    for (int facet = 0; facet < 4; facet ++) {
-        CellHandle nCell = cell->neighbor(facet);
-        if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
-        if (nCell->info().Pcondition) continue;
-//         if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-        if (nCell->info().saturation != 0.0) continue;
-        if (nCell->info().isNWRes==true) continue;
-        nCell->info().isNWRes = true;
-        nCell->info().isWRes = false;
-        nCell->info().isTrapNW = false;
-	nCell->info().trapCapP=0.0;	
-        NWResRecursion(nCell);
-    }
-}
-
-///invasion mode 2: withoutTrap
-void UnsaturatedEngine::invasion2()
-{
-    if(solver->debugOut) {cout<<"----start invasion2----"<<endl;}
-
-    ///update Pw, Pn according to reservoirInfo.
-    updatePressure();
-    if(solver->debugOut) {cout<<"----invasion2.updatePressure----"<<endl;}
-    
-    ///drainageSingleCell by Pressure difference, change Pressure and Saturation.
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    if(isDrainageActivated) {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if(cell->info().isNWRes)
-                invasionSingleCell(cell);
-        }
-    }
-    ///drainageSingleCell by Pressure difference, change Pressure and Saturation.
-    if(isImbibitionActivated) {
-        for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-            if(cell->info().isWRes)
-                invasionSingleCell(cell);
-        }
-    }
-
-    if(solver->debugOut) {cout<<"----invasion2.invasionSingleCell----"<<endl;}
-    
-    ///update W, NW reservoirInfo according to Pressure
-    updateReservoirs2();
-    if(solver->debugOut) {cout<<"----drainage2.update W, NW reservoirInfo----"<<endl;}    
-    
-}
-
-void UnsaturatedEngine::updateReservoirs2()
-{
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        if (cell->info().p()==bndCondValue[2]) {cell->info().isWRes=true; cell->info().isNWRes=false;}
-        else if (cell->info().p()==bndCondValue[3]) {cell->info().isNWRes=true; cell->info().isWRes=false;}
-        else {cerr<<"drainage mode2: updateReservoir Error!"<<endl;}
-    }
-}
-
-double UnsaturatedEngine::getMinDrainagePc()
-{
-    double nextEntry = 1e50;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        if (cell->info().isNWRes == true) {
-            for (int facet=0; facet<4; facet ++) {
-	      CellHandle nCell = cell->neighbor(facet);
-	      if (tri.is_infinite(nCell)) continue;
-                if (nCell->info().Pcondition) continue;
-//                 if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-                if ( nCell->info().isWRes == true && cell->info().poreThroatRadius[facet]>0) {
-                    double nCellP = std::max( (surfaceTension/cell->info().poreThroatRadius[facet]),(surfaceTension/nCell->info().poreBodyRadius) );
-//                     double nCellP = surfaceTension/cell->info().poreThroatRadius[facet];
-                    nextEntry = std::min(nextEntry,nCellP);}}}}
-                    
-    if (nextEntry==1e50) {
-        cout << "End drainage !" << endl;
-        return nextEntry=0;
-    }
-    else return nextEntry;
-}
-
-double UnsaturatedEngine::getMaxImbibitionPc()
-{
-    double nextEntry = -1e50;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        if (cell->info().isWRes == true) {
-            for (int facet=0; facet<4; facet ++) {
- 	      CellHandle nCell = cell->neighbor(facet);
-               if (tri.is_infinite(nCell)) continue;
-                if (nCell->info().Pcondition) continue;
-//                 if ( (nCell->info().isFictious) && (!isInvadeBoundary) ) continue;
-                if ( nCell->info().isNWRes == true && cell->info().poreThroatRadius[facet]>0) {
-                    double nCellP = std::min( (surfaceTension/nCell->info().poreBodyRadius), (surfaceTension/cell->info().poreThroatRadius[facet]));
-                    nextEntry = std::max(nextEntry,nCellP);}}}}
-                    
-    if (nextEntry==-1e50) {
-        cout << "End imbibition !" << endl;
-        return nextEntry=0;
-    }
-    else return nextEntry;
-}
-
-double UnsaturatedEngine::getSaturation(bool isSideBoundaryIncluded)
-{
-    if( (!isInvadeBoundary) && (isSideBoundaryIncluded)) cerr<<"In isInvadeBoundary=false drainage, isSideBoundaryIncluded can't set true."<<endl;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    double poresVolume = 0.0; //total pores volume
-    double wVolume = 0.0; 	//NW-phase volume
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();
-
-    for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
-        if (cell->info().Pcondition) continue;
-        if ( (cell->info().isFictious) && (!isSideBoundaryIncluded) ) continue;
-        poresVolume = poresVolume + cell->info().poreBodyVolume;
-        if (cell->info().saturation>0.0) {
-            wVolume = wVolume + cell->info().poreBodyVolume * cell->info().saturation;
-        }
-    }
-    return wVolume/poresVolume;
-}
 
 double UnsaturatedEngine::getSpecificInterfacialArea()
 {
@@ -585,20 +240,6 @@ void UnsaturatedEngine::printSomething()
       cerr<<id1<<" "<<id2<<endl;}
 }
 
-bool UnsaturatedEngine::detectBridge(RTriangulation::Finite_edges_iterator& edge)
-{
-	bool dryBridgeExist=true;
-	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-	RTriangulation::Cell_circulator cell1 = Tri.incident_cells(*edge);
-	RTriangulation::Cell_circulator cell0 = cell1++;
-	if(cell0->info().saturation==1) {dryBridgeExist=false; return dryBridgeExist;}
-	else {
-	while (cell1!=cell0) {
-	  if(cell1->info().saturation==1) {dryBridgeExist=false;break;}
-	  else cell1++;}
-	  return dryBridgeExist;
-	}
-}
 
 //----------temporary functions for comparison with experiment-----------------------
 void UnsaturatedEngine::initializeCellWindowsID()
@@ -712,100 +353,6 @@ double UnsaturatedEngine::getSphericalSubdomainSaturation(Vector3r pos, double r
 }
 
 //--------------end of comparison with experiment----------------------------
-
-///compute forces
-void UnsaturatedEngine::computeFacetPoreForcesWithCache(bool onlyCache)
-{
-    RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-    CVector nullVect(0,0,0);
-    //reset forces
-    if (!onlyCache) for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) v->info().forces=nullVect;
-// 	#ifdef parallel_forces
-// 	if (solver->noCache) {
-// 		solver->perVertexUnitForce.clear(); solver->perVertexPressure.clear();
-// 		solver->perVertexUnitForce.resize(solver->T[solver->currentTes].maxId+1);
-// 		solver->perVertexPressure.resize(solver->T[solver->currentTes].maxId+1);}
-// 	#endif
-// 	CellHandle neighbourCell;
-// 	VertexHandle mirrorVertex;
-    CVector tempVect;
-    //FIXME : Ema, be carefull with this (noCache), it needs to be turned true after retriangulation
-    if (solver->noCache) {//WARNING:all currentTes must be solver->T[solver->currentTes], should NOT be solver->T[currentTes]
-        for (FlowSolver::VCellIterator cellIt=solver->T[solver->currentTes].cellHandles.begin(); cellIt!=solver->T[solver->currentTes].cellHandles.end(); cellIt++) {
-            CellHandle& cell = *cellIt;
-            //reset cache
-            for (int k=0; k<4; k++) cell->info().unitForceVectors[k]=nullVect;
-
-            for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j))) {
-                    const CVector& Surfk = cell->info().facetSurfaces[j];
-                    //FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
-                    //The ratio void surface / facet surface
-                    Real area = sqrt(Surfk.squared_length());
-                    if (area<=0) cerr <<"AREA <= 0!! AREA="<<area<<endl;
-                    CVector facetNormal = Surfk/area;
-                    const std::vector<CVector>& crossSections = cell->info().facetSphereCrossSections;
-                    CVector fluidSurfk = cell->info().facetSurfaces[j]*cell->info().facetFluidSurfacesRatio[j];
-                    /// handle fictious vertex since we can get the projected surface easily here
-                    if (cell->vertex(j)->info().isFictious) {
-                        Real projSurf=std::abs(Surfk[solver->boundary(cell->vertex(j)->info().id()).coordinate]);
-                        tempVect=-projSurf*solver->boundary(cell->vertex(j)->info().id()).normal;
-                        cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
-                        //define the cached value for later use with cache*p
-                        cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
-                    }
-                    /// Apply weighted forces f_k=sqRad_k/sumSqRad*f
-                    CVector facetUnitForce = -fluidSurfk*cell->info().solidLine[j][3];
-                    CVector facetForce = cell->info().p()*facetUnitForce;
-
-                    for (int y=0; y<3; y++) {
-                        cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + facetForce*cell->info().solidLine[j][y];
-                        //add to cached value
-                        cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]+facetUnitForce*cell->info().solidLine[j][y];
-                        //uncomment to get total force / comment to get only pore tension forces
-                        if (!cell->vertex(facetVertices[j][y])->info().isFictious) {
-                            cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces -facetNormal*cell->info().p()*crossSections[j][y];
-                            //add to cached value
-                            cell->info().unitForceVectors[facetVertices[j][y]]=cell->info().unitForceVectors[facetVertices[j][y]]-facetNormal*crossSections[j][y];
-                        }
-                    }
-// 	#ifdef parallel_forces
-// 	solver->perVertexUnitForce[cell->vertex(j)->info().id()].push_back(&(cell->info().unitForceVectors[j]));
-// 	solver->perVertexPressure[cell->vertex(j)->info().id()].push_back(&(cell->info().p()));
-// 	#endif
-                }
-        }
-        solver->noCache=false;//cache should always be defined after execution of this function
-    }
-    if (onlyCache) return;
-
-//     else {//use cached values when triangulation doesn't change
-// 		#ifndef parallel_forces
-    for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
-        for (int yy=0; yy<4; yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
-    }
-
-//  		#else
-// 		#pragma omp parallel for num_threads(ompThreads)
-// 		for (int vn=0; vn<= solver->T[solver->currentTes].maxId; vn++) {
-// 			VertexHandle& v = solver->T[solver->currentTes].vertexHandles[vn];
-// 			const int& id =  v->info().id();
-// 			CVector tf (0,0,0);
-// 			int k=0;
-// 			for (vector<const Real*>::iterator c = solver->perVertexPressure[id].begin(); c != solver->perVertexPressure[id].end(); c++)
-// 				tf = tf + (*(solver->perVertexUnitForce[id][k++]))*(**c);
-// 			v->info().forces = tf;
-// 		}
-// 		#endif
-//     }
-    if (solver->debugOut) {
-        CVector totalForce = nullVect;
-        for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
-            if (!v->info().isFictious) totalForce = totalForce + v->info().forces;
-            else if (solver->boundary(v->info().id()).flowCondition==1) totalForce = totalForce + v->info().forces;
-        }
-        cout << "totalForce = "<< totalForce << endl;
-    }
-}
 
 #endif //TWOPHASEFLOW
 #endif //FLOW_ENGINE

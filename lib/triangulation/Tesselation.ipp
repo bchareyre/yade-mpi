@@ -166,6 +166,16 @@ void _Tesselation<TT>::compute ()
 		cell->info().setPoint(Point(x,y,z));
 	}
 	computed = true;
+	
+//	AlphaShape as (*Tri);
+//	as.set_alpha(as.find_alpha_solid());
+//	cerr << "Alpha shape computed" <<endl;
+//	std::list<CellHandle> cells,cells2;
+//	as.get_alpha_shape_cells(std::back_inserter(cells),
+  //             AlphaShape::EXTERIOR);
+//	as.get_alpha_shape_cells(std::back_inserter(cells2),
+  //             AlphaShape::INTERIOR);
+//	std::cerr<< "num exterior cells "<< cells.size() <<" vs. "<<cells2.size() <<std::endl;
 }
 
 template<class TT>

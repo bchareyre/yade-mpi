@@ -39,7 +39,7 @@ class Material: public Serializable, public Indexable{
 		((int,id,((void)"not shared",-1),Attr::readonly,"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise. This value is set automatically when the material is inserted to the simulation via :yref:`O.materials.append<MaterialContainer.append>`. (This id was necessary since before boost::serialization was used, shared pointers were not tracked properly; it might disappear in the future)"))
 		((string,label,,,"Textual identifier for this material; can be used for shared materials lookup in :yref:`MaterialContainer`."))
 		((Real,density,1000,,"Density of the material [kg/m³]")),
-		/* ctor */,
+                /* ctor */,
 		/*py*/
 		.def("newAssocState",&Material::newAssocState,"Return new :yref:`State` instance, which is associated with this :yref:`Material`. Some materials have special requirement on :yref:`Body::state` type and calling this function when the body is created will ensure that they match. (This is done automatically if you use utils.sphere, … functions from python).")
 		YADE_PY_TOPINDEXABLE(Material)
