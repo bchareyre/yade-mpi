@@ -3,6 +3,7 @@
 #include <pkg/dem/CapillaryPhys.hpp>
 #include <pkg/dem/ScGeom.hpp>
 #include <pkg/common/Sphere.hpp>
+#include<pkg/dem/Shop.hpp> // for direct use of aabbExtrema
 
 
 YADE_PLUGIN((MeasureCapStress));
@@ -59,10 +60,8 @@ void MeasureCapStress::action() {
   if (scene->isPeriodic)
     volume = scene->cell->hSize.determinant();
   else {
-	  //     boost::python::tuple extrema = Shop::aabbExtrema(); // cout << extrema not possible TODO Correct, possible to use python function aabbExtrema, see bodyNumInteractionsHistogram
-//     volume = boost::python::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );// => CRASH ???? Je n ai pas su comprendre pourquoi marche dans Shop01::getPorosity , Shop02::getStress() et pas ici
-    std::vector<Vector3r> extrema = aabbExtrema();
-    volume = (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]);
+    boost::python::tuple extrema = Shop::aabbExtrema();
+    volume = boost::python::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
   }
   if (debug) cout << "c++ : volume = " << volume << endl;
 //   if (volume ==0) LOG_ERROR("Could not get a non-zero volume value");
@@ -73,21 +72,6 @@ void MeasureCapStress::action() {
   capStrTens4 =  matBglob / volume;
 //   }
   capStrTens = capStrTens1 + capStrTens2 + capStrTens3 + capStrTens4;
-}
-
-std::vector<Vector3r> MeasureCapStress::aabbExtrema(){ //(centers = false)-like, like default-behavior of Shop::aabbExtrema, and comparable with volume of triaxial cell
-        Real inf=std::numeric_limits<Real>::infinity();
-        Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
-        FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-                shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
-                Vector3r rrr(s->radius,s->radius,s->radius);
-                minimum=minimum.cwiseMin(b->state->pos-rrr);
-                maximum=maximum.cwiseMax(b->state->pos+rrr);
-        }
-        std::vector<Vector3r> result (2,Vector3r::Zero());
-        result[0] = minimum;
-        result[1] = maximum;
-        return result;
 }
 
 

@@ -10,7 +10,6 @@ class MeasureCapStress : public PeriodicEngine {
     Matrix3r matBp_BodyGlob(Real, Real, Real, Real, Vector3r); // particle-scale matrix B' (from (3.49) p.65 [Khosravani2014]) relative to the contact line, expressed in global axis
     Matrix3r matLG_bridgeGlob(Real, Real, Real, Vector3r); // = surface tension * integral over Snw (deltaIJ - nI nJ) dS, expressed in global axis
     Matrix3r matGlobToLoc(Vector3r vecN); // Change of basis matrix, from local basis with vecN = z, see Fig 3.18 p.65 [Khosravani2014]; to global basis X,Y,Z, where vecN is identified by (theta,phi) angles, see Fig 3.8 p.54 [Khosravani2014]. Upon execution of this function, vec N is basically the meniscus' axis of symmetry.
-    std::vector<Vector3r> aabbExtrema(); // should be possible to use existing python function Shop::aabbExtrema (see bodyNumInteractionsHistogram) ?
     
   
   public:
