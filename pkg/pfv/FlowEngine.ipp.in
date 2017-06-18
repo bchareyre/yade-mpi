@@ -294,7 +294,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
         flow.computePermeability();
 	//This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
-	trickPermeability();
+	trickPermeability(&flow);
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
         boundaryConditions ( flow );

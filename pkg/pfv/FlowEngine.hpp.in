@@ -67,7 +67,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		vector<posData> positionBufferParallel;//keep the positions from a given step for multithread factorization
 		//copy positions in a buffer for faster and/or parallel access
 		virtual void setPositionsBuffer(bool current);
-		virtual void trickPermeability() {};
+		virtual void trickPermeability(Solver* flow) {};
 
 	public :
 		int retriangulationLastIter;
