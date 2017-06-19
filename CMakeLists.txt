@@ -658,5 +658,3 @@ ADD_CUSTOM_COMMAND(
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
                   )
 #===========================================================
-
-
