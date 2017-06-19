@@ -61,7 +61,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	phys->crackJointAperture = D<0? -D : 0.; // for DFNFlow
 
 	/* Determination of interaction */
-	if (D < 0) { //spheres do not touch 
+	if (D < 0) { //tensile configuration
 	  if ( !phys->isCohesive) {
 	    if (!neverErase) return false;
 	    else {
