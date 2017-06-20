@@ -363,7 +363,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	}
 
 	//TODO
-	double computePoreSatAtInterface(int ID);
 	//Dynamic code
 	boost::python::list cellEntrySaturation(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
 	  boost::python::list ids;
@@ -488,7 +487,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("setCellSaturation",&TwoPhaseFlowEngine::setCellSaturation,"change saturation of one pore")
 	.def("computeOnePhaseFlow",&TwoPhaseFlowEngine::computeOnePhaseFlow,"compute pressure and fluxes in the W-phase")
 	.def("initialization",&TwoPhaseFlowEngine::initialization,"Initialize invasion setup. Build network, compute pore geometry info and initialize reservoir boundary conditions. ")
-	.def("computePoreSatAtInterface",&TwoPhaseFlowEngine::computePoreSatAtInterface,(boost::python::arg("ID")),"compute pressure and fluxes in the W-phase")
 	.def("getPoreThroatRadiusList",&TwoPhaseFlowEngine::cellporeThroatRadius,(boost::python::arg("cell_ID")),"get 4 pore throat radii of a cell.")
 	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,"get 4 neigboring cells")
 	.def("getCellHasInterface",&TwoPhaseFlowEngine::cellHasInterface,"indicates whether a NW-W interface is present within the cell")
