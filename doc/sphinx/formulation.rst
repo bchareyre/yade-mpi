@@ -648,16 +648,16 @@ This equation can be used for all 6 degrees of freedom (DOF) in translation and 
 				
 DEM simulations
 """"""""""""""""
-In DEM simulations, per-particle stiffness $\vec{K}_{ij}$ is determined from the stiffnesses of contacts in which it participates [Chareyre2005]_. Suppose each contact has normal stiffness $K_{Nk}$, shear stiffness $K_{Tk}=\xi K_{Nk}$ and is oriented by normal $\vec{n}_{k}$. A translational stiffness matrix $\vec{K}_{ij}$ can be defined as the sum of contributions of all contacts in which it participates (indices $k$), as
+In DEM simulations, per-particle stiffness $\vec{K}_{ij}$ is determined from the stiffnesses of contacts in which it participates.  Suppose each contact has normal stiffness $K_{Nk}$, shear stiffness $K_{Tk}=\xi K_{Nk}$ and is oriented by normal $\vec{n}_{k}$. A translational stiffness matrix $\vec{K}_{ij}$ can be defined as the sum of contributions of all contacts in which it participates (indices $k$), as [Chareyre2005]_.
 
 .. math::
 	:label: eq-dtcr-particle-stiffness
 	
 	\vec{K}_{ij}=\sum_k (K_{Nk}-K_{Tk})\vec{n}_{i}\vec{n}_{j}+K_{Tk}=\sum_j K_{Nk}\left((1-\xi)\vec{n}_{i}\vec{n}_{j}+\xi\right)
 
-with $i$ and $j\in\{x,y,z\}$. Equations :eq:`eq-dtcr-axes` and :eq:`eq-dtcr-particle-stiffness` determine $\Dtcr$ in a simulation. A similar approach generalized to all 6 DOFs is implemented by the :yref:`GlobalStiffnessTimeStepper` engine in Yade. The derivation of generalized stiffness including rotational terms is very similar but not developped here, for simplicity. For full reference, see "PFC3D - Theoretical Background".
+with $i$ and $j\in\{x,y,z\}$. Equations :eq:`eq-dtcr-axes` and :eq:`eq-dtcr-particle-stiffness` determine $\Dtcr$ in a simulation. A similar approach generalized to all 6 DOFs is implemented by the :yref:`GlobalStiffnessTimeStepper` engine in Yade. The derivation of generalized stiffness including rotational terms is very similar and can be found in [AboulHosn2016]_.
 					
-Note that for computation efficiency reasons, eigenvalues of the stiffness matrices are not computed. They are only approximated assuming than DOF's are uncoupled, and using diagonal terms of $K.M^{-1}$. They give good approximates in typical mechanical systems.
+Note that for computation efficiency reasons, eigenvalues of the stiffness matrices are not computed. They are only approximated assuming than DOF's are uncoupled, and using the diagonal terms of $K.M^{-1}$. They give good approximates in typical mechanical systems.
 
 There is one important condition that $\omega_{\rm max}>0$: if there are no contacts between particles and $\omega_{\rm max}=0$, we would obtain value $\Dtcr=\infty$. While formally correct, this value is numerically erroneous: we were silently supposing that stiffness remains constant during each timestep, which is not true if contacts are created as particles collide. In case of no contact, therefore, stiffness must be pre-estimated based on future interactions, as shown in the next section.
 				
