@@ -11,9 +11,9 @@
 
 #include "SimpleShear.hpp"
 
-#include <pkg/dem/NormalInelasticPM.hpp>
 #include<pkg/dem/GlobalStiffnessTimeStepper.hpp>
-
+#include<pkg/dem/ElasticContactLaw.hpp>
+#include<pkg/dem/FrictPhys.hpp>
 #include<pkg/common/Aabb.hpp>
 #include<core/Scene.hpp>
 #include<pkg/common/InsertionSortCollider.hpp>
@@ -65,7 +65,7 @@ bool SimpleShear::generate(std::string& message)
 
 	shared_ptr<Body> w2;	// The lower one :
 	createBox(w2,Vector3r(length/2.0,-thickness/2.0,0),Vector3r(length/2.0,thickness/2.0,width/2.0));
-	YADE_PTR_CAST<FrictMat> (w2->material)->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
+	YADE_PTR_CAST<FrictMat> (w2->material)->frictionAngle = matFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
 	scene->bodies->insert(w2);
 
 	shared_ptr<Body> w3;	// The right one
@@ -74,7 +74,7 @@ bool SimpleShear::generate(std::string& message)
 
 	shared_ptr<Body> w4; // The upper one
 	createBox(w4,Vector3r(length/2.0,height+thickness/2.0,0),Vector3r(length/2.0,thickness/2.0,width/2.0));
-	YADE_PTR_CAST<FrictMat> (w4->material)->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
+	YADE_PTR_CAST<FrictMat> (w4->material)->frictionAngle = matFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
 	scene->bodies->insert(w4);
 
 // To close the front and the back of the box 
@@ -114,7 +114,7 @@ bool SimpleShear::generate(std::string& message)
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body); body->groupMask=1;
-	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
+	shared_ptr<FrictMat> mat(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
@@ -127,9 +127,9 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 	body->state->mass		=masse;
 	body->state->inertia		= Vector3r(2.0/5.0*masse*radius*radius,2.0/5.0*masse*radius*radius,2.0/5.0*masse*radius*radius);
 
-	mat->young			= sphereYoungModulus;
-	mat->poisson			= spherePoissonRatio;
-	mat->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	mat->young			= matYoungModulus;
+	mat->poisson			= matPoissonRatio;
+	mat->frictionAngle		= matFrictionDeg * Mathr::PI/180.0;
 	body->material = mat;
 
 	aabb->color		= Vector3r(0,1,0);
@@ -145,7 +145,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body); body->groupMask=1;
-	shared_ptr<NormalInelasticMat> mat(new NormalInelasticMat);
+	shared_ptr<FrictMat> mat(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
@@ -159,8 +159,8 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 	body->state->pos		= position;
 	body->state->ori		= Quaternionr::Identity();
 
-	mat->young	= boxYoungModulus;
-	mat->poisson	= boxPoissonRatio;
+	mat->young	= matYoungModulus;
+	mat->poisson	= matPoissonRatio;
 	mat->frictionAngle	= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
 	body->material = mat;
 
@@ -183,11 +183,11 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 void SimpleShear::createActors(shared_ptr<Scene>& scene)
 {
 	shared_ptr<IGeomDispatcher> interactionGeometryDispatcher(new IGeomDispatcher);
-	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom6D);
-	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom6D);
+	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
-	shared_ptr<IPhysFunctor> CL1Rel(new Ip2_2xNormalInelasticMat_NormalInelasticityPhys);
+	shared_ptr<IPhysFunctor> CL1Rel(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(CL1Rel);
 
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
@@ -211,7 +211,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& scene)
 	ids->geomDispatcher=interactionGeometryDispatcher;
 	ids->physDispatcher=interactionPhysicsDispatcher;
 	ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
-	shared_ptr<Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity> ldc(new Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity);
+	shared_ptr<Law2_ScGeom_FrictPhys_CundallStrack> ldc(new Law2_ScGeom_FrictPhys_CundallStrack);
 	ids->lawDispatcher->add(ldc);
 
 

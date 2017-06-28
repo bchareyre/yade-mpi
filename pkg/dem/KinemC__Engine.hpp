@@ -77,7 +77,6 @@ class KinemCNLEngine : public KinemSimpleShearBox
 				 ((Real,gammalim,0.0,,"the value of tangential displacement (of upper plate) at wich the shearing is stopped [m]"))
 				 ((Real,gamma,0.0,,"current value of tangential displacement [m]"))
 				 ((std::vector<Real>,gamma_save,,,"vector with the values of gamma at which a save of the simulation is performed [m]")),
-// 				 ((Real,coeff_dech,1.0,,"in the case of the use of 'Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity' for ex, where kn(unload)#kn(load). The engine cares to find the value at the first run BROKEN actually")),
 				temoin=0;
 				it_stop=0;
 				 );
