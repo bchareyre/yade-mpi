@@ -422,9 +422,9 @@ Engines define processes undertaken by particles. As we know from the theoretica
 	   ...:    ForceResetter(),
 	   ...:    InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
 	   ...:    InteractionLoop(           # dtto for the parenthesis here
-	   ...:        [Ig2_Sphere_Sphere_L3Geom(),Ig2_Wall_Sphere_L3Geom()],
+	   ...:        [Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
 	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
-	   ...:        [Law2_L3Geom_FrictPhys_ElPerfPl()]
+	   ...:        [Law2_ScGeom_FrictPhys_CundallStrack()]
 	   ...:    ),
 	   ...:    NewtonIntegrator(damping=.2,label='newton')      # define a name under which we can access this engine easily
 	   ...: ]
@@ -442,9 +442,9 @@ Instead of typing everything into the command-line, one can describe simulation 
 		ForceResetter(),
 		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
 		InteractionLoop(           # dtto for the parenthesis here
-			 [Ig2_Sphere_Sphere_L3Geom_Inc(),Ig2_Wall_Sphere_L3Geom_Inc()],
+			 [Ig2_Sphere_Sphere_ScGeom_Inc(),Ig2_Wall_Sphere_ScGeom_Inc()],
 			 [Ip2_FrictMat_FrictMat_FrictPhys()],
-			 [Law2_L3Geom_FrictPhys_ElPerfPl()]
+			 [Law2_ScGeom_FrictPhys_CundallStrack()]
 		),
 		GravityEngine(gravity=(0,0,-9.81)),              # 9.81 is the gravity acceleration, and we say that
 		NewtonIntegrator(damping=.2,label='newton')      # define a name under which we can access this engine easily

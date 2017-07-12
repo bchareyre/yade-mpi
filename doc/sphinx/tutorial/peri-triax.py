@@ -6,7 +6,7 @@ sp.toSimulation()
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*rMean),
-	InteractionLoop([Ig2_Sphere_Sphere_L3Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl()]),
+	InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),
 	NewtonIntegrator(damping=.6),
 	PeriTriaxController(goal=(-1e6,-1e6,-.1),stressMask=0b011,maxUnbalanced=.2,doneHook='goalReached()',label='triax',maxStrainRate=(.1,.1,.1),dynCell=True),
 	PyRunner(iterPeriod=100,command='addPlotData()')
