@@ -41,6 +41,8 @@
 #include <lib/serialization/ObjectIO.hpp>
 #include <csignal>
 
+#include <pkg/common/KinematicEngines.hpp>
+
 namespace py = boost::python;
 
 /*
@@ -564,6 +566,10 @@ class pyOmega{
 			if(coll){ _DO_FUNCTORS(coll->boundDispatcher->functors,BoundFunctor); }
 			#undef _DO_FUNCTORS
 			#undef _TRY_DISPATCHER
+			CombinedKinematicEngine* cke=dynamic_cast<CombinedKinematicEngine*>(e.get());
+			if (cke) {
+				FOREACH(const shared_ptr<KinematicEngine>& ke, cke->comb){ if(!ke->label.empty()){ pyRunString("__builtins__."+ke->label+"=Omega().labeledEngine('"+ke->label+"')"); } }
+			}
 		}
 	}
 	py::object labeled_engine_get(string label){
@@ -582,6 +588,10 @@ class pyOmega{
 			if(coll){ _DO_FUNCTORS(coll->boundDispatcher->functors,BoundFunctor); }
 			#undef _DO_FUNCTORS
 			#undef _TRY_DISPATCHER
+			CombinedKinematicEngine* cke=dynamic_cast<CombinedKinematicEngine*>(e.get());
+			if (cke) {
+				FOREACH(const shared_ptr<KinematicEngine>& ke, cke->comb){ if(ke->label==label) return py::object(ke); }
+			}
 		}
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}

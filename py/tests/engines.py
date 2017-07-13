@@ -54,4 +54,45 @@ class TestKinematicEngines(unittest.TestCase):
 			self.assertTrue(abs(O.bodies[id_nonfixed_helix].state.pos[2] - 10*cos(pi/angVelTemp*O.iter))<tolerance)		#Check helixEngine of nonfixed bodies Y
 			self.assertTrue(abs(O.bodies[id_nonfixed_helix].state.pos[1]-25.0 - O.iter)<tolerance)		#Check helixEngine of nonfixed bodies Z
 
-
+class TestLabelsOfEngines(unittest.TestCase):
+	def testLabels(self):
+		O.reset()
+		resetter = ForceResetter(label='lresetter')
+		bo1 = Bo1_Sphere_Aabb(label='lbo1')
+		collider = InsertionSortCollider([bo1],label='lcollider')
+		ig2 = Ig2_Sphere_Sphere_ScGeom(label='lig2')
+		ip2 = Ip2_FrictMat_FrictMat_FrictPhys(label='lip2')
+		law2 = Law2_ScGeom_FrictPhys_CundallStrack(label='llaw2')
+		iLoop = InteractionLoop([ig2],[ip2],[law2],label='liLoop')
+		trans1 = TranslationEngine(label='ltrans1')
+		rot1 = RotationEngine(label='lrot1')
+		trans2 = TranslationEngine(label='ltrans2')
+		rot2 = RotationEngine(label='lrot2')
+		comb = trans2 + rot2
+		comb.label = 'lcomb'
+		newton = NewtonIntegrator(label='lnewton')
+		pyRunner = PyRunner(label='lpyRunner')
+		O.engines=[
+			resetter,
+			collider,
+			iLoop,
+			trans1,
+			rot1,
+			comb,
+			newton,
+			pyRunner,
+		]
+		self.assertEqual(resetter,lresetter)
+		self.assertEqual(bo1,lbo1)
+		self.assertEqual(collider,lcollider)
+		self.assertEqual(ig2,lig2)
+		self.assertEqual(ip2,lip2)
+		self.assertEqual(law2,llaw2)
+		self.assertEqual(iLoop,liLoop)
+		self.assertEqual(trans1,ltrans1)
+		self.assertEqual(rot1,lrot1)
+		self.assertEqual(comb,lcomb)
+		self.assertEqual(trans2,ltrans2)
+		self.assertEqual(rot2,lrot2)
+		self.assertEqual(newton,lnewton)
+		self.assertEqual(pyRunner,lpyRunner)
