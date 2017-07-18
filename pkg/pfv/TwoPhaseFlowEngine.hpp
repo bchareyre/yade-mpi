@@ -13,7 +13,7 @@
 
 //keep this #ifdef as long as you don't really want to realize a final version publicly, it will save compilation time for everyone else
 //when you want it compiled, you can pass -DTWOPHASEFLOW to cmake, or just uncomment the following line
-//#define TWOPHASEFLOW
+// #define TWOPHASEFLOW
 #ifdef TWOPHASEFLOW
 #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
 // #include <Eigen/Sparse>
@@ -34,7 +34,6 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	double trapCapP;//for calculating the pressure of trapped pore, cell->info().p() = pressureNW- trapCapP. OR cell->info().p() = pressureW + trapCapP
 	bool hasInterface; //Indicated whether a NW-W interface is present within the pore body
 	std::vector<double> poreThroatRadius;
-	std::vector<double> kWater;	
 	double poreBodyRadius;
 	double poreBodyVolume;
 	double porosity;
@@ -42,27 +41,8 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	double solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for facet "i" and sphere (facetVertices)"[i][j]". Last component [i][3] for 1/sumLines in the facet "i" (used by chao).
 	
 	//DynamicTwoPhaseFlow 
-	double saturation2;
-	int numberFacets;
-	int isFictiousId;
-	int errorCount;
-	double mergedVolume;
-	int mergednr;
-	unsigned int mergedID;
-	double thresholdSaturation;
 	std::vector<double> entryPressure;
 	std::vector<double> entrySaturation;
-	double capillaryPressure;
-	bool isNewlyUpdated;
-	double flux;
-	double ptemp;
-	bool hasInterfaceTEMP;
-	bool isBC;
-	bool skip;
-	bool updateDyn;
-	double truncatedVolume;
-	double lengthLoss;
-	std::vector<double> kNormB;
 	std::vector<int> poreNeighbors;
 	std::vector<int> poreIdConnectivity;
 	std::vector<double> listOfkNorm;
@@ -71,18 +51,23 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	std::vector<double> listOfEntryPressure;
 	std::vector<double> kNorm2;
 	std::vector<double> listOfThroatArea;
+	double accumulativeDVSwelling;
+	double saturation2;
+	int numberFacets;
+	int isFictiousId;
+	double mergedVolume;
+	int mergednr;
+	unsigned int mergedID;
+	double thresholdSaturation;
+	double flux;
 	double accumulativeDV; 	
 	double airWaterArea;
 	bool isWResInternal;
       	double conductivityWRes;
-
-	double saturationMax;
-	double interfacialAreaWA;
-	double maxSaturation;
 	double minSaturation;
 	int poreId;
-	double invasionPc;
-	double hainesJump;	     
+	bool airBC;
+	bool waterBC;
 	double thresholdPressure;
 	double dvTPF;
 	bool isNWResDef;
@@ -105,40 +90,25 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 		for (int k=0; k<4;k++) for (int l=0; l<4;l++) solidLine[k][l]=0;
 		
 		//dynamic TwoPhaseFlow
+		airBC = false;
+		waterBC = false;
 		numberFacets = 4;
 		mergedVolume = 0;
 		mergednr = 0;
 		mergedID = 0;
-		errorCount = 0;
 		entryPressure.resize(4,0);
 		entrySaturation.resize(4,0);
 		poreIdConnectivity.resize(4,-1);
-		kWater.resize(4,0);
-		thresholdSaturation = 0;
-		capillaryPressure = 0;
-		flux = 0.0;
-		isNewlyUpdated = false;
-		ptemp = 0.0;
-		hasInterfaceTEMP = false;
-		updateDyn = false;
-		isBC = false;
-		truncatedVolume = 0.0;
-		lengthLoss = 0.0;
-		kNormB.resize(4,0);
-		saturationMax = 0.0;
-		interfacialAreaWA = 0.0;
-		skip = false;
+		thresholdSaturation = 0.0;
+		flux = 0.0;			//NOTE can potentially be removed, currently not used but might be handy in future work
 		accumulativeDV = 0.0;
 		thresholdPressure = 0.0;
-		invasionPc = 0.0;
 		airWaterArea = 0.0;
 		accumulativeDV = 0.0;
-		maxSaturation = 1.0;
 		minSaturation = 0.0;
 		poreId = -1;
-		hainesJump = 0.0;
 		isWResInternal = false;
-		dvTPF = 0.0;
+		dvTPF = 0.0;			//FIXME dvTPF is currently only used to impose pressure as dv() cannot be imposed from FlowEngine currently
 		isNWResDef = false;
 		conductivityWRes = 0.0;
 		invadedFrom = 0;
@@ -313,6 +283,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void transferConditions();
 	void imposeDeformationFluxTPF();
 	void updateDeformationFluxTPF();
+	void copyPoreDataToCells();
 	
 	std::vector<double> leftOverVolumePerSphere;
 	std::vector<double> untreatedAreaPerSphere;
@@ -325,6 +296,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	std::vector<double> saturationList;
 	std::vector<bool> hasInterfaceList;
 	std::vector<double> listOfFlux;
+	std::vector<double> listOfMergedVolume;
+
 	
 	Eigen::SparseMatrix<double> aMatrix;
 	typedef Eigen::Triplet<double> ETriplet;
@@ -422,49 +395,45 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((double,partiallySaturatedPores,false,,"Include partially saturated pores or not?"))
 
 	//BEGIN Latest dynamic/pore merging things (to clean maybe)
-	((double,entryMethodCorrection,float(entryPressureMethod),,"Parameter that corrects various entry pressure methods "))
+	((double,entryMethodCorrection,float(entryPressureMethod),,"Parameter that is used in computing entry pressure of a pore throat: P_ij =  entryMethodCorrection * surfaceTension / radius_porethroat "))
 	//Dynamic TwoPhaseFlow
-	((vector<bool>, bndCondIsWaterReservoir, vector<bool>(6,false),,"Water reservoir?"))
+	((vector<bool>, bndCondIsWaterReservoir, vector<bool>(6,false),,"Boundary conditions, if bndCondIsPressure[] = True, is it air or water boundary condition? True is water reservoir"))
 	((unsigned int,maxIDMergedCells,0,,"maximum number of merged ID, this is computed in mergeCells()"))
-	((int,iterNR,0,,"Number of time steps done during dynamic flow simulations"))
-	((double,capillaryPressure,0.0,,"Capillary pressure based on the volume averaged water pressure in all pores"))
 	((double,waterPressurePartiallySatPores,0.0,,"Capillary pressure based on the volume averaged water pressure in partially saturated pores"))
 	((double,waterPressure,0.0,,"Volume averaged water pressure"))
 	((double,waterSaturation,0.0,,"Water saturation, excluding the boundary cells"))
-	((double,voidVolume,0.0,,"total pore space"))
-  	((bool,stopSimulation, false,," No event is happening, thus stop the simulation! "))
-  	((bool,debugTPF, false,," No event is happening, thus stop the simulation! "))
-	((double,airWaterInterfacialArea,0.0,,"Air water interfacial area"))
+	((double,voidVolume,0.0,,"total volume pore space, without boundary cells"))
+  	((bool,stopSimulation, false,,"Stop dynamic flow simulation"))
+  	((bool,debugTPF, false,,"Print debuging messages two phase flow engine "))
+	((double,airWaterInterfacialArea,0.0,,"Air-water interfacial area"))
 	((double,areaAveragedPressure,0.0,,"Air water interfacial area averaged water pressure "))
-	((double,waterPressure_NHJ,0.0,,"water pressure without pores undergoing a haines jump"))
-
-
 	((double,maximumRatioPoreThroatoverPoreBody,0.90,,"maximum ratio of pore throat radius over pore body radius, this is used during merging of tetrahedra."))
 	((double,totalWaterVolume,0.0,,"total water volume"))
-	((string,modelRunName,"dynamicImbibition",,"Python command to be run when remeshing. Anticipated usage: define blocked cells (see also :yref:`TemplateFlowEngine_@TEMPLATE_FLOW_NAME@.blockCell`), or apply exotic types of boundary conditions which need to visit the newly built mesh"))
+	((string,modelRunName,"dynamicDrainage",,"Name of simulation, to be implemented into output files"))
 	((double,safetyFactorTimeStep,1.0,,"Safey coefficient for time step"))
-	((bool, makeMovie, false,,"Make movie? "))
 	((double,fluxInViaWBC,0.0,,"Total water flux over water boundary conditions"))
 	((double, accumulativeFlux,0.0,,"accumulative influx of water"))
 	((double, truncationPrecision,1e-6,,"threshold at which a saturation is truncated"))
 	((unsigned int, numberOfPores, 0,,"Number of pores (i.e. number of tetrahedra, but compensated for merged tetrahedra"))
 	((bool, firstDynTPF, true,,"this bool activated the initialization of the dynamic flow engine, such as merging and defining initial values"))
 	((bool, keepTriangulation, false,,"this bool activated triangulation or not during initialization"))
-	((double, hainesVelocity,0.001,,"threshold at which a saturation is truncated"))
 	((double, factorHJ,-1.0,,"threshold at which a saturation is truncated"))
  	((bool, remesh, false,,"update triangulation?"))
-	((bool, deformation, false,,"update triangulation?"))
+	((bool, deformation, false,,"simulation of dynamic flow during deformation"))
 	((int, iterationTPF, -1,,"Iteration number"))
-	((double, minWaterPressure, -30000.0,,"Iteration number"))
 	((double, initialPC, 2000.0,,"Iteration number"))
-	((double, sensorPressure, 0.0,,"Water pressure associated with a sensor"))
 	((double, accumulativeDeformationFlux, 0.0,,"accumulative internal flux caused by deformation"))
 	((bool, solvePressureSwitch, true,,"solve for pressure during actionTPF()"))
 	((double, deltaTimeTruncation, 0.0,,"truncation of time step, to avoid very small time steps during local imbibition, NOTE it does affect the mass conservation not set to 0"))
 	((double, waterBoundaryPressure, 0.0,,"Water pressure at boundary used in computations, is set automaticaly. "))
 	((double, waterVolumeTruncatedLost, 0.0,,"Water volume that has been truncated."))
-	((double, maxCapillaryPressure, 0.0,,"Water volume that has been truncated."))
 	((bool, getQuantitiesUpdateCont, false,,"solve for pressure during actionTPF()"))
+	((double, simpleWaterPressure, 0.0,,"Water pressure based on averaging of pore volume"))
+	((double, centroidAverageWaterPressure, 0.0,,"Water pressure based on centroid-corrected averaging, see Korteland et al. (2010) - what is the correct definition of average pressure?"))
+	((double, fractionMinSaturationInvasion, -1.0,,"Set the threshold saturation at which drainage can occur (Sthr = fractionMinSaturationInvasion), note that -1 implied the conventional definition of Sthr"))
+
+	
+	
 	//END Latest dynamic/pore merging
 
 	((bool, isCellLabelActivated, false,, "Activate cell labels for marking disconnected wetting clusters. NW-reservoir label 0; W-reservoir label 1; disconnected W-clusters label from 2. "))
@@ -504,6 +473,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("mergeCells",&TwoPhaseFlowEngine::mergeCells,"Extract the pore network of the granular material")
 	//Dynamic flow
  	.def("calculateResidualSaturation",&TwoPhaseFlowEngine::calculateResidualSaturation,"Calculate the residual saturation for each pore body")
+	.def("copyPoreDataToCells",&TwoPhaseFlowEngine::copyPoreDataToCells,"copy date from merged pore units back to grain-based tetrahedra")
 	.def("getCellEntrySaturation",&TwoPhaseFlowEngine::cellEntrySaturation,"get the entry saturation of each pore throat")
 	.def("getCellThresholdSaturation",&TwoPhaseFlowEngine::cellThresholdSaturation,"get the saturation of imbibition")
 	.def("getCellMergedID",&TwoPhaseFlowEngine::cellMergedID,"get the saturation of imbibition")

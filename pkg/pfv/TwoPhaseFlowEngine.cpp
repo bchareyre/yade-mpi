@@ -1457,7 +1457,7 @@ void TwoPhaseFlowEngine::transferConditions()
       
       if(cell->info().saturation == 1.0){
 	cell->info().hasInterface = false;
-	cell->info().hainesJump = 0.0;
+// 	cell->info().hainesJump = 0.0;
       }
       if(cell->info().saturation < 1.0){
 	cell->info().hasInterface = true;
@@ -1511,7 +1511,8 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
 		cell->neighbor(i)->info().hasInterface = true; 
 		cell->neighbor(i)->info().saturation = poreSaturationFromPcS(cell->neighbor(i),-1*initialPC/*waterBoundaryPressure*/);
 		cell->neighbor(i)->info().p() = -1*initialPC /*waterBoundaryPressure*/;
-		cell->neighbor(i)->info().hainesJump = 0.0;
+// 		cell->neighbor(i)->info().hainesJump = 0.0;
+		cell->neighbor(i)->info().airBC = true;
 		if(cell->neighbor(i)->info().saturation != cell->neighbor(i)->info().saturation || cell->neighbor(i)->info().saturation > 1.0 || cell->neighbor(i)->info().saturation < 0.0){
 		  std::cout << "Error with initial BC saturation: " << cell->neighbor(i)->info().saturation;
 		}
@@ -1522,7 +1523,7 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
 		cell->neighbor(i)->info().hasInterface = true;
 		cell->neighbor(i)->info().p() = -1*initialPC; 
 		cell->neighbor(i)->info().saturation = poreSaturationFromPcS(cell->neighbor(i),-1 * initialPC);
-		cell->neighbor(i)->info().hainesJump = 0.0;
+// 		cell->neighbor(i)->info().hainesJump = 0.0;
 // 		if(cell->info().saturation == truncationPrecision){cell->neighbor(i)->info().p() = -1*initialPC;}
 // 	      }
 // 	      if(cell->neighbor(i)->info().saturation < 0.0 || cell->neighbor(i)->info().saturation > 1.0){
@@ -1541,7 +1542,7 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
 		  Mcell->info().hasInterface = cell->neighbor(i)->info().hasInterface;
 		  Mcell->info().saturation = cell->neighbor(i)->info().saturation;
 		  Mcell->info().p() =  cell->neighbor(i)->info().p();
-		  Mcell->info().hainesJump = cell->neighbor(i)->info().hainesJump;
+// 		  Mcell->info().hainesJump = cell->neighbor(i)->info().hainesJump;
 		  Mcell->info().isNWRes = cell->neighbor(i)->info().isNWRes;
 		}
 	      }
@@ -1716,6 +1717,17 @@ void TwoPhaseFlowEngine::setListOfPores()
       }
       
       for (unsigned int i = 0 ; i < numberOfPores; i++){
+
+	if(listOfPores[i]->info().isWResInternal){		//Important to track for centroidAverage water pressure
+	  for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
+	   if(!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isWResInternal){
+		listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().waterBC = true;
+	    }
+	  }
+	}
+	
+	
+	
 	for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
 	  for(unsigned int k = 0; k < listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors.size(); k++){
 	    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == i){
@@ -1828,6 +1840,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	saturationList.assign(numberOfPores,0.0);
 	hasInterfaceList.assign(numberOfPores,false);
 	listOfFlux.assign(numberOfPores,0.0);
+	listOfMergedVolume.assign(numberOfPores,0.0);										//NOTE CHANGED AFTER PUSH ON GIT
     }
     
     //reset various lists
@@ -1845,18 +1858,18 @@ void TwoPhaseFlowEngine::solvePressure()
        //Get diagonal coeff
        double dsdp2 = 0.0;
        double coeffA = 0.0, coeffA2 = 0.0;
-       if(hasInterfaceList[i] && !firstDynTPF && listOfPores[i]->info().hainesJump == 0.0){
+       if(hasInterfaceList[i] && !firstDynTPF /*&& listOfPores[i]->info().hainesJump == 0.0*/){
 	    if(listOfPores[i]->info().p() == 0){
-	      std::cout << endl << "Error, pressure = 0 "<< listOfPores[i]->info().p() << listOfPores[i]->info().id << " " << listOfPores[i]->info().hainesJump;
+	      std::cout << endl << "Error, pressure = 0 "<< listOfPores[i]->info().p() << listOfPores[i]->info().id /*<< " " << listOfPores[i]->info().hainesJump*/;
 	      listOfPores[i]->info().p() = -1.0 * listOfPores[i]->info().thresholdPressure;
 	    }
 	    dsdp2 = dsdp(listOfPores[i],listOfPores[i]->info().p());
-	    coeffA = /*2.0 * */dsdp2 * ((listOfPores[i]->info().mergedVolume / scene->dt) + listOfPores[i]->info().accumulativeDV); //Just changed for DV
+	    coeffA = /*2.0 * */dsdp2 * ((listOfPores[i]->info().mergedVolume / scene->dt) + (listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling)); //Just changed for DV
 	}
 
            
        //fill matrix off-diagonals
-       if(/*!listOfPores[i]->info().isNWRes &&*/ listOfPores[i]->info().hainesJump == 0.0 && !listOfPores[i]->info().isWResInternal ){		//FIXME FIXME FIXME
+       if(/*!listOfPores[i]->info().isNWRes &&*/ /*listOfPores[i]->info().hainesJump == 0.0 &&*/ !listOfPores[i]->info().isWResInternal ){		//FIXME FIXME FIXME
 	  for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){ 
 // 	    if(!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWRes){		//FIXME FIXME FIXME
 	      tripletList.push_back(ETriplet(i,listOfPores[i]->info().poreNeighbors[j],-1.0 * listOfPores[i]->info().listOfkNorm[j]));
@@ -1872,16 +1885,16 @@ void TwoPhaseFlowEngine::solvePressure()
 	}
 	
 	//Fill matrix diagonal
-	if(/*!listOfPores[i]->info().isNWRes &&*/ listOfPores[i]->info().hainesJump == 0.0 && !listOfPores[i]->info().isWResInternal ){	//FIXME FIXME FIXME
-	  if(hasInterfaceList[i]){residualsList[i] += -1.0*listOfPores[i]->info().saturation * listOfPores[i]->info().accumulativeDV + coeffA * listOfPores[i]->info().p() /*- listOfPores[i]->info().flux*/;} //NOTE
-	  if(!hasInterfaceList[i] && deformation && listOfPores[i]->info().saturation > listOfPores[i]->info().minSaturation){residualsList[i] += -1.0*listOfPores[i]->info().accumulativeDV;} 
+	if(/*!listOfPores[i]->info().isNWRes &&*/ /*listOfPores[i]->info().hainesJump == 0.0 &&*/ !listOfPores[i]->info().isWResInternal ){	//FIXME FIXME FIXME
+	  if(hasInterfaceList[i]){residualsList[i] += -1.0*listOfPores[i]->info().saturation * (listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling) + coeffA * listOfPores[i]->info().p() /*- listOfPores[i]->info().flux*/;} //NOTE
+	  if(!hasInterfaceList[i] && deformation && listOfPores[i]->info().saturation > listOfPores[i]->info().minSaturation){residualsList[i] += -1.0*(listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling);} 
 	  tripletList.push_back(ETriplet(i,i, coeffA +  coeffA2));
 	}
 	
-  	if(listOfPores[i]->info().hainesJump != 0.0 && !listOfPores[i]->info().isNWRes){	  
-    	 residualsList[i] =  factorHJ; 
-     	 tripletList.push_back(ETriplet(i,i, 1.0));
-  	}
+//   	if(listOfPores[i]->info().hainesJump != 0.0 && !listOfPores[i]->info().isNWRes){	  
+//     	 residualsList[i] =  factorHJ; 
+//      	 tripletList.push_back(ETriplet(i,i, 1.0));
+//   	}
 	//FIXME FIXME FIXME
 //  	if(listOfPores[i]->info().isNWRes){
 //  	  residualsList[i] = waterBoundaryPressure;
@@ -1947,20 +1960,20 @@ void TwoPhaseFlowEngine::solvePressure()
 
 	//update saturation
 	for(unsigned int i = 0; i < numberOfPores; i++){
-	  if(hasInterfaceList[i] && listOfFlux[i] != 0.0 && !listOfPores[i]->info().isWResInternal/*&& saturationList[i] > listOfPores[i]->info().minSaturation*/){		
+	  if(hasInterfaceList[i] && listOfFlux[i] != 0.0 && !listOfPores[i]->info().isWResInternal/*&& saturationList[i] > listOfPores[i]->info().minSaturation*/ && !deformation){		
 // 	    if(!deformation || (deformation && listOfPores[i]->info().hainesJump != 0.0)){
        	      double ds = -1.0 * scene->dt * (listOfFlux[i]) / (listOfPores[i]->info().mergedVolume +  listOfPores[i]->info().accumulativeDV * scene->dt);
 	      saturationList[i] = ds + (saturationList[i] * listOfPores[i]->info().mergedVolume / (listOfPores[i]->info().mergedVolume +  listOfPores[i]->info().accumulativeDV * scene->dt ));
 // 	    }
 	    
-// 	    if(deformation && listOfPores[i]->info().hainesJump == 0.0){
-// 		saturationList[i] = saturationList[i] + (pressuresList[i] - listOfPores[i]->info().p())*dsdp(listOfPores[i],listOfPores[i]->info().p()) /*poreSaturationFromPcS(listOfPores[i],pressuresList[i])*/;
-// 	    }
+ 	    if(deformation){
+ 		saturationList[i] = saturationList[i] + (pressuresList[i] - listOfPores[i]->info().p())*dsdp(listOfPores[i],listOfPores[i]->info().p()) + (scene->dt / (listOfPores[i]->info().mergedVolume +  (listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling) * scene->dt )) * listOfPores[i]->info().accumulativeDVSwelling;
+ 	    }
 	  }  
 	}
 	
         for(unsigned int i = 0; i < numberOfPores; i++){
-	  waterAfter += saturationList[i] * (listOfPores[i]->info().mergedVolume + +  listOfPores[i]->info().accumulativeDV * scene->dt); 
+	  waterAfter += saturationList[i] * (listOfPores[i]->info().mergedVolume +   listOfPores[i]->info().accumulativeDV * scene->dt); 							//NOTE CHANGED AFTER PUSH ON GIT
         }
 
 	
@@ -1970,7 +1983,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	fluxInViaWBC += boundaryFlux * scene->dt;
 	
 	  
- 	if(std::abs(boundaryFlux * scene->dt + (waterBefore - waterAfter)) / std::abs(boundaryFlux * scene->dt) > 1e-3 && std::abs(boundaryFlux) > 1e-18){
+ 	if(!deformation && std::abs(boundaryFlux * scene->dt + (waterBefore - waterAfter)) / std::abs(boundaryFlux * scene->dt) > 1e-3 && std::abs(boundaryFlux) > 1e-18){
  	  std::cerr << endl << "No volume balance! Flux balance: WBFlux:" << std::abs(boundaryFlux * scene->dt + (waterBefore - waterAfter)) / std::abs(boundaryFlux * scene->dt)  << " " <<boundaryFlux * scene->dt << "Flux: " << summFluxList*scene->dt <<  "deltaVolume: " << waterBefore - waterAfter  << "Flux in IFACE: "<< summFluxUnsat * scene->dt << " lostVolume: " << lostVolume * scene->dt;
 // 	  stopSimulation = true;
  	}
@@ -1978,11 +1991,36 @@ void TwoPhaseFlowEngine::solvePressure()
 	double dt = 0.0, finalDT = 1e6, saveID = 0.0;
 	for(int i = 0; i < numberOfPores; i++){
 	  if(deformation){
-	    if(listOfPores[i]->info().accumulativeDV != 0.0){
-	      dt = std::abs(saturationList[i] * listOfPores[i]->info().mergedVolume / listOfPores[i]->info().accumulativeDV);
-	      if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = 0;}
+	    dt = -1.0 * listOfPores[i]->info().mergedVolume / (listOfPores[i]->info().accumulativeDV + listOfPores[i]->info().accumulativeDVSwelling);	//Residence time total pore volume
+	    if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = -1;}
+	    
+	    if(listOfPores[i]->info().accumulativeDVSwelling > 0.0 || listOfPores[i]->info().accumulativeDV > 0.0){ // Residence time during increase in pore size
+	      if(listOfPores[i]->info().accumulativeDVSwelling > listOfPores[i]->info().accumulativeDV){
+		dt = listOfPores[i]->info().mergedVolume * (1.0 - saturationList[i]) / listOfPores[i]->info().accumulativeDVSwelling;
+	      }
+	      if(listOfPores[i]->info().accumulativeDVSwelling <= listOfPores[i]->info().accumulativeDV){
+		dt = listOfPores[i]->info().mergedVolume * (1.0 - saturationList[i]) / listOfPores[i]->info().accumulativeDV;
+	      }
+	      if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = -2;}
+	    }
+	    if(listOfPores[i]->info().accumulativeDVSwelling < 0.0 || listOfPores[i]->info().accumulativeDV < 0.0){
+		if(listOfPores[i]->info().accumulativeDVSwelling < listOfPores[i]->info().accumulativeDV){
+		  dt = -1.0 * listOfPores[i]->info().mergedVolume * saturationList[i] / listOfPores[i]->info().accumulativeDVSwelling;
+		}
+		if(listOfPores[i]->info().accumulativeDVSwelling >= listOfPores[i]->info().accumulativeDV){
+		  dt = -1.0 * listOfPores[i]->info().mergedVolume * saturationList[i] / listOfPores[i]->info().accumulativeDV;
+		}
+		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = -2;}
 	    }
 	  }
+	  
+	  
+//  	  if(deformation){
+//  	    if(listOfPores[i]->info().accumulativeDV != 0.0){
+//  	      dt = std::abs(saturationList[i] * listOfPores[i]->info().mergedVolume / listOfPores[i]->info().accumulativeDV);
+//  	      if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = 0;}
+//  	    }
+//  	  }
 	  
 	  if(hasInterfaceList[i] /*&& !listOfPores[i]->info().isNWRes*/){		//FIXME FIXME FIXME (june1)
 	    
@@ -2014,7 +2052,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	
 	// --------------------------------------update cappilary pressure (need to correct for linearization of ds/dp)-----------------------------------------------------
 	for(int i = 0; i < numberOfPores; i++){
-	  if(hasInterfaceList[i] && listOfPores[i]->info().hainesJump == 0.0 && !listOfPores[i]->info().isWResInternal && (!deformation || listOfPores[i]->info().saturation != 0.0)){
+	  if(hasInterfaceList[i] /*&& listOfPores[i]->info().hainesJump == 0.0*/ && !listOfPores[i]->info().isWResInternal && (!deformation || listOfPores[i]->info().saturation != 0.0)){
 	    pressuresList[i] = porePressureFromPcS(listOfPores[i],saturationList[i]);
 	  }
 	}
@@ -2022,7 +2060,7 @@ void TwoPhaseFlowEngine::solvePressure()
 
 	// --------------------------------------Find invasion events-----------------------------------------------------
 	for(unsigned int i = 0; i < numberOfPores; i++){
-	  if(saturationList[i] > 1.0 - truncationPrecision &&  listOfFlux[i] < 0.0 && saturationList[i] != 1.0){
+	  if(saturationList[i] > 1.0 - truncationPrecision &&  (listOfFlux[i] < 0.0 || deformation) && saturationList[i] != 1.0){
 		if(saturationList[i] > 1.0){
 		 if(saturationList[listOfPores[i]->info().invadedFrom] >= 1.0){
 		   	waterVolumeTruncatedLost +=  (saturationList[i] - 1.0) * listOfPores[i]->info().mergedVolume;
@@ -2050,15 +2088,19 @@ void TwoPhaseFlowEngine::solvePressure()
 	
 	
 	for(unsigned int i = 0; i < numberOfPores; i++){
-	  if(hasInterfaceList[i] && saturationList[i] < listOfPores[i]->info().thresholdSaturation){
+	  if((fractionMinSaturationInvasion == -1 && hasInterfaceList[i] && saturationList[i] <  listOfPores[i]->info().thresholdSaturation) || 
+	    (fractionMinSaturationInvasion > 0.0 && saturationList[i] < fractionMinSaturationInvasion)
+	    
+	  ){
 	    for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
 	      if(airBoundaryPressure - pressuresList[listOfPores[i]->info().poreNeighbors[j]] > listOfPores[i]->info().listOfEntryPressure[j] &&
+		//saturationList[i] < listOfPores[i]->info().listOfEntrySaturation[j] &&
 		!hasInterfaceList[listOfPores[i]->info().poreNeighbors[j]] && 
 //   		!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWResDef && //NOTE
 		!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isWResInternal && //NOTE
 		saturationList[listOfPores[i]->info().poreNeighbors[j]] > listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().minSaturation &&
-		saturationList[listOfPores[i]->info().poreNeighbors[j]] <= 1.0 //&&
-// 		listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().invadedFrom != i	//NOTE FIXME FIXME
+		saturationList[listOfPores[i]->info().poreNeighbors[j]] <= 1.0		//&&
+//  		listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().invadedFrom != i	//NOTE FIXME FIXME
 	      ){
 //   		  std::cerr<< "Event occured! " << i << " " << j << " "<< listOfPores[i]->info().poreNeighbors[j];
 		  hasInterfaceList[listOfPores[i]->info().poreNeighbors[j]] = true;
@@ -2075,8 +2117,10 @@ void TwoPhaseFlowEngine::solvePressure()
 	
 	//truncate saturation
 	for(unsigned int i = 0; i < numberOfPores; i++){
-// 	  if(saturationList[i] > 1.0 - truncationPrecision && ((!deformation && listOfFlux[i] < -1e-18 && hasInterfaceList[i]) || deformation) /*&& !listOfPores[i]->info().isWResInternal*/ /*&& hasInterfaceList[i]*/){
-//  		saturationList[i] = 1.0;
+//  	  if(saturationList[i] > 1.0 - truncationPrecision && ((!deformation && listOfFlux[i] < -1e-18 && hasInterfaceList[i]) || deformation) /*&& !listOfPores[i]->info().isWResInternal*/ /*&& hasInterfaceList[i]*/){
+//   		saturationList[i] = 1.0;
+// 		waterVolumeTruncatedLost +=  (saturationList[i] - 1.0) * listOfPores[i]->info().mergedVolume;
+
 //  		hasInterfaceList[i] = false;
 // // 		listOfPores[i]->info().hainesJump = 1.0; 
 //   	      if(!deformation && hasInterfaceList[i]){
@@ -2099,10 +2143,10 @@ void TwoPhaseFlowEngine::solvePressure()
 	    }
 	  }
 	  
-	  if(listOfPores[i]->info().hainesJump != 0.0 && saturationList[i] < listOfPores[i]->info().thresholdSaturation){
-	      listOfPores[i]->info().hainesJump = 0.0;
-	      listOfPores[i]->info().isNWResDef = false;
-	  }
+// 	  if(/*listOfPores[i]->info().hainesJump != 0.0 &&*/ saturationList[i] < listOfPores[i]->info().thresholdSaturation){
+// 	      listOfPores[i]->info().hainesJump = 0.0;
+// 	      listOfPores[i]->info().isNWResDef = false;
+// 	  }
 	  if(listOfPores[i]->info().isNWResDef && saturationList[i] < listOfPores[i]->info().thresholdSaturation){
 	    listOfPores[i]->info().isNWResDef = false;
 	  }
@@ -2112,86 +2156,145 @@ void TwoPhaseFlowEngine::solvePressure()
 
     //project pressure & saturation back on cells
     if(deformation){
-	for(unsigned int i = 0; i < numberOfPores; i++){
+	double voidVolumeCellBefore = 0.0, voidVolumeCellAfter = 0.0, voidMergedBefore = 0.0, voidMergedAfter = 0.0;
+//       computePoreBodyVolume();
 	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-	    if(cell->info().poreId == i){
-		cell->info().saturation = saturationList[i];
-		cell->info().p() = pressuresList[i];
-		cell->info().hasInterface = bool(hasInterfaceList[i]);
-		cell->info().flux = listOfFlux[i];
-		cell->info().isNWRes = listOfPores[i]->info().isNWRes;
-		cell->info().hainesJump = listOfPores[i]->info().hainesJump;
-		cell->info().airWaterArea = listOfPores[i]->info().airWaterArea;
-		if(saturationList[i] > listOfPores[i]->info().minSaturation){
-		  cell->info().mergedVolume = listOfPores[i]->info().mergedVolume + listOfPores[i]->info().accumulativeDV * oldDT;
-// 		  listOfMergedVolume[i] = cell->info()./*mergedVolume*/;
-		  cell->info().poreBodyVolume += cell->info().dv() * oldDT;	
-		}
-	      
+	   if(!cell->info().isFictious){
+		voidVolumeCellBefore += cell->info().poreBodyVolume;
 	    }
 	  }
+	  for(unsigned int i = 0; i < numberOfPores; i++){
+	      voidMergedBefore += listOfPores[i]->info().mergedVolume;
+	  }
+	
+
+	for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+	  cell->info().poreBodyVolume += cell->info().dv() * oldDT;			
+	}
+	
+	for(unsigned int i = 0; i < numberOfPores; i++){
+	  listOfPores[i]->info().mergedVolume  += listOfPores[i]->info().accumulativeDV * oldDT;
+
+		//NOTE for one-way coupling, this functionailty is not required, for two-way coupling it is. but it is slow! 
+ 	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+ 	    if(cell->info().poreId == i){
+ 		cell->info().saturation = saturationList[i];
+ 		cell->info().p() = pressuresList[i];
+ 		cell->info().hasInterface = bool(hasInterfaceList[i]);
+ 		cell->info().flux = listOfFlux[i];
+ 		cell->info().isNWRes = listOfPores[i]->info().isNWRes;
+//  		cell->info().hainesJump = listOfPores[i]->info().hainesJump;
+ 		cell->info().airWaterArea = listOfPores[i]->info().airWaterArea;
+ 		cell->info().mergedVolume = listOfPores[i]->info().mergedVolume;												//NOTE ADDED AFTER TRUNK UPDATE
+ 		cell->info().poreBodyRadius = getChi(cell->info().numberFacets)*std::pow(listOfPores[i]->info().mergedVolume,(1./3.));						//NOTE ADDED AFTER TRUNK UPDATE
+ 		cell->info().dv() = 0.0;	
+ 		cell->info().accumulativeDV = 0.0;																//NOTE ADDED AFTER TRUNK UPDATE
+ 	    }
+ 	  }
 	} 
+	
+	for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+	   if(!cell->info().isFictious){
+		voidVolumeCellAfter += cell->info().poreBodyVolume;
+	    }
+	  }
+	  for(unsigned int i = 0; i < numberOfPores; i++){
+	      voidMergedAfter += listOfPores[i]->info().mergedVolume;
+	  }
+	  
+//   	 if(deformation){std::cerr << endl << "CellBefore: " << voidVolumeCellBefore << " CellAfter: " << voidVolumeCellAfter << " dCell: " << (voidVolumeCellBefore - voidVolumeCellAfter) << " MergedBefore: " << voidMergedBefore << " MergedAfter: " << voidMergedAfter  << " dMerged: " << (voidMergedBefore - voidMergedAfter);}
+	
+	
     }
-//     if(!deformation && deformation){
+
       for(unsigned int i = 0; i < numberOfPores; i++){
 		if(saturationList[i]  > 1.0){
 		 std::cerr << endl << "Error!, saturation larger than 1? "; 
-		 saturationList[i] = 0.0;
+		 saturationList[i] = 1.0;								//NOTE ADDED AFTER TRUNK UPDATE should be 0.0?
 // 		 stopSimulation = true;
 		}
 		listOfPores[i]->info().saturation = saturationList[i];
 		listOfPores[i]->info().p() = pressuresList[i];
 		listOfPores[i]->info().hasInterface = bool(hasInterfaceList[i]);
 		listOfPores[i]->info().flux = listOfFlux[i];
+		listOfPores[i]->info().dv() = 0.0;							//NOTE ADDED AFTER TRUNK UPDATE
+		listOfPores[i]->info().accumulativeDV = 0.0;
       }
-//     }
-
 }
 
 void TwoPhaseFlowEngine::getQuantities()
 {
   double waterVolume = 0.0, pressureWaterVolume = 0.0, voidVolume2=0.0, pressureIF = 0.0,  waterVolumeIF = 0.0, waterVolume_NHJ = 0.0, pressureWaterVolume_NHJ = 0.0;
-  double pressureAreaAccumulative = 0.0, AreaAccumulative = 0.0;
+  double pressureAreaAccumulative = 0.0, AreaAccumulative = 0.0, waterVolumeP = 0.0, YDimension  = 0.0, simplePressureAverage = 0.0;
   voidVolume = 0.0;
-//   if(!deformation || deformation){
     for(unsigned int i = 0; i < numberOfPores; i++){
-// 	if(listOfPores[i]->info().isWResInternal){
 	  voidVolume += listOfPores[i]->info().mergedVolume;
 	  waterVolume += listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation;
-	  pressureWaterVolume += listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation * listOfPores[i]->info().p();
-	  if(listOfPores[i]->info().hasInterface){
+	  YDimension += solver->cellBarycenter(listOfPores[i])[1] * listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation;
+	  simplePressureAverage += listOfPores[i]->info().mergedVolume * listOfPores[i]->info().p();
+	  
+	  if(std::abs(listOfPores[i]->info().p()) < 1e10){
+	    pressureWaterVolume += listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation * listOfPores[i]->info().p();
+	    waterVolumeP += listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation;
+	  }
+	  if(listOfPores[i]->info().saturation < 1.0){
 	   waterVolume_NHJ +=  listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation;
 	   pressureWaterVolume_NHJ += listOfPores[i]->info().mergedVolume * listOfPores[i]->info().saturation * listOfPores[i]->info().p();
 	  }
-// 	}
+ 	
     }
     
     double areaAveragedPressureAcc = 0.0, areaSphere = 0.0;
     airWaterInterfacialArea = 0.0;
     for(unsigned int i = 0; i < numberOfPores; i++){
-      if(listOfPores[i]->info().hasInterface){
-	if(listOfPores[i]->info().saturation < 1.0 && listOfPores[i]->info().saturation >= listOfPores[i]->info().thresholdSaturation){
-	 areaSphere = 4.0 * 3.14159265359 * std::pow(getChi(listOfPores[i]->info().numberFacets) * std::pow(listOfPores[i]->info().mergedVolume * (1.0 - listOfPores[i]->info().saturation),0.3333),2); 
-	}
-	if(listOfPores[i]->info().saturation < listOfPores[i]->info().thresholdSaturation && listOfPores[i]->info().saturation > 0.0 && listOfPores[i]->info().saturation > listOfPores[i]->info().minSaturation){		//FIXME FIXME FIXME 1 june 2016
-	  areaSphere = 4.0 * 3.14159265359 * std::pow((2.0 * surfaceTension / (-1.0*listOfPores[i]->info().p())),2.0) + 2.0 * getN(listOfPores[i]->info().numberFacets) * (listOfPores[i]->info().poreBodyRadius - (2.0 * surfaceTension / (-1.0*listOfPores[i]->info().p()))) * 
-	  (2.0 * surfaceTension / (-1.0 * listOfPores[i]->info().p())) * (2.0 * 3.14159265359 - getDihedralAngle(listOfPores[i]->info().numberFacets));
-	}
-	areaAveragedPressureAcc += areaSphere * listOfPores[i]->info().p();
-	airWaterInterfacialArea += areaSphere;
+	if(listOfPores[i]->info().hasInterface){
+	    if(listOfPores[i]->info().saturation < 1.0 && listOfPores[i]->info().saturation >= listOfPores[i]->info().thresholdSaturation){
+	      areaSphere = 4.0 * 3.14159265359 * std::pow(getChi(listOfPores[i]->info().numberFacets) * std::pow(listOfPores[i]->info().mergedVolume * (1.0 - listOfPores[i]->info().saturation),0.3333),2); 
+	    }
+	    if(listOfPores[i]->info().saturation < listOfPores[i]->info().thresholdSaturation && listOfPores[i]->info().saturation > 0.0 && listOfPores[i]->info().saturation > listOfPores[i]->info().minSaturation){		//FIXME FIXME FIXME 1 june 2016
+	      areaSphere = 4.0 * 3.14159265359 * std::pow((2.0 * surfaceTension / (-1.0*listOfPores[i]->info().p())),2.0) + 2.0 * getN(listOfPores[i]->info().numberFacets) * (listOfPores[i]->info().poreBodyRadius - (2.0 * surfaceTension / (-1.0*listOfPores[i]->info().p()))) * 
+	      (2.0 * surfaceTension / (-1.0 * listOfPores[i]->info().p())) * (2.0 * 3.14159265359 - getDihedralAngle(listOfPores[i]->info().numberFacets));
+	    }
+	    areaAveragedPressureAcc += areaSphere * listOfPores[i]->info().p();
+	    airWaterInterfacialArea += areaSphere;
+      }
     }
-    }
+ 
     areaAveragedPressure = areaAveragedPressureAcc / airWaterInterfacialArea;
-//   }
-  
-  waterSaturation = waterVolume / voidVolume;
-  waterPressure = pressureWaterVolume / waterVolume;
-  waterPressurePartiallySatPores = pressureIF / waterVolumeIF;
-  waterPressure_NHJ = pressureWaterVolume_NHJ / waterVolume_NHJ;
-//   voidVolume = voidVolume2;
-  totalWaterVolume = waterVolume; 
+    waterSaturation = waterVolume / voidVolume;
+    waterPressure = pressureWaterVolume / waterVolumeP;
+    waterPressurePartiallySatPores = pressureWaterVolume_NHJ / waterVolume_NHJ;
+    simpleWaterPressure = simplePressureAverage / voidVolume;
+    totalWaterVolume = waterVolume; 
+    
+    
+    
+    if(!deformation){
+      double volumeWaterVBC = 0.0, volumeWaterPressureBC = 0.0, volumeWaterBC = 0.0, volumeWaterAirBC = 0.0, volumeWaterPressureAirBC = 0.0, volumeAirBC = 0.0, Ybottom = 0.0, Ytop = 0.0;
+      for(unsigned int i = 0; i < numberOfPores; i++){
+      if(listOfPores[i]->info().waterBC){
+	volumeWaterVBC += listOfPores[i]->info().saturation * listOfPores[i]->info().mergedVolume;
+	volumeWaterPressureBC += listOfPores[i]->info().saturation * listOfPores[i]->info().mergedVolume * listOfPores[i]->info().p();
+	volumeWaterBC +=  listOfPores[i]->info().mergedVolume;
+	Ybottom += solver->cellBarycenter(listOfPores[i])[1] * listOfPores[i]->info().mergedVolume;
+      }
+      if(listOfPores[i]->info().airBC){
+	volumeWaterAirBC += listOfPores[i]->info().saturation * listOfPores[i]->info().mergedVolume;
+	volumeWaterPressureAirBC += listOfPores[i]->info().saturation * listOfPores[i]->info().mergedVolume * listOfPores[i]->info().p();
+	volumeAirBC +=  listOfPores[i]->info().mergedVolume;
+	Ytop += solver->cellBarycenter(listOfPores[i])[1] * listOfPores[i]->info().mergedVolume;
+      }
+      }
+      double Stop = volumeWaterAirBC / volumeAirBC;  //air BC
+      double Sbottom = volumeWaterVBC / volumeWaterBC;//Water BC.
+      double Ptop = volumeWaterPressureAirBC / volumeWaterAirBC ;
+      double Pbottom = volumeWaterPressureBC /  volumeWaterVBC ;
+      double z = (((Ytop / volumeAirBC) - (Ybottom / volumeWaterBC)) / 2.0) + (Ybottom / volumeWaterBC);
+      double gradP =  -1.0 * (Stop - Sbottom) +  (Stop * Ptop - Sbottom * Pbottom);
+      double gradZ =  -1.0 * (YDimension / waterVolume)*(Stop - Sbottom) +  ((Stop * Ytop / volumeAirBC) - (Sbottom * Ybottom / volumeWaterBC));
+      centroidAverageWaterPressure = waterPressure + (1.0 / gradZ) *  (z - (YDimension / waterVolume)) * gradP;
+    }
 }
-
 
 void TwoPhaseFlowEngine::imposeDeformationFluxTPF()
 {    
@@ -2237,35 +2340,117 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
 }
 
 
+
 void TwoPhaseFlowEngine::updatePoreUnitProperties()
 {
-    //hydraulic radius
-    //pore throat radii
-   computePoreThroatRadiusMethod2();
-   solver->computePermeability();
+  
+  //FIXME clean-up this function (computePoreThroatRadiusMethod2() does not include update of particle location, thus this is a quick fix
+
+  
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();  
+    for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
+      if(!cell->info().isFictious){
+	for(unsigned int j = 0; j<4; j++){
+	  if(cell->info().poreId != cell->neighbor(j)->info().poreId){
+	    double rA = positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].radius;
+	    double rB = positionBufferCurrent[cell->vertex(facetVertices[j][1])->info().id()].radius;
+	    double rC = positionBufferCurrent[cell->vertex(facetVertices[j][2])->info().id()].radius;
+	    CVector posA(positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].pos[0],positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].pos[1],positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].pos[2] );
+	    CVector posB(positionBufferCurrent[cell->vertex(facetVertices[j][1])->info().id()].pos[0],positionBufferCurrent[cell->vertex(facetVertices[j][1])->info().id()].pos[1],positionBufferCurrent[cell->vertex(facetVertices[j][1])->info().id()].pos[2] );
+	    CVector posC(positionBufferCurrent[cell->vertex(facetVertices[j][2])->info().id()].pos[0],positionBufferCurrent[cell->vertex(facetVertices[j][2])->info().id()].pos[1],positionBufferCurrent[cell->vertex(facetVertices[j][2])->info().id()].pos[2] );
+	    CVector B = posB - posA; //positionBufferCurrent[cell->vertex(facetVertices[j][1])->info().id()].pos - positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].pos;
+	    CVector x = B/sqrt(B.squared_length());
+	    CVector C = posC - posA; //positionBufferCurrent[cell->vertex(facetVertices[j][2])->info().id()].pos - positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].pos;
+	    CVector z = CGAL::cross_product(x,C);
+	    CVector y = CGAL::cross_product(x,z);
+	    y = y/std::sqrt(y.squared_length());
+
+	    double b1[2]; b1[0] = B*x; b1[1] = B*y;
+	    double c1[2]; c1[0] = C*x; c1[1] = C*y;
+
+	    double A = ((std::pow(rA,2))*(1-c1[0]/b1[0])+((std::pow(rB,2)*c1[0])/b1[0])-std::pow(rC,2)+pow(c1[0],2)+std::pow(c1[1],2)-((std::pow(b1[0],2)+std::pow(b1[1],2))*c1[0]/b1[0]))/(2*c1[1]-2*b1[1]*c1[0]/b1[0]);
+	    double BB = (rA-rC-((rA-rB)*c1[0]/b1[0]))/(c1[1]-b1[1]*c1[0]/b1[0]);
+	    double CC = (std::pow(rA,2)-std::pow(rB,2)+std::pow(b1[0],2)+std::pow(b1[1],2))/(2*b1[0]);
+	    double D = (rA-rB)/b1[0];
+	    double E = b1[1]/b1[0];
+	    double F = std::pow(CC,2)+std::pow(E,2)*std::pow(A,2)-2*CC*E*A;
+
+	    double c = -F-std::pow(A,2)+pow(rA,2);
+	    double b = 2*rA-2*(D-BB*E)*(CC-E*A)-2*A*BB;
+	    double a = 1-std::pow((D-BB*E),2)-std::pow(BB,2);
+
+	    if ((std::pow(b,2)-4*a*c)<0){std::cout << "NEGATIVE DETERMINANT" << endl; }
+	    double reff = (-b+std::sqrt(pow(b,2)-4*a*c))/(2*a);
+
+
+
+	    if (cell->vertex(facetVertices[j][2])->info().isFictious || cell->vertex(facetVertices[j][1])->info().isFictious || cell->vertex(facetVertices[j][2])->info().isFictious){
+		reff = -1 * reff;
+	    }
+	    
+	    cell->info().poreThroatRadius[j] = reff;
+	    
+	    for(unsigned int k = 0; k < listOfPores[cell->info().poreId]->info().poreNeighbors.size(); k++){
+	      if(listOfPores[cell->info().poreId]->info().poreNeighbors[k] == cell->neighbor(j)->info().id){
+		listOfPores[cell->info().poreId]->info().listOfEntryPressure[k] = reff;
+		for(unsigned int l = 0; l < listOfPores[listOfPores[cell->info().poreId]->info().poreNeighbors[k]]->info().poreNeighbors.size(); l++){
+		    if(listOfPores[listOfPores[cell->info().poreId]->info().poreNeighbors[k]]->info().poreNeighbors[l] == listOfPores[cell->info().poreId]->info().poreId){
+		      listOfPores[cell->info().poreId]->info().listOfEntryPressure[k] = reff;
+		}
+	      }
+	    }
+	    }
+	}
+	}
+      }
+    }
+  //FIXME replace all above with function: computePoreThroatRadiusMethod(), which includes particle update
    
+   solver->computePermeability();  
+}
+
+void TwoPhaseFlowEngine::copyPoreDataToCells()
+{
+
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();  
+	for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+	  if(!cell->info().isFictious){
+ 		cell->info().saturation = listOfPores[cell->info().poreId]->info().saturation;
+ 		cell->info().p() = listOfPores[cell->info().poreId]->info().p();
+ 		cell->info().hasInterface = bool(hasInterfaceList[cell->info().poreId]);
+ 		cell->info().flux = listOfFlux[cell->info().poreId];
+ 		cell->info().isNWRes = listOfPores[cell->info().poreId]->info().isNWRes;
+//  		cell->info().hainesJump = listOfPores[cell->info().poreId]->info().hainesJump;
+ 		cell->info().airWaterArea = listOfPores[cell->info().poreId]->info().airWaterArea;
+ 		if(deformation){
+		  cell->info().mergedVolume = listOfPores[cell->info().poreId]->info().mergedVolume;												//NOTE ADDED AFTER TRUNK UPDATE
+		  cell->info().poreBodyRadius = getChi(cell->info().numberFacets)*std::pow(listOfPores[cell->info().poreId]->info().mergedVolume,(1./3.));			
+		}//NOTE ADDED AFTER TRUNK UPDATE
+														//NOTE ADDED AFTER TRUNK UPDATE
+	    }
+	  }  
 }
         
 void TwoPhaseFlowEngine::actionTPF()
 {
   iterationTPF += 1;
   if(firstDynTPF){
-    std::cout << endl << "Welcome to the two-phase flow Engine" << endl << "by T.Sweijen, B.Chareyre and S.M.Hassanizadeh" << endl << "For contact: T.Sweijen@uu.nl";
-    solver->computePermeability();
-    scene->time = 0.0;
-    initialization();
-    actionMergingAlgorithm();
-    calculateResidualSaturation();
-    setInitialConditions();
-    setBoundaryConditions();
-    setPoreNetwork();
-    scene->dt = 1e-20;
-   setListOfPores();
-   solvePressure();
-   getQuantities();
-    
-   firstDynTPF = false;
-
+      std::cout << endl << "Welcome to the two-phase flow Engine" << endl << "by T.Sweijen, B.Chareyre and S.M.Hassanizadeh" << endl << "For contact: T.Sweijen@uu.nl";
+      solver->computePermeability();
+      scene->time = 0.0;
+      initialization();
+      actionMergingAlgorithm();
+      calculateResidualSaturation();
+      setInitialConditions();
+      setBoundaryConditions();
+      setPoreNetwork();
+      scene->dt = 1e-20;
+      setListOfPores();
+      solvePressure();
+      getQuantities();
+      firstDynTPF = false;
   }
   if(!firstDynTPF && !stopSimulation){
 //    bool remesh = false;
@@ -2288,13 +2473,14 @@ void TwoPhaseFlowEngine::actionTPF()
    }
    setListOfPores();
    if(solvePressureSwitch){solvePressure();}
-   if(deformation){getQuantities();}
+   if(deformation){if(int(float(iterationTPF)/50.0) == float(iterationTPF)/50.0){getQuantities();}}	//FIXME update of quantities has to be made more appropiate
+
    
 //    getQuantities();//NOTE FIX
    
     if(!deformation ){
       if(!getQuantitiesUpdateCont){
-	if(int(float(iterationTPF)/10.0) == float(iterationTPF)/10.0){getQuantities();}
+	if(int(float(iterationTPF)/100.0) == float(iterationTPF)/100.0){getQuantities();}
       }
       if(getQuantitiesUpdateCont){
 	getQuantities();
