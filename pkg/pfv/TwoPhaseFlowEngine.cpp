@@ -2224,6 +2224,7 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
     double volume = 0.0, invTime = (1.0 / scene->dt);
     if(scene->dt == 0.0){std::cerr<<" No dt found!";}
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
+      cell->info().dv() = 0.0;
 	if(!cell->info().isFictious){
 	  double solidVol = getSolidVolumeInCell(cell);
 	  if(solidVol < 0.0){std::cerr<<"Error! negative pore body volume! " << solidVol; solidVol = 0.0;}
@@ -2422,8 +2423,8 @@ void TwoPhaseFlowEngine::actionTPF()
    //Time steps + deformation, but no remeshing
    scene->time = scene->time + scene->dt;
    if(deformation && !remesh){
+     updateDeformationFluxTPF();
      if(int(float(iterationTPF)/10.0) == float(iterationTPF)/10.0){
-	updateDeformationFluxTPF();
 	updatePoreUnitProperties();
    }
   }
