@@ -51,6 +51,7 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	std::vector<double> listOfEntryPressure;
 	std::vector<double> kNorm2;
 	std::vector<double> listOfThroatArea;
+	std::vector<double> particleSurfaceArea;	//Surface area of four particles enclosing one grain-based tetrahedra
 	double accumulativeDVSwelling;
 	double saturation2;
 	int numberFacets;
@@ -69,6 +70,8 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 	bool airBC;
 	bool waterBC;
 	double thresholdPressure;
+	double apparentSolidVolume;
+	double dvSwelling;
 	double dvTPF;
 	bool isNWResDef;
 	int invadedFrom;
@@ -96,9 +99,12 @@ class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 		mergedVolume = 0;
 		mergednr = 0;
 		mergedID = 0;
+		apparentSolidVolume = 0.0;
+		dvSwelling = 0.0;
 		entryPressure.resize(4,0);
 		entrySaturation.resize(4,0);
 		poreIdConnectivity.resize(4,-1);
+		particleSurfaceArea.resize(4,0);
 		thresholdSaturation = 0.0;
 		flux = 0.0;			//NOTE can potentially be removed, currently not used but might be handy in future work
 		accumulativeDV = 0.0;
@@ -268,7 +274,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void setListOfPores();
 	void getQuantities();
 	double porePressureFromPcS(CellHandle cell, double saturation);
-
+	double getSolidVolumeInCell(CellHandle cell);
+	
 	double getConstantC4(CellHandle cell);  
 	double getConstantC3(CellHandle cell);
 	double dsdp(CellHandle cell, double pw);
@@ -314,6 +321,13 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	  boost::python::list ids;
 	  if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
 	  for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->info().kNorm() [i]);
+	return ids;
+	}
+	
+      boost::python::list solidSurfaceAreaPerParticle(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
+	  boost::python::list ids;
+	  if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
+	  for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->info().particleSurfaceArea[i]);
 	return ids;
 	}
 
@@ -431,6 +445,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((double, simpleWaterPressure, 0.0,,"Water pressure based on averaging of pore volume"))
 	((double, centroidAverageWaterPressure, 0.0,,"Water pressure based on centroid-corrected averaging, see Korteland et al. (2010) - what is the correct definition of average pressure?"))
 	((double, fractionMinSaturationInvasion, -1.0,,"Set the threshold saturation at which drainage can occur (Sthr = fractionMinSaturationInvasion), note that -1 implied the conventional definition of Sthr"))
+	((vector<double>, setFractionParticles, vector<double>(scene->bodies->size(),0.0),,"Correction fraction for swelling of particles by mismatch of surface area of particles with those from actual surface area in pore units"))
 
 	
 	
@@ -478,6 +493,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getCellThresholdSaturation",&TwoPhaseFlowEngine::cellThresholdSaturation,"get the saturation of imbibition")
 	.def("getCellMergedID",&TwoPhaseFlowEngine::cellMergedID,"get the saturation of imbibition")
 	.def("actionTPF",&TwoPhaseFlowEngine::actionTPF,"run 1 time step flow Engine")
+	.def("getSolidSurfaceAreaPerParticle",&TwoPhaseFlowEngine::solidSurfaceAreaPerParticle,(boost::python::arg("cell_ID")),"get solid area inside a packing of particles")
 	.def("readTriangulation",&TwoPhaseFlowEngine::readTriangulation,"get the solid area of various solids in a pore")
 	.def("imposeDeformationFluxTPF",&TwoPhaseFlowEngine::imposeDeformationFluxTPF,"Impose fluxes defined in dvTPF")
 	.def("getCellPorosity",&TwoPhaseFlowEngine::cellPorosity,"get the porosity of individual cells.")
