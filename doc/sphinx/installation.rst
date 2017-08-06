@@ -320,3 +320,8 @@ Cloud Computing
 ----------------
 
 It is possible to exploit cloud computing services to run Yade. The combo Yade/Amazon Web Service has been found to work well, namely. Detailed instructions for migrating to amazon can be found in the section :ref:`CloudComputing`.
+
+GPU Acceleration
+----------------
+
+The FlowEngine can be accelerated with CHOLMOD's GPU accelerated solver. The specific hardware and software requirements are outlined in the section :ref:`GPUacceleration`.

@@ -22,6 +22,8 @@ Welcome to Yade's documentation!
 
   amazonEC2.rst
 
+  GPUacceleration.rst
+
   github.rst
 
   formulation.rst
