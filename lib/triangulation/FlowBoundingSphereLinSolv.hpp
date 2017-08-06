@@ -8,6 +8,7 @@
 #ifdef FLOW_ENGINE
 #pragma once
 
+#define CHOLMOD_LIB
 #define EIGENSPARSE_LIB //comment this if CHOLMOD is not available
 // #define TAUCS_LIB //comment this if TAUCS lib is not available, it will disable PARDISO lib as well
 
@@ -16,11 +17,17 @@
 	#include <Eigen/SparseCore>
 	#include <Eigen/CholmodSupport>
 #endif
+
+#ifdef CHOLMOD_LIB 
+	#include <cholmod.h>
+#endif
+
 #ifdef TAUCS_LIB
 #define TAUCS_CORE_DOUBLE
 #include <complex> //THIS ONE MUST ABSOLUTELY BE INCLUDED BEFORE TAUCS.H!
 #include <stdlib.h>
 #include <float.h>
+//#include <time.h>
 extern "C" {
 #include "taucs.h"
 }
@@ -78,6 +85,20 @@ public:
 	//here we specify both thread numbers independently
 	int numFactorizeThreads;
 	int numSolveThreads;
+	#endif
+
+	#ifdef CHOLMOD_LIB
+	cholmod_factor* L;
+	cholmod_sparse* Achol;
+	cholmod_common com;
+	void add_T_entry(cholmod_triplet* T, long r, long c, double x)
+	{
+		size_t k = T->nnz;
+		((long*)T->i)[k] = r;
+		((long*)T->j)[k] = c;
+		((double*)T->x)[k] = x;
+		T->nnz++;
+	}
 	#endif
 
 	#ifdef TAUCS_LIB
@@ -155,6 +176,7 @@ public:
 	int pardisoSolveTest();
 	int pardisoSolve(Real dt);
 	int eigenSolve(Real dt);
+	int cholmodSolve(Real dt);
 	
 	void copyGsToCells();
 	void copyCellsToGs(Real dt);
@@ -178,6 +200,9 @@ public:
 			break;
 		case 3:
 			eigenSolve(dt);
+			break;
+		case 4:
+			cholmodSolve(dt);
 			break;
 		}
 		computedOnce=true;

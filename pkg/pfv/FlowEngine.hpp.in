@@ -266,7 +266,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((double,permeabilityFactor,1.0,,"Permability multiplier ($m$): $m=1$ (default) attempts to predicty the actual hydraulic conductivity using a Poiseuille equation; $m>0$ multiplies the default values by $m$; $m<0$ defines the conductivity independently of particle size and viscosity as if the material was a homogeneous continuum of conductivity $-m$"))
 		((double,viscosity,1.0,,"viscosity of the fluid"))
 		((double,stiffness, 10000,,"equivalent contact stiffness used in the lubrication model"))
-		((int, useSolver, 0,, "Solver to use. 0:Gauss-Seidel, >0: Cholesky factorization (sparse CHOLMOD)"))
+		((int, useSolver, 0,, "Solver to use. 0:Gauss-Seidel, >0: Cholesky factorization (sparse CHOLMOD), 4: GPU accelerated CHOLMOD (must be combined with :yref:`FlowEngine::multithread`=True)"))
 		((int, xmin,0,(Attr::readonly),"Index of the boundary $x_{min}$. This index is not equal the the id of the corresponding body in general, it may be used to access the corresponding attributes (e.g. flow.bndCondValue[flow.xmin], flow.wallId[flow.xmin],...)."))
 		((int, xmax,1,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))
 		((int, ymin,2,(Attr::readonly),"See :yref:`FlowEngine::xmin`."))

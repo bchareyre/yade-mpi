@@ -63,6 +63,14 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::~FlowBoundingSphereLinSolv()
 	#ifdef TAUCS_LIB
 	if (Fccs) taucs_ccs_free(Fccs);
 	#endif
+	#ifdef CHOLMOD_LIB
+	if (useSolver == 4){
+		cholmod_l_free_sparse(&Achol, &com);
+		cholmod_l_free_factor(&L, &com);
+		cholmod_l_finish(&com);
+		//cout << "Achol memory freed and cholmod finished" <<endl;
+	}
+	#endif
 }
 template<class _Tesselation, class FlowType>
 FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): FlowType() {
@@ -84,6 +92,11 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	factorizedEigenSolver=false;
 	numFactorizeThreads=1;
 	numSolveThreads=1;
+	#endif
+	#ifdef CHOLMOD_LIB
+	cholmod_l_start(&com);
+	com.useGPU=1; //useGPU;
+	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
 	#endif
 }
 
@@ -275,6 +288,19 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 			for(int k=0;k<T_nnz;k++) tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
  			A.resize(ncols,ncols);
 			A.setFromTriplets(tripletList.begin(), tripletList.end());
+		#endif
+		#ifdef CHOLMOD_LIB
+		}else if (useSolver==4){
+			//com.useGPU=useGPU; //useGPU;
+			cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &com);		
+			// set all the values for the cholmod triplet matrix
+			for(int k=0;k<T_nnz;k++){
+				add_T_entry(T,is[k]-1, js[k]-1, vs[k]);
+			}
+			//cholmod_l_print_triplet(T, "triplet", &com);
+			Achol = cholmod_l_triplet_to_sparse(T, T->nnz, &com);
+			//cholmod_l_print_sparse(Achol, "Achol", &com);
+			cholmod_l_free_triplet(&T, &com);
 		#endif
 		}
 		isLinearSystemSet=true;
@@ -536,6 +562,45 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 	}
 #else
 	cerr<<"Flow engine not compiled with eigen, nothing computed if useSolver=3"<<endl;
+#endif
+	return 0;
+}
+
+template<class _Tesselation, class FlowType>
+int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
+{
+#ifdef CHOLMOD_LIB
+	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
+	copyCellsToLin(dt);
+	cholmod_dense* B = cholmod_l_zeros(ncols, 1, Achol->xtype, &com);
+	double* B_x =(double *) B->x;
+	for (int k=0; k<ncols; k++) B_x[k]=T_bv[k];
+	if (!factorizedEigenSolver) {
+		//clock_t t;
+		//t = clock();
+		openblas_set_num_threads(numFactorizeThreads);
+		L = cholmod_l_analyze(Achol, &com);
+		cholmod_l_factorize(Achol, L, &com);
+		//t = clock() - t;
+		//cout << "CHOLMOD Time to factorize on GPU " << ((float)t)/CLOCKS_PER_SEC << endl;
+		factorizedEigenSolver=true;
+	}
+	
+	if (!factorizeOnly){
+		//clock_t t;
+		//t = clock();
+		openblas_set_num_threads(numSolveThreads);
+		cholmod_dense* ex = cholmod_l_solve(CHOLMOD_A, L, B, &com);
+		double* e_x =(double *) ex->x;
+		for (int k=0; k<ncols; k++) T_x[k] = e_x[k];
+		//t = clock()-t;
+		//cout << "CHOLMOD Time to solve and copy to T_x " << ((float)t)/CLOCKS_PER_SEC << endl;		
+		copyLinToCells();
+		cholmod_l_free_dense(&ex, &com);
+	}
+	cholmod_l_free_dense(&B, &com);
+#else
+	cerr<<"Flow engine not compiled with CHOLMOD, nothing computed if useSolver=4"<<endl;
 #endif
 	return 0;
 }
