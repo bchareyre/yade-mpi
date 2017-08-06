@@ -92,7 +92,7 @@ Following the instructions outlined `here <https://yade-dem.org/doc/installation
 -- Found Lapack in /usr/lib/liblapack.so
 
 
-If you have multiple versions of any of these packages, the system may find the wrong one. In this cas you will need to either uninstall the old libraries (e.g. ``sudo apt-get remove libcholmod`` if the other library was installed with apt-get) or edit the paths within ``cMake/Find_____.cmake``.
+If you have multiple versions of any of these packages, the system may find the wrong one. In this case, you will need to either uninstall the old libraries (e.g. ``sudo apt-get remove libcholmod`` if the other library was installed with apt-get) or edit the paths within ``cMake/Find_____.cmake``.
 
 Metis is compiled with SuiteSparse, so the Metis library and Metis include should link to files within ``usr/local/SuiteSparse/``. 
 
