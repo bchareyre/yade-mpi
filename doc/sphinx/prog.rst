@@ -1410,11 +1410,11 @@ In some cases, such as OpenMP-loops requiring integral index (OpenMP >= 3.0 allo
 
 .. code-block:: c++
 
-	inr nIntr=(int)scene->interactions->size(); // hoist container size
+	int nIntr=(int)scene->interactions->size(); // hoist container size
 	#pragma omp parallel for
-	for(int j=0; j<nIntr, j++){
-	   const shared_ptr<Interaction>& i(scene->interactions[j]);
-	   if(!->isReal()) continue;
+	for(int j=0; j<nIntr; j++){
+	   const shared_ptr<Interaction>& i=(*scene->interactions)[j];
+	   if(!i->isReal()) continue;
 	   /* … */
 	}
 
