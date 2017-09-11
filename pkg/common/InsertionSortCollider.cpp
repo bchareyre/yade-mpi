@@ -239,7 +239,7 @@ void InsertionSortCollider::action(){
 				if(!s) continue;
 				minR=min(s->radius,minR);
 			}
-			if (std::isinf(minR)) LOG_ERROR("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive verletDist in your script.");
+			if (std::isinf(minR)) LOG_WARN("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive verletDist in your script.");
 			// if no spheres, disable stride
 			verletDist=std::isinf(minR) ? 0 : std::abs(verletDist)*minR;
 		}
