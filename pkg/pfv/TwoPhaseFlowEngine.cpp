@@ -492,11 +492,13 @@ void TwoPhaseFlowEngine::initializeReservoirs()
 }
 
 
-void TwoPhaseFlowEngine::savePoreNetwork()
+void TwoPhaseFlowEngine::savePoreNetwork(const char* folder)
 {
+    //Open relevant files
     std::ofstream filePoreBodyRadius;
     std::cout << "Opening File: " << "PoreBodyRadius" << std::endl;
-    filePoreBodyRadius.open("PoreBodyRadius.txt", std::ios::trunc);
+    mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    filePoreBodyRadius.open(string(folder) + "/PoreBodyRadius.txt", std::ios::trunc);
     if(!filePoreBodyRadius.is_open()){
         std::cerr<< "Error opening file [" << "PoreBodyRadius" << ']' << std::endl;
         return;
@@ -504,7 +506,7 @@ void TwoPhaseFlowEngine::savePoreNetwork()
     
     std::ofstream filePoreBoundary;
     std::cout << "Opening File: " << "PoreBoundary" << std::endl;
-    filePoreBoundary.open("PoreBoundary.txt" , std::ios::trunc);
+    filePoreBoundary.open(string(folder) + "/PoreBoundaryIndex.txt" , std::ios::trunc);
     if(!filePoreBoundary.is_open()){
         std::cerr<< "Error opening file [" << "PoreBoundary" << ']' << std::endl;
         return;
@@ -512,14 +514,14 @@ void TwoPhaseFlowEngine::savePoreNetwork()
     
     std::ofstream filePoreBodyVolume;
     std::cout << "Opening File: " << "PoreBodyVolume" << std::endl;
-    filePoreBodyVolume.open("PoreBodyVolume.txt", std::ios::trunc);
+    filePoreBodyVolume.open(string(folder) + "/PoreBodyVolume.txt", std::ios::trunc);
     if(!filePoreBodyVolume.is_open()){
         std::cerr<< "Error opening file [" << "PoreBodyVolume" << ']' << std::endl;
         return;
     }
     std::ofstream fileLocation;
     std::cout << "Opening File: " << "Location" << std::endl;
-    fileLocation.open("Location.txt", std::ios::trunc);
+    fileLocation.open(string(folder) + "/PoreBodyLocation.txt", std::ios::trunc);
     if(!fileLocation.is_open()){
         std::cerr<< "Error opening file [" << "fileLocation" << ']' << std::endl;
         return;
@@ -527,49 +529,78 @@ void TwoPhaseFlowEngine::savePoreNetwork()
     
     std::ofstream fileNeighbor;
     std::cout << "Opening File: " << "fileNeighbor" << std::endl;
-    fileNeighbor.open("neighbor.txt", std::ios::trunc);
-    if(!filePoreBoundary.is_open()){
+    fileNeighbor.open(string(folder) + "/PoreBodyNeighbor.txt", std::ios::trunc);
+    if(!fileNeighbor.is_open()){
         std::cerr<< "Error opening file [" << "fileNeighbor" << ']' << std::endl;
         return;
     }
     
     std::ofstream fileThroatRadius;
     std::cout << "Opening File: " << "fileThroatRadius" << std::endl;
-    fileThroatRadius.open("throatRadius.txt", std::ios::trunc);
-    if(!filePoreBoundary.is_open()){
+    fileThroatRadius.open(string(folder) + "/throatRadius.txt", std::ios::trunc);
+    if(!fileThroatRadius.is_open()){
         std::cerr<< "Error opening file [" << "fileThroatRadius" << ']' << std::endl;
         return;
     }
     std::ofstream fileThroats;
     std::cout << "Opening File: " << "fileThroats" << std::endl;
-    fileThroats.open("Throats.txt", std::ios::trunc);
-    if(!filePoreBoundary.is_open()){
+    fileThroats.open(string(folder) + "/throatConnectivityPoreBodies.txt", std::ios::trunc);
+    if(!fileThroats.is_open()){
         std::cerr<< "Error opening file [" << "fileThroats" << ']' << std::endl;
         return;
     }
+    std::ofstream fileThroatFluidArea;
+    std::cout << "Opening File: " << "fileThroatFluidArea" << std::endl;
+    fileThroatFluidArea.open(string(folder) + "/fileThroatFluidArea.txt", std::ios::trunc);
+    if(!fileThroatFluidArea.is_open()){
+        std::cerr<< "Error opening file [" << "fileThroatFluidArea" << ']' << std::endl;
+        return;
+    }
+    std::ofstream fileHydraulicRadius;
+    std::cout << "Opening File: " << "fileHydraulicRadius" << std::endl;
+    fileHydraulicRadius.open(string(folder) + "/fileHydraulicRadius.txt", std::ios::trunc);
+    if(!fileHydraulicRadius.is_open()){
+        std::cerr<< "Error opening file [" << "fileHydraulicRadius" << ']' << std::endl;
+        return;
+    }
+    std::ofstream fileConductivity;
+    std::cout << "Opening File: " << "fileConductivity" << std::endl;
+    fileConductivity.open(string(folder) + "/fileConductivity.txt", std::ios::trunc);
+    if(!fileConductivity.is_open()){
+        std::cerr<< "Error opening file [" << "fileConductivity" << ']' << std::endl;
+        return;
+    }
     
-    
-    cout << solver->T[solver->currentTes].cellHandles.size();
+    //Extract pore network based on triangulation
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
       if(cell->info().isGhost == false && cell->info().id < solver->T[solver->currentTes].cellHandles.size()){
       filePoreBodyRadius << cell->info().poreBodyRadius << '\n';
-       filePoreBodyVolume << cell->info().poreBodyRadius << '\n';
-    	CVector center ( 0,0,0 );
-	for ( int k=0;k<4;k++ ){ center= center + 0.25* (cell->vertex(k)->point()-CGAL::ORIGIN);}
-
- 	fileLocation  << center<< '\n';
-	for (unsigned int i=0;i<4;i++){
-	 if(cell->neighbor(i)->info().isGhost == false && cell->neighbor(i)->info().id < solver->T[solver->currentTes].cellHandles.size() && (cell->info().id < cell->neighbor(i)->info().id)){
+      filePoreBodyVolume << cell->info().poreBodyRadius << '\n';
+      CVector center ( 0,0,0 );
+      double count = 0.0;
+      for ( int k=0;k<4;k++ ){ 
+	  if(cell->vertex(k)->info().id() > 5){
+	    center= center + (cell->vertex(k)->point()-CGAL::ORIGIN);
+	    count = count + 1.0;
+	  }
+      }
+      if(count != 0.0){center = center * (1./count);}
+      fileLocation  << center<< '\n';
+      for (unsigned int i=0;i<4;i++){
+        if(cell->neighbor(i)->info().isGhost == false && cell->neighbor(i)->info().id < solver->T[solver->currentTes].cellHandles.size() && (cell->info().id < cell->neighbor(i)->info().id)){
 	   fileNeighbor << cell->neighbor(i)->info().id << '\n';
 	   fileThroatRadius << cell->info().poreThroatRadius[i] << '\n';
 	   fileThroats << cell->info().id << " " << cell->neighbor(i)->info().id << '\n';
+	   const CVector& Surfk = cell->info().facetSurfaces[i];
+	   Real area = sqrt(Surfk.squared_length());
+	   fileThroatFluidArea << cell->info().facetFluidSurfacesRatio[i] * area << '\n';
+	   fileHydraulicRadius << 2.0 * solver->computeHydraulicRadius(cell,i) << '\n';
+	   fileConductivity << cell->info().kNorm()[i] << '\n';
 	 }
-	}
-
       }
-      
+
       if(cell->info().isFictious == 1 && cell->info().isGhost == false && cell->info().id < solver->T[solver->currentTes].cellHandles.size()){
 	//add boundary condition
 	 if(cell->info().isFictious == 1 &&(cell->vertex(0)->info().id() == 3 || cell->vertex(1)->info().id() == 3  || cell->vertex(2)->info().id() == 3  || cell->vertex(3)->info().id() == 3)){
@@ -583,16 +614,17 @@ void TwoPhaseFlowEngine::savePoreNetwork()
       if(cell->info().isFictious == 0 && cell->info().isGhost == false && cell->info().id < solver->T[solver->currentTes].cellHandles.size()){
 	filePoreBoundary << "0" << '\n';       
       }
-}
-
-
+     }
+    }
+    fileThroatFluidArea.close(); 
+    fileHydraulicRadius.close(); 
+    fileConductivity.close(); 
     filePoreBodyRadius.close();
     filePoreBoundary.close();
     filePoreBodyVolume.close();
     fileLocation.close();
     fileNeighbor.close();
     fileThroatRadius.close();
-
 
 }
 

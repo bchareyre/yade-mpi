@@ -332,7 +332,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	}
 
 	//post-processing
-	void savePoreNetwork();
+	void savePoreNetwork(const char* folder);
 	void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
 		
 	boost::python::list cellporeThroatRadius(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
@@ -480,7 +480,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	//Pore merging
 	.def("getCellMergedVolume",&TwoPhaseFlowEngine::cellMergedVolume,"get the merged volume of pore space in each pore unit")
 	.def("setCellHasInterface",&TwoPhaseFlowEngine::setCellHasInterface,"change wheter a cell has a NW-W interface")
-	.def("savePoreNetwork",&TwoPhaseFlowEngine::savePoreNetwork,"Extract the pore network of the granular material")
+	.def("savePoreNetwork",&TwoPhaseFlowEngine::savePoreNetwork,(boost::python::arg("folder")="./poreNetwork"),"Extract the pore network of the granular material (i.e. based on triangulation of the pore space")
 	.def("reTriangulateSpheres",&TwoPhaseFlowEngine::reTriangulate,"apply triangulation, while maintaining saturation")
 	.def("actionMergingAlgorithm",&TwoPhaseFlowEngine::actionMergingAlgorithm,"apply triangulation, while maintaining saturation")
 	.def("getCell2",&TwoPhaseFlowEngine::getCell2,(boost::python::arg("pos")),"get id of the cell containing (X,Y,Z).")		//should be removed finally, duplicate function
