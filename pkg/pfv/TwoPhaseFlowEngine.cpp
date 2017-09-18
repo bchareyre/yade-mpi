@@ -777,6 +777,7 @@ double TwoPhaseFlowEngine::dsdp(CellHandle cell, double pw)
 
 double TwoPhaseFlowEngine::poreSaturationFromPcS(CellHandle cell,double pw)
 {
+    //Using equation: Pc = 2*surfaceTension / (Chi * PoreBodyVolume^(1/3) * (1-exp(-kappa * S)))
   double s = truncationPrecision;
      if(-1*pw > cell->info().thresholdPressure){
        s = std::log(1.0 + cell->info().thresholdPressure / pw) / (-1.0 * getKappa(cell->info().numberFacets));
@@ -785,17 +786,12 @@ double TwoPhaseFlowEngine::poreSaturationFromPcS(CellHandle cell,double pw)
 	s = cell->info().thresholdSaturation;
      }
      if(-1*pw < cell->info().thresholdPressure){
-	std::cerr<<endl<< "Error! Requesting saturation while capillary pressure is below threshold value? " << pw << " " << cell->info().thresholdPressure;
+	if(!remesh && !firstDynTPF){std::cerr<<endl<< "Error! Requesting saturation while capillary pressure is below threshold value? " << pw << " " << cell->info().thresholdPressure;}
 	s = cell->info().thresholdSaturation;
      }
-//    double s = getConstantC4(cell) /std::pow(pw,2) - getConstantC3(cell) / std::pow(pw,3);
-//   double s = 1e-6;
-//   if(-1 * pw < cell->info().thresholdPressure){std::cout << "requesting saturation from Pc < thresholdPC";}
-//   if(-1 * pw >= cell->info().thresholdPressure){
-//     s = std::log(1 - cell->info().thresholdPressure / (-1 * pw)) / (-1 * getKappa(cell->info().numberFacets));
+
      if(s > 1.0 || s < 0.0){std::cout << "Error, saturation from Pc(S) curve is not correct: "<< s << " "<<  cell->info().poreId << " log:" << std::log(1.0 + cell->info().thresholdPressure / pw)<< " " << (-1.0 * getKappa(cell->info().numberFacets)) << " pw=" << pw << " " << cell->info().thresholdPressure; s = 1.0;}
      if(s != s){std::cerr<<endl << "Error! sat in PcS is nan: " << s << "  " << pw << " " << getConstantC4(cell) << " " << getConstantC3(cell) << " mergedVolume=" << cell->info().mergedVolume << " pthreshold=" << cell->info().thresholdPressure;}
-//   }
   return s;
 }
 
@@ -1472,6 +1468,11 @@ void TwoPhaseFlowEngine::setInitialConditions()
 	cell->info().hasInterface = false;
 	cell->info().saturation = 1.0;
       }
+      if(!drainageFirst){   //Secundairy imbibition                 FIXME(thomas): primary imbibition to be included, using hasInterface = False and saturation = 0.0
+	cell->info().hasInterface = true;
+	cell->info().saturation = truncationPrecision;
+        cell->info().p() = porePressureFromPcS(cell,cell->info().saturation);
+      } 
     }
     std::cout<< endl << "Initial conditions are set";
 }
@@ -1534,37 +1535,26 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
       }
     }
      for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+         
       //set initial interface in simulations
+         
+      //Drainage
       if(drainageFirst && cell->info().isNWRes){
 	for (unsigned int i = 0; i<4; i++){
 	  if(!cell->neighbor(i)->info().isFictious){
 	    if(!deformation){
-// 	      if(cell->neighbor(i)->info().thresholdPressure <  initialPC /*-1 * waterBoundaryPressure*/){
 		cell->neighbor(i)->info().hasInterface = true; 
-		cell->neighbor(i)->info().saturation = poreSaturationFromPcS(cell->neighbor(i),-1*initialPC/*waterBoundaryPressure*/);
-		cell->neighbor(i)->info().p() = -1*initialPC /*waterBoundaryPressure*/;
-// 		cell->neighbor(i)->info().hainesJump = 0.0;
+		cell->neighbor(i)->info().saturation = poreSaturationFromPcS(cell->neighbor(i),-1*initialPC);
+		cell->neighbor(i)->info().p() = -1*initialPC;
 		cell->neighbor(i)->info().airBC = true;
 		if(cell->neighbor(i)->info().saturation != cell->neighbor(i)->info().saturation || cell->neighbor(i)->info().saturation > 1.0 || cell->neighbor(i)->info().saturation < 0.0){
 		  std::cout << "Error with initial BC saturation: " << cell->neighbor(i)->info().saturation;
 		}
-// 	      }
 	    }
 	    if(deformation){
-// 	      if(cell->neighbor(i)->info().thresholdPressure < initialPC){
 		cell->neighbor(i)->info().hasInterface = true;
 		cell->neighbor(i)->info().p() = -1*initialPC; 
 		cell->neighbor(i)->info().saturation = poreSaturationFromPcS(cell->neighbor(i),-1 * initialPC);
-// 		cell->neighbor(i)->info().hainesJump = 0.0;
-// 		if(cell->info().saturation == truncationPrecision){cell->neighbor(i)->info().p() = -1*initialPC;}
-// 	      }
-// 	      if(cell->neighbor(i)->info().saturation < 0.0 || cell->neighbor(i)->info().saturation > 1.0){
-// 		std::cerr << "what? S is weird: " << cell->neighbor(i)->info().saturation; 
-// 		cell->neighbor(i)->info().saturation = 1.0;
-// 		cell->neighbor(i)->info().hasInterface = false;
-// 		cell->neighbor(i)->info().isNWResDef = false;
-// 		cell->neighbor(i)->info().p() = 0.0;
-// 	      }
 	    }
 	    
 	    //Update properties of other cells in pore unit
@@ -1574,7 +1564,6 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
 		  Mcell->info().hasInterface = cell->neighbor(i)->info().hasInterface;
 		  Mcell->info().saturation = cell->neighbor(i)->info().saturation;
 		  Mcell->info().p() =  cell->neighbor(i)->info().p();
-// 		  Mcell->info().hainesJump = cell->neighbor(i)->info().hainesJump;
 		  Mcell->info().isNWRes = cell->neighbor(i)->info().isNWRes;
 		}
 	      }
@@ -1582,17 +1571,24 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
 	  }
 	}
       }
+      //Imbibition                                  FIXME(thomas): Needs to be tested for both rigid packings and deforming packings
+      if(!drainageFirst){
+          for (unsigned int i = 0; i<4; i++){
+          if(cell->info().isNWRes){
+              cell->neighbor(i)->info().airBC = true;
+          }
+          if(cell->info().isWRes){
+            cell->neighbor(i)->info().hasInterface = true; 
+            cell->neighbor(i)->info().saturation = poreSaturationFromPcS(cell->neighbor(i),-1*initialPC);
+            cell->neighbor(i)->info().p() = -1*initialPC;
+            if(cell->neighbor(i)->info().saturation != cell->neighbor(i)->info().saturation || cell->neighbor(i)->info().saturation > 1.0 || cell->neighbor(i)->info().saturation < 0.0){
+                std::cout << "Error with initial BC saturation: " << cell->neighbor(i)->info().saturation;
+            }
+       }
+      }
     }
-    //
-    //temp
-//    if(deformation){
-//     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) { 
-// 		if(cell->info().saturation == 1e-6){
-// 		  cell->info().isNWRes = true;
-// 		  cell->info().hasInterface = false;
-// 		}
-//     }
-//    }
+   }
+
     
     
    if(waterBoundaryPressure == 0.0){waterBoundaryPressure = -1 * initialPC;}
@@ -2046,7 +2042,15 @@ void TwoPhaseFlowEngine::solvePressure()
 	}
 	
 	
-	if(finalDT == 1e6){std::cout << endl << "NO dt found!" ; finalDT = deltaTimeTruncation;saveID = 5;}
+	if(finalDT == 1e6){
+            finalDT = deltaTimeTruncation;
+            saveID = 5;
+            if(!firstDynTPF && !remesh){
+                std::cout << endl << "NO dt found!";
+                stopSimulation = true;
+            }
+            
+        }
 	scene->dt = finalDT * safetyFactorTimeStep;
 	if(debugTPF){std::cerr<<endl<< "Time step: " << finalDT << " Limiting process:" << saveID;}
 	    
@@ -2420,7 +2424,6 @@ void TwoPhaseFlowEngine::copyPoreDataToCells()
  		cell->info().hasInterface = bool(hasInterfaceList[cell->info().poreId]);
  		cell->info().flux = listOfFlux[cell->info().poreId];
  		cell->info().isNWRes = listOfPores[cell->info().poreId]->info().isNWRes;
-//  		cell->info().hainesJump = listOfPores[cell->info().poreId]->info().hainesJump;
  		cell->info().airWaterArea = listOfPores[cell->info().poreId]->info().airWaterArea;
  		if(deformation){
 		  cell->info().mergedVolume = listOfPores[cell->info().poreId]->info().mergedVolume;												//NOTE ADDED AFTER TRUNK UPDATE
