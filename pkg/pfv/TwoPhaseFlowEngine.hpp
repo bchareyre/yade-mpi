@@ -382,6 +382,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	CELL_SCALAR_GETTER(bool,.isFictious,cellIsFictious) //Temporary function to allow for simulations in Python
 	CELL_SCALAR_GETTER(bool,.hasInterface,cellHasInterface) //Temporary function to allow for simulations in Python
 	CELL_SCALAR_GETTER(Real,.poreBodyRadius,cellInSphereRadius) //Temporary function to allow for simulations in Python	
+	CELL_SCALAR_SETTER(Real,.poreBodyRadius,setPoreBodyRadius) //Temporary function to allow for simulations in Python, for lbm coupling.	
 	CELL_SCALAR_GETTER(Real,.poreBodyVolume,cellVoidVolume) //Temporary function to allow for simulations in Python	
 
 	CELL_SCALAR_GETTER(Real,.mergedVolume,cellMergedVolume) //Temporary function to allow for simulations in Python
@@ -475,6 +476,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,"get 4 neigboring cells")
 	.def("getCellHasInterface",&TwoPhaseFlowEngine::cellHasInterface,"indicates whether a NW-W interface is present within the cell")
 	.def("getCellInSphereRadius",&TwoPhaseFlowEngine::cellInSphereRadius,"get the radius of the inscribed sphere in a pore unit")
+	.def("setPoreBodyRadius",&TwoPhaseFlowEngine::setPoreBodyRadius,"set the entry pore body radius.")
 	.def("getCellVoidVolume",&TwoPhaseFlowEngine::cellVoidVolume,"get the volume of pore space in each pore unit")
 	//Pore merging
 	.def("getCellMergedVolume",&TwoPhaseFlowEngine::cellMergedVolume,"get the merged volume of pore space in each pore unit")
