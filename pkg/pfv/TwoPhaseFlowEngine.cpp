@@ -3009,7 +3009,9 @@ void TwoPhaseFlowEngine::setPoreThroatRadius(unsigned int cell1, unsigned int ce
     else {
         for (unsigned int i=0; i<4; i++) {
             if (solver->T[solver->currentTes].cellHandles[cell1]->neighbor(i)->info().id==cell2)
-                solver->T[solver->currentTes].cellHandles[cell1]->info().poreThroatRadius[i]=radius;}}
+                solver->T[solver->currentTes].cellHandles[cell1]->info().poreThroatRadius[i]=radius;
+            if (solver->T[solver->currentTes].cellHandles[cell2]->neighbor(i)->info().id==cell1)
+                solver->T[solver->currentTes].cellHandles[cell2]->info().poreThroatRadius[i]=radius;}}
 }
 double TwoPhaseFlowEngine::getPoreThroatRadius(unsigned int cell1, unsigned int cell2)
 {
