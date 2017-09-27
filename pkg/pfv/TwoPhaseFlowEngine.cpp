@@ -848,6 +848,7 @@ void TwoPhaseFlowEngine::mergeCells()
       bool check = false;
       RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
       FiniteCellsIterator cellEnd = tri.finite_cells_end();
+      maxIDMergedCells = 0;
       
       //Initialize Merged Volumes
       for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
@@ -1205,21 +1206,14 @@ void TwoPhaseFlowEngine::calculateResidualSaturation()
 void TwoPhaseFlowEngine::reTriangulate()
 {
       //Governing function to apply triangulation while maintaining saturation distribution.
-      std::cerr << endl << "step 1" ;
+      if(debugTPF){std::cerr << endl << "Apply retriangulation";} 
       initializationTriangulation();
-      std::cerr << endl << "step 2" ;
       readTriangulation();      
-      std::cerr << endl << "step 3" ;
       keepTriangulation = false;
-      std::cerr << endl << "step 4" ;
       initialization();
-      std::cerr << endl << "step 5" ;
       assignWaterVolumesTriangulation();
-      std::cerr << endl << "step 6" ;
       actionMergingAlgorithm();
-      std::cerr << endl << "step 7" ;
       equalizeSaturationOverMergedCells();
-      std::cerr << endl << "step 8" ;
 }
 
 void TwoPhaseFlowEngine::initializationTriangulation()
@@ -1911,7 +1905,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	
 	//Fill matrix diagonal
 	if(!listOfPores[i]->info().isWResInternal ){	
-	  if(hasInterfaceList[i]){residualsList[i] += -1.0*listOfPores[i]->info().saturation * (listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling) + coeffA * listOfPores[i]->info().p() /*- listOfPores[i]->info().flux*/;} //NOTE
+	  if(hasInterfaceList[i]){residualsList[i] += -1.0*listOfPores[i]->info().saturation * (listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling) + coeffA * listOfPores[i]->info().p();}
 	  if(!hasInterfaceList[i] && deformation && listOfPores[i]->info().saturation > listOfPores[i]->info().minSaturation){residualsList[i] += -1.0*(listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling);} 
 	  tripletList.push_back(ETriplet(i,i, coeffA +  coeffA2));
 	}
@@ -1978,11 +1972,11 @@ void TwoPhaseFlowEngine::solvePressure()
 	}
 	
         for(unsigned int i = 0; i < numberOfPores; i++){
-	  waterAfter += saturationList[i] * (listOfPores[i]->info().mergedVolume +   listOfPores[i]->info().accumulativeDV * scene->dt); 							//NOTE CHANGED AFTER PUSH ON GIT
+	  waterAfter += saturationList[i] * (listOfPores[i]->info().mergedVolume +   listOfPores[i]->info().accumulativeDV * scene->dt); 							
         }
 
 	
-	accumulativeFlux += (summFluxList /*+ lostVolume*/) * scene->dt;
+	accumulativeFlux += (summFluxList) * scene->dt;
 	accumulativeDeformationFlux += accumulativeDefFlux * scene->dt;
 	
 	fluxInViaWBC += boundaryFlux * scene->dt;
@@ -2093,13 +2087,10 @@ void TwoPhaseFlowEngine::solvePressure()
 	  if((fractionMinSaturationInvasion == -1 && hasInterfaceList[i] && saturationList[i] <  listOfPores[i]->info().thresholdSaturation) || (fractionMinSaturationInvasion > 0.0 && saturationList[i] < fractionMinSaturationInvasion)){
 	    for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
 	      if(airBoundaryPressure - pressuresList[listOfPores[i]->info().poreNeighbors[j]] > listOfPores[i]->info().listOfEntryPressure[j] &&
-		//saturationList[i] < listOfPores[i]->info().listOfEntrySaturation[j] &&
 		!hasInterfaceList[listOfPores[i]->info().poreNeighbors[j]] && 
-//   		!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWResDef && //NOTE
-		!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isWResInternal && //NOTE
+		!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isWResInternal && 
 		saturationList[listOfPores[i]->info().poreNeighbors[j]] > listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().minSaturation &&
-		saturationList[listOfPores[i]->info().poreNeighbors[j]] <= 1.0		//&&
-//  		listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().invadedFrom != i	//NOTE in case of too much "pinning", forth-and-back movement of an air water interface, stability can be enforced by blocking it.
+		saturationList[listOfPores[i]->info().poreNeighbors[j]] <= 1.0		
 	      ){
 		  hasInterfaceList[listOfPores[i]->info().poreNeighbors[j]] = true;
 		  saturationList[listOfPores[i]->info().poreNeighbors[j]] = 1.0 - truncationPrecision;
@@ -2414,7 +2405,7 @@ void TwoPhaseFlowEngine::updatePoreUnitProperties()
 
 void TwoPhaseFlowEngine::copyPoreDataToCells()
 {
-
+    //NOTE: Don't apply this function via python directly after applying reTriangulation() via Python, this will give segment fault. 
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();  
 	for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
