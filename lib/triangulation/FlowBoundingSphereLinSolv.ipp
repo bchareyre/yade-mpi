@@ -63,7 +63,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::~FlowBoundingSphereLinSolv()
 	#ifdef TAUCS_LIB
 	if (Fccs) taucs_ccs_free(Fccs);
 	#endif
-	#ifdef CHOLMOD_LIB
+	#ifdef PFV_GPU
 	if (useSolver == 4){
 		cholmod_l_free_sparse(&Achol, &com);
 		cholmod_l_free_factor(&L, &com);
@@ -93,7 +93,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	numFactorizeThreads=1;
 	numSolveThreads=1;
 	#endif
-	#ifdef CHOLMOD_LIB
+	#ifdef PFV_GPU
 	cholmod_l_start(&com);
 	com.useGPU=1; //useGPU;
 	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
@@ -289,7 +289,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
  			A.resize(ncols,ncols);
 			A.setFromTriplets(tripletList.begin(), tripletList.end());
 		#endif
-		#ifdef CHOLMOD_LIB
+		#ifdef PFV_GPU
 		}else if (useSolver==4){
 			//com.useGPU=useGPU; //useGPU;
 			cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &com);		
@@ -569,7 +569,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 {
-#ifdef CHOLMOD_LIB
+#ifdef PFV_GPU
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
 	copyCellsToLin(dt);
 	cholmod_dense* B = cholmod_l_zeros(ncols, 1, Achol->xtype, &com);

@@ -87,7 +87,7 @@ public:
 	int numSolveThreads;
 	#endif
 
-	#ifdef CHOLMOD_LIB
+	#ifdef PFV_GPU
 	cholmod_factor* L;
 	cholmod_sparse* Achol;
 	cholmod_common com;
