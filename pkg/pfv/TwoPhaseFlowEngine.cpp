@@ -15,7 +15,7 @@
 
 #include "TwoPhaseFlowEngine.hpp"
 #ifdef TWOPHASEFLOW
-
+#include <boost/range/algorithm_ext/erase.hpp>
 
 YADE_PLUGIN((TwoPhaseFlowEngineT));
 YADE_PLUGIN((TwoPhaseFlowEngine));
@@ -1651,7 +1651,7 @@ void TwoPhaseFlowEngine::setPoreNetwork()
 	      for(unsigned int ngb = 0; ngb <4 ; ngb++){
 		if(cell->neighbor(ngb)->info().poreId != j && cell->neighbor(ngb)->info().poreId != -1 ){
 		  cancel = false;
-		  for(int checkID = 0; checkID < poreNeighbors.size(); checkID++){
+		  for(unsigned int checkID = 0; checkID < poreNeighbors.size(); checkID++){
 		   if( poreNeighbors[checkID] == cell->neighbor(ngb)->info().poreId){
 		    cancel = true; 
 // 		    std::cerr<<"skipCell";
@@ -1673,12 +1673,12 @@ void TwoPhaseFlowEngine::setPoreNetwork()
 	    }
 	  }
 	  //temp check
-	  for(int checkID = 0; checkID < poreNeighbors.size(); checkID++){
-	   for(int checkID2 = 0; checkID2 < poreNeighbors.size(); checkID2++){
+	  for(unsigned int checkID = 0; checkID < poreNeighbors.size(); checkID++){
+	   for(unsigned int checkID2 = 0; checkID2 < poreNeighbors.size(); checkID2++){
 	     if(poreNeighbors[checkID] == poreNeighbors[checkID2] && checkID != checkID2){
 	      stopSimulation = true;
 	      std::cerr<<endl<<"double pore throat: ";
-	       for(int checkID3 = 0; checkID3 < poreNeighbors.size(); checkID3++){
+	       for(unsigned int checkID3 = 0; checkID3 < poreNeighbors.size(); checkID3++){
 		 std::cerr<< " " << poreNeighbors[checkID3];
 	      }
 	    }
@@ -1714,7 +1714,7 @@ void TwoPhaseFlowEngine::setListOfPores()
       listOfPores.clear();
       for (unsigned int j = 0 ; j < numberOfPores; j++){
 	for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-	    if(cell->info().poreId == j && !cell->info().isGhost && !stop){
+	    if(cell->info().poreId == (int) j && !cell->info().isGhost && !stop){
 	      listOfPores.push_back(cell);
 	      stop = true;
 	    }
@@ -1726,7 +1726,7 @@ void TwoPhaseFlowEngine::setListOfPores()
 	
     for (unsigned int i = 0 ; i < numberOfPores; i++){
 	 for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-	    if(cell->info().poreId == i && !listOfPores[i]->info().isNWRes){
+	    if(cell->info().poreId == (int) i && !listOfPores[i]->info().isNWRes){
 	    for(unsigned int j = 0; j<4; j++){
 	     if(cell->neighbor(j)->info().isWRes){
 	       listOfPores[i]->info().isWResInternal = true;
@@ -1751,7 +1751,7 @@ void TwoPhaseFlowEngine::setListOfPores()
 	
 	for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
 	  for(unsigned int k = 0; k < listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors.size(); k++){
-	    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == i){
+	    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == (int) i){
 	      listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().listOfEntryPressure[k] = listOfPores[i]->info().listOfEntryPressure[j];
 	      listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().listOfThroatArea[k] = listOfPores[i]->info().listOfThroatArea[j];
 	      listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().listOfkNorm[k] = listOfPores[i]->info().listOfkNorm[j];
@@ -1812,7 +1812,7 @@ void TwoPhaseFlowEngine::setListOfPores()
  		 
  		 
  		 for(unsigned int k = 0; k < listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors.size(); k++){ 
-		    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == i){
+		    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == (int) i){
 			listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().listOfkNorm[k] = listOfPores[i]->info().listOfkNorm[j];
 		    }
 		 }
@@ -1829,7 +1829,7 @@ void TwoPhaseFlowEngine::setListOfPores()
  	for(unsigned int i = 0; i < numberOfPores; i++){
  	 for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){ 
  	  for(unsigned int k = 0; k < listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors.size(); k++){
- 		    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == i){
+ 		    if(listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().poreNeighbors[k] == (int) i){
  			listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().listOfkNorm[k] = listOfPores[i]->info().listOfkNorm[j];
  		    }
  		 }
@@ -2020,30 +2020,26 @@ void TwoPhaseFlowEngine::solvePressure()
 	      //thresholdSaturation
 	      if(std::abs(listOfPores[i]->info().thresholdSaturation - saturationList[i]) > truncationPrecision){
 		dt =  -1.0 * (listOfPores[i]->info().thresholdSaturation - saturationList[i]) * listOfPores[i]->info().mergedVolume / listOfFlux[i];
-		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = 1;}
+		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;/*saveID = 1;*/}
 	      }
 	      //Empty pore
 	      if(std::abs(0.0 - saturationList[i]) > truncationPrecision && listOfFlux[i] > 0.0){ //only for drainage
 		dt =  -1.0 * (0.0 - saturationList[i]) * listOfPores[i]->info().mergedVolume / listOfFlux[i];
-		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = 2;}
+		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;/*saveID = 2;*/}
 	      }
 	      //Saturated pore
 	      if(std::abs(1.0 - saturationList[i]) > truncationPrecision && listOfFlux[i] < 0.0){ //only for imbibition
 		dt =  -1.0 * (1.0 - saturationList[i]) * listOfPores[i]->info().mergedVolume / listOfFlux[i];
-		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;saveID = 3;}
+		if(dt > deltaTimeTruncation && dt < finalDT){finalDT = dt;/*saveID = 3;*/}
 	      }
 	  }
 	}
-	
-	
 	if(finalDT == 1e6){
             finalDT = deltaTimeTruncation;
             saveID = 5;
             if(!firstDynTPF && !remesh){
                 std::cout << endl << "NO dt found!";
-                stopSimulation = true;
-            }
-            
+                stopSimulation = true;}            
         }
 	scene->dt = finalDT * safetyFactorTimeStep;
 	if(debugTPF){std::cerr<<endl<< "Time step: " << finalDT << " Limiting process:" << saveID;}
@@ -2053,8 +2049,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	// --------------------------------------update cappilary pressure (need to correct for linearization of ds/dp)-----------------------------------------------------
 	for(int i = 0; i < numberOfPores; i++){
 	  if(hasInterfaceList[i] && !listOfPores[i]->info().isWResInternal && (!deformation || listOfPores[i]->info().saturation != 0.0)){
-	    pressuresList[i] = porePressureFromPcS(listOfPores[i],saturationList[i]);
-	  }
+	    pressuresList[i] = porePressureFromPcS(listOfPores[i],saturationList[i]);}
 	}
 	
 
@@ -2274,7 +2269,7 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
   for(int i = 0; i < numberOfPores; i++){
     dv = 0.0, dvSwelling =0.0;
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
-	if(cell->info().poreId == i){
+	if(cell->info().poreId == (int) i){
 	      dv += cell->info().dv();
 	      dvSwelling += cell->info().dvSwelling;
 	 }
@@ -2517,6 +2512,45 @@ void TwoPhaseFlowEngine::clusterGetPore(PhaseCluster* cluster, CellHandle cell) 
 	cluster->volume+=cell->info().poreBodyVolume;
 	cluster->pores.push_back(cell);
 }
+
+vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHandle cell)
+{
+	//invade the pore and attach to NW reservoir, label is assigned after reset
+	int label = cell->info().label;
+	cell->info().saturation=0;
+	cell->info().isNWRes=true;
+	clusterGetPore(clusters[0].get(),cell);
+	
+	//update the cluster(s)
+	unsigned nPores = cluster->pores.size();
+	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base clsuter
+	if (nPores<2) {cluster->reset(); return  newClusters;}
+	FOREACH(CellHandle& cell, cluster->pores) {cell->info().label=-1;} //mark all pores, and get them back in again below
+	cell->info().label=0;//mark the invaded one 
+	auto nextPore = cluster->pores.begin(); //find a remaining pore to start reconstruction of the cluster
+	while (*nextPore==cell) nextPore++;
+	(*nextPore)->info().label = label; //assign the label of the original cluster
+	vector<TwoPhaseFlowEngineT::CellHandle> pores = cluster->pores; //copy before reset
+	cluster->reset(); //reset pores, volume, entryRadius, area... but restore label again after that
+	cluster->label = label;
+	updateSingleCellLabelRecursion(*nextPore,cluster); //rebuild 
+	newClusters.push_back(cluster->label);//we will return the original cluster itself if not empty
+	
+	nPores = nPores - cluster->pores.size();// the number of pores which remain to be assigned to one or multiple new clusters
+	while (nPores > 1) {//should be =1 if the cluster remain the same -1 removed pore
+		while ((*nextPore)->info().label!=-1 and nextPore!=cluster->pores.end()) nextPore++;
+		if (nextPore==cluster->pores.end()) cerr << "this is not supposed to happen! L2367"<<endl;
+		// gen new clusters on the fly until no pores remain
+		shared_ptr<PhaseCluster> clst (new PhaseCluster());
+		clst->label=clusters.size();
+		newClusters.push_back(cluster->label);
+		clusters.push_back(clst);
+		updateSingleCellLabelRecursion(*nextPore,clusters.back().get());
+		nPores = nPores - clst->pores.size();
+	}
+	return newClusters;// return list of created clusters
+}
+
 // int TwoPhaseFlowEngine:: getMaxCellLabel()
 // {
 //     int maxLabel=-1;

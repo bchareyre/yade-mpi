@@ -143,6 +143,7 @@ class PhaseCluster : public Serializable
 		vector<std::pair<std::pair<unsigned int,unsigned int>,double> > interfaces;
 		TwoPhaseFlowEngineT::RTriangulation* tri;
 		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear(); interfaces.clear();}
+		
 		vector<int> getPores() { vector<int> res;
 			for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
 			return res;}
@@ -217,16 +218,22 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void NWResRecursion(CellHandle cell);
 	void checkTrap(double pressure);
 	void updateReservoirLabel();
+	void invasion2();//without-trap
+	void updateReservoirs2();
+	///end of invasion model
+	
+	//## Clusters ##
 	void updateCellLabel();
 	void updateSingleCellLabelRecursion(CellHandle cell, PhaseCluster* cluster);
 	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet);//update cluster inetrfacial area and max entry radius wrt to a facet
 	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//add pore to cluster, updating flags and cluster volume
+	vector<int> clusterInvadePore(PhaseCluster* cluster, CellHandle cell);//remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
+	vector<int> pyClusterInvadePore(int cellId) {
+		int label = solver->T[solver->currentTes].cellHandles[cellId]->info().label;
+		if (label<=1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
+		return clusterInvadePore(clusters[label].get(), solver->T[solver->currentTes].cellHandles[cellId]);}
 	boost::python::list pyClusters();
 // 	int getMaxCellLabel();
-
-	void invasion2();//without-trap
-	void updateReservoirs2();
-	///end of invasion model
 
 	//compute forces
 	void computeFacetPoreForcesWithCache(bool onlyCache=false);	
@@ -507,7 +514,10 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("computeCapillaryForce",&TwoPhaseFlowEngine::computeCapillaryForce,"Compute capillary force. ")
 	.def("saveVtk",&TwoPhaseFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
 	.def("getPotentialPendularSpheresPair",&TwoPhaseFlowEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
+	// Clusters
 	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
+	.def("clusterInvadePore",&TwoPhaseFlowEngine::pyClusterInvadePore,boost::python::arg("cellId"),"drain the pore identified by cellId and update the clusters accordingly.")
+	// others
 	.def("getCellVolume",&TwoPhaseFlowEngine::cellVolume,"get the volume of each cell")
 	.def("isCellNeighbor",&TwoPhaseFlowEngine::isCellNeighbor,(boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID")),"check if cell1 and cell2 are neigbors.")
 	.def("setPoreThroatRadius",&TwoPhaseFlowEngine::setPoreThroatRadius, (boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID"), boost::python::arg("radius")), "set the pore throat radius between cell1 and cell2.")
