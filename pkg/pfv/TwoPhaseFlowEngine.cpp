@@ -1445,30 +1445,76 @@ void TwoPhaseFlowEngine::equalizeSaturationOverMergedCells()
 
 void TwoPhaseFlowEngine::setInitialConditions()
 {
+    if(debugTPF){std::cerr<<endl<<"Set initial condition";}
+
+    //four possible initial configurations are allowed: primary drainage, primary imbibition, secondary drainage, secondary imbibition
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+        
+      //make backup of saturated hydraulic conductivity
       for(unsigned int ngb = 0; ngb<4; ngb++){
        cell->info().kNorm2[ngb] = cell->info().kNorm()[ngb];
-// 	 cell->info().hydrRadius[ngb]	= 2.0* solver->computeHydraulicRadius(cell, ngb);
-
       }
+                
+      cell->info().isFictiousId = -1;
       cell->info().isWRes = false;
       cell->info().isNWRes = false;
-      cell->info().p() = 0.0;
-      cell->info().isFictiousId = -1;
+      
 
-      if(drainageFirst){
-	cell->info().hasInterface = false;
-	cell->info().saturation = 1.0;
+      if(cell->info().isFictious){
+        //boundary cells are not used here 
+        cell->info().p() = 0.0;
+        cell->info().saturation = 1.0;
+        cell->info().hasInterface = false;
       }
-      if(!drainageFirst){   //Secundairy imbibition                 FIXME(thomas): primary imbibition to be included, using hasInterface = False and saturation = 0.0
-	cell->info().hasInterface = true;
-	cell->info().saturation = truncationPrecision;
-        cell->info().p() = porePressureFromPcS(cell,cell->info().saturation);
-      } 
+      if(!cell->info().isFictious){
+        //Primary drainage
+        if(drainageFirst && primaryTPF){
+             cell->info().p() = -1 * initialPC;
+             cell->info().saturation = 1.0;
+             cell->info().hasInterface = false;
+        }
+        //Secondary drainage (using saturation field as input parameter)
+        if(drainageFirst && !primaryTPF){
+             cell->info().p() = -1 * initialPC;
+             if(cell->info().saturation <= cell->info().thresholdSaturation){
+                cell->info().p() = porePressureFromPcS(cell,cell->info().saturation);
+                cell->info().hasInterface = true;
+             }
+             if(cell->info().saturation > cell->info().thresholdSaturation){
+                 cell->info().p() = -1*initialPC;  
+                 cell->info().saturation = 1.0;
+                 cell->info().hasInterface = false;
+                 std::cerr << "Warning: local saturation changed for compatibility of local Pc(S)";
+             }
+             
+        }
+        //Primary imbibition
+        if(!drainageFirst && primaryTPF){
+             cell->info().p() = -1 * initialPC;
+             cell->info().saturation = poreSaturationFromPcS(cell,-1*initialPC);
+             cell->info().hasInterface = true;                                          //FIXME: hasInterface should be false, but until an imbibition criteria is implementend into solvePressure, this should remain true for testing purposes
+        }
+        //Secondary imbibition
+        if(!drainageFirst && !primaryTPF){
+             cell->info().p() = -1 * initialPC;
+             if(cell->info().saturation <= cell->info().thresholdSaturation){
+                cell->info().p() = porePressureFromPcS(cell,cell->info().saturation);
+                cell->info().hasInterface = true;
+             } 
+             if(cell->info().saturation > cell->info().thresholdSaturation){
+                 cell->info().p() = -1*initialPC;  
+                 cell->info().saturation = 1.0;
+                 cell->info().hasInterface = false;
+                 std::cerr << "Warning: local saturation changed for compatibility of local Pc(S)";
+             }
+            
+             
+        }
+
+      }
     }
-    std::cout<< endl << "Initial conditions are set";
 }
 
 void TwoPhaseFlowEngine::transferConditions()
@@ -1478,30 +1524,20 @@ void TwoPhaseFlowEngine::transferConditions()
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
       for(unsigned int ngb = 0; ngb<4; ngb++){
        cell->info().kNorm2[ngb] = cell->info().kNorm()[ngb];
-// 	 cell->info().hydrRadius[ngb]	= 2.0* solver->computeHydraulicRadius(cell, ngb);
-
       }
       
       if(cell->info().saturation == 1.0){
 	cell->info().hasInterface = false;
-// 	cell->info().hainesJump = 0.0;
       }
       if(cell->info().saturation < 1.0){
 	cell->info().hasInterface = true;
 	cell->info().p() = porePressureFromPcS(cell,cell->info().saturation);
-// 	cell->info().hainesJump = hainesVelocity * 3.14 *  std::pow(cell->info().poreBodyRadius,2);			//NOTE FIX!
       }
-//       if(cell->info().saturation <= cell->info().thresholdSaturation){
-// 	cell->info().hasInterface = true;
-// 	cell->info().hainesJump = 0.0;
-// 	cell->info().p() = porePressureFromPcS(cell,cell->info().saturation);
-//       }
     }
 }
 
 void TwoPhaseFlowEngine::setBoundaryConditions()
 {
-    int saveFictiousID = 0;
     RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
@@ -1515,13 +1551,11 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
 		cell->info().p() = bndCondValue[cell->info().isFictiousId];
 		cell->info().isWRes = true;
 		waterBoundaryPressure = bndCondValue[cell->info().isFictiousId];
-// 		nrWaterBoundaryConditions += 1;
 	      }
 	      if(bndCondIsPressure[cell->info().isFictiousId] && !bndCondIsWaterReservoir[cell->info().isFictiousId]){
 		cell->info().p() = bndCondValue[cell->info().isFictiousId];
 		cell->info().isNWRes = true;
 		airBoundaryPressure = bndCondValue[cell->info().isFictiousId];
-		saveFictiousID = i;
 	      }
 	    }	    
 	  }
@@ -1578,7 +1612,18 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
             if(cell->neighbor(i)->info().saturation != cell->neighbor(i)->info().saturation || cell->neighbor(i)->info().saturation > 1.0 || cell->neighbor(i)->info().saturation < 0.0){
                 std::cout << "Error with initial BC saturation: " << cell->neighbor(i)->info().saturation;
             }
+            if(cell->neighbor(i)->info().mergedID > 0){
+	      for (FiniteCellsIterator Mcell = tri.finite_cells_begin(); Mcell != cellEnd; Mcell++) {
+		if(Mcell->info().mergedID == cell->neighbor(i)->info().mergedID){
+		  Mcell->info().hasInterface = cell->neighbor(i)->info().hasInterface;
+		  Mcell->info().saturation = cell->neighbor(i)->info().saturation;
+		  Mcell->info().p() =  cell->neighbor(i)->info().p();
+		  Mcell->info().isNWRes = cell->neighbor(i)->info().isNWRes;
+		}
+	      }
+	    }
        }
+
       }
     }
    }
@@ -1587,16 +1632,33 @@ void TwoPhaseFlowEngine::setBoundaryConditions()
     
    if(waterBoundaryPressure == 0.0){waterBoundaryPressure = -1 * initialPC;}
 
-   for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-    if(!cell->info().hasInterface && !cell->info().isFictious){
-     cell->info().p() =  -1 * initialPC; //waterBoundaryPressure;		FIXME FIXME FIXME 
-    }
-   }
-
-    std::cout << endl << "Boundary conditions are set, water pressure at: " << waterBoundaryPressure << " and air pressure at: " << airBoundaryPressure << " in BC Id=" << saveFictiousID;
 	  
 }
+void TwoPhaseFlowEngine::verifyCompatibilityBC()
+{
+    //This is merely a function to double check boundary conditions to avoid ill-posed B.C.
+    std::cerr << endl << "Boundary and initial conditions are set for: ";
+
+    if(drainageFirst && primaryTPF){  
+        std::cerr<< "Primary Drainage"; 
+        if(initialPC > -1 * waterBoundaryPressure){ std::cerr << endl << "Warning, initial capillary pressure larger than imposed capillary pressure, this may cause imbibition";}
+    }
+    if(drainageFirst && !primaryTPF){ 
+        std::cerr<< "Secondary Drainage";
+        if(initialPC > -1 * waterBoundaryPressure){ std::cerr << endl << "Warning, initial capillary pressure larger than imposed capillary pressure, this may cause imbibition";}
+    }
+    if(!drainageFirst && primaryTPF){
+        std::cerr<< "Primary Imbibition";
+        if(initialPC < -1 * waterBoundaryPressure){ std::cerr << endl << "Warning, initial capillary pressure smaller than imposed capillary pressure, this may cause drainage";}
+    }
+    if(!drainageFirst && !primaryTPF){
+        std::cerr<< "Secondary Imbibition";
+        if(initialPC < -1 * waterBoundaryPressure){ std::cerr << endl << "Warning, initial capillary pressure smaller than imposed capillary pressure, this may cause drainage";}
+    }
     
+    std::cout << endl << "Water pressure at: " << waterBoundaryPressure << " and air pressure at: " << airBoundaryPressure << " InitialPC: "<< initialPC;
+
+}
 
 void TwoPhaseFlowEngine::setPoreNetwork()
 {
@@ -1672,18 +1734,7 @@ void TwoPhaseFlowEngine::setPoreNetwork()
 	      }
 	    }
 	  }
-	  //temp check
-	  for(unsigned int checkID = 0; checkID < poreNeighbors.size(); checkID++){
-	   for(unsigned int checkID2 = 0; checkID2 < poreNeighbors.size(); checkID2++){
-	     if(poreNeighbors[checkID] == poreNeighbors[checkID2] && checkID != checkID2){
-	      stopSimulation = true;
-	      std::cerr<<endl<<"double pore throat: ";
-	       for(unsigned int checkID3 = 0; checkID3 < poreNeighbors.size(); checkID3++){
-		 std::cerr<< " " << poreNeighbors[checkID3];
-	      }
-	    }
-	   }
-	  }
+
 	  
 	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
 	    if(cell->info().poreId == j){
@@ -2432,6 +2483,7 @@ void TwoPhaseFlowEngine::actionTPF()
       calculateResidualSaturation();
       setInitialConditions();
       setBoundaryConditions();
+      verifyCompatibilityBC();
       setPoreNetwork();
       scene->dt = 1e-20;
       setListOfPores();

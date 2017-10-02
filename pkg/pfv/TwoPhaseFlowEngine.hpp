@@ -298,6 +298,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void imposeDeformationFluxTPF();
 	void updateDeformationFluxTPF();
 	void copyPoreDataToCells();
+        void verifyCompatibilityBC();
 	
 	std::vector<double> leftOverVolumePerSphere;
 	std::vector<double> untreatedAreaPerSphere;
@@ -453,6 +454,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((double, centroidAverageWaterPressure, 0.0,,"Water pressure based on centroid-corrected averaging, see Korteland et al. (2010) - what is the correct definition of average pressure?"))
 	((double, fractionMinSaturationInvasion, -1.0,,"Set the threshold saturation at which drainage can occur (Sthr = fractionMinSaturationInvasion), note that -1 implied the conventional definition of Sthr"))
 	((vector<double>, setFractionParticles, vector<double>(scene->bodies->size(),0.0),,"Correction fraction for swelling of particles by mismatch of surface area of particles with those from actual surface area in pore units"))
+       	((bool,primaryTPF, true,,"Boolean to indicate whether the initial conditions are for primary drainage of imbibition (dictated by drainageFirst) or secondary drainage or imbibition. Note that during simulations, a switch from drainage to imbibition or vise versa can easily be made by changing waterBoundaryPressure"))
 
 	
 	
