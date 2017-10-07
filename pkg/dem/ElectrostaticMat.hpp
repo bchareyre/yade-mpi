@@ -37,6 +37,7 @@ class ElectrostaticPhys: public CohFrictPhys {
                         ((Real,DebyeLength,1e-8,,"Debye Length [m]"))
                         ((Real,InterConst,1e-12,,"Double layer interaction constant [J]"))
                         ((Real,A,1e-19,,"Hamaker constant [J]"))
+                        ((Real, eps, 0.001,,"Rugosity [-]"))
 			, // ctors
                         createIndex();,
                         .def_readonly("DebyeLength",&ElectrostaticPhys::DebyeLength,"Debye Length \kappa^-1 [m]")
@@ -65,6 +66,7 @@ class Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys: public Ip2_CohFri
                         ((Real,A,1e-19,,"Hamaker constant [J]"))
                         ((Real,Z,0,,"Interaction constant [N]. If 0, will be calculated from termal properties"))
                         ((Real,z,0,,"Surface ion valency [-]"))
+                        ((Real, eps, 0.001,,"Rugosity [-]"))
                         ((vector<Vector2r>,Ions,vector<Vector2r>({Vector2r(-1,1),Vector2r(1,1)}),,"List of ions's charge and concentration (default is: 1mol/l Na(+1)Cl(-1): [(+1,1),(-1,1)]"))
                     ,,
 		);

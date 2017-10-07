@@ -11,22 +11,35 @@
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/dem/ElasticContactLaw.hpp>
+#include<pkg/dem/ViscoelasticPM.hpp>
 
 #define ln(x) log(x)
 
 namespace py=boost::python;
 
 
-class LubricationPhys: public NormShearPhys {
+class LubricationPhys: public ViscElPhys {
         public:
-                LubricationPhys(NormShearPhys const& ); // "copy" constructor
+                LubricationPhys(ViscElPhys const& ); // "copy" constructor
                 virtual ~LubricationPhys();
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LubricationPhys,NormShearPhys,"IPhys class for Lubrication w/o FlowEngine. Used by Law2_ScGeom_LubricationPhys.",
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LubricationPhys,NormShearPhys,"IPhys class for Lubrication w/o FlowEngine. Used by Law2_ScGeom_LubricationPhys and Law2_ScGeom_ImplicitLubricationPhys.",
                 ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
-                ((shared_ptr<IPhys>,otherPhys,0,,"Other physics combined"))
+                ((Real,eps,0.001,,"Rugosity: fraction of radius used as rugosity [-]"))
+                ((Real,kno,0.0,,"Coeficient for normal stiffness"))
+                ((Real,kso,0.0,,"Coeficient for tangeancial stiffness"))
+                ((Real,nun,0.0,,"Normal viscosity coefficient"))
+                ((Real,phic,0.0,,"Critical friction angle [-]"))
+                ((Vector3r,NormalForce,Vector3r::Zero,,"Normal force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
+                ((Vector3r,TangentForce,Vector3r::Zero,,"Tangeancial force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
+                ((Real,ue,0.,,"Surface deflection at t-dt [m]"))
+               // ((shared_ptr<IPhys>,otherPhys,0,,"Other physics combined"))
                 , // ctors
                 createIndex();,
                       .def_readonly("eta",&LubricationPhys::eta,"Fluid viscosity [Pa.s]")
+                      .def_readonly("eps",&LubricationPhys::eps,"Rugosity [-]")
+                      .def_readonly("NormalForce",&LubricationPhys::NormalForce,"Normal Force computed")
+                      .def_readonly("TangentForce",&LubricationPhys::TangentForce,"Tangent Force computed")
+                      .def_readonly("ue",&LubricationPhys::ue,"Surface deflection")
                 );
                 DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(LubricationPhys,NormShearPhys);
@@ -41,8 +54,10 @@ class Ip2_ElastMat_ElastMat_LubricationPhys: public IPhysFunctor{
                 DECLARE_LOGGER;
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_ElastMat_ElastMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
-                        ((shared_ptr<IPhysFunctor>, otherPhysFunctor,0,,"Other physics to combine with lubrication.")),,
-                .def_readwrite("otherPhys",&Ip2_ElastMat_ElastMat_LubricationPhys::otherPhysFunctor,"Other physics to combine with lubrication")
+                        ((Real,eps,0.001,,"Rugosity [-]"))
+                       // ((shared_ptr<IPhysFunctor>, otherPhysFunctor,0,,"Other physics to combine with lubrication."))
+                                                  ,,
+                //.def_readwrite("otherPhys",&Ip2_ElastMat_ElastMat_LubricationPhys::otherPhysFunctor,"Other physics to combine with lubrication")
                 );
 };
 REGISTER_SERIALIZABLE(Ip2_ElastMat_ElastMat_LubricationPhys);
@@ -53,12 +68,22 @@ class Law2_ScGeom_LubricationPhys: public LawFunctor{
                 bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
                 FUNCTOR2D(GenericSpheresContact,LubricationPhys);
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_LubricationPhys,LawFunctor,"Material law for lubrication between two spheres.",
-                    ((bool,activateLubrication,false,,"Activate lubrication (default: false)"))
-                    ((shared_ptr<LawFunctor>, otherLawFunctor,0,,"Other interaction law to combine with lubrication")),,
-                    .def_readwrite("activateLubrication",&Law2_ScGeom_LubricationPhys::activateLubrication,"Activate lubrication (default: false)")
-                    .def_readwrite("otherLaw",&Law2_ScGeom_LubricationPhys::otherLawFunctor,"Other interaction law to combine with lubrication")
+                    //((bool,activateLubrication,false,,"Activate lubrication"))
+                    //((shared_ptr<LawFunctor>, otherLawFunctor,0,,"Other interaction law to combine with lubrication"))
+                                                  ,,
+                    //.def_readwrite("activateLubrication",&Law2_ScGeom_LubricationPhys::activateLubrication,"Activate lubrication (default: false)")
+                    //.def_readwrite("otherLaw",&Law2_ScGeom_LubricationPhys::otherLawFunctor,"Other interaction law to combine with lubrication")
                 );
                 DECLARE_LOGGER;
-
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_LubricationPhys);
+
+class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
+        public:
+                bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
+                FUNCTOR2D(GenericSpheresContact,LubricationPhys);
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_LubricationPhys,LawFunctor,"Material law for lubrication and contact between two spheres, resolved implicitly.",,,
+                );
+                DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom_ImplicitLubricationPhys);
