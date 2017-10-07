@@ -6,7 +6,7 @@
 YADE_PLUGIN((ElectrostaticMat)(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys)(ElectrostaticPhys)(Law2_ScGeom_ElectrostaticPhys))
 
 
-ElectrostaticPhys::ElectrostaticPhys(const CohFrictPhys & obj) : CohFrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19)
+ElectrostaticPhys::ElectrostaticPhys(const CohFrictPhys & obj) : CohFrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19), eps(0.001)
 {
 }
 
@@ -58,6 +58,7 @@ void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_pt
         }
         
         phys->A = A;
+        phys->eps = eps;
         
         if(A == 0)
             LOG_ERROR("Hamaker constant (A) is null. Van Der Waals force will not be calculated");
@@ -111,33 +112,24 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     if(D > 10*phys->DebyeLength)
         return false;
 
+    // Rugosity correction
+    D = max(D, phys->eps*(a1+a2)/2);
+
 
     /* constitutive law */
     Real DLEF(0.); // Double Layer Electrostatic Force
     Real VdW(0.);  // Van Der Waals Force
 
 
-    if(D > 0.)
-    {
-        DLEF = -phys->InterConst*K*exp(-K*D);
-        VdW = phys->A/(6.*pow(D,2));
+    DLEF = phys->InterConst*K*exp(-K*D);
+    VdW = -phys->A/(6.*pow(D,2));
 
-        Real f_VdW = VdW*a1*a2/(a1+a2);
-        Real f_DLE = DLEF*a1*a2/(a1+a2);
+    normalForce = (VdW + DLEF)*a1*a2/(a1+a2)*geom->normal/geom->normal.norm();
 
-        normalForce = (f_VdW + f_DLE)*geom->normal/geom->normal.norm();
-    }
-    else
-    {
-        normalForce = 0.*geom->normal;
-    }
+    phys->kn = (phys->A/3./pow(D,3.)+pow(K,2.)*phys->InterConst*exp(-K*D))*a1*a2/(a1+a2); // Stiffness
 
+    scene->forces.addForce(id1,normalForce);
+    scene->forces.addForce(id2,-normalForce);
 
-	if (!scene->isPeriodic) {
-                applyForceAtContactPoint(normalForce, geom->contactPoint , id1, s1->se3.position, id2, s2->se3.position);
-	} else {
-                scene->forces.addForce(id1,normalForce);
-                scene->forces.addForce(id2,-normalForce);
-	}
-	return true;
+    return true;
 }
