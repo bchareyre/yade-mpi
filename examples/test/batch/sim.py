@@ -6,11 +6,11 @@ readParamsFromTable(unknownOk=True,
 	notInTable='notInTable'
 )
 from yade.params import table
-print O.tags['description']
+#print O.tags['description']
 print 'important',table.important
 print 'unimportant',table.unimportant
-print O.tags['params'].replace(',','_');
-print O.tags['defaultParams']
+#print O.tags['params']
+#print O.tags['defaultParams']
 import time
 #time.sleep(5)
 O.engines=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
