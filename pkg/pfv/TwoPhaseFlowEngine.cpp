@@ -2575,30 +2575,35 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHan
 	
 	//update the cluster(s)
 	unsigned nPores = cluster->pores.size();
-	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base clsuter
-	if (nPores<2) {cluster->reset(); return  newClusters;}
+	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base cluster
+	if (nPores==0) {LOG_WARN("Invading the empty cluster id="<<label); }
+	if (nPores<2) {cluster->reset(); cluster->label = label; return  newClusters;}
 	FOREACH(CellHandle& cell, cluster->pores) {cell->info().label=-1;} //mark all pores, and get them back in again below
-	cell->info().label=0;//mark the invaded one 
-	auto nextPore = cluster->pores.begin(); //find a remaining pore to start reconstruction of the cluster
-	while (*nextPore==cell) nextPore++;
-	(*nextPore)->info().label = label; //assign the label of the original cluster
-	vector<TwoPhaseFlowEngineT::CellHandle> pores = cluster->pores; //copy before reset
+	cell->info().label=0;//mark the invaded one
+	
+	//find a remaining pore	
+	unsigned neighborStart=0;
+	while ( (cell->neighbor(neighborStart)->info().label != -1 or
+		   solver->T[solver->currentTes].Triangulation().is_infinite(cell->neighbor(neighborStart))) 
+		   and neighborStart<3 ) ++neighborStart;	
+	if (neighborStart==3 and cell->neighbor(neighborStart)->info().label != -1) cerr<<"This is not supposed to happen (line "<<__LINE__<<")"<<endl;
+
+	auto nCell = cell->neighbor(neighborStart); //use the remaining pore to start reconstruction of the cluster
+	nCell->info().label = label; //assign the label of the original cluster
 	cluster->reset(); //reset pores, volume, entryRadius, area... but restore label again after that
 	cluster->label = label;
-	updateSingleCellLabelRecursion(*nextPore,cluster); //rebuild 
+	updateSingleCellLabelRecursion(nCell,cluster); //rebuild 
 	newClusters.push_back(cluster->label);//we will return the original cluster itself if not empty
-	
-	nPores = nPores - cluster->pores.size();// the number of pores which remain to be assigned to one or multiple new clusters
-	while (nPores > 1) {//should be =1 if the cluster remain the same -1 removed pore
-		while ((*nextPore)->info().label!=-1 and nextPore!=cluster->pores.end()) nextPore++;
-		if (nextPore==cluster->pores.end()) cerr << "this is not supposed to happen! L2367"<<endl;
-		// gen new clusters on the fly until no pores remain
+ 	
+	// gen new clusters on the fly from the other neighbors of the invaded pore (for disconnected subclusters)
+	for (int neighborId=neighborStart+1 ; neighborId<=3; neighborId++) {//should be =1 if the cluster remain the same -1 removed pore
+		const CellHandle& nCell = cell->neighbor(neighborId);
+		if (nCell->info().label != -1 or solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue; //already reached from another neighbour (connected domain): skip, else this is a new cluster
 		shared_ptr<PhaseCluster> clst (new PhaseCluster());
 		clst->label=clusters.size();
-		newClusters.push_back(cluster->label);
+		newClusters.push_back(clst->label);
 		clusters.push_back(clst);
-		updateSingleCellLabelRecursion(*nextPore,clusters.back().get());
-		nPores = nPores - clst->pores.size();
+		updateSingleCellLabelRecursion(nCell,clusters.back().get());
 	}
 	return newClusters;// return list of created clusters
 }
