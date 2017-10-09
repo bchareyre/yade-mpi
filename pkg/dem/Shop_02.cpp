@@ -476,7 +476,7 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 }
 
 
-py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy){
+py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy, int dir){
 	//Initialization
 	int minZ;
 	int maxZ;
@@ -498,7 +498,7 @@ py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool 
 			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 			if (sphere->radius!=radiusPy) continue;
 		} //select diameters asked
-		const Real zPos = b->state->pos[2]-zRef;
+                const Real zPos = b->state->pos[dir]-zRef;
 		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 
 		minZ= floor((zPos-s->radius)/dz);
