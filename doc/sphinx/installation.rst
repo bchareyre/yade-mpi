@@ -37,7 +37,7 @@ Each branch corresponds to one distribution, e.g., xenial, stretch etc.
 The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`__. 
 It uses "pbuilder" to build packages, so all packages are built in a clean environment.
 
-If you do not need ``yadedaily``-package any more, just remove the
+If you do not need ``yadedaily``-package anymore, just remove the
 corresponding line in /etc/apt/sources.list and the package itself::
 
 	sudo apt-get remove yadedaily
@@ -61,7 +61,7 @@ The `Debian-Backports <http://backports.debian.org/Instructions>`_
 repository is updated regularly to bring the newest Yade version to the users of stable 
 Debians.
 
-Daily and stable Yade versions can coexist without any conflicts, i.e., you can use `yade`` and ``yadedaily``
+Daily and stable Yade versions can coexist without any conflicts, i.e., you can use ``yade`` and ``yadedaily``
 at the same time.
 
 Source code
