@@ -1,5 +1,5 @@
 // 2017 © William Chèvremont <william.chevremont@univ-grenoble-alpes.fr>
-
+ 
 #pragma once
 
 #include<pkg/common/ElastMat.hpp>
