@@ -1700,56 +1700,11 @@ void TwoPhaseFlowEngine::setPoreNetwork()
 	  }
 	}
       }
-      bool cancel = false, firstCheck = true;;
-      for (unsigned int j = 0 ; j < numberOfPores; j++){
-	firstCheck = true;
-	  std::vector<int> poreNeighbors;
-	  std::vector<double> listOfkNorm;
-	  std::vector<double> listOfEntrySaturation;
-	  std::vector<double> listOfEntryPressure;
-  	  std::vector<double> listOfThroatArea;
-	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-	    if(cell->info().poreId == j){
-	      for(unsigned int ngb = 0; ngb <4 ; ngb++){
-		if(cell->neighbor(ngb)->info().poreId != j && cell->neighbor(ngb)->info().poreId != -1 ){
-		  cancel = false;
-		  for(unsigned int checkID = 0; checkID < poreNeighbors.size(); checkID++){
-		   if( poreNeighbors[checkID] == cell->neighbor(ngb)->info().poreId){
-		    cancel = true; 
-// 		    std::cerr<<"skipCell";
-		   }
-		  }
-		  if((firstCheck || !cancel) || poreNeighbors.size() == 0){
-		    poreNeighbors.push_back(cell->neighbor(ngb)->info().poreId);
-		    listOfkNorm.push_back(cell->info().kNorm()[ngb]);
-		    listOfEntrySaturation.push_back(cell->info().entrySaturation[ngb]);
-		    listOfEntryPressure.push_back(cell->info().entryPressure[ngb]);
-		  
-		    const CVector& Surfk = cell->info().facetSurfaces[ngb];
-		    Real area = sqrt(Surfk.squared_length());
-		    listOfThroatArea.push_back(area * cell->info().facetFluidSurfacesRatio[ngb]);
-		    if(firstCheck){firstCheck = false;}
-		  }
-		}
-	      }
-	    }
-	  }
-
-	  
-	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-	    if(cell->info().poreId == j){
-		   cell->info().poreNeighbors = poreNeighbors;
-		   cell->info().listOfEntrySaturation = listOfEntrySaturation;
-		   cell->info().listOfEntryPressure = listOfEntryPressure;
-		   cell->info().listOfThroatArea = listOfThroatArea;
-		   cell->info().listOfkNorm = listOfkNorm;
-		   cell->info().listOfkNorm2 = listOfkNorm;
-	    }
-	  }
-	  
-      }    
       
-
+      
+      
+      
+   makeListOfPoresInCells(false);
 }
 
 
@@ -2016,10 +1971,11 @@ void TwoPhaseFlowEngine::solvePressure()
 	  if(!deformation && hasInterfaceList[i] && listOfFlux[i] != 0.0 && !listOfPores[i]->info().isWResInternal){		
        	      double ds = -1.0 * scene->dt * (listOfFlux[i]) / (listOfPores[i]->info().mergedVolume +  listOfPores[i]->info().accumulativeDV * scene->dt);
 	      saturationList[i] = ds + (saturationList[i] * listOfPores[i]->info().mergedVolume / (listOfPores[i]->info().mergedVolume +  listOfPores[i]->info().accumulativeDV * scene->dt )); 
- 	    if(deformation){
+          }
+ 	    if(deformation && hasInterfaceList[i] && !listOfPores[i]->info().isWResInternal){
  		saturationList[i] = saturationList[i] + (pressuresList[i] - listOfPores[i]->info().p())*dsdp(listOfPores[i],listOfPores[i]->info().p()) + (scene->dt / (listOfPores[i]->info().mergedVolume +  (listOfPores[i]->info().accumulativeDV - listOfPores[i]->info().accumulativeDVSwelling) * scene->dt )) * listOfPores[i]->info().accumulativeDVSwelling;
  	    }
-	  }  
+	  
 	}
 	
         for(unsigned int i = 0; i < numberOfPores; i++){
@@ -2294,6 +2250,9 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
   if(!imposeDeformationFluxTPFSwitch){    
     setPositionsBuffer(true);
     updateVolumes(*solver);
+    
+    
+    if(swelling){
     double volume = 0.0, invTime = (1.0 / scene->dt);
     if(scene->dt == 0.0){std::cerr<<" No dt found!";}
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
@@ -2316,7 +2275,10 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
 	  summBC += cell->info().dv();
 	}
     }
+    }
   }
+  
+  
   for(int i = 0; i < numberOfPores; i++){
     dv = 0.0, dvSwelling =0.0;
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
@@ -2330,24 +2292,28 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
      listOfPores[i]->info().accumulativeDVSwelling = dvSwelling;
      summMC += dv;
   }
-  for(int i = 0; i < numberOfPores; i++){
-   if(listOfPores[i]->info().isNWRes){
-     double count = 0.0;
-     for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
-       if(!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWRes){
-	  count += 1.0;
-       }
-     }
-     for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
-       if(!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWRes){
-	 if(count != 0.0){
-	  listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().accumulativeDVSwelling += listOfPores[i]->info().accumulativeDVSwelling / count;
-       }
-       }
-      }
-      listOfPores[i]->info().accumulativeDVSwelling = 0.0;
-     }
-   }
+  
+  if(swelling){
+    //Account for swelling of particles into a non-existing pore (i.e. boundary pores).
+    for(int i = 0; i < numberOfPores; i++){
+    if(listOfPores[i]->info().isNWRes){
+        double count = 0.0;
+        for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
+            if(!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWRes){
+                count += 1.0;
+            }
+        }
+        for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
+            if(!listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().isNWRes){
+                if(count != 0.0){
+                    listOfPores[listOfPores[i]->info().poreNeighbors[j]]->info().accumulativeDVSwelling += listOfPores[i]->info().accumulativeDVSwelling / count;
+                }
+            }
+        }
+        listOfPores[i]->info().accumulativeDVSwelling = 0.0;
+        }
+    }
+  }
 }
 
 double TwoPhaseFlowEngine::getSolidVolumeInCell(CellHandle cell)
@@ -2391,7 +2357,7 @@ void TwoPhaseFlowEngine::updatePoreUnitProperties()
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
       if(!cell->info().isFictious){
 	for(unsigned int j = 0; j<4; j++){
-	  if(cell->info().poreId != cell->neighbor(j)->info().poreId){
+	  if(cell->info().poreId != cell->neighbor(j)->info().poreId && cell->info().id > cell->neighbor(j)->info().id){
 	    double rA = positionBufferCurrent[cell->vertex(facetVertices[j][0])->info().id()].radius;
 	    double rB = positionBufferCurrent[cell->vertex(facetVertices[j][1])->info().id()].radius;
 	    double rC = positionBufferCurrent[cell->vertex(facetVertices[j][2])->info().id()].radius;
@@ -2429,24 +2395,90 @@ void TwoPhaseFlowEngine::updatePoreUnitProperties()
 	    }
 	    
 	    cell->info().poreThroatRadius[j] = reff;
-	    
-	    for(unsigned int k = 0; k < listOfPores[cell->info().poreId]->info().poreNeighbors.size(); k++){
-	      if(listOfPores[cell->info().poreId]->info().poreNeighbors[k] == cell->neighbor(j)->info().id){
-		listOfPores[cell->info().poreId]->info().listOfEntryPressure[k] = reff;
-		for(unsigned int l = 0; l < listOfPores[listOfPores[cell->info().poreId]->info().poreNeighbors[k]]->info().poreNeighbors.size(); l++){
-		    if(listOfPores[listOfPores[cell->info().poreId]->info().poreNeighbors[k]]->info().poreNeighbors[l] == listOfPores[cell->info().poreId]->info().poreId){
-		      listOfPores[cell->info().poreId]->info().listOfEntryPressure[k] = reff;
-		}
-	      }
-	    }
-	    }
+	    cell->neighbor(j)->info().poreThroatRadius[tri.mirror_index(cell, j)] = reff;
+
 	}
 	}
       }
     }
-  //FIXME replace all above with function: computePoreThroatRadiusMethod(), which includes particle update
+    
+    
+    makeListOfPoresInCells(true);
+    
+
+}
+
+void TwoPhaseFlowEngine::makeListOfPoresInCells(bool fast)
+{
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();
+    bool cancel = false, firstCheck = true;;
+      for (unsigned int j = 0 ; j < numberOfPores; j++){
+	  firstCheck = true;
+	  std::vector<int> poreNeighbors;
+	  std::vector<double> listOfkNorm;
+	  std::vector<double> listOfEntrySaturation;
+	  std::vector<double> listOfEntryPressure;
+  	  std::vector<double> listOfThroatArea;
+	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
+	    if(cell->info().poreId == j){
+	      for(unsigned int ngb = 0; ngb <4 ; ngb++){
+		if(cell->neighbor(ngb)->info().poreId != j && cell->neighbor(ngb)->info().poreId != -1 ){
+		  cancel = false;
+		  for(unsigned int checkID = 0; checkID < poreNeighbors.size(); checkID++){
+		   if( poreNeighbors[checkID] == cell->neighbor(ngb)->info().poreId){
+		    cancel = true; 
+// 		    std::cerr<<"skipCell";
+		   }
+		  }
+		  if((firstCheck || !cancel) || poreNeighbors.size() == 0){
+		    if(!fast){poreNeighbors.push_back(cell->neighbor(ngb)->info().poreId);}
+		    if(!fast){listOfkNorm.push_back(cell->info().kNorm()[ngb]);}
+		    listOfEntryPressure.push_back(entryMethodCorrection * surfaceTension / cell->info().poreThroatRadius[ngb]);
+                    double saturation = poreSaturationFromPcS(cell,-1.0 * cell->info().entryPressure[ngb]); 
+                    listOfEntrySaturation.push_back(saturation);
+                    if(saturation > 1.0 || saturation < 0.0 || saturation != saturation){
+                     std::cerr<<endl<< "Time to update triangulation, entry saturation not correct: " << saturation;   
+                    }
+                    
+                  
+                    
+		  
+                    if(!fast){
+                        const CVector& Surfk = cell->info().facetSurfaces[ngb];
+                        Real area = sqrt(Surfk.squared_length());
+                        listOfThroatArea.push_back(area * cell->info().facetFluidSurfacesRatio[ngb]);
+                    }
+		    if(firstCheck){firstCheck = false;}
+		  }
+		}
+	      }
+	    }
+	  }
+	  if(fast){
+//                 listOfPores[j]->info().poreNeighbors = poreNeighbors;
+		   listOfPores[j]->info().listOfEntrySaturation = listOfEntrySaturation;
+		   listOfPores[j]->info().listOfEntryPressure = listOfEntryPressure;
+// 		   listOfPores[j]->info().listOfThroatArea = listOfThroatArea;
+// 		   listOfPores[j]->info().listOfkNorm = listOfkNorm;
+// 		   listOfPores[j]->info().listOfkNorm2 = listOfkNorm;
+          }
+
+	  if(!fast){
+            for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
+                if(cell->info().poreId == j){
+                    cell->info().poreNeighbors = poreNeighbors;
+                    cell->info().listOfEntrySaturation = listOfEntrySaturation;
+                    cell->info().listOfEntryPressure = listOfEntryPressure;
+                    cell->info().listOfThroatArea = listOfThroatArea;
+                    cell->info().listOfkNorm = listOfkNorm;
+                    cell->info().listOfkNorm2 = listOfkNorm;
+                }
+            }
+          }
+	  
+      }    
    
-   solver->computePermeability();  
 }
 
 void TwoPhaseFlowEngine::copyPoreDataToCells()
