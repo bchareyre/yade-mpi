@@ -89,13 +89,14 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
             Real scalarNF=phys->normalForce.norm();
 	    Real scalarSF=phys->shearForce.norm();
 	    totalTensCracksE+=0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) );
+            totalCracksSurface += phys->crossSection;
 	    
 	    if (recordCracks){
-	      std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
-	      if(file.tellp()==0){ file <<"iter time p0 p1 p2 type size norm0 norm1 norm2 nrg"<<endl; }
-	      Vector3r crackNormal=Vector3r::Zero();
-	      if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
-	      file << boost::lexical_cast<string> ( scene->iter ) << " " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( 0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) ) ) <<endl;
+                std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
+                if(file.tellp()==0){ file <<"iter time p0 p1 p2 type size norm0 norm1 norm2 nrg"<<endl; }
+                Vector3r crackNormal=Vector3r::Zero();
+                if ((smoothJoint) && (phys->isOnJoint)) { crackNormal=phys->jointNormal; } else {crackNormal=geom->normal;}
+                file << boost::lexical_cast<string> ( scene->iter ) << " " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( 0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) ) ) <<endl;
 	    }
 	    cracksFileExist=true;
             
@@ -116,7 +117,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	/* NormalForce */
 	Real Fn = 0;
 	Fn = phys->kn*D; 
-
+        
 	/* ShearForce */
 	Vector3r& shearForce = phys->shearForce; 
 	Real jointSliding=0;
@@ -143,7 +144,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	/* Mohr-Coulomb criterion */
 	Real maxFs = phys->FsMax + Fn*phys->tanFrictionAngle;
 	Real scalarShearForce = shearForce.norm();
-	  
+               
 	if (scalarShearForce > maxFs) {
 	  if (scalarShearForce != 0)
 	    shearForce*=maxFs/scalarShearForce;
@@ -152,7 +153,6 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  if ((smoothJoint) && (phys->isOnJoint)) {phys->dilation=phys->jointCumulativeSliding*phys->tanDilationAngle-D; phys->initD+=(jointSliding*phys->tanDilationAngle);}
 
 // 	  if (!phys->isCohesive) {
-// 	    
 //             nbSlips++;
 //             totalSlipE+=((1./phys->ks)*(trialForce-shearForce))/*plastic disp*/.dot(shearForce)/*active force*/;
 //             
@@ -181,6 +181,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    Real scalarNF=phys->normalForce.norm();
 	    Real scalarSF=phys->shearForce.norm();
 	    totalShearCracksE+=0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) );
+            totalCracksSurface += phys->crossSection;
     
 	    if (recordCracks){
 	      std::ofstream file (fileCracks.c_str(), !cracksFileExist ? std::ios::trunc : std::ios::app);
@@ -191,20 +192,29 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    }
 	    cracksFileExist=true;
 
-	    // set the contact properties to friction if in compression, delete contact if in tension
-	    phys->isBroken = true;
-	    phys->isCohesive = 0;
-	    phys->FnMax = 0;
-	    phys->FsMax = 0;
-//	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep?
-	    if ( D < 0 ) { // spheres do not touch
-	      if (!neverErase) return false;
-	      else {
-		phys->shearForce = Vector3r::Zero();
+            // option 1: delete contact whatsoever
+            if (!neverErase) return false;
+            else {
+                phys->shearForce = Vector3r::Zero();
 		phys->normalForce = Vector3r::Zero();
 		return true;
-	      }
-	    }
+            }
+            
+//             // option 2: set the contact properties to friction if in compression, delete contact if in tension
+// 	    phys->isBroken = true;
+// 	    phys->isCohesive = 0;
+// 	    phys->FnMax = 0;
+// 	    phys->FsMax = 0;
+// //	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep?
+// 	    if ( D < 0 ) { // spheres do not touch
+//                 if (!neverErase) return false;
+//                 else {
+//                     phys->shearForce = Vector3r::Zero();
+//                     phys->normalForce = Vector3r::Zero();
+//                     return true;
+//                 }
+// 	    }
+	    
 	  }
 	}
 	
@@ -252,6 +262,8 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	Real v2 	= yade2->poisson;
 	Real f1 	= yade1->frictionAngle;
 	Real f2 	= yade2->frictionAngle;
+        Real rf1 	= yade1->residualFrictionAngle>=0? yade1->residualFrictionAngle: yade1->frictionAngle;
+	Real rf2 	= yade2->residualFrictionAngle>=0? yade2->residualFrictionAngle: yade2->frictionAngle;
 	Real SigT1	= yade1->tensileStrength;
 	Real SigT2	= yade2->tensileStrength;
 	Real Coh1	= yade1->cohesion;
@@ -264,13 +276,9 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 
 	/* Pass values to JCFpmPhys. In case of a "jointed" interaction, the following values will be replaced by other ones later (in few if(){} blocks)*/
 	
-	// frictional properties
+	// elastic properties
 	contactPhysics->kn = 2.*E1*R1*E2*R2/(E1*R1+E2*R2);
-	if ( (v1==0)&&(v2==0) )
-	  contactPhysics->ks = 0;
-	else
-	  contactPhysics->ks = 2.*E1*R1*v1*E2*R2*v2/(E1*R1*v1+E2*R2*v2);
-	contactPhysics->tanFrictionAngle = std::tan(std::min(f1,f2));
+        ( (v1==0)&&(v2==0) )? contactPhysics->ks=0 : contactPhysics->ks = 2.*E1*R1*v1*E2*R2*v2/(E1*R1*v1+E2*R2*v2);
 	
 	// cohesive properties
 	///to set if the contact is cohesive or not
@@ -284,6 +292,14 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	  contactPhysics->FnMax = std::min(SigT1,SigT2)*contactPhysics->crossSection;
 	  contactPhysics->FsMax = std::min(Coh1,Coh2)*contactPhysics->crossSection;
 	}
+	// do we need that?
+// 	else {
+// 	  contactPhysics->FnMax = 0.;
+// 	  contactPhysics->FsMax = 0.;
+// 	}
+	
+        // frictional properties      
+        contactPhysics->isCohesive? contactPhysics->tanFrictionAngle = std::tan(std::min(f1,f2)) : contactPhysics->tanFrictionAngle = std::tan(std::min(rf1,rf2));
 
 	/// +++ Jointed interactions ->NOTE: geom->normal is oriented from 1 to 2 / jointNormal from plane to sphere 
 	if ( st1->onJoint && st2->onJoint )

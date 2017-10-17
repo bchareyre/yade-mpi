@@ -35,6 +35,7 @@ class JCFpmMat: public FrictMat {
 		((int,type,0,,"If particles of two different types interact, it will be with friction only (no cohesion).[-]"))
 		((Real,tensileStrength,0.,,"Defines the maximum admissible normal force in traction in the matrix (:yref:`FnMax<JCFpmPhys.FnMax>` = tensileStrength * :yref:`crossSection<JCFpmPhys.crossSection>`). [Pa]"))
 		((Real,cohesion,0.,,"Defines the maximum admissible tangential force in shear, for Fn=0, in the matrix (:yref:`FsMax<JCFpmPhys.FsMax>` = cohesion * :yref:`crossSection<JCFpmPhys.crossSection>`). [Pa]"))
+                ((Real,residualFrictionAngle,-1.,,"Defines the residual friction angle (when contacts are not cohesive). residualFrictionAngle=frictionAngle if not specified. [degrees]"))
 		((Real,jointNormalStiffness,0.,,"Defines the normal stiffness on the joint surface. [Pa/m]"))
 		((Real,jointShearStiffness,0.,,"Defines the shear stiffness on the joint surface. [Pa/m]"))
 		((Real,jointTensileStrength,0.,,"Defines the :yref:`maximum admissible normal force in traction<JCFpmPhys.FnMax>` on the joint surface. [Pa]"))
@@ -54,22 +55,22 @@ class JCFpmPhys: public NormShearPhys {
 		virtual ~JCFpmPhys();
 
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(JCFpmPhys,NormShearPhys,"Representation of a single interaction of the JCFpm type, storage for relevant parameters",
-			((Real,initD,0,,"equilibrium distance for interacting particles. Computed as the interparticular distance at first contact detection."))
+			((Real,initD,0.,,"equilibrium distance for interacting particles. Computed as the interparticular distance at first contact detection."))
 			((bool,isBroken,false,,"flag for broken interactions"))
 			((bool,isCohesive,false,,"If false, particles interact in a frictional way. If true, particles are bonded regarding the given :yref:`cohesion<JCFpmMat.cohesion>` and :yref:`tensile strength<JCFpmMat.tensileStrength>` (or their jointed variants)."))
 			((bool,more,false,,"specifies if the interaction is crossed by more than 3 joints. If true, interaction is deleted (temporary solution)."))
 			((bool,isOnJoint,false,,"defined as true when both interacting particles are :yref:`on joint<JCFpmState.onJoint>` and are in opposite sides of the joint surface. In this case, mechanical parameters of the interaction are derived from the ''joint...'' material properties of the particles. Furthermore, the normal of the interaction may be re-oriented (see :yref:`Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint`)."))
 			((bool,isOnSlot,false,,"defined as true when interaction is located in the perforation slot (surface)."))
-			((Real,tanFrictionAngle,0,,"tangent of Coulomb friction angle for this interaction (auto. computed). [-]"))
-			((Real,crossSection,0,,"crossSection=pi*Rmin^2. [m2]"))
-			((Real,FnMax,0,,"positiv value computed from :yref:`tensile strength<JCFpmMat.tensileStrength>` (or joint variant) to define the maximum admissible normal force in traction: Fn >= -FnMax. [N]"))
-			((Real,FsMax,0,,"computed from :yref:`cohesion<JCFpmMat.cohesion>` (or jointCohesion) to define the maximum admissible tangential force in shear, for Fn=0. [N]"))
+			((Real,tanFrictionAngle,0.,,"tangent of Coulomb friction angle for this interaction (auto. computed). [-]"))
+			((Real,crossSection,0.,,"crossSection=pi*Rmin^2. [m2]"))
+			((Real,FnMax,0.,,"positiv value computed from :yref:`tensile strength<JCFpmMat.tensileStrength>` (or joint variant) to define the maximum admissible normal force in traction: Fn >= -FnMax. [N]"))
+			((Real,FsMax,0.,,"computed from :yref:`cohesion<JCFpmMat.cohesion>` (or jointCohesion) to define the maximum admissible tangential force in shear, for Fn=0. [N]"))
 			((Vector3r,jointNormal,Vector3r::Zero(),,"normal direction to the joint, deduced from e.g. :yref:`<JCFpmState.jointNormal1>`."))
-			((Real,jointCumulativeSliding,0,,"sliding distance for particles interacting on a joint. Used, when :yref:`<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint>` is true, to take into account dilatancy due to shearing. [-]"))
-			((Real,tanDilationAngle,0,,"tangent of the angle defining the dilatancy of the joint surface (auto. computed from :yref:`JCFpmMat.jointDilationAngle`). [-]"))
-			((Real,dilation,0,,"defines the normal displacement in the joint after sliding treshold. [m]"))
-			((Real,crackJointAperture,0,,"Relative displacement between 2 spheres (in case of a crack it is equivalent of the crack aperture)"))
-			((bool, breakOccurred,0,,"Flag used to trigger retriangulation as soon as a cohesive bond breaks in FlowEngine (for DFNFlow use only)"))
+			((Real,jointCumulativeSliding,0.,,"sliding distance for particles interacting on a joint. Used, when :yref:`<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.smoothJoint>` is true, to take into account dilatancy due to shearing. [-]"))
+			((Real,tanDilationAngle,0.,,"tangent of the angle defining the dilatancy of the joint surface (auto. computed from :yref:`JCFpmMat.jointDilationAngle`). [-]"))
+			((Real,dilation,0.,,"defines the normal displacement in the joint after sliding treshold. [m]"))
+			((Real,crackJointAperture,0.,,"Relative displacement between 2 spheres (in case of a crack it is equivalent of the crack aperture)"))
+			((bool,breakOccurred,0,,"Flag used to trigger retriangulation as soon as a cohesive bond breaks in FlowEngine (for DFNFlow use only)"))
 			,
 			createIndex();
 			,
@@ -109,6 +110,7 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 			((int,nbShearCracks,0,,"number of shear microcracks."))
 			((Real,totalTensCracksE,0.,,"calculate the overall energy dissipated by interparticle microcracking in tension."))
 			((Real,totalShearCracksE,0.,,"calculate the overall energy dissipated by interparticle microcracking in shear."))
+                        ((Real,totalCracksSurface,0.,,"calculate the total cracked surface."))
 // 			((bool,recordSlips,false,,"if true, data about frictional interactions that slip are stored in a text file cracksKey.txt."))
 // 			((int,nbSlips,0,,"number of slips."))
 //			((Real,totalSlipE,0.,,"calculate the overall energy dissipated by interparticle friction."))
