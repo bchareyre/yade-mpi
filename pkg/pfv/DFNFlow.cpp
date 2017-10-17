@@ -14,7 +14,7 @@
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
 
-#define DFNFLOW
+// #define DFNFLOW
 
 #ifdef DFNFLOW
 #include "FlowEngine_DFNFlowEngineT.hpp"
@@ -228,7 +228,7 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, R
 	const CellHandle& cell1 = currentFacet.first;
 	const CellHandle& cell2 = currentFacet.first->neighbor(facet->second);
 	if ( Tri.is_infinite(cell1) || Tri.is_infinite(cell2)) cerr<<"Infinite cell found in trickPermeability, should be handled somehow, maybe"<<endl;
-	cell1->info().kNorm()[facet->second]=cell2->info().kNorm()[Tri.mirror_index(cell1, facet->second)] = apertureFactor*pow((aperture),3)/(12*viscosity);
+	cell1->info().kNorm()[currentFacet.second]=cell2->info().kNorm()[Tri.mirror_index(cell1,currentFacet.second)] = apertureFactor*pow((aperture),3)/(12*viscosity);
 	/// For vtk recorder:
 	cell1->info().crack= 1;
 	cell2->info().crack= 1;
@@ -305,10 +305,11 @@ void DFNFlowEngine::trickPermeability(Solver* flow)
 				Real aperture = jcfpmphys->crackJointAperture;
 // 				Real aperture = jcfpmphys->crackJointAperture + residualAperture;
 // 				cout<<"aperture = " << aperture <<endl;
-// 				if (aperture > maxAperture) maxAperture = aperture; /// to avoid problem for large deformations?
+// 				if (aperture > valueToDefine) aperture = valueToDefine; /// to avoid problem for large deformations?
 				if (aperture <= residualAperture) aperture = residualAperture;
-				
+				if (aperture > maxAperture) maxAperture = aperture; 
 				SumOfApertures += aperture;
+				
 				trickPermeability(edge, aperture);
 			};
 		}
