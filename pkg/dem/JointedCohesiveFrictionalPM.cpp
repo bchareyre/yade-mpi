@@ -77,10 +77,16 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  if ( phys->isCohesive && (phys->FnMax>0) && (std::abs(D)>Dtensile) ) {
 	    
 	    nbTensCracks++;
+	    phys->isCohesive = 0;
+	    phys->FnMax = 0;
+	    phys->FsMax = 0;
+	    /// Do we need both the following lines?
+	    phys->breakOccurred = true;  // flag for DFNFlowEngine
+	    phys->isBroken = true; // flag for DFNFlowEngine
+	    
             // update body state with the number of broken bonds -> do we really need that?
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
-            phys->breakOccurred = true;  // flag to trigger remesh for DFNFlowEngine
             st1->nbBrokenBonds++;
 	    st2->nbBrokenBonds++;
 	    st1->damageIndex+=1.0/st1->nbInitBonds;
@@ -100,15 +106,10 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    }
 	    cracksFileExist=true;
             
-	    /// Timos
 	    if (!neverErase) return false; 
 	    else {
 	      phys->shearForce = Vector3r::Zero();
 	      phys->normalForce = Vector3r::Zero();
-	      phys->isCohesive =0;
-	      phys->FnMax = 0;
-	      phys->FsMax = 0;
-	      phys->isBroken = true;
 	      return true;
 	    }
 	  }
@@ -169,6 +170,14 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	  if ( phys->isCohesive ) { 
 
 	    nbShearCracks++;
+	    phys->isCohesive = 0;
+	    phys->FnMax = 0;
+	    phys->FsMax = 0;
+	    /// Do we need both the following lines?
+	    phys->breakOccurred = true;  // flag for DFNFlowEngine
+	    phys->isBroken = true; // flag for DFNFlowEngine
+	    
+	    
 	    // update body state with the number of broken bonds -> do we really need that?
 	    JCFpmState* st1=dynamic_cast<JCFpmState*>(b1->state.get());
 	    JCFpmState* st2=dynamic_cast<JCFpmState*>(b2->state.get());
@@ -191,29 +200,25 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	      file << boost::lexical_cast<string> ( scene->iter ) << " " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 2 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( 0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) ) ) <<endl;
 	    }
 	    cracksFileExist=true;
-
-            // option 1: delete contact whatsoever
-            if (!neverErase) return false;
-            else {
-                phys->shearForce = Vector3r::Zero();
-		phys->normalForce = Vector3r::Zero();
-		return true;
-            }
+	    
+// 	    // option 1: delete contact whatsoever (if in compression, it will be detected as a new contact at the next timestep -> actually, not necesarily because of the near neighbour interaction: there could be a gap between the bonded particles and thus a broken contact may not be frictional at the next timestep if the detection is done for strictly contacting particles...) -> to TEST
+//             if (!neverErase) return false;
+//             else {
+//                 phys->shearForce = Vector3r::Zero();
+// 		phys->normalForce = Vector3r::Zero();
+// 		return true;
+//             }
             
-//             // option 2: set the contact properties to friction if in compression, delete contact if in tension
-// 	    phys->isBroken = true;
-// 	    phys->isCohesive = 0;
-// 	    phys->FnMax = 0;
-// 	    phys->FsMax = 0;
-// //	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep?
-// 	    if ( D < 0 ) { // spheres do not touch
-//                 if (!neverErase) return false;
-//                 else {
-//                     phys->shearForce = Vector3r::Zero();
-//                     phys->normalForce = Vector3r::Zero();
-//                     return true;
-//                 }
-// 	    }
+            // option 2: delete contact if in tension
+//	    shearForce *= Fn*phys->tanFrictionAngle/scalarShearForce; // now or at the next timestep? should not be very different -> to TEST
+	    if ( D < 0 ) { // spheres do not touch
+                if (!neverErase) return false;
+                else {
+                    phys->shearForce = Vector3r::Zero();
+                    phys->normalForce = Vector3r::Zero();
+                    return true;
+                }
+	    }
 	    
 	  }
 	}
