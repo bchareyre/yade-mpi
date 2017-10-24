@@ -81,7 +81,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    phys->FnMax = 0;
 	    phys->FsMax = 0;
 	    /// Do we need both the following lines?
-	    phys->breakOccurred = true;  // flag for DFNFlowEngine
+	    phys->breakOccurred = true;  // flag to trigger remesh for DFNFlowEngine
 	    phys->isBroken = true; // flag for DFNFlowEngine
 	    
             // update body state with the number of broken bonds -> do we really need that?
@@ -174,7 +174,7 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	    phys->FnMax = 0;
 	    phys->FsMax = 0;
 	    /// Do we need both the following lines?
-	    phys->breakOccurred = true;  // flag for DFNFlowEngine
+	    phys->breakOccurred = true;  // flag to trigger remesh for DFNFlowEngine
 	    phys->isBroken = true; // flag for DFNFlowEngine
 	    
 	    // update body state with the number of broken bonds -> do we really need that?
