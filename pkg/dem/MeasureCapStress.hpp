@@ -1,4 +1,4 @@
-// jerome.duriez@ucalgary.ca
+// jerome.duriez@irstea.fr
 
 #pragma once
 

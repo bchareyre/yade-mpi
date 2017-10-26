@@ -1,4 +1,4 @@
-% J. Duriez (jerome.duriez@ucalgary.ca)
+% J. Duriez (jerome.duriez@irstea.fr)
 
 function [dist,vol,force,delta1,delta2,eStar,nn11,nn33,out] = solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,speak,plot3D)
 %Computes one single liquid (capillary) bridge

@@ -1,4 +1,4 @@
-% J. Duriez (jerome.duriez@ucalgary.ca)
+% J. Duriez (jerome.duriez@irstea.fr)
 
 function writesCapFile()
 % Builds capillary files for given radius ratio and contact angle
