@@ -1,14 +1,14 @@
 #pragma once
 
 /// Frequently used:
-typedef CGT::CVector CVector;
-typedef CGT::Point Point;
-
+// typedef CGT::CVector CVector;
+// typedef CGT::Point Point;
+/*
 /// Converters for Eigen and CGAL vectors
 inline CVector makeCgVect ( const Vector3r& yv ) {return CVector ( yv[0],yv[1],yv[2] );}
 inline Point makeCgPoint ( const Vector3r& yv ) {return Point ( yv[0],yv[1],yv[2] );}
 inline Vector3r makeVector3r ( const Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
-inline Vector3r makeVector3r ( const CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+inline Vector3r makeVector3r ( const CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}*/
 
 /// The following macros can be used to expose CellInfo members.
 /// The syntax is CELL_SCALAR_GETTER(double,.p(),pressure), note the "." before member name, data members would be without the "()" 
