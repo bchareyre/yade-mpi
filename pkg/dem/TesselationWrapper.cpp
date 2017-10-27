@@ -392,4 +392,15 @@ boost::python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		return ret;
 }
 
+
+boost::python::list TesselationWrapper::getAlphaFaces(double alpha)
+{
+	vector<AlphaFace> faces;
+	Tes->setAlphaFaces(faces,alpha);
+	boost::python::list ret;
+	for (auto f=faces.begin();f!=faces.end();f++)
+		ret.append(boost::python::make_tuple(Vector3i(f->ids[0],f->ids[1],f->ids[2]),makeVector3r(f->normal)));
+	return ret;
+}
+
 #endif /* YADE_CGAL */

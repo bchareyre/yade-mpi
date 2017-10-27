@@ -113,6 +113,10 @@ public:
 	inline Real&	Volume (unsigned int id) { return vertexHandles[id]->info().v(); }
 	inline const VertexHandle&	vertex (unsigned int id) const { return vertexHandles[id]; }
 
+	// Alpha Shapes
+	void testAlphaShape();
+	struct AlphaFace {unsigned int ids[3]; CVector normal;};
+	void setAlphaFaces(std::vector<AlphaFace>& faces, double alpha=0);
 	
 // 	FiniteCellsIterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}
 // 	FiniteCellsIterator finiteCellsEnd(void);// {return Tri->finite_cells_end();}

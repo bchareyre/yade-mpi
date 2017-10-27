@@ -22,13 +22,13 @@
  * Example usage script :
  *
  *tt=TriaxialTest()
- *tt.generate("test.xml")
- *O.load("test.xml")
- *O.run(100) //for unknown reasons, this procedure crashes at iteration 0
+ *tt.generate("test.yade")
+ *O.load("test.yade")
+ *O.run(100,True) 
  *TW=TesselationWrapper()
- *TW.triangulate() //compute regular Delaunay triangulation, don't construct tesselation
- *TW.computeVolumes() //will silently tesselate the packing
- *TW.volume(10) //get volume associated to sphere of id 10
+ *TW.triangulate() #compute regular Delaunay triangulation, don't construct tesselation
+ *TW.computeVolumes() #will silently tesselate the packing
+ *TW.volume(10) #get volume associated to sphere of id 10
  *
  */
 
@@ -40,6 +40,7 @@ public:
 	typedef Tesselation::VertexInfo							VertexInfo;
 	typedef Tesselation::CellInfo							CellInfo;
 	typedef RTriangulation::Finite_edges_iterator					FiniteEdgesIterator;
+	typedef Tesselation::AlphaFace							AlphaFace;
 	
 	
 	
@@ -72,6 +73,9 @@ public:
 	///compute voronoi centers then stop (don't compute anything else)
  	void	computeTesselation (void);
  	void	computeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz);
+	
+	void	testAlphaShape() {Tes->testAlphaShape();}
+	boost::python::list getAlphaFaces(double alpha);	
 
 	///compute Voronoi vertices + volumes of all cells
 	///use computeTesselation to force update, e.g. after spheres positions have been updated
@@ -136,6 +140,8 @@ public:
 	.def("getVolPoroDef",&TesselationWrapper::getVolPoroDef,(boost::python::arg("deformation")=false),"Return a table with per-sphere computed quantities. Include deformations on the increment defined by states 0 and 1 if deformation=True (make sure to define states 0 and 1 consistently).")
 	.def("computeDeformations",&TesselationWrapper::computeDeformations,"compute per-particle deformation. Get it with :yref:`TesselationWrapper::deformation` (id,i,j).")
 	.def("deformation",&TesselationWrapper::deformation,(boost::python::arg("id"),boost::python::arg("i"),boost::python::arg("j")),"Get particle deformation")
+	.def("testAlphaShape",&TesselationWrapper::testAlphaShape,"transitory function, testing AlphaShape feature")
+	.def("getAlphaFaces",&TesselationWrapper::getAlphaFaces,(boost::python::arg("alpha")=0),"Get the list of alpha faces for a given alpha. If alpha is not specified or null the minimum alpha resulting in a unique connected domain is used")
 	);
 	DECLARE_LOGGER;
 };

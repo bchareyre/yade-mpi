@@ -179,6 +179,133 @@ void _Tesselation<TT>::compute ()
 }
 
 template<class TT>
+void _Tesselation<TT>::testAlphaShape()
+{
+// 	if (!computed) compute();
+// 	if (!redirected) redirect();
+// 	FiniteCellsIterator cellEnd = Tri->finite_cells_end();
+// 	for ( FiniteCellsIterator cell = Tri->finite_cells_begin(); cell != cellEnd; cell++ )
+// 	{
+// 
+// 		const Sphere& S0 = cell->vertex ( 0 )->point();
+// 		const Sphere& S1 = cell->vertex ( 1 )->point();
+// 		const Sphere& S2 = cell->vertex ( 2 )->point();
+// 		const Sphere& S3 = cell->vertex ( 3 )->point();
+// 		Real x,y,z;
+// 		CGAL::weighted_circumcenterC3 (
+// 			S0.point().x(), S0.point().y(), S0.point().z(), S0.weight(),
+// 			S1.point().x(), S1.point().y(), S1.point().z(), S1.weight(),
+// 			S2.point().x(), S2.point().y(), S2.point().z(), S2.weight(),
+// 			S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
+// 			x, y, z );
+// 		cell->info().setPoint(Point(x,y,z));
+// 	}
+// 	computed = true;
+	// first call the copy constructor since building the AlphaShape will destroy the triangulation
+	RTriangulation temp(*Tri);
+	AlphaShape as (temp);
+	as.set_alpha(as.find_alpha_solid());
+	cerr << "Alpha shape computed. alpha_solid=" <<as.find_alpha_solid() <<endl;
+	std::list<CellHandle> cells,cells2,cells3;
+	std::list<Facet> facets,facets2,facets3;
+	std::list<CVector> normals;
+	as.get_alpha_shape_cells(std::back_inserter(cells),AlphaShape::EXTERIOR);
+	as.get_alpha_shape_cells(std::back_inserter(cells2), AlphaShape::INTERIOR);
+	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
+
+	std::cerr<< "num exterior cells "<< cells.size() <<" vs. "<<cells2.size() <<std::endl;
+	std::cerr<< "num regular facets "<< facets.size() << std::endl;
+	for (auto f=facets.begin(); f!=facets.end();f++){
+		int idx = f->second;//index of the facet within cell defined by f->first
+		std::cerr << f->first->vertex(facetVertices[idx][0])->info().id()
+			<<" "<< f->first->vertex(facetVertices[idx][1])->info().id()
+			<<" "<< f->first->vertex(facetVertices[idx][2])->info().id()  << std::endl;
+		CVector normal = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
+			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
+		Point pp;
+ 		if (as.classify(f->first)==AlphaShape::INTERIOR) {
+			pp= f->first->vertex(f->second)->point(); std::cerr << "found as.classify(f->first)==Alpha_shape_3::INTERIOR"<<std::endl;}
+		else {
+			pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point(); std::cerr << "not an Alpha_shape_3::INTERIOR"<<std::endl;}
+		//check if the normal vector is inward or outward
+		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+		if (dotP<0) normal=-normal;
+		std::cerr <<"dotP="<<dotP<<std::endl<<"normal: "<<normal<<std::endl;
+	}
+}
+
+// template<class TT>
+// void _Tesselation<TT>::setAlphaBoundaryPoints(double alpha)
+// {
+// 	AlphaShape as (*Tri);
+// 	if (!alpha) as.set_alpha(as.find_alpha_solid());
+// 	else as.set_alpha(alpha);
+// 	cerr << "Alpha shape computed. alpha_solid=" <<as.find_alpha_solid() <<endl;
+// 	std::list<CellHandle> cells,cells2,cells3;
+// 	std::list<Facet> facets,facets2,facets3;
+// 	std::list<CVector> normals;
+// 	as.get_alpha_shape_cells(std::back_inserter(cells),AlphaShape::EXTERIOR);
+// 	as.get_alpha_shape_cells(std::back_inserter(cells2), AlphaShape::INTERIOR);
+// 	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
+// 	
+// 	faces.resize(facets.size()); int k=0;
+// 
+// 	std::cerr<< "num exterior cells "<< cells.size() <<" vs. "<<cells2.size() <<std::endl;
+// 	std::cerr<< "num regular facets "<< facets.size() << std::endl;
+// 	for (auto f=facets.begin(); f!=facets.end();f++){
+// 		int idx = f->second;//index of the facet within cell defined by f->first
+// 		std::cerr << f->first->vertex(facetVertices[idx][0])->info().id()
+// 			<<" "<< f->first->vertex(facetVertices[idx][1])->info().id()
+// 			<<" "<< f->first->vertex(facetVertices[idx][2])->info().id()  << std::endl;
+// 		CVector normal = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
+// 			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
+// 		Point pp;
+//  		if (as.classify(f->first)==AlphaShape::INTERIOR) {
+// 			pp= f->first->vertex(f->second)->point(); std::cerr << "found as.classify(f->first)==Alpha_shape_3::INTERIOR"<<std::endl;}
+// 		else {
+// 			pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point(); std::cerr << "not an Alpha_shape_3::INTERIOR"<<std::endl;}
+// 		//check if the normal vector is inward or outward
+// 		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+// 		if (dotP<0) normal=-normal;
+// 		// set the face in the global list 
+// 		for (int ii=0; ii<3;ii++) faces[k].ids[ii]= f->first->vertex(facetVertices[idx][ii])->info().id();
+// 		faces[k++].normal = normal;
+// 		std::cerr <<"dotP="<<dotP<<std::endl<<"normal: "<<normal<<std::endl;
+// 	}
+// }
+
+template<class TT>
+void _Tesselation<TT>::setAlphaFaces(std::vector<AlphaFace>& faces, double alpha)
+{
+	RTriangulation temp(*Tri);
+	AlphaShape as (temp);
+	if (!alpha) {
+		as.set_alpha(as.find_alpha_solid());
+		/*cerr << "Alpha shape computed. alpha_solid=" <<as.find_alpha_solid() <<endl;*/}
+	else as.set_alpha(alpha);
+	
+	std::list<Facet> facets;
+	std::list<CVector> normals;
+	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);// get the list of "contour" facets
+	faces.resize(facets.size()); int k=0;
+
+	for (auto f=facets.begin(); f!=facets.end();f++){
+		int idx = f->second;//index of the facet within cell defined by f->first
+		CVector normal = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
+			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
+		Point pp;
+ 		if (as.classify(f->first)==AlphaShape::INTERIOR) pp= f->first->vertex(f->second)->point();
+		else pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point();
+		//check if the normal vector is inward or outward
+		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+		if (dotP<0) normal=-normal;
+		// set the face in the global list 
+		for (int ii=0; ii<3;ii++) faces[k].ids[ii]= f->first->vertex(facetVertices[idx][ii])->info().id();
+		faces[k++].normal = normal;
+	}
+}
+
+template<class TT>
 Segment _Tesselation<TT>::Dual ( FiniteFacetsIterator &f_it )
 {
 	return Segment ( f_it->first->info(), ( f_it->first->neighbor ( f_it->second ) )->info() );
@@ -311,7 +438,7 @@ typename Tesselation::VertexHandle PeriodicTesselation<Tesselation>::insert(Real
 			Vh->info().isGhost=0;
 		} else Vh->info().isGhost=1;
 	}
-	else cerr << " : Vh==NULL!!" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad<<" fictious="<<isFictious<< endl;
+	else cerr << " : Vh==NULL!!" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad<<" fictious="<<isFictious<<", isGhost="<< bool(duplicateOfId>=0)<<endl;
 	return Vh;
 }
 
