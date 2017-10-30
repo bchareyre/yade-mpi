@@ -9,11 +9,11 @@ LubricationPhys::LubricationPhys(const ViscElPhys &obj) :
     ViscElPhys(obj),
     eta(1.),
     eps(0.001),
-    ue(0.),
     kno(0.),
     kso(0.),
     nun(0.),
     phic(0.),
+    ue(0.),
     NormalForce(Vector3r::Zero()),
     TangentForce(Vector3r::Zero())
 {

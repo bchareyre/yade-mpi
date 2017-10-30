@@ -40,7 +40,7 @@ class ElectrostaticPhys: public CohFrictPhys {
                         ((Real, eps, 0.001,,"Rugosity [-]"))
 			, // ctors
                         createIndex();,
-                        .def_readonly("DebyeLength",&ElectrostaticPhys::DebyeLength,"Debye Length \kappa^-1 [m]")
+                        .def_readonly("DebyeLength",&ElectrostaticPhys::DebyeLength,"Debye Length kappa^-1 [m]")
                         .def_readonly("InterConst",&ElectrostaticPhys::InterConst,"Interaction Constant Z [J]")
                         .def_readonly("A",&ElectrostaticPhys::A,"Hamaker Constant A [J]")
 		);
