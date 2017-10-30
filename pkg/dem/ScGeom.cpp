@@ -74,7 +74,7 @@ Vector3r ScGeom::getIncidentVel(const State* rbp1, const State* rbp2, Real dt, c
 	} else {
 		// It is correct for sphere-sphere and sphere-facet contact
 		Vector3r c1x = (contactPoint - rbp1->pos);
-		Vector3r c2x = (contactPoint - rbp2->pos + shift2);
+		Vector3r c2x = (contactPoint - (rbp2->pos + shift2));
 		Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
 		relativeVelocity+=shiftVel;
 		return relativeVelocity;}
