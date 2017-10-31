@@ -1,6 +1,6 @@
 % J. Duriez (jerome.duriez@irstea.fr)
 
-function [dist,vol,force,delta1,delta2,eStar,nn11,nn33,out] = solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,speak,plot3D)
+function [dist,vol,force,delta1,delta2,eStar,nn11,nn33,out] = solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,plot3D,speak)
 %Computes one single liquid (capillary) bridge
 %   Lian's method: iterative determination using Taylor expansion with
 %   finite difference (FD) increment = deltaZ (a function attribute)
@@ -27,9 +27,14 @@ global cstC
 % see [9] Lian1993, (6) Duriez2017, or (2.51) Soulie2005 ~ (10) Soulie2006..
 cstC = 1/rRatio * sin(radians(delta1)) * sin(radians(delta1+theta)) + 1/2 * uStar * rRatio^-2 * sin(radians(delta1))^2;
 
-% Use of cstC to get the right filling angle delta2:
-fun = @(delta2)cstC_delta2(delta2,theta,uStar);
-delta2 = fzero(fun,[0 90]); % fzero does not catch multiple roots, if it occurs
+% Use of cstC to get the right filling angle delta2 (# delta1 for rRatio # 1), according to e.g. (2.52) Soulie2005:
+if rRatio ~=1
+    fun = @(delta2)cstC_delta2(delta2,theta,uStar);
+    delta2 = fzero(fun,[0 90]); % fzero does not catch multiple roots, if it occurs
+else
+    delta2 = delta1;
+end
+
 
 % Discrete set of profile values:
 rho = -ones(30000,1); % preallocating 26000 or 30000 makes 90 profile computations take ~ 10.8s instead of ~ 14.5
@@ -50,7 +55,7 @@ rhoRight = sin(radians(delta2));
 % Some remarks about next loop:
 % - this loop may extend the size of rho without problem
 % - just keep a simple and efficient test to stop computations. A more restrictive
-% one may lead to go beyond the right contact line and lead to divergence..
+% one may take you beyond the right contact line and lead to divergence..
 while rho(step) < 1.00001*rhoRight
     rho2d = rhoSecond(rho(step),rhoPrime(step),uStar); % all terms are at "i"
     rho(step+1) = rho(step) + deltaZ * rhoPrime(step) + 1/2 * deltaZ^2 * rho2d;
@@ -141,7 +146,7 @@ function angleRad = radians(angle)
 angleRad = angle * pi / 180;
 end
 
-function y = cstC_delta2(delta2,theta,uStar) % from e.g. (2.52) Soulie 2005
+function y = cstC_delta2(delta2,theta,uStar) % from e.g. (2.52) Soulie2005
 global cstC
 y = sin(radians(delta2)) * sin(radians(delta2+theta)) + 1/2 * uStar * sin(radians(delta2))^2 - cstC;
 end
@@ -170,36 +175,44 @@ lastZ = deltaZ*(length(rho) -1);
 vecZ = 0:deltaZ:lastZ;
 
 % Toroidal profile parameters: see [15]-[17] Lian1993, for r=1
-d1Rad = radians(delta1);d2Rad = radians(delta2); thRad = radians(theta);
-dist = lastZ - (1-cos(d1Rad)) - (1-cos(d2Rad)); % TODO: only for r=1
-rho1 = ( dist/2. + 1 - cos(d1Rad) )/cos(d2Rad+thRad);
-rho2 = sin(d2Rad) - (1-sin(d2Rad+thRad)) * ( dist/2 + 1-cos(d2Rad) ) / cos(d2Rad+thRad);
+if rRatio == 1
+    d1Rad = radians(delta1);d2Rad = radians(delta2); thRad = radians(theta);
+    dist = lastZ - (1-cos(d1Rad)) - (1-cos(d2Rad)); % TODO: only for r=1
+    rho1 = ( dist/2. + 1 - cos(d1Rad) )/cos(d2Rad+thRad);
+    rho2 = sin(d2Rad) - (1-sin(d2Rad+thRad)) * ( dist/2 + 1-cos(d2Rad) ) / cos(d2Rad+thRad);
+    torProfile = rho1 + abs(rho2) - ( rho1^2 - (vecZ-lastZ/2).^2 ).^(1/2);
+end
 
 figure();
-plot(vecZ,rho,'o');hold on;
+plot(vecZ,rho);hold on;
 plot([0;lastZ],[1/rRatio * sin(radians(delta1));1/rRatio * sin(radians(delta1))],'r')
 plot([0;lastZ],[rhoNeck;rhoNeck],'m')
 plot([0;lastZ],[sin(radians(delta2));sin(radians(delta2))],'g')
-plot(vecZ,rho1 + abs(rho2) - ( rho1^2 - (vecZ-lastZ/2).^2 ).^(1/2),'b');
-legend('Profile','Left value','Neck value','Right value','Toroidal profile')
 xlabel('Interparticle axis, z')
-ylabel('\rho(z)')
+ylabel('Profile height, \rho(z)')
 title(['\delta_1 = ',num2str(delta1)])
-if rRatio ~= 1
-    disp('Plotted toroidal profile is obviously wrong because rRatio # 1')
+if rRatio == 1
+    plot(vecZ(1:floor(length(rho)/50):end),torProfile(1:floor(length(rho)/50):end),'ob');
+    legend('Profile','Left value','Neck value','Right value','Toroidal profile')
+else
+    legend('Profile','Left value','Neck value','Right value')
 end
-% disp([num2str(delta1),' profile plotted with ',num2str(length(rho)),' rho values'])
 
 end
 
 function plot3Dbridge(rho,deltaZ,rRatio)
 
 nPtsAlongAxis = 200 ; % grid-step along "rho" and z axis (the x,y plane of the 3D figure in fact)
-nRhoVal =length(rho);
+nRhoVal = length(rho);
+rhoMax = max(rho);
 lastZ = deltaZ*(nRhoVal -1);
-x = -max(rho):max(rho)/nPtsAlongAxis:max(rho);
 
+% discretization of x axis of 3D figure
+x = -rhoMax:rhoMax/nPtsAlongAxis:rhoMax;
+% discretization of y axis of 3D figure (= z axis from Fig. 1 Duriez2017),
+% nPtsAlongAxis values, from 0 to lastZ:
 y = 0:lastZ / (nPtsAlongAxis-1):lastZ; % will then reach exactly lastZ
+
 alt = zeros(length(y),length(x));
 for i = 1:length(y)
     indRho = floor( (i-1)*(nRhoVal-1)/(nPtsAlongAxis) ) +1;
@@ -224,7 +237,7 @@ delta1 = asin(rRatio*rho(1));
 yC1 = - cos(delta1)/rRatio;
 delta2 = asin(rho(nRhoVal));
 yC2 = lastZ + cos(delta2); % Center of right sphere:
-x = -max(rho):max(rho)/40:max(rho);
+x = -rhoMax:rhoMax/40:rhoMax;
 y = x + lastZ/2;
 altSph1 = zeros(length(x),length(x));
 altSph2 = zeros(length(x),length(x));
@@ -243,7 +256,7 @@ end
 
 surf(x,y,matAltToPlot(altSph1),'FaceColor','none')
 surf(x,y,matAltToPlot(altSph2),'FaceColor','none')
-caxis([0,max(rho)])
+caxis([0,rhoMax])
 grid off
 axis square
 end
