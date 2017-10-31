@@ -29,6 +29,7 @@ namespace CGT {
 		typedef typename baseType::FiniteFacetsIterator			FiniteFacetsIterator;\
 		typedef typename baseType::LocateType				LocateType;\
 		typedef typename baseType::EdgeIterator				EdgeIterator;\
+		typedef typename RTriangulation::Edge				Edge;\
 		typedef typename baseType::FiniteEdgesIterator			FiniteEdgesIterator;\
 		typedef typename baseType::VectorVertex				VectorVertex;\
 		typedef typename baseType::VectorCell				VectorCell;\
@@ -60,6 +61,7 @@ public:
 	typedef typename RTriangulation::Finite_facets_iterator					FiniteFacetsIterator;
 	typedef typename RTriangulation::Locate_type						LocateType;
 	typedef typename RTriangulation::Edge_iterator						EdgeIterator;
+	typedef typename RTriangulation::Edge							Edge;
 	typedef typename RTriangulation::Finite_edges_iterator					FiniteEdgesIterator;	
 	
 	typedef std::vector<VertexHandle>							VectorVertex;
@@ -97,7 +99,9 @@ public:
 	int Max_id (void) {return maxId;}
 	
 	void	compute ();	//Calcule le centres de Voronoi pour chaque cellule
-	void	Invalidate () {computed=false;}  //Set the tesselation as "not computed" (computed=false), this will launch 						//tesselation internaly when using functions like computeVolumes())
+	Point	circumCenter (const CellHandle& cell);
+	Point 	setCircumCenter (const CellHandle& cell, bool force=0);
+	void	Invalidate () {computed=false;}  //Set the tesselation as "not computed" (computed=false), this will launch tesselation internaly when using functions like computeVolumes())
 	// N.B : compute() must be executed before the functions below are used
 	void	Clear(void);
 
@@ -114,9 +118,10 @@ public:
 	inline const VertexHandle&	vertex (unsigned int id) const { return vertexHandles[id]; }
 
 	// Alpha Shapes
-	void testAlphaShape();
+	void testAlphaShape(double alpha=0);
 	struct AlphaFace {unsigned int ids[3]; CVector normal;};
 	void setAlphaFaces(std::vector<AlphaFace>& faces, double alpha=0);
+	double alphaVoronoiFaceArea (const Edge& ed_it, const AlphaShape& as, const RTriangulation& Tri);
 	
 // 	FiniteCellsIterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}
 // 	FiniteCellsIterator finiteCellsEnd(void);// {return Tri->finite_cells_end();}

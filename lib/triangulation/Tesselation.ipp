@@ -149,42 +149,7 @@ void _Tesselation<TT>::compute ()
 {
 	if (!redirected) redirect();
 	FiniteCellsIterator cellEnd = Tri->finite_cells_end();
-	for ( FiniteCellsIterator cell = Tri->finite_cells_begin(); cell != cellEnd; cell++ )
-	{
-
-		const Sphere& S0 = cell->vertex ( 0 )->point();
-		const Sphere& S1 = cell->vertex ( 1 )->point();
-		const Sphere& S2 = cell->vertex ( 2 )->point();
-		const Sphere& S3 = cell->vertex ( 3 )->point();
-		Real x,y,z;
-		CGAL::weighted_circumcenterC3 (
-			S0.point().x(), S0.point().y(), S0.point().z(), S0.weight(),
-			S1.point().x(), S1.point().y(), S1.point().z(), S1.weight(),
-			S2.point().x(), S2.point().y(), S2.point().z(), S2.weight(),
-			S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
-			x, y, z );
-		cell->info().setPoint(Point(x,y,z));
-	}
-	computed = true;
-	
-//	AlphaShape as (*Tri);
-//	as.set_alpha(as.find_alpha_solid());
-//	cerr << "Alpha shape computed" <<endl;
-//	std::list<CellHandle> cells,cells2;
-//	as.get_alpha_shape_cells(std::back_inserter(cells),
-  //             AlphaShape::EXTERIOR);
-//	as.get_alpha_shape_cells(std::back_inserter(cells2),
-  //             AlphaShape::INTERIOR);
-//	std::cerr<< "num exterior cells "<< cells.size() <<" vs. "<<cells2.size() <<std::endl;
-}
-
-template<class TT>
-void _Tesselation<TT>::testAlphaShape()
-{
-// 	if (!computed) compute();
-// 	if (!redirected) redirect();
-// 	FiniteCellsIterator cellEnd = Tri->finite_cells_end();
-// 	for ( FiniteCellsIterator cell = Tri->finite_cells_begin(); cell != cellEnd; cell++ )
+	for ( FiniteCellsIterator cell = Tri->finite_cells_begin(); cell != cellEnd; cell++ ) cell->info().setPoint(circumCenter(cell));
 // 	{
 // 
 // 		const Sphere& S0 = cell->vertex ( 0 )->point();
@@ -200,37 +165,121 @@ void _Tesselation<TT>::testAlphaShape()
 // 			x, y, z );
 // 		cell->info().setPoint(Point(x,y,z));
 // 	}
-// 	computed = true;
-	// first call the copy constructor since building the AlphaShape will destroy the triangulation
+	computed = true;
+}
+
+template<class TT>
+Point _Tesselation<TT>::circumCenter (const CellHandle& cell)
+{
+	const Sphere& S0 = cell->vertex ( 0 )->point();
+	const Sphere& S1 = cell->vertex ( 1 )->point();
+	const Sphere& S2 = cell->vertex ( 2 )->point();
+	const Sphere& S3 = cell->vertex ( 3 )->point();
+	Real x,y,z;
+	CGAL::weighted_circumcenterC3 (
+		S0.point().x(), S0.point().y(), S0.point().z(), S0.weight(),
+		S1.point().x(), S1.point().y(), S1.point().z(), S1.weight(),
+		S2.point().x(), S2.point().y(), S2.point().z(), S2.weight(),
+		S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
+		x, y, z );
+	return Point(x,y,z);
+}
+template<class TT>
+Point _Tesselation<TT>::setCircumCenter (const CellHandle& cell,bool force) {
+	if (force or cell->info()==CGAL::ORIGIN) cell->info().setPoint(circumCenter(cell));
+	return (Point) cell->info();
+}
+
+template<class TT>
+void _Tesselation<TT>::testAlphaShape(double alpha)
+{
+// 	if (not computed) compute();
+	
 	RTriangulation temp(*Tri);
 	AlphaShape as (temp);
-	as.set_alpha(as.find_alpha_solid());
-	cerr << "Alpha shape computed. alpha_solid=" <<as.find_alpha_solid() <<endl;
-	std::list<CellHandle> cells,cells2,cells3;
+	if (!alpha) alpha=as.find_alpha_solid();
+	as.set_alpha(alpha);	
+	cerr << "Alpha shape computed. alpha_solid=" <<alpha <<endl;
+	
+	std::list<CellHandle> cells,cells2,cells3,cells4;
 	std::list<Facet> facets,facets2,facets3;
+	std::list<VertexHandle> alphaVertices;
 	std::list<CVector> normals;
-	as.get_alpha_shape_cells(std::back_inserter(cells),AlphaShape::EXTERIOR);
-	as.get_alpha_shape_cells(std::back_inserter(cells2), AlphaShape::INTERIOR);
+	std::list<CVector> normals2;
+	std::list<Edge> edges0,edges1,edges2,edges3;
+	as.get_alpha_shape_cells(std::back_inserter(cells),AlphaShape::REGULAR);
+	as.get_alpha_shape_cells(std::back_inserter(cells2), AlphaShape::EXTERIOR);
+	as.get_alpha_shape_cells(std::back_inserter(cells3),AlphaShape::INTERIOR);
+	as.get_alpha_shape_cells(std::back_inserter(cells4),AlphaShape::SINGULAR);
 	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
-
-	std::cerr<< "num exterior cells "<< cells.size() <<" vs. "<<cells2.size() <<std::endl;
+	as.get_alpha_shape_vertices(std::back_inserter(alphaVertices), AlphaShape::REGULAR);
+	as.get_alpha_shape_edges(std::back_inserter(edges0), AlphaShape::INTERIOR);
+	as.get_alpha_shape_edges(std::back_inserter(edges1), AlphaShape::REGULAR);
+	as.get_alpha_shape_edges(std::back_inserter(edges2), AlphaShape::SINGULAR);
+	as.get_alpha_shape_edges(std::back_inserter(edges3), AlphaShape::EXTERIOR);
+	
+	int finitEdges=0;
+	for ( FiniteEdgesIterator ed_it=Tri->finite_edges_begin(); ed_it!=Tri->finite_edges_end();ed_it++ ) ++finitEdges;
+	
+	std::cerr<< "num regular cells "<< cells.size() <<" vs. "<<cells2.size() <<" vs. "<<cells3.size()<<" vs. "<<cells4.size()<<std::endl;
 	std::cerr<< "num regular facets "<< facets.size() << std::endl;
+	std::cerr<< "num edges "<< edges0.size() <<" "<< edges1.size() <<" "<< edges2.size() <<" "<< edges3.size() <<"(finite ones:"<<finitEdges<<")" << std::endl;
+// 	for (auto v=alphaVertices.begin(); v!=alphaVertices.end();v++){
+// 		std::cerr<< "alpha vertex:"<<(*v)->info().id()<<std::endl;
+// 	}
+// 	for (auto c=cells.begin(); c!=cells.end();c++){
+// 		(*c)->info().setPoint(circumCenter(*c));
+// 		std::cerr<< "alpha cell:"<<(Point) (*c)->info()<<std::endl;
+// 	}
+	
 	for (auto f=facets.begin(); f!=facets.end();f++){
-		int idx = f->second;//index of the facet within cell defined by f->first
-		std::cerr << f->first->vertex(facetVertices[idx][0])->info().id()
-			<<" "<< f->first->vertex(facetVertices[idx][1])->info().id()
-			<<" "<< f->first->vertex(facetVertices[idx][2])->info().id()  << std::endl;
-		CVector normal = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
+		const int& idx = f->second;//index of the facet within cell defined by f->first
+// 		std::cerr << f->first->vertex(facetVertices[idx][0])->info().id()
+// 			<<" "<< f->first->vertex(facetVertices[idx][1])->info().id()
+// 			<<" "<< f->first->vertex(facetVertices[idx][2])->info().id()  << std::endl;
+		CVector surface = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
 			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
+		//largest sphere
+		double maxWeight = std::max(f->first->vertex(facetVertices[idx][0])->point().weight(),max(f->first->vertex(facetVertices[idx][1])->point().weight(), f->first->vertex(facetVertices[idx][2])->point().weight()));
 		Point pp;
+		Point vv;
  		if (as.classify(f->first)==AlphaShape::INTERIOR) {
-			pp= f->first->vertex(f->second)->point(); std::cerr << "found as.classify(f->first)==Alpha_shape_3::INTERIOR"<<std::endl;}
+			pp= f->first->vertex(f->second)->point();
+			if (not computed) f->first->info().setPoint(circumCenter(f->first));
+// 			std::cerr<< "alpha cell:"<<(Point) f->first->info()<<std::endl;
+			vv = f->first->info();
+// 			std::cerr << "vv="<<vv<<std::endl;
+// 			if (not computed) f->first->info().setPoint(Tri->dual(f->first));
+// 			std::cerr << "found as.classify(f->first)==Alpha_shape_3::INTERIOR"<<std::endl;
+		}
 		else {
-			pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point(); std::cerr << "not an Alpha_shape_3::INTERIOR"<<std::endl;}
-		//check if the normal vector is inward or outward
-		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
-		if (dotP<0) normal=-normal;
-		std::cerr <<"dotP="<<dotP<<std::endl<<"normal: "<<normal<<std::endl;
+			if (not as.classify(f->first->neighbor(f->second))==AlphaShape::INTERIOR) std::cerr<<"_____________BIG PROB. HERE ___________"<<std::endl;
+
+			pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point();
+			if (not computed) f->first->neighbor(f->second)->info().setPoint(circumCenter(f->first->neighbor(f->second)));
+// 			std::cerr<< "alpha cell:"<<(Point) f->first->neighbor(f->second)->info()<<std::endl;
+			vv = f->first->neighbor(f->second)->info();
+// 			std::cerr << "vv="<<vv<<std::endl;
+// 			if (not computed) f->first->neighbor(f->second)->info().setPoint(Tri->dual(f->first->neighbor(f->second)));
+// 			std::cerr << "not an Alpha_shape_3::INTERIOR"<<std::endl;
+		}
+		//check if the surface vector is inward or outward
+		double dotP = surface*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+		if (dotP<0) surface=-surface;
+		double area = sqrt(surface.squared_length());
+		CVector normal = surface/area; //unit normal
+// 		std::cerr <<"dotP="<<dotP<<std::endl<<"surface: "<<surface<<std::endl;
+		
+		double h1 = (f->first->vertex(facetVertices[idx][0])->point().point()-vv)*surface/area; //orthogonal distance from Voronoi vertex to the plane in which the spheres lie, call the intersection V
+		Point V = vv + h1*normal;
+		double distLiu = sqrt((V-Point(0,0,0)).squared_length());
+		double sqR = (V-f->first->vertex(facetVertices[idx][0])->point().point()).squared_length(); //squared distance between V and the center of sphere 0 
+		double temp = alpha + f->first->vertex(facetVertices[idx][0])->point().weight() -sqR;
+		if (temp<0) {temp=0; std::cerr<<"NEGATIVE TEMP!"<<std::endl;}
+		if (temp>maxWeight) temp=maxWeight; //if alpha vertex is too far, crop
+		double h2 = sqrt(temp);// this is now the distance from Voronoi vertex to "alpha" vertex (after cropping if needed)
+		V = V+h2*normal;
+		std::cerr <<"dist alpha center:"<<sqrt((V-Point(0,0,0)).squared_length())<<"(vs. Liu:"<< distLiu << ")"<<std::endl;
 	}
 }
 
@@ -305,6 +354,37 @@ void _Tesselation<TT>::setAlphaFaces(std::vector<AlphaFace>& faces, double alpha
 	}
 }
 
+// template<class TT>
+// void _Tesselation<TT>::setAlphaFacesExtended(std::vector<AlphaFace>& faces, double alpha)
+// {
+// 	RTriangulation temp(*Tri);
+// 	AlphaShape as (temp);
+// 	if (!alpha) {
+// 		as.set_alpha(as.find_alpha_solid());
+// 		/*cerr << "Alpha shape computed. alpha_solid=" <<as.find_alpha_solid() <<endl;*/}
+// 	else as.set_alpha(alpha);
+// 	
+// 	std::list<Facet> facets;
+// 	std::list<CVector> normals;
+// 	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);// get the list of "contour" facets
+// 	faces.resize(facets.size()); int k=0;
+// 
+// 	for (auto f=facets.begin(); f!=facets.end();f++){
+// 		int idx = f->second;//index of the facet within cell defined by f->first
+// 		CVector normal = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
+// 			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
+// 		Point pp;
+//  		if (as.classify(f->first)==AlphaShape::INTERIOR) pp= f->first->vertex(f->second)->point();
+// 		else pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point();
+// 		//check if the normal vector is inward or outward
+// 		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+// 		if (dotP<0) normal=-normal;
+// 		// set the face in the global list 
+// 		for (int ii=0; ii<3;ii++) faces[k].ids[ii]= f->first->vertex(facetVertices[idx][ii])->info().id();
+// 		faces[k++].normal = normal;
+// 	}
+// }
+
 template<class TT>
 Segment _Tesselation<TT>::Dual ( FiniteFacetsIterator &f_it )
 {
@@ -332,6 +412,87 @@ double _Tesselation<TT>::computeVFacetArea ( FiniteEdgesIterator ed_it )
 		++cell2;
 	}
 	return area;
+}
+
+template<class TT>
+double _Tesselation<TT>::alphaVoronoiFaceArea (const Edge& ed_it, const AlphaShape& as, const RTriangulation& Tri)
+{
+	//Overall, we calculate the area vector of the polygonal Voronoi face between two spheres, this is done by integrating x×dx
+ 
+        double alpha = as.get_alpha();
+	CellCirculator cell0,cell1,cell2; 
+	cell0 = Tri->incident_cells ( ed_it );
+	cell2 = cell0;
+	while ( !as.classify(cell2)==AlphaShape::INTERIOR ) {++cell2; if (cell2==cell0) cerr<<"infinite loop on an edge, probably singular"<<endl;}
+	cell1=cell2;
+
+	//pA,pB are the spheres of the edge, (p1,p2) are iterating over the vertices of the vornonoi face, p12 can be an intermediate point for EXTERIOR-EXTERIOR parts of the contour 
+	Point pA,pB,p1,p2,p12;
+        p1 = setCircumCenter(cell1);//starting point of the polygon
+	CVector branch;
+	CVector branchArea(0,0,0);
+	pA = ( ed_it->first )->vertex ( ed_it->second )->point().point();//one sphere
+	pB = ( ed_it->first )->vertex ( ed_it->third )->point().point();//another sphere
+	CVector AB = pB-pA;
+	bool interior1 = true;//keep track of last cell's status
+	bool interior2; 
+	do {
+		++cell2;
+		interior2 = (as.classify(cell2)==AlphaShape::INTERIOR);
+		if (interior2) {//easy
+			setCircumCenter(cell2);
+			p2 = cell2->info();
+			branch=p2-p1;
+			branchArea += cross_product(branch, p1-CGAL::ORIGIN);
+		} else {//tricky, we have to construct the face between INTERIOR-EXTERIOR, or even EXTERIOR-EXTERIOR
+			CellCirculator baseCell=cell1;
+			//handle EXTERIOR-EXTERIOR by checking the n+1 cell
+			if (!interior1) {baseCell=cell2; baseCell++; if(as.classify(baseCell)!=AlphaShape::INTERIOR) cerr<<"3 consecutive EXTERIOR cells in a loop";}
+			Point vv = setCircumCenter(baseCell);
+			// finding the facet from baseCell to cell2 ...
+			int idx=0; while (baseCell->neighbor(idx)!=cell2) {idx++; if(idx>3) cerr<<"HUUUUUUUH";}
+			// ... then its surface vector
+			CVector surface = 0.5*cross_product(baseCell->vertex(facetVertices[idx][0])->point().point()-baseCell->vertex(facetVertices[idx][1])->point().point(),
+			baseCell->vertex(facetVertices[idx][0])->point().point()-baseCell->vertex(facetVertices[idx][2])->point().point());
+			//largest sphere
+			double maxWeight = std::max(baseCell->vertex(facetVertices[idx][0])->point().weight(),max(baseCell->vertex(facetVertices[idx][1])->point().weight(), baseCell->vertex(facetVertices[idx][2])->point().weight()));
+			//check if the surface vector is inward or outward
+			double dotP = surface*(baseCell->vertex(facetVertices[idx][0])->point()-baseCell->vertex(idx)->point());
+			if (dotP<0) surface=-surface;
+			double area = sqrt(surface.squared_length());
+			CVector normal = surface/area; //unit normal
+			double h1 = (baseCell->vertex(facetVertices[idx][0])->point().point()-vv)*normal; //orthogonal distance from Voronoi vertex to the plane in which the spheres lie, call the intersection V
+			p2 = vv + h1*normal;
+			double sqR = (p2-baseCell->vertex(facetVertices[idx][0])->point().point()).squared_length(); //squared distance between V and the center of sphere 0
+                        double temp = alpha + baseCell->vertex(facetVertices[idx][0])->point().weight() -sqR;
+                        if (temp<0) {temp=0; std::cerr<<"NEGATIVE TEMP!"<<std::endl;}
+                        if (temp>maxWeight) temp=maxWeight; //if alpha vertex is too far, crop
+                        double h2 = sqrt(temp);// this is now the distance from Voronoi vertex to "alpha" vertex (after cropping if needed)
+		        p2 = p2+h2*normal;
+		
+		        bool coplanar=false;
+		
+		        if (!(interior1 or interior2))  {
+			        //VERSION 1,intersection of orthogonal planes from two branches
+			        CVector tangent = cross_product(AB,branch);
+			        tangent = tangent/sqrt(tangent.squared_length());//this is orthogonal to the _previous_ branch segment of the polygonal contour
+			        double dotP = tangent*normal;
+			        coplanar=(dotP>1e-2);
+			        if (!coplanar) p12=p2+(p1-p2)*normal/dotP*tangent;
+			        cerr<<"p12="<<p12<<" with p1="<< p1<<", p2="<<p2 <<endl;
+			        //VERSION 2... a different p12 (possibly parallelogram?)
+			
+			        //Whatever the method:
+			        branchArea += cross_product(p12-p1, p1-CGAL::ORIGIN);
+			        p1 = p12;
+                        }
+		        branchArea += cross_product(p2-p1, p1-CGAL::ORIGIN);
+			
+		}
+		cell1=cell2; p1=p2;
+		
+	} while (cell2!=cell0);
+	return branchArea;
 }
 
 template<class TT>
