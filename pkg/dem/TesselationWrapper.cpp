@@ -403,4 +403,23 @@ boost::python::list TesselationWrapper::getAlphaFaces(double alpha)
 	return ret;
 }
 
+boost::python::list TesselationWrapper::getAlphaCaps(double alpha)
+{
+  vector<AlphaCap> caps;
+  Tes->setExtendedAlphaCaps(caps,alpha);
+  boost::python::list ret;
+  for (auto f=caps.begin();f!=caps.end();f++)
+    ret.append(boost::python::make_tuple(f->id,makeVector3r(f->normal)));
+  return ret;
+}
+
+boost::python::list TesselationWrapper::getAlphaVertices(double alpha)
+{
+	vector<int> vertices=Tes->getAlphaVertices(alpha);
+	boost::python::list ret;
+	for (auto f=vertices.begin();f!=vertices.end();f++)
+		ret.append(*f);
+	return ret;
+}
+
 #endif /* YADE_CGAL */

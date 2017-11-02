@@ -120,8 +120,12 @@ public:
 	// Alpha Shapes
 	void testAlphaShape(double alpha=0);
 	struct AlphaFace {unsigned int ids[3]; CVector normal;};
+        struct AlphaCap {unsigned int id; CVector normal;};
 	void setAlphaFaces(std::vector<AlphaFace>& faces, double alpha=0);
-	double alphaVoronoiFaceArea (const Edge& ed_it, const AlphaShape& as, const RTriangulation& Tri);
+        void setExtendedAlphaCaps(std::vector<AlphaCap>& caps, double alpha=0);
+	CVector alphaVoronoiFaceArea (const Edge& ed_it, const AlphaShape& as, const RTriangulation& Tri);
+        CVector alphaVoronoiPartialCapArea (const Edge& ed_it, const AlphaShape& as);
+	std::vector<int> getAlphaVertices(double alpha=0);
 	
 // 	FiniteCellsIterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}
 // 	FiniteCellsIterator finiteCellsEnd(void);// {return Tri->finite_cells_end();}

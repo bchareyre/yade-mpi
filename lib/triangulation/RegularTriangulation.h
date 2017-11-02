@@ -57,7 +57,7 @@ class SimpleCellInfo : public Point {
 	unsigned int id;
 	Real s;
 	bool isFictious;//true if the cell has at least one fictious bounding sphere as a vertex
-	SimpleCellInfo (void) {isFictious=false; s=0;}
+	SimpleCellInfo (void) {isFictious=false; s=0;Point::operator= (CGAL::ORIGIN);}
 	SimpleCellInfo& setPoint(const Point &p) { Point::operator= (p); return *this; }
 	SimpleCellInfo& setScalar(const Real &scalar) { s=scalar; return *this; }
 	inline Real x (void) {return Point::x();}
