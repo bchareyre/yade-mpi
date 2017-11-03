@@ -739,7 +739,6 @@ CVector _Tesselation<TT>::alphaVoronoiPartialCapArea ( const Edge& ed_it, const 
 	CVector branchArea(0,0,0);
 	
 	CVector AB = pB-pA;
-	interior2=true;
 	
 	bool first=true;
 	
