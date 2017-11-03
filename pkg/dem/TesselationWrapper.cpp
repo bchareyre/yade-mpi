@@ -406,10 +406,14 @@ boost::python::list TesselationWrapper::getAlphaFaces(double alpha)
 boost::python::list TesselationWrapper::getAlphaCaps(double alpha)
 {
   vector<AlphaCap> caps;
-  Tes->setExtendedAlphaCaps(caps,alpha);
+  vector<Vector3r> segments;
+  segments=Tes->setExtendedAlphaCaps(caps,alpha);
   boost::python::list ret;
-  for (auto f=caps.begin();f!=caps.end();f++)
+   for (auto f=caps.begin();f!=caps.end();f++)
     ret.append(boost::python::make_tuple(f->id,makeVector3r(f->normal)));
+   cerr<<"number of caps="<<caps.size()<<endl;
+  for (auto f=segments.begin();f!=segments.end();f++)
+  	ret.append(*f);
   return ret;
 }
 

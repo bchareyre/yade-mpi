@@ -373,12 +373,17 @@ void _Tesselation<TT>::setAlphaFaces(std::vector<AlphaFace>& faces, double alpha
 }
 
 template<class TT>
-void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, double alpha )
+std::vector<Vector3r> _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, double alpha )
 {
+  std::vector<Vector3r> vSegments;
   RTriangulation temp ( *Tri );
   AlphaShape as ( temp );
-  if ( !alpha ) as.set_alpha ( as.find_alpha_solid() );
-  else as.set_alpha ( alpha );
+  double minAlpha=as.find_alpha_solid();
+  if ( !alpha ) as.set_alpha ( minAlpha );
+  else {
+    as.set_alpha ( alpha );
+    if (alpha<minAlpha) cerr<<"TesselationWrapper: Using alpha<minAlpha will not work. Consider using default alpha (=0)"<<endl;
+  }
 
 
   std::list<VertexHandle> alphaVertices;
@@ -393,8 +398,8 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
   for ( auto e=edges.begin(); e!=edges.end(); e++ )
     {
       
-      CVector area = alphaVoronoiPartialCapArea ( *e,as );
-      cerr <<"Edge:"<<e->first->vertex ( e->second )->info().id()<<" to "<<e->first->vertex ( e->third )->info().id()<<" = "<<area <<endl;
+      CVector area = alphaVoronoiPartialCapArea ( *e,as,vSegments );
+//       cerr <<"Edge:"<<e->first->vertex ( e->second )->info().id()<<" to "<<e->first->vertex ( e->third )->info().id()<<" = "<<area <<endl;
       areas[e->first->vertex ( e->second )->info().id()]= areas[e->first->vertex ( e->second )->info().id()] + area;
       areas[e->first->vertex ( e->third )->info().id()]= areas[e->first->vertex ( e->third )->info().id()] - area;
     }
@@ -406,6 +411,7 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
       faces[k].normal=areas[id];
       ++k;
     }
+    return vSegments;
 }
 
 // template<class TT>
@@ -559,132 +565,262 @@ CVector _Tesselation<TT>::alphaVoronoiFaceArea (const Edge& ed_it, const AlphaSh
 	return 0.5*branchArea;//0.5 because the above integral is twice the area
 }
 
+// template<class TT>
+// CVector _Tesselation<TT>::alphaVoronoiPartialCapArea ( const Edge& ed_it, const AlphaShape& as )
+// {
+// 	//Overall, a partial area vector based on only the outer part of a polygonal Voronoi face (see alphaVoronoiFaceArea), looping on REGULAR edges incident to a boundary sphere and using this function for each of them should give the contour integral of x×dx for the polygonal cap of the sphere.
+// 	double alpha = as.get_alpha();
+// 	CellCirculator cell0,cell1,cell2,cell3;
+// 	cell0 = as.incident_cells ( ed_it );
+// 	cell2 = cell0;
+// 
+// 	////TEMP
+// 	++cell2;
+// 	while ( cell2 !=cell0 ) {
+// 		cerr <<"cell cirulator:"<<(as.classify ( cell2 ) ==AlphaShape::INTERIOR)<<" "<<as.is_infinite(cell2)<<endl;
+// 		++cell2;
+// 	//     if ( cell2==cell0 ) cerr<<"infinite loop on an edge, probably singular"<<endl;
+// 	}
+// 	cerr <<"cell cirulator:"<<(as.classify ( cell0 ) ==AlphaShape::INTERIOR)<<" "<<as.is_infinite(cell0)<<endl;
+// //// END TEMP
+// 	while ( as.classify ( cell2 ) !=AlphaShape::INTERIOR ){
+// 		++cell2;
+// 		if ( cell2==cell0 ) cerr<<"infinite loop on an edge, probably singular"<<endl;
+// 	}
+// 	cell0=cell1=cell3=cell2;
+// 	cell3++;
+// 
+// 	//pA,pB are the spheres of the edge, (p1,p2) are iterating over the vertices of the vornonoi face, p12 can be an intermediate point for EXTERIOR-EXTERIOR parts of the contour
+// 	Point pA,pB,p1,p2,p12,vv0,vv;
+// 	//   p1 = setCircumCenter ( cell1 ); //starting point of the polygon
+// 	CVector branch, normal;
+// 	CVector branchArea ( 0,0,0 );
+// 	pA = ( ed_it.first )->vertex ( ed_it.second )->point().point();//one sphere
+// 	pB = ( ed_it.first )->vertex ( ed_it.third )->point().point();//another sphere
+// 	CVector AB = pB-pA;
+// 	bool interior1 = true;//keep track of last cell's status
+// 	bool interior2,interior3,isFiniteAlphaCell;
+// 	interior2=true;
+// 	do {
+// 		if (interior2 or as.is_infinite(cell2)) {//if on a finite alpha cell we have multiple voronoi vertices in one single cell, hence no stepping in that case
+// 			++cell2; ++cell3;
+// 			interior2 = ( as.classify ( cell2 ) ==AlphaShape::INTERIOR );
+// 			interior3 = ( as.classify ( cell3 ) ==AlphaShape::INTERIOR );
+// 			isFiniteAlphaCell=false;
+// 			} else isFiniteAlphaCell=true;
+// 		if ( !interior2 ) {
+// //                         if (not interior3) p2=setCircumCenter(cell2);//prepare the starting point in the last INTERIOR cell
+// // //                         p2 = cell2->info();
+// // //                         branch=p2-p1;
+// // //                         branchArea = branchArea + cross_product(branch, p1-CGAL::ORIGIN);
+// // //                         cerr<<"branchArea(1) "<<branch<<" cross "<<p1<<endl;
+// //                 } else {//we have to construct the external line or poly-line between two EXTERIOR cells
+// 			CellCirculator baseCell=cell1;
+// 			//handle EXTERIOR-EXTERIOR by checking the n+1 cell
+// 			if ( !interior1 ) {
+// 				baseCell=cell2;
+// 				baseCell++;
+// 				vv0=vv;
+// 				cerr<<"archiving vv0 "<<vv0<<endl;
+// 				if ( as.classify ( baseCell ) !=AlphaShape::INTERIOR ) cerr<<"3 consecutive EXTERIOR cells in a loop";
+// 			}
+// 			vv = setCircumCenter ( baseCell );
+// 			cerr<<"circumCenter"<<vv<<endl;
+// 			// finding the facet from baseCell to cell2 ...
+// 			int idx=0;
+// 			while ( baseCell->neighbor ( idx ) !=cell2 ) {
+// 				idx++;
+// 				if ( idx>3 ) cerr<<"HUUUUUUUH";}
+// 			// ... then its surface vector
+// 			CVector surface = 0.5*cross_product ( baseCell->vertex ( facetVertices[idx][0] )->point().point()-baseCell->vertex ( facetVertices[idx][1] )->point().point(),
+// 			baseCell->vertex ( facetVertices[idx][0] )->point().point()-baseCell->vertex ( facetVertices[idx][2] )->point().point() );
+// 			//largest sphere
+// 			double maxWeight = std::max ( baseCell->vertex ( facetVertices[idx][0] )->point().weight(),max ( baseCell->vertex ( facetVertices[idx][1] )->point().weight(), baseCell->vertex ( facetVertices[idx][2] )->point().weight() ) );
+// 			//check if the surface vector is inward or outward
+// 			double dotP = surface* ( baseCell->vertex ( facetVertices[idx][0] )->point()-baseCell->vertex ( idx )->point() );
+// 			if ( dotP<0 ) surface=-surface;
+// 			double area = sqrt ( surface.squared_length() );
+// 			normal = surface/area; //unit normal
+// 			double h1 = ( baseCell->vertex ( facetVertices[idx][0] )->point().point()-vv ) *normal; //orthogonal distance from Voronoi vertex to the plane in which the spheres lie, call the intersection V
+// 			p2 = vv + h1*normal;
+// 			double sqR = ( p2-baseCell->vertex ( facetVertices[idx][0] )->point().point() ).squared_length(); //squared distance between V and the center of sphere 0
+// 			double temp = alpha + baseCell->vertex ( facetVertices[idx][0] )->point().weight() -sqR;
+// 			if ( temp<0 ){
+// 				temp=0;
+// 				std::cerr<<"NEGATIVE TEMP!"<<std::endl;}
+// 			if ( temp>maxWeight ) temp=maxWeight; //if alpha vertex is too far, crop
+// 			double h2 = sqrt ( temp ); // this is now the distance from Voronoi vertex to "alpha" vertex (after cropping if needed)
+// 			p2 = p2+h2*normal;
+// 
+// 			if ( ! ( interior1 or interior2 ) ){
+// 				//VERSION 1,intersection of orthogonal planes from two branches
+// 				CVector tangent = cross_product ( AB,p1-vv0 );
+// 				CVector p1mp2=p1-p2;
+// 				bool clockWise = ( tangent*p1mp2>0 );
+// 				tangent = tangent/sqrt ( tangent.squared_length() ); //this is orthogonal to the _previous_ branch segment of the polygonal contour
+// 				double dotP = tangent*normal;
+// 
+// 				if ( (!isFiniteAlphaCell) and abs(dotP)>1e-2 /*not coplanar*/){
+// 					//make sure the construction is not singular (no intermediate vertex)
+// 					if ( ( p1mp2* ( p1-vv0 ) >0 ) and ( p1mp2*normal<0 ) ){
+// 						p12=p1- ( p1mp2 ) *normal/dotP*tangent;
+// //						if (((p12-p1)*p1mp2)*(p12-p2)*p1mp2)<0) {//make sure the construction is not singular (no intermediate vertex)
+// 						cerr<<"p12="<<p12<<" with p1="<< p1<<", p2="<<p2 <<" tangent="<<tangent<<" "<<AB <<" "<<p1-pA <<endl;
+// 						//VERSION 2... a different p12 (possibly parallelogram?)
+// 
+// 						//Whatever the method:
+// 						branchArea = cross_product ( p12-p1, p1-CGAL::ORIGIN );
+// 						cerr<<"branchArea(2) "<<p12-p1<<" cross "<<p1<<endl;
+// 						p1 = p12;
+// 					}
+// 				}
+// 
+// 				cerr<<"branchArea(3) "<<p2-p1<<" cross "<<p1<<endl;
+// 				branchArea = branchArea+cross_product ( p2-p1, p1-CGAL::ORIGIN );
+// 
+// 				//check the orientation (we need to accumulate along the polyline with a given direction)
+// 				if ( clockWise ) return 0.5*branchArea;
+// 				else return -0.5*branchArea;
+// 			}
+// 		}
+// 		cell1=cell2;
+// 		p1=p2;
+// 		interior1=interior2;
+// 	}
+// 	while ( cell2!=cell0 );
+// 	cerr << "WE SHOULD NEVER REACH HERE" <<endl;
+// 	return CVector(0,0,0);
+// }
+
 template<class TT>
-CVector _Tesselation<TT>::alphaVoronoiPartialCapArea ( const Edge& ed_it, const AlphaShape& as )
+CVector _Tesselation<TT>::alphaVoronoiPartialCapArea ( const Edge& ed_it, const AlphaShape& as, std::vector<Vector3r>& vSegments )
 {
 	//Overall, a partial area vector based on only the outer part of a polygonal Voronoi face (see alphaVoronoiFaceArea), looping on REGULAR edges incident to a boundary sphere and using this function for each of them should give the contour integral of x×dx for the polygonal cap of the sphere.
 	double alpha = as.get_alpha();
 	CellCirculator cell0,cell1,cell2,cell3;
 	cell0 = as.incident_cells ( ed_it );
-	cell2 = cell0;
+	cell1 = cell2 = cell0;
+	++cell2;
 
 	////TEMP
-	++cell2;
-	while ( cell2 !=cell0 ) {
-		cerr <<"cell cirulator:"<<(as.classify ( cell2 ) ==AlphaShape::INTERIOR)<<" "<<as.is_infinite(cell2)<<endl;
-		++cell2;
-	//     if ( cell2==cell0 ) cerr<<"infinite loop on an edge, probably singular"<<endl;
-	}
-	cerr <<"cell cirulator:"<<(as.classify ( cell0 ) ==AlphaShape::INTERIOR)<<" "<<as.is_infinite(cell0)<<endl;
+// 	while ( cell2 !=cell0 ) {
+// 		cerr <<"cell cirulator:"<<(as.classify ( cell2 ) ==AlphaShape::INTERIOR)<<" "<<as.is_infinite(cell2)<<endl;
+// 		++cell2;
+// 	//     if ( cell2==cell0 ) cerr<<"infinite loop on an edge, probably singular"<<endl;
+// 	}
+// 	cerr <<"cell cirulator:"<<(as.classify(cell0) ==AlphaShape::INTERIOR)<<" "<<as.is_infinite(cell0)<<endl;
+// 	cell0 = as.incident_cells ( ed_it );
+// 	cell1 = cell2 = cell0;
+// 	++cell2;
 //// END TEMP
-	while ( as.classify ( cell2 ) !=AlphaShape::INTERIOR ){
-		++cell2;
-		if ( cell2==cell0 ) cerr<<"infinite loop on an edge, probably singular"<<endl;
+	while ( as.classify(cell1) !=AlphaShape::INTERIOR or as.classify(cell2) ==AlphaShape::INTERIOR){//we want interior->exterior starting sequence
+		++cell1;
+		if ( cell0==cell2++ ) cerr<<"infinite loop on an edge, probably singular"<<endl;
 	}
-	cell0=cell1=cell3=cell2;
-	cell3++;
+	cell0=cell1++;//keep the starting sequence as 0->1, cell1 is now equal to cell2
+	cell3=cell2; cell3++;//we have now cell0 < cell1=cell2 < cell3
+	
+	while ( as.classify ( cell3 ) !=AlphaShape::INTERIOR){//we want an exterior->interior end-point, could be that cell3=cell0 and that's ok
+		++cell2; ++cell3;
+		if ( cell2==cell0 ) cerr<<"infinite loop on an edge, probably singular(2)"<<endl;
+	}
+	//now cell0 < cell1 < ... < cell2 < cell3
+	
+	const Point& pA = ( ed_it.first )->vertex ( ed_it.second )->point().point();//one sphere
+	const Point& pB = ( ed_it.first )->vertex ( ed_it.third )->point().point();//another sphere
 
-	//pA,pB are the spheres of the edge, (p1,p2) are iterating over the vertices of the vornonoi face, p12 can be an intermediate point for EXTERIOR-EXTERIOR parts of the contour
-	Point pA,pB,p1,p2,p12,vv0,vv;
+	//pA,pB are the spheres of the edge, (p1,p2) are iterating over the vertices of the vornonoi face, p12 is an intermediate point for convex parts
+	Point p1,p2,p12,vv0,vv3;
+	vv0=setCircumCenter(cell0);//start point
+	vv3=setCircumCenter(cell3);//end point
+	
 	//   p1 = setCircumCenter ( cell1 ); //starting point of the polygon
 	CVector branch, normal;
-	CVector branchArea ( 0,0,0 );
-	pA = ( ed_it.first )->vertex ( ed_it.second )->point().point();//one sphere
-	pB = ( ed_it.first )->vertex ( ed_it.third )->point().point();//another sphere
+	CVector branchArea(0,0,0);
+	
 	CVector AB = pB-pA;
-	bool interior1 = true;//keep track of last cell's status
-	bool interior2,interior3,isFiniteAlphaCell;
 	interior2=true;
-	do {
-		if (interior2 or as.is_infinite(cell2)) {//if on a finite alpha cell we have multiple voronoi vertices in one single cell, hence no stepping in that case
-			++cell2; ++cell3;
-			interior2 = ( as.classify ( cell2 ) ==AlphaShape::INTERIOR );
-			interior3 = ( as.classify ( cell3 ) ==AlphaShape::INTERIOR );
-			isFiniteAlphaCell=false;
-			} else isFiniteAlphaCell=true;
-		if ( !interior2 ) {
-//                         if (not interior3) p2=setCircumCenter(cell2);//prepare the starting point in the last INTERIOR cell
-// //                         p2 = cell2->info();
-// //                         branch=p2-p1;
-// //                         branchArea = branchArea + cross_product(branch, p1-CGAL::ORIGIN);
-// //                         cerr<<"branchArea(1) "<<branch<<" cross "<<p1<<endl;
-//                 } else {//we have to construct the external line or poly-line between two EXTERIOR cells
-			CellCirculator baseCell=cell1;
-			//handle EXTERIOR-EXTERIOR by checking the n+1 cell
-			if ( !interior1 ) {
-				baseCell=cell2;
-				baseCell++;
-				vv0=vv;
-				cerr<<"archiving vv0 "<<vv0<<endl;
-				if ( as.classify ( baseCell ) !=AlphaShape::INTERIOR ) cerr<<"3 consecutive EXTERIOR cells in a loop";
-			}
-			vv = setCircumCenter ( baseCell );
-			cerr<<"circumCenter"<<vv<<endl;
-			// finding the facet from baseCell to cell2 ...
+	
+	bool first=true;
+	
+	do { //this do-while will run twice and it should return the second time, we work with the "exit" and "enter" regions of a polyline wrt. the alpha contour
+			CellCirculator baseCell= first ? cell0 : cell3;//it plays the role of the internal cell
+			CellCirculator outerCell= first ? cell1 : cell2;//it plays the role of the external cell
+
+			// finding the facet from baseCell to outerCell ...
 			int idx=0;
-			while ( baseCell->neighbor ( idx ) !=cell2 ) {
+			while ( baseCell->neighbor ( idx ) !=outerCell ) {
 				idx++;
 				if ( idx>3 ) cerr<<"HUUUUUUUH";}
 			// ... then its surface vector
+			//FIXME: for many cases this cross product is not needed if we set/use voronoi centers of alpha cells
 			CVector surface = 0.5*cross_product ( baseCell->vertex ( facetVertices[idx][0] )->point().point()-baseCell->vertex ( facetVertices[idx][1] )->point().point(),
 			baseCell->vertex ( facetVertices[idx][0] )->point().point()-baseCell->vertex ( facetVertices[idx][2] )->point().point() );
 			//largest sphere
 			double maxWeight = std::max ( baseCell->vertex ( facetVertices[idx][0] )->point().weight(),max ( baseCell->vertex ( facetVertices[idx][1] )->point().weight(), baseCell->vertex ( facetVertices[idx][2] )->point().weight() ) );
 			//check if the surface vector is inward or outward
-			double dotP = surface* ( baseCell->vertex ( facetVertices[idx][0] )->point()-baseCell->vertex ( idx )->point() );
+			double dotP = surface* ( baseCell->vertex ( facetVertices[idx][0] )->point()-baseCell->vertex (idx)->point() );
 			if ( dotP<0 ) surface=-surface;
 			double area = sqrt ( surface.squared_length() );
 			normal = surface/area; //unit normal
+			Point vv=first?vv0:vv3;
 			double h1 = ( baseCell->vertex ( facetVertices[idx][0] )->point().point()-vv ) *normal; //orthogonal distance from Voronoi vertex to the plane in which the spheres lie, call the intersection V
-			p2 = vv + h1*normal;
+			p2 = vv;
+			p2 = p2 + h1*normal;                        
+                        
 			double sqR = ( p2-baseCell->vertex ( facetVertices[idx][0] )->point().point() ).squared_length(); //squared distance between V and the center of sphere 0
 			double temp = alpha + baseCell->vertex ( facetVertices[idx][0] )->point().weight() -sqR;
 			if ( temp<0 ){
 				temp=0;
 				std::cerr<<"NEGATIVE TEMP!"<<std::endl;}
 			if ( temp>maxWeight ) temp=maxWeight; //if alpha vertex is too far, crop
-			double h2 = sqrt ( temp ); // this is now the distance from Voronoi vertex to "alpha" vertex (after cropping if needed)
-			p2 = p2+h2*normal;
+			double h2 = sqrt ( temp ); // this is now the distance from inner Voronoi vertex to "alpha" vertex (after cropping if needed)			
+			if ((h1+h2)>0) p2 = p2+h2*normal;
+                        else p2 = vv;//we must NOT crop a voronoi segment which is entirely outside the domain (it can happen), if so keep as is
+			
 
-			if ( ! ( interior1 or interior2 ) ){
-				//VERSION 1,intersection of orthogonal planes from two branches
+			if ( !first ){//now we have the starting and the ending parts calculated, connect them via straight or broken (i.e. convex) line and return
 				CVector tangent = cross_product ( AB,p1-vv0 );
 				CVector p1mp2=p1-p2;
-				bool clockWise = ( tangent*p1mp2>0 );
+// 				bool clockWise = ( tangent*p1mp2>0 );//not sure it works
+                                bool clockWise = ( cross_product(p1-vv0,p2-p1)*AB>0 );
 				tangent = tangent/sqrt ( tangent.squared_length() ); //this is orthogonal to the _previous_ branch segment of the polygonal contour
 				double dotP = tangent*normal;
+                                
+  vSegments.push_back(makeVector3r(p1));
 
-				if ( (!isFiniteAlphaCell) and abs(dotP)>1e-2 /*not coplanar*/){
-					//make sure the construction is not singular (no intermediate vertex)
+				if ( abs(dotP)>1e-2 /*not coplanar*/){
+					//make sure the construction is not singular (if so we use straight line)
 					if ( ( p1mp2* ( p1-vv0 ) >0 ) and ( p1mp2*normal<0 ) ){
 						p12=p1- ( p1mp2 ) *normal/dotP*tangent;
 //						if (((p12-p1)*p1mp2)*(p12-p2)*p1mp2)<0) {//make sure the construction is not singular (no intermediate vertex)
 						cerr<<"p12="<<p12<<" with p1="<< p1<<", p2="<<p2 <<" tangent="<<tangent<<" "<<AB <<" "<<p1-pA <<endl;
-						//VERSION 2... a different p12 (possibly parallelogram?)
-
-						//Whatever the method:
 						branchArea = cross_product ( p12-p1, p1-CGAL::ORIGIN );
 						cerr<<"branchArea(2) "<<p12-p1<<" cross "<<p1<<endl;
+      vSegments.push_back(makeVector3r(p12)); vSegments.push_back(makeVector3r(p12));
 						p1 = p12;
 					}
 				}
-
-				cerr<<"branchArea(3) "<<p2-p1<<" cross "<<p1<<endl;
+vSegments.push_back(makeVector3r(p2));
+// 				cerr<<"branchArea(3) "<<p1<<" to "<<p2<<" (dist="<< sqrt((p1-p2).squared_length())<<")"<<endl;
+//                                 cerr<<"with vv0="<<vv0<<" and vv3="<<vv3<<endl;
 				branchArea = branchArea+cross_product ( p2-p1, p1-CGAL::ORIGIN );
 
 				//check the orientation (we need to accumulate along the polyline with a given direction)
 				if ( clockWise ) return 0.5*branchArea;
 				else return -0.5*branchArea;
 			}
-		}
-		cell1=cell2;
+// 		}
+// 		cell1=cell2;
 		p1=p2;
-		interior1=interior2;
+		first=!first;
+// 		interior1=interior2;
 	}
-	while ( cell2!=cell0 );
+	while ( !first );
 	cerr << "WE SHOULD NEVER REACH HERE" <<endl;
 	return CVector(0,0,0);
 }
+
 
 template<class TT>
 void _Tesselation<TT>::AssignPartialVolume ( FiniteEdgesIterator& ed_it )
