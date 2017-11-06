@@ -30,6 +30,8 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,nun,0.0,,"Normal viscosity coefficient"))
                 ((Real,phic,0.0,,"Critical friction angle [-]"))
 		((Real,ue,0.,,"Surface deflection at t-dt [m]"))
+                ((bool,contact,false,,"Spheres in contact"))
+                ((bool,slip,false,,"Slip condition"))
                 ((Vector3r,NormalForce,Vector3r::Zero(),,"Normal force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
                 ((Vector3r,TangentForce,Vector3r::Zero(),,"Tangeancial force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
                 ((shared_ptr<IPhys>,otherPhys,0,,"Other physics combined (used only by Law2_ScGeom_LubricationPhys)"))
@@ -37,6 +39,11 @@ class LubricationPhys: public ViscElPhys {
                 createIndex();,
                       .def_readonly("eta",&LubricationPhys::eta,"Fluid viscosity [Pa.s]")
                       .def_readonly("eps",&LubricationPhys::eps,"Rugosity [-]")
+                      .def_readonly("NormalForce",&LubricationPhys::NormalForce,"Normal componant of the force [N]")
+                      .def_readonly("TangentForce",&LubricationPhys::TangentForce,"Shear compoannt of the force [N]")
+                      .def_readonly("ue",&LubricationPhys::ue,"Surface deflection [m]")
+                      .def_readonly("contact",&LubricationPhys::contact,"Spheres in contact")
+                      .def_readonly("slip",&LubricationPhys::slip,"Slip contact")
                 );
                 DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(LubricationPhys,ViscElPhys);
@@ -99,7 +106,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			,// CTOR
 			,// PY
                           .def_readwrite("activateNormalLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateNormalLubrication,"Activate normal lubrication (default: true)")
-                          .def_readwrite("activateTangeancialLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTangencialLubrication,"Activate tangencial lubrication (default: true)")
+                          .def_readwrite("activateTangencialLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTangencialLubrication,"Activate tangencial lubrication (default: true)")
                           .def_readwrite("activateTwistLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTwistLubrication,"Activate twist lubrication (default: true)")
                           .def_readwrite("activateRollLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateRollLubrication,"Activate roll lubrication (default: true)")
                 );

@@ -14,6 +14,8 @@ LubricationPhys::LubricationPhys(const ViscElPhys &obj) :
     nun(0.),
     phic(0.),
     ue(0.),
+    contact(false),
+    slip(false),
     NormalForce(Vector3r::Zero()),
     TangentForce(Vector3r::Zero())
 {
@@ -166,6 +168,7 @@ CREATE_LOGGER(Law2_ScGeom_LubricationPhys);
 
 bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
 {
+
     // Physic
     LubricationPhys* phys=static_cast<LubricationPhys*>(iPhys.get());
 
@@ -186,6 +189,9 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Real u((s1->se3.position-s2->se3.position).norm()-2.*a);
     const Real pi(3.141596);
 
+    if(u > a)
+        return false;
+
     // Speeds
     Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*interaction->cellDist.cast<Real>()) : Vector3r::Zero();
     Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*interaction->cellDist.cast<Real>()): Vector3r::Zero();
@@ -193,27 +199,44 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Vector3r relV = geom->getIncidentVel(s1, s2, scene->dt, shift2, shiftVel, false );
     Vector3r relVN = relV.dot(norm)*norm; // Normal velocity
     Vector3r relVT = relV - relVN; // Tangeancial velocity
-    Real udot = relVN.norm(); // Normal velocity norm
+    Real udot = relV.dot(norm); // Normal velocity norm
 
     // Normal force
     Vector3r Fn(Vector3r::Zero());
     Real ue(0.);
-    Real g = 3./2.*phys->kno*std::pow(std::abs(phys->ue),0.5); // Stiffness for normal surface deflection
-    bool contact = (u + phys->NormalForce.norm()/g) < phys->eps;
+    Real delt = max(std::abs(phys->ue),a/100.);
+    //Real delt = std::abs(phys->ue);
+    
+    //delt = a/100.;
+    
+    Real g = 3./2.*phys->kno*std::pow(delt,0.5); // Stiffness for normal surface deflection
+    bool contact = (u - phys->ue) < phys->eps*a;
     Real kn = (contact) ? g : 0.;
+
+    if(contact && !phys->contact) LOG_INFO("CONTACT");
+    if(!contact && phys->contact) LOG_INFO("END OF CONTACT");
 
     if(activateNormalLubrication)
     {
-        Real A = (g + kn)/phys->nun;
-        Real B = -1./scene->dt - g/phys->nun*u - 2*kn/phys->nun*u+kn*phys->eps*a;
-        Real C = phys->ue/scene->dt + udot + kn/phys->nun*u*u - kn/phys->nun*u*phys->eps*a;
+        Real G = g/phys->nun;
+        Real K = kn/phys->nun;
+        Real EPS = phys->eps*a;
 
-        Real rho = B*B-4*A*C;
+        Real A = G + K;
+        Real B = -1./scene->dt - G*u - 2.*K*u + K*EPS;
+        Real C = phys->ue/scene->dt + udot + K*u*u - K*u*EPS;
+
+        Real rho = B*B-4.*A*C;
 
         Real u1 = (-B+std::sqrt(rho))/(2.*A);
         Real u2 = (-B-std::sqrt(rho))/(2.*A);
 
-        ue = (std::abs(phys->ue - u1) < std::abs(phys->ue-u2)) ? u1 : u2;
+        // FIXME: Very ugly...
+        if(rho >= 0)
+            ue = (std::abs(phys->ue - u1) < std::abs(phys->ue - u2)) ? u1 : u2;
+        else
+            ue = phys->ue;
+
         Fn = -ue*g*norm;
     }
 
@@ -223,18 +246,26 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     if(activateTangencialLubrication)
     {
         Vector3r Ft_ = geom->rotate(phys->TangentForce);
-        Real kt = phys->kso*std::pow(ue,0.5);
-        Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+u)*ln((2.*a+u)/u));
+        Real kt = phys->kso*std::pow(delt,0.5);
+        Real un = u - 2.*ue;
+        Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+un)*ln((2.*a+un)/un));
 
+        //LOG_INFO("nut: " << nut);
 
         if(contact)
         {
             Ft = Ft_ - scene->dt*kt*relVT;
-            Real Feps = std::abs(-kn*(u-ue-phys->eps));
+            Real Feps = std::abs(-kn*(u-ue-phys->eps*a));
 
             if(Ft.norm() > Feps*std::tan(phys->phic)) // If slip
             {
+                //LOG_INFO("SLIP");
                 Ft = (Ft_ - scene->dt*kt*relVT*(1.+Feps*std::tan(phys->phic)/relVT.norm()))/(1.+kt/nut*scene->dt);
+                phys->slip = true;
+            }
+            else
+            {
+                phys->slip = false;
             }
         }
         else
@@ -248,16 +279,17 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     phys->NormalForce = Fn;
     phys->TangentForce = Ft;
     phys->ue = ue;
+    phys->contact = contact;
 
     // Rolling and twist torques
-    Vector3r relAngularVelocity = s1->angVel-s2->angVel;
+    Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
     Vector3r relTwistVelocity = relAngularVelocity.dot(norm)*norm;
     Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
 
     Vector3r Cr = Vector3r::Zero();
-    if(activateRollLubrication) Cr = -pi*phys->eta*a*a*a*(3./2.*ln(a/u)+63./500.*u/a*ln(a/u))*relRollVelocity;
+    if(activateRollLubrication) Cr = pi*phys->eta*a*a*a*(3./2.*ln(a/u)+63./500.*u/a*ln(a/u))*relRollVelocity;
     Vector3r Ct = Vector3r::Zero();
-    if (activateTwistLubrication) Ct = -pi*phys->eta*a*u*ln(a/u)*relTwistVelocity;
+    if (activateTwistLubrication) Ct = pi*phys->eta*a*u*ln(a/u)*relTwistVelocity;
 
     // total torque
     Vector3r C1 = (geom->radius1+u/2.)*Ft.cross(norm)+Cr+Ct;

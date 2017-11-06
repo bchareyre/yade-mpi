@@ -193,7 +193,7 @@ for i,l in enumerate(useLines):
 		logFiles.append(logFile2)
 		env='YADE_BATCH='
 		if table: env+='%s:%d'%(table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
-		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,'--nice=%s'%nice if nice!=None else '',nCores,script)
+		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,script)
 		desc=params[l]['description']
 		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
@@ -206,7 +206,7 @@ for job in jobs:
 	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command
 	if not dryRun:
                 # Create script file from model
-                scriptname = opts.oar_script+'.'+str(i)
+                scriptname = '/tmp/'+opts.oar_script.split('/')[-1]+'.'+str(i)
                 i = i+1;
                 
                 with open(opts.oar_script) as infile, open(scriptname, 'w') as outfile:
@@ -214,12 +214,10 @@ for job in jobs:
                                 line = line.replace("__COMMAND_HERE__", job.command)
                                 outfile.write(line)
                 
-                os.system('%s'%(scriptname));
-                #print 'oarsub --project=%s -l/walltime=%s,cores=%i -O %s %s\n'%(project, walltime, job.nCores, job.log,scriptname);
+                os.chmod(scriptname,0744);               
+                #os.system('%s'%(scriptname));
+                os.system('oarsub --project=%s -l/walltime=%s,cores=%i -O %s -E %s.err %s\n'%(project, walltime, job.nCores, job.log,job.log,scriptname));
 
-
-                
-                
                 
                 
 sys.stdout.flush()
