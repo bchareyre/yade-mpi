@@ -180,7 +180,7 @@ vecZ = 0:deltaZ:lastZ;
 % Toroidal profile parameters: see [15]-[17] Lian1993, for r=1
 if rRatio == 1
     d1Rad = radians(delta1);d2Rad = radians(delta2); thRad = radians(theta);
-    dist = lastZ - (1-cos(d1Rad)) - (1-cos(d2Rad)); % TODO: only for r=1
+    dist = lastZ - (1-cos(d1Rad)) - (1-cos(d2Rad));
     rho1 = ( dist/2. + 1 - cos(d1Rad) )/cos(d2Rad+thRad);
     rho2 = sin(d2Rad) - (1-sin(d2Rad+thRad)) * ( dist/2 + 1-cos(d2Rad) ) / cos(d2Rad+thRad);
     torProfile = rho1 + abs(rho2) - ( rho1^2 - (vecZ-lastZ/2).^2 ).^(1/2);
