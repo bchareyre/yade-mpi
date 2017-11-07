@@ -47,24 +47,19 @@ for i=1:length(delta1Cons)
     sol_u(i,:) = [dist,uStar,vol,force,delta1,delta2,eStar,nn11,nn33];
 
 end
-% toc
+% timeLoop = toc;
+% disp(['Here, loop took ',num2str(timeLoop),' s'])
 
 % Get rid of unphysical solutions with negativ distances and/or volume:
 physSol = sol_u( sol_u(:,1)>=0 & sol_u(:,3)>=0,: ); % NB: vol>=0 is true for vol = Inf
 
-% Get rid of diverged solutions with infinite volume (should <=> infinite
-% profile):
-nonDvSol = physSol(isfinite(physSol(:,3)),:);
-% nNonDvSol = length(nonDvSol(:,1));
-% disp(['We had to suppress ',num2str((1-nNonDvSol/nPhysSol)*100),' % of diverged "solutions"'])
-
 % Get rid of unstable physical solutions:(those with biggest volumes)
 % We use volume values for this purpose, see e.g. Duriez2017
-distRupt = max(nonDvSol(:,1));
-% eRupt = nonDvSol(nonDvSol(:,1)==distRupt,7); % does not work since eRupt can be a global maximum
+distRupt = max(physSol(:,1));
+% eRupt = physSol(physSol(:,1)==distRupt,7); % would not work since eRupt can be a global maximum
 % (when two branches are increasing with d*)
-vRupt = nonDvSol(nonDvSol(:,1)==distRupt,3);
-stabSol = nonDvSol(nonDvSol(:,3)>=vRupt,:);
+vRupt = physSol(physSol(:,1)==distRupt,3);
+stabSol = physSol(physSol(:,3)>=vRupt,:);
 
 
 % ----------- Save of data in text files -----------
@@ -83,7 +78,7 @@ if save ~=0
     writeFile(nomFic,head_wE,sol_u)
     
     nomFic = ['capDataPhys_r',num2str(rRatio),'_theta',num2str(theta),'_ucStar',num2str(uStar),'.txt'];
-    writeFile(nomFic,head_wE,nonDvSol)
+    writeFile(nomFic,head_wE,physSol)
     
     nomFic = ['capDataStab_r',num2str(rRatio),'_theta',num2str(theta),'_ucStar',num2str(uStar),'.txt'];
     head_woE = ['dist*\tuc*\tV*\tF*\tdelta1 (deg)\tdelta2(deg)\tn11 (-)\tn33 (-)\t',strDz,'\n'];

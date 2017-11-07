@@ -56,6 +56,7 @@ rhoRight = sin(radians(delta2));
 % - this loop may extend the size of rho without problem
 % - just keep a simple and efficient test to stop computations. A more restrictive
 % one may take you beyond the right contact line and lead to divergence..
+% tic
 while rho(step) < 1.00001*rhoRight
     rho2d = rhoSecond(rho(step),rhoPrime(step),uStar); % all terms are at "i"
     rho(step+1) = rho(step) + deltaZ * rhoPrime(step) + 1/2 * deltaZ^2 * rho2d;
@@ -63,6 +64,7 @@ while rho(step) < 1.00001*rhoRight
     rhoPrime(step+1) = drho(rho(step+1),rho(step),deltaZ,rho2d); % i+1 value of rhoPrime, function of rho_{i+1}, rho_i, and rho2d_i. Used next time in loop.
     step=step+1;
 end
+% toc
 %-------------------------------------------------------------------------
 
 % Two following lines to suppress extra data due to preallocation. Keep
@@ -71,7 +73,7 @@ rhoPrime = rhoPrime(rho>0);
 rho = rho(rho>0);
 
 % --------------- Output computations from now on: ------------------------
-
+% tic
 d1 = radians(delta1); d2 = radians(delta2);
 
 % Inter particle dimensionless distance:
@@ -139,6 +141,7 @@ else
     out = 1;
 end
 
+% toc
 end
 
 
