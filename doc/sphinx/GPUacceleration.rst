@@ -45,8 +45,8 @@ The following instructions to install CUDA are a boiled down version of `these i
 	sudo apt-get update  #update the Apt repository cache
 	sudo apt-get install cuda #install CUDA
 	# Add the CUDA library to your path
-	export PATH=/usr/local/cuda-8.0/bin${PATH:+:${PATH}}
-	export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64\ ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+	export PATH=/usr/local/cuda-8.0/bin\${PATH:+:\${PATH}}
+	export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64\ \${LD_LIBRARY_PATH:+:\${LD_LIBRARY_PATH}}
 
 **Note: use `this tool <https://developer.nvidia.com/cuda-downloads>`__ to determine your ``<distro>_<version>_<architecture>`` values.
 
@@ -61,20 +61,20 @@ Verify your CUDA installation by navigating to ``/usr/local/cuda-8.0/samples`` a
 
 Now you can navigate to ``/usr/local/cuda-8.0/samples/1_Utilities/deviceQuery/`` and execute ``./deviceQuery`` . Verify the ``Result = PASS``. 
 
-Install CuBlas, OpenBlas, and Lapack
-====================================
+Install OpenBlas, and Lapack
+============================
 
 Execute the following command:
 
 ::
 
-sudo apt-get install libcublas7.5 libopenblas-dev liblapack-dev 
+sudo apt-get install libopenblas-dev liblapack-dev 
 
 
 Install SuiteSparse
 ===================
 
-Download the `SuiteSparse package <http://faculty.cse.tamu.edu/davis/suitesparse.html>`__ and extract the files to ``/usr/local/``. Navigate to Line 222 and 223 of ``/usr/local/SuiteSparse/SuiteSparse_config/SuiteSparse_config.mk`` and modify ``CUDART_LIB = path/to/libcudart.so`` and ``CUBLAS_LIB=path/to/libcublas.so/`` to reflect the correct location on your system. In most cases these paths should be ``usr/lib/x86_64-linux-gnu/libcudart.so`` and ``/usr/lib/x86_64-linux-gnu/libcudart.so``, respectively. Navigate back to the main SuiteSparse folder and execute ``make``. SuiteSparse is now compiled and installed on your machine. Check your personal configuration with ``make config``.
+Download the `SuiteSparse package <http://faculty.cse.tamu.edu/davis/suitesparse.html>`__ and extract the files to ``/usr/local/``. Run ``make config`` and verify ``CUDART_LIB`` and ``CUBLAS_LIB`` point to your cuda installed libraries. The typical paths will follow ``CUDART_LIB=/usr/local/cuda-x.y/lib64`` and ``CUBLAS_LIB=/usr/local/cuda-x.y/lib64``. If the paths are blank, you may need to navigate to to ``CUDA_PATH`` in ``/usr/local/SuiteSparse/SuiteSparse_config/SuiteSparse_config.mk`` and modify it manually to point to your cuda installation. Navigate back to the main SuiteSparse folder and execute ``make``. SuiteSparse is now compiled and installed on your machine.
 
 Test CHOLMOD's GPU functionality by navigating to ``SuiteSparse/CHOLMOD/Demo`` and executing ``sh gpu.sh``. Note: you will need to download the nd6k.mtx from `here <http://www.cise.ufl.edu/research/sparse/matrices>`__ and put it in your home directory.
 
@@ -88,7 +88,7 @@ Following the instructions outlined `here <https://yade-dem.org/doc/installation
 -- Found Cholmod in /usr/local/SuiteSparse/lib/libcholmod.so
 -- Found OpenBlas in /usr/lib/libopenblas.so
 -- Found Metis in /usr/local/SuiteSparse/lib/libmetis.so
--- Found CuBlas in /usr/lib/x86_64-linux-gnu/libcublas.so
+-- Found CuBlas in /usr/local/cuda-x.y/libcublas.so
 -- Found Lapack in /usr/lib/liblapack.so
 
 
