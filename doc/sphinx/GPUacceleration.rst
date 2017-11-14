@@ -92,14 +92,14 @@ Following the instructions outlined `here <https://yade-dem.org/doc/installation
 -- Found Lapack in /usr/lib/liblapack.so
 
 
-If you have multiple versions of any of these packages, the system may find the wrong one. In this case, you will need to either uninstall the old libraries (e.g. ``sudo apt-get remove libcholmod`` if the other library was installed with apt-get) or edit the paths within ``cMake/Find_____.cmake``.
+If you have multiple versions of any of these packages, the system may find the wrong one. In this case, you will need to either uninstall the old libraries (e.g. ``sudo apt-get remove libcholmod`` if the other library was installed with apt-get) or edit the paths within ``cMake/Find_____.cmake``. If you installed a version of Cuda other than 8.0 in a different location than ``/usr/local``, you will need to edit ``cMake/FindCublas.cmake`` to reflect these changes before compilation.
 
 Metis is compiled with SuiteSparse, so the Metis library and Metis include should link to files within ``usr/local/SuiteSparse/``. 
 
 Controlling the GPU
 ===================
 
-The GPU accelerated solver can be activated within Yade by setting ``flow.useSolver=4`` and ``flow.multithread=True``. There are several environment variables that control the allowable memory, allowable GPU matrix size, etc. These are highlighted within the CHOLMOD User Guide, which can be found in ``SuiteSparse/CHOLMOD/Doc``. 
+The GPU accelerated solver can be activated within Yade by setting ``flow.useSolver=4`` and ``flow.multithread=True``. There are several environment variables that control the allowable memory, allowable GPU matrix size, etc. These are highlighted within the CHOLMOD User Guide, which can be found in ``SuiteSparse/CHOLMOD/Doc``. At the minimum, the user needs to set the environment variable by executing ``export CHOLMOD_USE_GPU=1``. We also recommend you designate half of your available GPU memory with ``export CHOLMOD_GPU_MEM_BYTES=3000000000`` (for a 6GB graphics card), since the multithreaded solver will keep 2 solvers running at a time to improve efficiency.
 
 Expected performance
 ====================

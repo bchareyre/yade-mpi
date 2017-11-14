@@ -4,8 +4,8 @@
 #  CUBBLAS_LIBRARY, libraries to link against to use Cublas.
 #  CUBLAS_FOUND, If false, do not try to use Cublas.
 
-FIND_LIBRARY(CUBLAS_LIBRARY NAMES cublas libcublas PATHS /usr/lib/x86_64-linux-gnu )
-FIND_LIBRARY(CUDART_LIBRARY NAMES cudart libcudart PATHS /usr/lib/x86_64-linux-gnu )
+FIND_LIBRARY(CUBLAS_LIBRARY NAMES cublas libcublas PATHS /usr/local/cuda-8.0/lib64 )
+FIND_LIBRARY(CUDART_LIBRARY NAMES cudart libcudart PATHS /usr/local/cuda-8.0/lib64 )
 
 # handle the QUIETLY and REQUIRED arguments and set LOKI_FOUND to TRUE if
 # all listed variables are TRUE
