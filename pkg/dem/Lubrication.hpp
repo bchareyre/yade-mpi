@@ -13,8 +13,6 @@
 #include<pkg/dem/ElasticContactLaw.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 
-#define ln(x) log(x)
-
 namespace py=boost::python;
 
 
@@ -30,6 +28,10 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,nun,0.0,,"Normal viscosity coefficient"))
                 ((Real,phic,0.0,,"Critical friction angle [-]"))
 		((Real,ue,0.,,"Surface deflection at t-dt [m]"))
+//                ((Real,ue2,0.,,"Rejected solution of ue"))
+//                ((Real,due,0.,,"Last increment of ue"))
+//                ((Real,dtm,0.,,"dt optim."))
+                ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
                 ((Vector3r,NormalForce,Vector3r::Zero(),,"Normal force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
@@ -42,8 +44,10 @@ class LubricationPhys: public ViscElPhys {
                       .def_readonly("NormalForce",&LubricationPhys::NormalForce,"Normal componant of the force [N]")
                       .def_readonly("TangentForce",&LubricationPhys::TangentForce,"Shear compoannt of the force [N]")
                       .def_readonly("ue",&LubricationPhys::ue,"Surface deflection [m]")
+//                      .def_readonly("ue2",&LubricationPhys::ue2,"Rejected solution of ue [m]")
                       .def_readonly("contact",&LubricationPhys::contact,"Spheres in contact")
                       .def_readonly("slip",&LubricationPhys::slip,"Slip contact")
+//                      .def_readonly("dtm",&LubricationPhys::dtm,"Dtm")
                 );
                 DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(LubricationPhys,ViscElPhys);
@@ -103,12 +107,15 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
                           ((bool,activateTangencialLubrication,true,,"Activate tangencial lubrication (default: true)"))
                           ((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
                           ((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
-			,// CTOR
+                          ((int,solution,4,,"Resolution method (default: 4)"))
+                          ((bool,debug,false,,"Write debug informations"))
+                        ,// CTOR
 			,// PY
                           .def_readwrite("activateNormalLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateNormalLubrication,"Activate normal lubrication (default: true)")
                           .def_readwrite("activateTangencialLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTangencialLubrication,"Activate tangencial lubrication (default: true)")
                           .def_readwrite("activateTwistLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTwistLubrication,"Activate twist lubrication (default: true)")
                           .def_readwrite("activateRollLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateRollLubrication,"Activate roll lubrication (default: true)")
+                          .def_readwrite("solution",&Law2_ScGeom_ImplicitLubricationPhys::solution,"Choose resolution method")
                 );
                 DECLARE_LOGGER;
 };
