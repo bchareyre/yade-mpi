@@ -118,7 +118,7 @@ bool Law2_ScGeom_LubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys>
 
     // geometric parameters
     Real a((geom->radius1+geom->radius2)/2.);
-    Real h((s1->se3.position-s2->se3.position).norm()-2.*a);
+    Real h(geom->penetrationDepth);
     const Real pi(3.141596);
 
     // Speeds
@@ -195,7 +195,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     // geometric parameters
     Real a((geom->radius1+geom->radius2)/2.);
-    Real u((s1->se3.position-s2->se3.position).norm()-2.*a);
+    Real u(-geom->penetrationDepth);
     const Real pi(3.141596);
 
     if(u > a)
@@ -230,8 +230,8 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     Real kn = (contact) ? g : 0.;
 
-    if(contact && !phys->contact) LOG_INFO("CONTACT");
-    if(!contact && phys->contact) LOG_INFO("END OF CONTACT");
+    if(debug && contact && !phys->contact) LOG_INFO("CONTACT");
+    if(debug && !contact && phys->contact) LOG_INFO("END OF CONTACT");
 
     if(activateNormalLubrication)
     {
@@ -313,7 +313,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
                 if(debug)
                     LOG_DEBUG("d F(d) F/(dF/dd) " << d << " " << F(d) << " " << FdF(d));
 
-                if(i == 19)
+                if(debug && i == 19)
                     LOG_DEBUG("Max Newton-Rafson steps reach");
             }
 
