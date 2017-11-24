@@ -1,4 +1,5 @@
-// 2014 © Raphael Maurin <raphael.maurin@irstea.fr> 
+// 2017 © Raphael Maurin <raphael.maurin@imft.fr> 
+// 2017 © Julien Chauchat <julien.chauchat@legi.grenoble-inp.fr> 
 
 #include"HydroForceEngine.hpp"
 #include<core/Scene.hpp>
@@ -17,8 +18,8 @@ YADE_PLUGIN((HydroForceEngine));
 
 void HydroForceEngine::action(){
 	/* Application of hydrodynamical forces */
-	if (activateAverage==true) averageProfile(); //Calculate the average solid profiles
-
+        Vector3r gravityBuoyancy = gravity;
+	if (steadyFlow==true) gravityBuoyancy[0] = 0.;// If the fluid flow is steady, no streamwise buoyancy contribution from gravity
 	FOREACH(Body::id_t id, ids){
 		Body* b=Body::byId(id,scene).get();
 		if (!b) continue;
@@ -46,7 +47,7 @@ void HydroForceEngine::action(){
 					liftForce[2] = 0.5*densFluid*Mathr::PI*pow(sphere->radius,2.0)*Cl*(vRelTop*vRelTop-vRelBottom*vRelBottom);
 				}
 				//buoyant weight force calculation
-				Vector3r buoyantForce = -4.0/3.0*Mathr::PI*pow(sphere->radius,3.0)*densFluid*gravity;
+				Vector3r buoyantForce = -4.0/3.0*Mathr::PI*pow(sphere->radius,3.0)*densFluid*gravityBuoyancy;
 				if (convAccOption==true){convAccForce[0] = - convAcc[p];}
 				//add the hydro forces to the particle
 				scene->forces.addForce(id,dragForce+liftForce+buoyantForce+convAccForce);		
@@ -211,9 +212,6 @@ void HydroForceEngine::averageProfile(){
 	vxPart2 = velAverageX2;
 	vyPart2 = velAverageY2;
 	vzPart2 = velAverageZ2;
-
-	//desactivate the average to avoid calculating at each step, only when asked by the user
-	activateAverage=false; 
 }
 
 
@@ -256,7 +254,7 @@ void HydroForceEngine::turbulentFluctuation(){
 			// The fluctuations along wall-normal and streamwise directions are correlated in order to be consistent with the formulation of the Reynolds stress tensor and to recover the result
 			// that the magnitude of the fluctuation along streamwise = 2*along wall normal
 			if ((p<nCell)&&(posSphere[2]-zRef>bedElevation)) {  // Remove the particles outside of the flow and inside the granular bed, they are not submitted to turbulent fluctuations. 
-				Real uStar2 = simplifiedReynoldStresses[p];
+				Real uStar2 = ReynoldStresses[p]/densFluid;
 				if (uStar2>0.0){
 					Real uStar = sqrt(uStar2);
 					rand1 = rnd();
@@ -306,7 +304,7 @@ void HydroForceEngine::turbulentFluctuationBIS(){
                         if (sphere){
                                 Vector3r posSphere = b->state->pos;//position vector of the sphere
                                 int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
-                                if (simplifiedReynoldStresses[p]>0.0) uStar = sqrt(simplifiedReynoldStresses[p]);
+                                if (ReynoldStresses[p]>0.0) uStar = sqrt(ReynoldStresses[p]/densFluid);
                                 // Remove the particles outside of the flow and inside the granular bed, they are not submitted to turbulent fluctuations. 
                                 if ((p<nCell)&&(posSphere[2]-zRef>bedElevation)) {
                                         rand1 = rnd();
@@ -369,7 +367,7 @@ void HydroForceEngine::turbulentFluctuationFluidizedBed(){
 			// If the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
 			// The fluctuation magnitude is linked to the value of the Reynolds stress tensor at the given position, a kind of local friction velocity ustar
 			if ((p<nCell)&&(posSphere[2]-zRef>0.)) {  // Remove the particles outside of the flow
-				Real uStar2 = simplifiedReynoldStresses[p];
+				Real uStar2 = ReynoldStresses[p]/densFluid;
 				if (uStar2>0.0){
 					Real uStar = sqrt(uStar2);
 					rand1 = rnd();
@@ -390,107 +388,69 @@ void HydroForceEngine::turbulentFluctuationFluidizedBed(){
 	}
 }
 
-/* function declaration */
-void doubleq(double ddam1[],double ddam2[],double ddam3[],double ddbm[],double ddxm[],int n);
-void calbeta(int irheolf, double alphas[], double beta[], double alphasmax, unsigned long n);
-void calviscotlm(int iturbu, int ilm, double dz, double h,double ufn[], double alphas[], double alphasmax, double kappa, double lmExp, double viscoft[], unsigned long n);
-void fluidModel(double h,double sig[],double dsig[],double dp,double ufn[],double alphaf[],double rhof,double viscof,double usnp[],double alphas[],double rhos,double alphasmax,double dpdx,double slope, double gra, double tfin,double dt,double cfdpYade[], double ufnp[], double viscoft[]);
-
-void  HydroForceEngine::updateVelocity() {
-	fluidModel(fluidHeight,&sig[0],&dsig[0],diameterPart,&vxFluid[0],
-			&phiPart[0],//FIXME: in the py script it's in fact (1-phiPart) which is passed to nsmp, wtf? and why the redundancy wrt [#] (below)
-			densFluid,
-			viscoDyn /*is it really the dynamic one here? else pass viscoDyn/densFluid (awkward anyway) */,
-			&vxPart[0],
-			&phiPartFluid[0] /*[#] WHY PASSING IT AGAIN?!! It seems to be equal to phiPart in practice */,
-			densPart, alphasmax, dpdx, slope,
-			gravity[2],/*FIXME: I'm assuming that gravity is along 2-axis (??), does it mean that users have to define gravity multiple times in one single script? Newton::gravity, HydroForceEngine::gravity? ugly... :-\ */
-			fluidResolPeriod,dtFluid,
-			&taufsi[0],
-			&vxFluid[0],&turbulentViscosity[0]); //<-------- output of the function
-}
 
 
-void fluidModel(double h,double sig[],double dsig[],double dp,double ufn[],double alphaf[],double rhof,double viscof,double usnp[],double alphas[],double rhos,double alphasmax,double dpdx,double slope, double gra, double tfin,double dt,double cfdpYade[], double ufnp[], double viscoft[])
+///////////////////////
+/* Fluid Resolution */
+///////////////////////
+// Fluid resolution routine: 1D vertical volume-averaged fluid momentum balance resolution
+void HydroForceEngine::fluidResolution(double tfin,double dt)
 {
-	const unsigned& ndimz=HydroForceEngine::ndimz;
-  unsigned j;
-  int irheolf,idrag,iturbu,ilm,iusl,idrift;
-  double dummy,dn1,ds1,dn2,ds2,dz,dzn,dzs,dzm;
-  double alphafp,alphafwn,alphafws,rhop;
-  double kappa,lmExp,expoRZ;
-  double as,an,ap1,a[ndimz],b[ndimz],c[ndimz],s[ndimz],udrift[ndimz],beta[ndimz],cfdp[ndimz];
-  double Rep,cd;
+  int j;
+  double dummy,dn1,ds1,dn2,ds2,dzn,dzs,dzm;
+  double alphafp,alphafwn,alphafws;
+  double viscof;
+  double as,an,ap1,a[nCell],b[nCell],c[nCell],s[nCell],beta[nCell],alphaf[nCell],ufnp[nCell],viscoft[nCell],wallFriction[nCell];
   double time=0;
+  vector<Real> ufn(nCell,0.0);	//Fluid velocity profile at time step n: initialization to a vector of size nCell
+  ufn = vxFluid;	//Assign the global variable vxFluid to ufn, i.e. the last fluid velocity profile evaluated
 
-  // impose constant grid size
-  dz=dsig[0]*h;
+  // compute the kinematic viscosity
+  viscof = viscoDyn/densFluid;
+
+  for (j=0;j<nCell;j++){
+	alphaf[j]=1.-phiPart[j];  // compute fluid phase volume fraction or porosity
+	ufnp[j]=ufn[j];  // initialize ufnp to ufn
+	viscoft[j]=0.;	// Initialize the turbulent viscosity vector to zero
+	wallFriction[j]=0.;	//Initialize the lateral wall friction term to zero. 
+	}
+  // Compute taufsi = phi/Vp*<fd>/rhof/(uf - up) for later resolution
+  computeTaufsi(dt);
+
+  // Mesh definition: regular with boundary conditions different: 0.5dz at the top, and 1.5dz at the bottom
+  double sig[nCell],dsig[nCell-1];
+  sig[0]=0.; sig[1]=1.5*deltaZ;dsig[0]=1.5*deltaZ;dsig[1]=deltaZ;
+  for (j=2;j<nCell-1;j++) {sig[j]=sig[j-1]+deltaZ; dsig[j]=deltaZ;}
+  sig[nCell-1]= sig[nCell-2]+0.5*deltaZ;dsig[nCell-2]=0.5*deltaZ;
+
+  // Implicitation factor of the lateral sink term due to wall friction
+  double imp=0.5;
   
-  //
-  // Option of the code
-  //
-  //    irheolf = 0 : Viscosite du fluide pur
-  //              1 : Viscosite d'Einstein
-  //              2 : Viscosite de Graham
-  //              3 : Viscosite de Krieger-Dougherty / Ishii-Zuber
-  //              4 : Viscosite de Boyer et al. 
-  irheolf = 0;
-
-  //     idrag = 0 : Trainee de Dallavale
-  //             1 : Trainee de Schiller & Naumann
-  //             2 : Trainee de Clift & Gauvin
-  //             3 : Loi de Stokes
-  //             4 : Loi de Darcy
-  //             5 : Loi de Ergun
-  //             6 : Imposed from averaged drag force (Yade) 
-  idrag = 0;
-
-  //     exposant de Richardson-Zaki (fonction d'entravement)
-  expoRZ = -3.1;
-          
-  //     iturbu = 0 : Pas de turbulence
-  //              1 : Longueur de mélange 
-  //                  ilm = 0 : longueur de melange de Prandtl
-  //                        1 : longueur de melange de Prandtl avec effet de Surface libre
-  //                        2 : Li and Sawamoto  (1995)
-  iturbu = 1;
-  ilm = 2;
-
-  kappa = 0.41;
-  lmExp = 1;
-
-  //     iusl = 0 : Condition de Dirichlet (u=0 en z=h)
-  //            1 : Condition de Neumann   (dudz=0 en z=h)
-  iusl = 1;     
-	
-  //     idrift = 0 : Sans vitesse de dispersion
-  //              1 : Avec vitesse de dispersion
-  idrift = 0;
-
-
   // Time loop
   while (time < tfin)
     {
       // Advance time
       time = time + dt;
-      printf("t=%7.4f s\n",time);
-      
-      // Viscosity amplification factor
-      calbeta(irheolf,alphas,beta,alphasmax,ndimz);
 
-      // Eddy viscosity 
-      calviscotlm(iturbu,ilm,dz,h,ufn,alphas,alphasmax,kappa,lmExp,viscoft,ndimz);
+      // Compute the viscosity amplification factor profile (due to the presence of particles), beta
+      calbeta(beta);
 
-      // Bottom boundary condition: (always no-slip)
+      // Compute the eddy viscosity depth profile, viscoft
+      calviscotlm(ufn,viscof,viscoft,sig,dsig);
+
+      // Compute the lateral wall friction profile, if activated
+      if (fluidWallFriction==true) calWallFriction(ufn,channelWidth,viscof,wallFriction);
+
+ 
+     // Bottom boundary condition: (always no-slip)
       j=0;
       a[j]=0.;
       b[j]=1.;
       c[j]=0.;
-      
       s[j]=0.;
-      
+
       // Top boundary condition: (0: no-slip / 1: zero gradient) 
-      j=ndimz-1;
+      j=nCell-1;
       if (iusl==0)
 	{
 	  a[j]=0.;
@@ -507,149 +467,105 @@ void fluidModel(double h,double sig[],double dsig[],double dp,double ufn[],doubl
        
 
       //Main loop
-      for(j=1;j<=ndimz-2;j++)
+      for(j=1;j<=nCell-2;j++)
 	{
 	  // volume fraction interpolation (staggered grid)
 	  alphafp = 0.5*(alphaf[j]+alphaf[j+1]);
 	  if (j==1)
 	    {
-	      dzn = dz;
-	      dzs = 1.5*dz;
-	      
 	      alphafwn=0.5*(alphaf[j+2]+alphaf[j+1]); 
 	      alphafws=alphaf[j-1]; 
 	    }
-	  else if (j==ndimz-2)
+	  else if (j==nCell-2)
 	    {
-	      dzn = 0.5*dz;
-	      dzs = dz;
-	      
 	      alphafwn=alphaf[j+1]; 
 	      alphafws=0.5*(alphaf[j  ]+alphaf[j-1]);
 	    }
 	  else
 	    {
-	      dzn = dz;
-	      dzs = dz;
-	      
 	      alphafwn=0.5*(alphaf[j+2]+alphaf[j+1]); 
 	      alphafws=0.5*(alphaf[j  ]+alphaf[j-1]);
 	    }
+	  dzn = dsig[j];
+	  dzs = dsig[j-1];
 	  dzm = 0.5*(dzn+dzs);
 
-	  // Drag model
-	  if (idrag==6)
-	    {
-	      // read from file:
-	      //cfdp[j] = cfdpYade[j];
-	      cfdp[j] = max(0.,cfdpYade[j]/max(fabs(usnp[j]-ufn[j]),1e-5))/rhof;
-	      //printf("%u\t%12.8f\t%12.8f\t%12.8f\n", j,ufn[j],usnp[j],cfdp[j]);
-	    }
-	  else if (idrag==0)
-	    {
-	      // Dallavalle + Richardson & Zaki
-	      Rep=max(fabs(ufn[j]-usnp[j])*dp/viscof,1e-8);
-	      cd=(24.4/Rep+0.4)*pow(alphafp,expoRZ);
-	      cfdp[j]=0.75*(1-alphafp)/dp*cd*fabs(ufn[j]-usnp[j]);
-	      //printf("%u\t%12.8f\t%12.8f\t%12.8f\n", j,ufn[j],usnp[j],cfdp[j]);
-	    }
-	  else
-	    {
-	      printf("idrag value undefined");
-	      break;
-	    }
 	  // Diffusion coefficients
 	  // Eddy viscosity terms
 	  dummy=dt/dzm;   
-	  ds1=dummy*viscoft[j  ]/dzn;
-	  dn1=dummy*viscoft[j+1]/dzs;
+	  ds1=dummy*viscoft[j  ]/dzs;
+	  dn1=dummy*viscoft[j+1]/dzn;
 	  // Viscous terms
-	  ds2=dummy*viscof*beta[j  ]/dz*alphafp;
-	  dn2=dummy*viscof*beta[j+1]/dz*alphafp;
+	  ds2=dummy*viscof*beta[j  ]/dzs*alphafp;
+	  dn2=dummy*viscof*beta[j+1]/dzn*alphafp;
 	  
 	  // Numerical scheme coefficient (diffussion only in 1DV)
 	  an=dn1+(dn2)*alphafwn;
 	  as=ds1+(ds2)*alphafws;
 	
 	  ap1=dn1+(dn2)*alphafp+ds1+(ds2)*alphafp;
-
 	  // LHS: algebraic system coefficients
 	  a[j] = - as;
-	  b[j] = alphafp + ap1 + dt*cfdp[j];
+	  b[j] = alphafp + ap1 + dt*taufsi[j]  + imp*dt*alphafp*2./channelWidth*0.125*wallFriction[j]*ufn[j]; 
 	  c[j] = - an;
 
-	  // RHS: unsteady, gravity, drag, pressure gradient
-	  s[j]= alphafp*ufn[j] + alphafp*gra*sin(slope)*dt + dt*cfdp[j]*(usnp[j]+udrift[j]) - alphafp*dpdx/rhof*dt;
-	  //printf("%u\t%12.8f\t%12.8f\t%12.8f\n", j,a[j],b[j],c[j]);
-	}
+	  // RHS: unsteady, gravity, drag, pressure gradient, lateral wall friction
+	  s[j]= alphafp*ufn[j] + alphafp*std::abs(gravity[0])*dt + dt*taufsi[j]*vxPart[j] - alphafp*dpdx/densFluid*dt - (1.-imp)*dt*alphafp*2./channelWidth*0.125*wallFriction[j]*ufn[j];
+        }
       // Implicit solution using tridiag (useful because of potential very high viscosities) 
-      doubleq( a, b , c, s , ufnp,ndimz);
+      doubleq( a, b , c, s , ufnp);
       // Update solution for next time step
-      for(j=0;j<=ndimz-1;j++)
+      for(j=0;j<=nCell-1;j++)
 	{
 	  ufn[j]=ufnp[j];
-	  //printf("%u\t%12.8f\t%12.8f\t%12.8f\n", j,ufn[j],usnp[j],cfdp[j]);
 	}
     }
+  // Update fluid velocity
+  vxFluid = ufn;
+  //Evaluate and update fluid Reynolds stresses
+  ReynoldStresses.resize(nCell);
+  memset(& ReynoldStresses[0],0,nCell);
+  turbulentViscosity.resize(nCell);
+  memset(& turbulentViscosity[0],0,nCell);
+  for (j=0;j<=nCell-1;j++){
+	turbulentViscosity[j] = viscoft[j];
+	ReynoldStresses[j] = densFluid*viscoft[j]*(ufn[j+1]-ufn[j])/deltaZ;
+	}
+  ReynoldStresses[nCell-1] = ReynoldStresses[nCell-2];turbulentViscosity[nCell-1]=viscoft[nCell-1];
 }
 
-void calbeta(int irheolf, double alphas[], double beta[], double alphasmax, unsigned long n)
+// Compute the effective viscosity accounting for the presence of particles
+void HydroForceEngine::calbeta(double beta[])
 {
-	const unsigned& ndimz=HydroForceEngine::ndimz;
   int j;
-  double ratio1,hsuram1;
-
   // viscosity amplification factor
   if (irheolf==0)
     // 0 : Viscosite du fluide pur
     {
-      for(j=0;j<=ndimz;j++)
+      for(j=0;j<=nCell;j++)
 	beta[j]=1.;
     }
   else if (irheolf==1)
     // 1 : Viscosite d'Einstein
     {
-      for(j=0;j<=ndimz;j++)
-	beta[j]=1.+2.5*alphas[j];
-    }
-  else if (irheolf==2)
-    // 2 : Viscosite de Graham // this one is buged
-    {
-      for(j=0;j<=ndimz;j++)
-	{
-	  ratio1=pow(min(alphas[j]/alphasmax,0.99),0.3333333);
-	  hsuram1=0.5*max(ratio1/(1.-ratio1),1e-3);
-	  //	  printf("%u\t%7.4f\t%7.4f\n",j,ratio1,hsura);
-	  beta[j]=1.+2.5*alphas[j]+2.25*(1+0.5/hsuram1)*(hsuram1-pow(1.+1./hsuram1,-1)-pow(1+1./hsuram1,2));
-	}
-    }
-  else if (irheolf==3)
-    // 3 : Viscosite de Krieger-Dougherty / Ishii-Zuber
-    {
-      for(j=0;j<=ndimz;j++)
-	beta[j]=pow(1.-min(alphas[j]/alphasmax,0.99),-(2.5*alphasmax));
-    }
-  else if (irheolf==4)
-    // 4 : Viscosite de Boyer et al.
-    {
-      for(j=0;j<=ndimz;j++)
-	beta[j]=1. + 2.5*alphas[j]*pow(1.-min(alphas[j]/alphasmax,0.99),-1);
+      for(j=0;j<=nCell;j++)
+	beta[j]=1.+2.5*phiPart[j];
     }
 }
 
-// ------------------------------------------------------------------------------//
-
-void calviscotlm(int iturbu, int ilm, double dz, double h,double ufn[], double alphas[], double alphasmax, double kappa, double lmExp, double viscoft[], unsigned long n)
+// Compute the eddy viscosity, turbulentViscosity
+void HydroForceEngine::calviscotlm(vector<Real> ufn,double viscof,double viscoft[],double sig[],double dsig[])
 {
-	const unsigned& ndimz=HydroForceEngine::ndimz;
   int j;
-  double lm[n],dist,sum,alphasmid,dzm,dudz;
+  double lm[nCell],sum,alphasmid,dudz,ustar;
+  // compute the fluid height
+  double fluidHeight = sig[nCell-1];
 
   // Eddy viscosity 
   if (iturbu==0)
     // 0 : No turbulence
     {
-      for(j=0;j<=ndimz;j++)
+      for(j=0;j<=nCell;j++)
         viscoft[j]=0.;
     }
   else if (iturbu==1)
@@ -658,61 +574,48 @@ void calviscotlm(int iturbu, int ilm, double dz, double h,double ufn[], double a
       if (ilm==0)
 	// 0 : Prandtl mixing length
 	{
-	  dist = 0;
 	  lm[0]=0.;
-	  for(j=1;j<=ndimz-1;j++)
-	    {
-	      lm[j]=kappa*dist;
-	      dist = dist + dz;
-	    }
+	  for(j=1;j<=nCell-1;j++) lm[j]=kappa*sig[j];
 	}
       else if (ilm==1)
         // 1 : Parabolic profile (free surface flows)
         {
-          dist = 0;
 	  lm[0]=0.;
-          for(j=1;j<=ndimz-1;j++)
-            {
-              lm[j]=kappa*dist*sqrt(1.-dist/h);
-	      dist = dist + dz;
-            }
-          lm[ndimz-1]=0.;
+          for(j=1;j<=nCell-1;j++)  lm[j]=kappa*sig[j]*sqrt(1.-sig[j]/fluidHeight);
+          lm[nCell-1]=0.;
         }
       else if (ilm==2)
         // 2 : Li and Sawamoto (1995) integral of concentration profile
         {
-          dist = 0;
 	  sum = 0.;
 	  lm[0]=0.;
-          for(j=1;j<=ndimz-1;j++)
+          for(j=1;j<=nCell-1;j++)
             {
-	      alphasmid=0.5*(alphas[j-1]+alphas[j]);
-	      sum = sum + min(alphasmid/alphasmax,0.9999999)*dz;
-	      lm[j]=kappa*(dist-pow(sum,lmExp));
-	      //	      printf("%u\t%7.4f\t%7.4f\n",j,lm[j],dist*kappa);
-              dist=dist+dz;
+	      alphasmid=std::min(0.5*(phiPart[j-1]+phiPart[j]),phiMax);
+              sum=sum+kappa*(phiMax-alphasmid)/phiMax*dsig[j-1];
+              lm[j]=sum;
             }
-          lm[ndimz-1]=lm[ndimz-2];
+          lm[nCell-1]=lm[nCell-2];
         }
       // Compute the velocity gradient and the mixing length
-      for(j=1;j<ndimz-1;j++)
+      for(j=1;j<nCell-1;j++)
 	{
-	  if (j==1)
-	    dzm=1.5*dz;
-	  else if (j==ndimz-1)
-	    dzm=0.5*dz;
-	  else
-	    dzm=dz;
-	  dudz=(ufn[j]-ufn[j-1])/dz;
-	  viscoft[j]=(1.-alphas[j])*pow(lm[j],2)*fabs(dudz);
-	  //printf("%u\t%7.4f\t%7.4f\t%7.4f\n",j,fabs(dudz),lm[j],viscoft[j]);
+	  dudz=(ufn[j]-ufn[j-1])/dsig[j-1];
+	  viscoft[j]=(1.-phiPart[j])*pow(lm[j],2)*fabs(dudz);
+        }
+      viscoft[nCell-1]=viscoft[nCell-2];
+      // test on y+ for viscous sublayer
+      ustar = sqrt(fabs(gravity[0])*sig[nCell-1]);
+      if (viscousSubLayer==1){
+	      for(j=1;j<nCell-1;j++)  if (sig[j]*ustar/viscof<11.3) viscoft[j]=0.;
 	}
-      viscoft[ndimz-1]=viscoft[ndimz-2];
+          
     }
+  
 }
 
-// ------------------------------------------------------------------------------//
-void doubleq(double ddam1[],double ddam2[],double ddam3[],double ddbm[],double ddxm[],int n)
+//Resolution of tridiagonal system
+void HydroForceEngine::doubleq(double ddam1[],double ddam2[],double ddam3[],double ddbm[],double ddxm[])
 {
   /* reosolution of tridiagonal system
        am1,2,3[n] - Tridiagonal matrix coefficients                                     
@@ -723,27 +626,84 @@ void doubleq(double ddam1[],double ddam2[],double ddam3[],double ddbm[],double d
   */
 
   int i,ii;
-  double ddem[n],ddfm[n],dddiv;
+  double ddem[nCell],ddfm[nCell],dddiv;
 
   // downward sweep
   dddiv=ddam2[0];
   ddem[0]=-ddam3[0]/dddiv;
   ddfm[0]=ddbm[0]/dddiv;
   
-  for (i=1;i<=n-2;i++)
+  for (i=1;i<=nCell-2;i++)
     {
       dddiv=ddam2[i]+ddam1[i]*ddem[i-1];
       ddem[i]=-ddam3[i]/dddiv;
       ddfm[i]=(ddbm[i]-ddam1[i]*ddfm[i-1])/dddiv;
     }
     // upward sweep
-  dddiv=ddam2[n-1]+ddam1[n-1]*ddem[n-2];
-  ddfm[n-1]=(ddbm[n-1]-ddam1[n-1]*ddfm[n-2])/dddiv;
-  ddxm[n-1]=ddfm[n-1];
-
-  for (ii=1;ii<=n-1;ii++)
+  dddiv=ddam2[nCell-1]+ddam1[nCell-1]*ddem[nCell-2];
+  ddfm[nCell-1]=(ddbm[nCell-1]-ddam1[nCell-1]*ddfm[nCell-2])/dddiv;
+  ddxm[nCell-1]=ddfm[nCell-1];
+  //////CAREFUL HERE: in fortran the loop is over the range similar to the first one. This was not the case here !!!!!! I NEED TO KNOW IF THIS IS OK OR NOT 
+  // DOES NOT SEEMS TO BE IMPORTANT
+  for (ii=1;ii<=nCell-1;ii++)
     {
-      i=n-1-ii;
+      i=nCell-1-ii;
       ddxm[i]=ddem[i]*ddxm[i+1]+ddfm[i];
     }  
 }
+
+//  Create taufsi = dragTerm/(rhof(vf-vxp)) for the fluid resolution
+void HydroForceEngine::computeTaufsi(Real dt)
+{
+  //Resize and initialize taufsi
+  taufsi.resize(nCell);
+  memset(& taufsi[0],0,nCell);
+
+  //Initialization
+  Real lim = 1e-5, dragTerm=0., partVolume=1., partVolume1=1., partVolume2=1.;
+  // Evaluate particles volume
+  if (twoSize==true){
+	partVolume1 = 4./3.*Mathr::PI*pow(radiusPart1,3);
+	partVolume2 = 4./3.*Mathr::PI*pow(radiusPart2,3);
+  }
+  else 	partVolume = 4./3.*Mathr::PI*pow(radiusPart,3);
+  // Compute taufsi
+  taufsi[0] = 0.;
+  for(int i=1;i<nCell;i++)
+	{
+	if (twoSize==true){
+		dragTerm = phiPart1[i]/partVolume1*averageDrag1[i] + phiPart2[i]/partVolume2*averageDrag2[i];
+	}
+	else {
+		dragTerm = phiPart[i]/partVolume*averageDrag[i];
+	}
+
+	Real urel = std::abs(vxFluid[i] - vxPart[i]);
+	Real urel_bound = std::max(urel,lim); //limit the value to avoid division by 0
+	taufsi[i] = std::max(0.,std::min(dragTerm/urel_bound/densFluid,pow(10*dt,-1.))); //limit the max value of taufsi to the fluid resolution limit, i.e. 1/(10dt) and required positive (charact. time)
+	}
+}
+
+//Evaluate the wall friction coefficient at each elevation, solving the Graf & Altinakar 1993 formulation. 
+void HydroForceEngine::calWallFriction(vector<Real> ufn,Real channelWidth,double viscof,double wallFriction[]){
+   int  maxiter,q,j;
+   double Re, epsilon, ff, ffold,delta;
+   maxiter = 100;	//Maximum number iteration for the resolution
+   epsilon = 1e-3;	//Tolerance for the equation resolution
+   for (j=0;j<=nCell-1;j++){
+        Re = max(1e-10,ufn[j]*channelWidth/viscof);
+  	ffold=pow(0.32,-2);	//Initial guess of the friction factor
+     	delta=1e10;	//Initialize at a random value greater than epsilon
+	q=0;
+	while ((delta>=epsilon)&&(q<maxiter)){ //Loop while the required precision is reached or the  maximum iteration number is overpassed
+		q+=1;
+		//Graf and Altinakar 1993 formulation of the friction factor
+		ff = pow(2.*log(Re*sqrt(ffold))+0.32,-2);
+		delta = fabs(ff-ffold)/ffold;
+		ffold = ff;
+		}
+	if (q==maxiter) ff=0.;
+	wallFriction[j] = ff;
+   }
+}
+
