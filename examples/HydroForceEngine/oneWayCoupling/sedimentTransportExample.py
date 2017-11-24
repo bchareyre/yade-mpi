@@ -1,6 +1,6 @@
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
-# 04/07/2016
+# 24/11/2017
 #
 # Example script to simulate sediment transport from an imposed 1D vertical fluid profile
 # Make use of HydroForceEngine, which is tailored to be used with a 1D RANS code, solving the fluid momentum balance as a function of the depth to determine u_x^f(z) the vertical fluid profile (vxFluidPY).
@@ -9,7 +9,9 @@
 # Apply fluid forces from an imposed fluid profile vxFluidPY through the engine HydroForceEngine
 # Let evolve the problem to equilibrium and measure the granular depth profiles of particles volume fraction and particle velocity
 #
-# The force applied by the fluid on the particles are restricted to drag and buoyancy. To know the exact expressions of the latter (and for any precisions regarding an action of HydroForceEngine), please  refer to the documentation of HydroForceEngine and to the c++ source code pkg/common/ForceEngine.cpp and hpp. 
+# The force applied by the fluid on the particles are restricted to drag and buoyancy. To know the exact expressions of the latter (and for any precisions regarding an action of HydroForceEngine), please  refer to the documentation of HydroForceEngine and to the c++ source code pkg/common/HydroForceEngine.cpp and hpp. 
+#
+# Data can be saved and plot with the file postProcessing_sedim.py
 #
 ############################################################################################################################################################################
 
@@ -27,22 +29,23 @@ import numpy as np
 #Particles
 diameterPart = 6e-3	#Diameter of the particles, in meter
 densPart = 2500		#density of the particles, in kg/m3
-phiPartMax = 0.61	#Value of the dense packing solid volume fraction
-restitCoef = 0.5	#Restitution coefficient of the particles
+phiPartMax = 0.61	#Value of the dense packing solid volume fraction, dimensionless
+restitCoef = 0.5	#Restitution coefficient of the particles, dimensionless
 partFrictAngle = atan(0.4)	#friction angle of the particles, in radian
 
-#fluid
-densFluidPY = 1000.	#Density of the fluid
-kinematicViscoFluid = 1e-6	#kinematic viscosity of the fluid
-waterDepth = 20.#Water depth in diameter
+#Fluid
+densFluidPY = 1000.	#Density of the fluid, in kg/m3
+kinematicViscoFluid = 1e-6	#kinematic viscosity of the fluid, in m^2/s
+waterDepth = 20.#Water depth, in diameter
 
 #Configuration: inclined channel
-slope = 0.05	#Inclination angle of the channel slope in radian
+slope = 0.05	#Inclination angle of the channel slope, in radian
 lengthCell = 10	#Streamwise length of the periodic cell, in diameter
 widthCell = 10	#Spanwise length of the periodic cell, in diameter
 Nlayer = 10.	#nb of layer of particle, in diameter
-fluidHeight = (Nlayer+waterDepth)*diameterPart	#Height of the flow from the bottom of the sample
+fluidHeight = (Nlayer+waterDepth)*diameterPart	#Height of the flow from the bottom of the sample, in m
 
+saveData = 1	#If put to 1, at each execution of function measure() save the sediment transport rate, fluid velocity, solid volume fraction and velocity profiles for post-processing
 endTime = 10	#Time simulated (in seconds)
 
 
@@ -68,7 +71,6 @@ length = lengthCell*diameterPart #length of the stream, in m
 width = widthCell*diameterPart  #width of the stream, in m
 groundPosition = height/4.0 #Definition of the position of the ground, in m
 gravityVector = Vector3(9.81*sin(slope),0.0,-9.81*cos(slope)) #Gravity vector to consider a channel inclined with slope angle 'slope'
-gravityVectorApplied = Vector3(0.0,0.0,-9.81*cos(slope)) #Applied gravity for buoyancy (no x contribution in turbulent cases)
 
 #Particles contact law/material parameters
 maxPressure = (densPart-densFluidPY)*phiPartMax*Nlayer*diameterPart*abs(gravityVector[2]) #Estimated max particle pressure from the static load
@@ -135,7 +137,7 @@ O.engines = [
    	[Law2_ScGeom_ViscElPhys_Basic()]
 	,label = 'interactionLoop'),				
 	#Apply an hydrodynamic force to the particles
-	HydroForceEngine(densFluid = densFluidPY,viscoDyn = kinematicViscoFluid*densFluidPY,zRef = groundPosition,gravity = gravityVectorApplied,deltaZ = dz,expoRZ = expoDrag_PY,lift = False,nCell = ndimz,vCell = length*width*dz ,vxFluid = vxFluidPY,phiPart = phiPartPY,vxPart = vxPartPY,ids = idApplyForce, label = 'hydroEngine', dead = True),
+	HydroForceEngine(densFluid = densFluidPY,viscoDyn = kinematicViscoFluid*densFluidPY,zRef = groundPosition,gravity = gravityVector,deltaZ = dz,expoRZ = expoDrag_PY,nCell = ndimz,vCell = length*width*dz ,vxFluid = vxFluidPY,phiPart = phiPartPY,vxPart = vxPartPY,ids = idApplyForce, label = 'hydroEngine', dead = True),
 	#Measurement, output files
 	PyRunner(command = 'measure()', virtPeriod = 0.1, label = 'measurement', dead = True),
 	# Check if the packing is stabilized, if yes activate the hydro force on the grains and the slope.
@@ -182,14 +184,15 @@ def gravityDeposition(lim):
 #######		      ########
 ###	    OUTPUT	   ###
 #######		      ########
-# Averaging/Save
+#Initialization
 qsMean = 0		#Mean dimensionless sediment transport rate
 zAxis = np.zeros(ndimz)	#z scale, in diameter
+for i in range(0,ndimz):#z scale used for the possible plot at the end
+	zAxis[i] = i*dz/diameterPart
+# Averaging/Save
 def measure():
-	global qsMean
-	global vxPartPY
-	global phiPartPY
-	global zAxis
+	global qsMean,vxPartPY,phiPartPY
+
 	#Evaluate the average depth profile of streamwise, spanwise and wall-normal particle velocity, particle volume fraction (and drag force for coupling with RANS fluid resolution), and store it in hydroEngine variables vxPart, vyPart, vzPart, phiPart, averageDrag
 	hydroEngine.averageProfile()
 	#Extract the calculated vector. They can be saved and plotted afterwards. 
@@ -213,18 +216,30 @@ def measure():
 		for i in range(0,ndimz):
 			zAxis[i] = i*dz/diameterPart
 
-## Paste the following (uncommented) code in the console at the end of the simulation to observe the shape of the granular depth profiles (solid volume fraction and velocity)
-#import matplotlib.pyplot as pyp
-#pyp.figure('solid volume fraction profile')
-#pyp.plot(phiPartPY,zAxis,'g')
-#pyp.xlabel(r'$\phi$')
-#pyp.ylabel(r'$z/d$')
-#pyp.figure('streamwise particle velocity profile')
-#pyp.plot(vxPartPY,zAxis,'g')
-#pyp.xlabel(r'$<v_x^p>$')
-#pyp.ylabel(r'$z/d$')
-#pyp.show()
 
+	if saveData==1:	#Save data for postprocessing
+		global fileNumber
+		nameFile = scriptPath + '/data/'+ str(fileNumber)+'.py'	# Name of the file that will be saved
+		globalParam =  ['qsMean','phiPartPY','vxPartPY','vxFluidPY','zAxis']	# Variables to save
+		Save(nameFile, globalParam)	#Save
+		fileNumber+=1	#Increment the file number
+
+
+#Save data details
+fileNumber = 0	# Counter for the file saved
+if saveData==1:	#If saveData option is activated, requires a folder data
+	scriptPath = os.path.abspath(os.path.dirname(sys.argv[-1])) #Path where the script is stored
+	if os.path.exists(scriptPath +'/data/')==False:
+		os.mkdir(scriptPath +'/data/')
+	else:
+		print '\n!! Save data: overwrite the files contains in the folder data/ !!\n'
+#Function to save global variables in a python file which can be re-executed for post-processing
+def Save(filePathName, globalVariables):
+	f = open(filePathName,'w')
+	f.write('from numpy import *\n')
+	for i in globalVariables:
+		f.write(i + ' = '+repr(globals()[i]) + '\n')
+	f.close()
 #Plot the dimensionless sediment transport rate as a function of time during the simulation
 plot.plots={'time':('SedimentRate')}
 plot.plot()
