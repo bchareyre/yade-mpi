@@ -403,17 +403,23 @@ boost::python::list TesselationWrapper::getAlphaFaces(double alpha)
 	return ret;
 }
 
-boost::python::list TesselationWrapper::getAlphaCaps(double alpha)
+boost::python::list TesselationWrapper::getAlphaCaps(double alpha, double shrinkedAlpha, bool fixedAlpha)
 {
   vector<AlphaCap> caps;
-  vector<Vector3r> segments;
-  segments=Tes->setExtendedAlphaCaps(caps,alpha);
+  Tes->setExtendedAlphaCaps(caps,alpha,shrinkedAlpha,fixedAlpha);
   boost::python::list ret;
    for (auto f=caps.begin();f!=caps.end();f++)
     ret.append(boost::python::make_tuple(f->id,makeVector3r(f->normal)));
-   cerr<<"number of caps="<<caps.size()<<endl;
+//    cerr<<"number of caps="<<caps.size()<<endl;
+  return ret;
+}
+
+boost::python::list TesselationWrapper::getAlphaGraph(double alpha, double shrinkedAlpha, bool fixedAlpha)
+{
+  vector<Vector3r> segments=Tes->getExtendedAlphaGraph(alpha,shrinkedAlpha,fixedAlpha);
+  boost::python::list ret;
   for (auto f=segments.begin();f!=segments.end();f++)
-  	ret.append(*f);
+        ret.append(*f);
   return ret;
 }
 
