@@ -15,7 +15,7 @@
 #ifdef YADE_SPH
 #include<pkg/common/SPHEngine.hpp>
 #endif
-#ifdef YADE_DEFORM
+#ifdef YADE_DEFORM 
 #include <core/PartialEngine.hpp>
 #endif
 
@@ -43,7 +43,7 @@ class ViscElMat : public FrictMat {
 		((int,KernFunctionVisco,   Lucy,, "Kernel function for viscosity calculation (by default - Lucy). The following kernel functions are available: Lucy=1."))
 #endif
 #ifdef YADE_DEFORM
-		((bool,DeformEnabled,false,,"True, if particle deformation is needed. Off by default."))
+		((bool,DeformEnabled,false,,"True, if particle deformation is needed. Off by default, see [Haustein2017118]_ ."))
 #endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_.")),
 		createIndex();
@@ -69,7 +69,7 @@ class ViscElPhys : public FrictPhys{
 		((Real,mu,-1,,   "Viscosity. See Mueller [Mueller2003]_ ."))                                              // [Mueller2003], (14)
 #endif
 #ifdef YADE_DEFORM
-		((bool,DeformEnabled,false,,"True, if particle deformation mechanism is needed."))
+		((bool,DeformEnabled,false,,"True, if particle deformation mechanism is needed, see [Haustein2017118]_ ."))
 #endif
 		((unsigned int,mRtype,1,,"Rolling resistance type, see [Zhou1999536]_. mRtype=1 - equation (3) in [Zhou1999536]_; mRtype=2 - equation (4) in [Zhou1999536]_")),
 		createIndex();
@@ -152,7 +152,7 @@ Real find_cn_from_en(const Real& en, const Real& m, const Real& kn, const shared
 class DeformControl: public PartialEngine{
 	public:
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DeformControl,PartialEngine,"This engine implements particle deformation with const. volume . ",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DeformControl,PartialEngine,"This engine implements particle deformation with const. volume, see [Haustein2017118]_ . ",
 		// Attrs
 		,/* ctor */
 		,/* py */
