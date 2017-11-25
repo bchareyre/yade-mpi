@@ -18,6 +18,19 @@ YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhe
 //*********************************************************************************
 /* Polyhedra Constructor */
 
+Polyhedra::Polyhedra(const std::vector<Vector3r> && V) {
+	createIndex();
+	v = V;
+	Initialize();
+}
+
+Polyhedra::Polyhedra (const Vector3r && xsize, const int && xseed) {
+	createIndex();
+	seed=xseed;
+	size=xsize;
+	v.clear();
+	Initialize();
+}
 void Polyhedra::Initialize(){
 	if (init) return;
 	bool isRandom = false;
@@ -241,11 +254,60 @@ vector<vector<int>> Polyhedra::GetSurfaces() const {
 	return ret;
 }
 
+Vector3r Polyhedra::GetCentroid() {
+	Initialize();
+	return centroid;
+}
 
+Vector3r Polyhedra::GetInertia() {
+	Initialize();
+	return inertia;
+}
+
+vector<int> Polyhedra::GetSurfaceTriangulation() {
+	Initialize();
+	return faceTri;
+}
+
+Real Polyhedra::GetVolume() {
+	Initialize();
+	return volume;
+}
+
+Quaternionr Polyhedra::GetOri() {
+	Initialize();
+	return orientation;
+}
+
+void Polyhedra::Clear() {
+	v.clear();
+	P.clear();
+	init = 0;
+	size = Vector3r(1.,1.,1.);
+	faceTri.clear();
+}
+
+bool Polyhedra::IsInitialized() const {
+	return init;
+}
+
+Polyhedron Polyhedra::GetPolyhedron() const {
+	return P;
+}
 //****************************************************************************************
 /* Destructor */
 
 Polyhedra::~Polyhedra(){}
+
+//****************************************************************************************
+Real PolyhedraMat::GetStrength() const {return strength;};
+Real PolyhedraMat::GetStrengthTau() const {return strengthTau;};
+Real PolyhedraMat::GetStrengthSigmaCZ() const {return sigmaCZ;};
+Real PolyhedraMat::GetStrengthSigmaCD() const {return sigmaCD;};
+int PolyhedraMat::GetWeiM() const {return Wei_m;};
+Real PolyhedraMat::GetWeiS0() const {return Wei_S0;};
+Real PolyhedraMat::GetWeiV0() const {return Wei_V0;};
+Real PolyhedraMat::GetP() const {return Wei_P;};
 
 //****************************************************************************************
 /* Destructor */
