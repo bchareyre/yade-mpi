@@ -138,7 +138,7 @@ void PeriodicFlowEngine:: action()
         epsVolCumulative += epsVolMax;
 	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
-		(defTolerance>0 && epsVolCumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
+		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0  && retriangulationLastIter>meshUpdateInterval);
 
 	timingDeltas->checkpoint("Update_Volumes");
 
@@ -179,7 +179,7 @@ void PeriodicFlowEngine:: action()
 	timingDeltas->checkpoint("Applying Forces");
 	if (multithread && !first) {
 		while (updateTriangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
-		if (updateTriangulation || ellapsedIter>(0.5*meshUpdateInterval)) {
+		if (updateTriangulation || (meshUpdateInterval>0 && ellapsedIter>(0.5*meshUpdateInterval))) {
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0 || doInterpolate) solver->interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
 			solver=backgroundSolver;
