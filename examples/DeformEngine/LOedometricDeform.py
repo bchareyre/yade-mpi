@@ -3,7 +3,7 @@
 
 # Testing of the Deformation Enginge with Luding Contact Law
 # Modified Oedometric Test
-# The reference paper [Haustein2017118]
+# The reference paper [Haustein2017]
 
 
 from yade import utils, plot, timing

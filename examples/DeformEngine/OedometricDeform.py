@@ -2,7 +2,7 @@
 #encoding: ascii
 
 # Modefied Oedometric Test for particle deformation under const. volume
-# The reference paper [Haustein2017118]
+# The reference paper [Haustein2017]
 
 
 from yade import utils, plot, timing

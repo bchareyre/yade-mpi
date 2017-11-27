@@ -177,12 +177,12 @@ class PolyhedraMat: public FrictMat{
 		((bool,IsSplitable,0,,"To be splitted ... or not"))
 		((Real,strength,100,,"Stress at which polyhedra of volume 4/3*pi [mm] breaks."))
 		((Real,strengthTau,-1,,"Tangential stress at which polyhedra of volume 4/3*pi [mm] breaks."))
-		((Real,sigmaCZ,-1,,"Mohr-Coulomb failure criterium SigmaCZ, Pa, maximal tensile strength (if negative - disabled), [Gladk2017]_"))
-		((Real,sigmaCD,-1,,"Mohr-Coulomb failure criterium SigmaCD, Pa,  maximal compressive strength (if negative - disabled), [Gladk2017]_"))
-		((int,Wei_m,-1,,"Weibull Formulation, Weibull modulus, m, (if negative - disabled), [Gladk2017]_"))
-		((Real,Wei_S0,-1,,"Weibull Formulation, Sigma0, Pa, (if negative - disabled), [Gladk2017]_"))
-		((Real,Wei_V0,1e-9,,"Weibull Formulation, V0, m^3, representative volume, [Gladk2017]_."))
-		((Real,Wei_P,-1,,"Weibull Formulation, failure  probability, P, [Gladk2017]_."))
+		((Real,sigmaCZ,-1,,"Mohr-Coulomb failure criterium SigmaCZ, Pa, maximal tensile strength (if negative - disabled), [Gladky2017]_"))
+		((Real,sigmaCD,-1,,"Mohr-Coulomb failure criterium SigmaCD, Pa,  maximal compressive strength (if negative - disabled), [Gladky2017]_"))
+		((int,Wei_m,-1,,"Weibull Formulation, Weibull modulus, m, (if negative - disabled), [Gladky2017]_"))
+		((Real,Wei_S0,-1,,"Weibull Formulation, Sigma0, Pa, (if negative - disabled), [Gladky2017]_"))
+		((Real,Wei_V0,1e-9,,"Weibull Formulation, V0, m^3, representative volume, [Gladky2017]_."))
+		((Real,Wei_P,-1,,"Weibull Formulation, failure  probability, P, [Gladky2017]_."))
 		((Real,young,1e8,,"Young modulus")),
 		/*ctor*/ createIndex();
 	);

@@ -200,7 +200,7 @@ void SplitPolyTauMax::action()
 /* Split if stress exceed strength */
 
 inline bool isPolyhedraBroken (const Real & Sigma0, const Real & Sigma, const Real & V0, const Real & V, unsigned int m, const Real & P) {
-	// [Gladk2017], eq. (6)
+	// [Gladky2017], eq. (6)
 	const Real failureProbability = 1 - exp(-V/V0 * (std::pow((Sigma/Sigma0),m)));
 	if (failureProbability > P) {
 		return true;
