@@ -28,6 +28,16 @@ class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 	DFNCellInfo() : crack(false)  {} /// enable to visualize cracked cells in Paraview
 //	DFNCellInfo() : crack(false), crackArea(0) {}
 // 	void anotherFunction() {};
+	std::vector<int> faceBreakCount;
+	std::vector<int> facetAperture;
+
+	DFNCellInfo (void)
+	{	
+		faceBreakCount.resize(4,0);
+		facetAperture.resize(4,0);
+	}
+	inline std::vector<int>& count(void) {return faceBreakCount;}
+	inline std::vector<int>& aperture(void) {return facetAperture;}
 
 };
 
@@ -48,7 +58,7 @@ public:
   {
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
-        char filename[80];
+        char filename[250];
 	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         sprintf(filename,"%s/out_%d.vtk",folder,number++);
 	int firstReal=-1;
@@ -137,6 +147,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 	Real averageFracturePermeability;
     	Real maxAperture;	
 	Real crackArea;
+	bool edgeOnJoint;
 	Real getCrackArea() {return crackArea;}
 	Real getLeakOffRate() {return leakOffRate;}
     	Real getAverageAperture() {return averageAperture;}
@@ -147,6 +158,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"This is an enhancement of the FlowEngine for intact and fractured rocks that takes into acount pre-existing discontinuities and bond breakage between particles. The local conductivity around the broken link is calculated according to parallel plates model",
 	((Real,jointResidualAperture,1.e-6,,"residual aperture of joints"))
+	((Real, facetEdgeBreakThreshold, 1,,"minimum number of edges that need to be broken for a facet to be tricked"))
 	((Real,slotInitialAperture,1.e-6,,"initial aperture of injection slots"))
 	((Real,inducedCracksResidualAperture,0.,,"residual aperture of induced cracks"))
 	((Real,apertureFactor,1.,,"calibration parameter for fracture conductance to deal with tortuosity"))
@@ -228,6 +240,13 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Facet_circulator& facet, R
 	const CellHandle& cell1 = currentFacet.first;
 	const CellHandle& cell2 = currentFacet.first->neighbor(facet->second);
 	if ( Tri.is_infinite(cell1) || Tri.is_infinite(cell2)) cerr<<"Infinite cell found in trickPermeability, should be handled somehow, maybe"<<endl;
+	if (cell1->info().count()[currentFacet.second] < 3){
+		cell1->info().count()[currentFacet.second] += 1;
+		//cell1->info().aperture()[currentFacet.second] += aperture // used with avgAperture below if desired
+	}
+	if (!edgeOnJoint && cell1->info().count()[currentFacet.second] < facetEdgeBreakThreshold) return; // only allow facets with 2 or 3 broken edges to be tricked
+	// Need to decide aperture criteria! Otherwise it selects the most recent broken edge aperture for facet's perm calc. Here is one possibility: 
+	//Real avgAperture = cell1->info().aperture()[currentFacet.second]/Real(cell1->info().count()[currentFacet.second]);
 	cell1->info().kNorm()[currentFacet.second]=cell2->info().kNorm()[Tri.mirror_index(cell1,currentFacet.second)] = apertureFactor*pow((aperture),3)/(12*viscosity);
 	/// For vtk recorder:
 	cell1->info().crack= 1;
@@ -294,8 +313,15 @@ void DFNFlowEngine::trickPermeability(Solver* flow)
 				numberOfCrackedOrJoinedInteractions +=1;
 				
 				/// here are some workarounds
-				Real residualAperture = jcfpmphys->isOnJoint? jointResidualAperture : inducedCracksResidualAperture; /// inducedCracksResidualAperture=0. by default
-				
+				//Real residualAperture = jcfpmphys->isOnJoint? jointResidualAperture : inducedCracksResidualAperture; /// inducedCracksResidualAperture=0. by default
+				Real residualAperture;
+				if (jcfpmphys->isOnJoint){
+					residualAperture = jointResidualAperture;
+					edgeOnJoint = true; 
+				}else{ 
+					residualAperture = inducedResidualAperture;					
+					edgeOnJoint = false;
+				}
 				/// for injection slot (different from pre-existing fractures if needed)
 				if (jcfpmphys->isOnSlot) {residualAperture = slotInitialAperture;}
 				
