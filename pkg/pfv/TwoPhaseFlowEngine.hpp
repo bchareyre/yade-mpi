@@ -354,10 +354,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 
 	boost::python::list getNeighbors(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
 		boost::python::list ids;
-		if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
+		const RTriangulation& Tri = solver->tesselation().Triangulation();
+		if (id>=solver->tesselation().cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
 		for (unsigned int i=0;i<4;i++) {
-			const CellHandle& neighbourCell = solver->T[solver->currentTes].cellHandles[id]->neighbor(i);
-			if (!solver->T[currentTes].Triangulation().is_infinite(neighbourCell)) ids.append(neighbourCell->info().id);}
+			const CellHandle& neighbourCell = solver->tesselation().cellHandles[id]->neighbor(i);
+			if (!Tri.is_infinite(neighbourCell)) ids.append(neighbourCell->info().id);}
 		return ids;}
 
 	//TODO
