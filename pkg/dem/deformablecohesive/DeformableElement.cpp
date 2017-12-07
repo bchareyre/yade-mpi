@@ -12,7 +12,7 @@
 #include <core/State.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/deformablecohesive/Node.hpp>
-#include <string.h>
+#include <string>
 #include <boost/lexical_cast.hpp>
 
 DeformableElement::~DeformableElement(){

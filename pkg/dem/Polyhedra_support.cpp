@@ -742,6 +742,16 @@ shared_ptr<Body> NewPolyhedra(vector<Vector3r> v, shared_ptr<Material> mat){
 	return body;
 }
 
+Real maxDistancePoints (const std::vector<Vector3r> & v) {
+	Real maxDistance = 0.;
+	for (unsigned int i = 0; i < v.size(); ++i) {
+		for (unsigned int j = i+1; j < v.size(); ++j) {
+			maxDistance = std::max(maxDistance, (v[i] - v[j]).norm());
+		}
+	}
+	return maxDistance;
+}
+
 //**********************************************************************************
 //split polyhedra
 shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, const Vector3r direction, const Vector3r point){
@@ -755,22 +765,23 @@ shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, const Vector3r dir
 	const Vector3r OrigAngVel = X->angVel;
 
 	//move and rotate CGAL structure Polyhedron
-	Matrix3r rot_mat = (se3.orientation).toRotationMatrix();
-	Vector3r trans_vec = se3.position;
+	const Matrix3r rot_mat = (se3.orientation).toRotationMatrix();
+	const Vector3r trans_vec = se3.position;
+
 	Transformation t_rot_trans(
 		rot_mat(0,0),rot_mat(0,1),rot_mat(0,2),trans_vec[0],
 		rot_mat(1,0),rot_mat(1,1),rot_mat(1,2),trans_vec[1],
 		rot_mat(2,0),rot_mat(2,1),rot_mat(2,2),trans_vec[2],1.);
+
 	Polyhedron PA = A->GetPolyhedron();
 	std::transform( PA.points_begin(), PA.points_end(), PA.points_begin(), t_rot_trans);
- 
-	//calculate first splitted polyhedrons
+
+	//calculate splitted polyhedrons
 	Plane B(ToCGALPoint(point-direction*SPLITTER_GAP), ToCGALVector(direction)); 
 	Polyhedron S1 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) - 1E-6*ToCGALVector(direction));
 
 	B = Plane(ToCGALPoint(point+direction*SPLITTER_GAP), ToCGALVector((-1.)*direction));
 	Polyhedron S2 = Polyhedron_Plane_intersection(PA, B, ToCGALPoint(se3.position), B.projection(ToCGALPoint(OrigPos)) + 1E-6*ToCGALVector(direction));
-	//scene->bodies->erase(body->id);
 
 	//replace original polyhedron
 	A->Clear();
@@ -788,12 +799,12 @@ shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, const Vector3r dir
 	vector<Vector3r> v2;
 	for(Polyhedron::Vertex_iterator vi = S2.vertices_begin(); vi !=  S2.vertices_end(); vi++) v2.push_back(FromCGALPoint(vi->point()));
 	shared_ptr<Body> BP = NewPolyhedra(v2, body->material);
+	
 	BP->shape->color = Vector3r(Real(rand())/RAND_MAX,Real(rand())/RAND_MAX,Real(rand())/RAND_MAX);
 	scene->bodies->insert(BP);
 	//set proper state variables
 	BP->state->vel = OrigVel + OrigAngVel.cross(BP->state->pos-OrigPos);
 	BP->state->angVel = OrigAngVel;
-
 	return BP;
 }
 

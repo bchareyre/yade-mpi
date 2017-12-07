@@ -3,7 +3,7 @@ Import geometry from various formats ('import' is python keyword, hence the name
 """
 
 from yade.wrapper import *
-from yade import utils
+from yade import utils, polyhedra_utils
 
 from minieigen import *
 
@@ -492,6 +492,7 @@ def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Qua
 				vertLoad.append(pos)
 				i+=1
 			polR = polyhedra_utils.polyhedra(material=material,v=vertLoad,**kw)
-			ret.append(polR)
+			if (polR != -1):
+				ret.append(polR)
 			i= i + surfs - 1
 	return ret

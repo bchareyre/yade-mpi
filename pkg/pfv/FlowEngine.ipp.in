@@ -60,7 +60,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         epsVolCumulative += epsVolMax;
 	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
-		(defTolerance>0 && epsVolCumulative > defTolerance) || retriangulationLastIter>meshUpdateInterval;
+		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0 && retriangulationLastIter>meshUpdateInterval);
 
 // remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
 	if (breakControlledRemesh){
@@ -120,7 +120,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		  sleeping++;
 		boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
 		if (debug && sleeping) cerr<<"sleeping..."<<sleeping<<endl;
-		if (updateTriangulation || (ellapsedIter>(0.5*meshUpdateInterval) && backgroundCompleted)) {
+		if (updateTriangulation || ((meshUpdateInterval>0  && ellapsedIter>(0.5*meshUpdateInterval)) && backgroundCompleted)) {
 			if (debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0 || doInterpolate) solver->interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);

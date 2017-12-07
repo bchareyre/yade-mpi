@@ -39,43 +39,42 @@
 #define unlikely(x)     __builtin_expect((x),0)
 
 //CGAL definitions - does not work with another kernel!! Why???
-typedef CGAL::Exact_predicates_inexact_constructions_kernel  K;
-typedef CGAL::Polyhedron_3<K>	Polyhedron;
-typedef CGAL::Delaunay_triangulation_3<K> Triangulation;
-typedef K::Point_3 CGALpoint;
-typedef K::Triangle_3 CGALtriangle;
-typedef K::Vector_3 CGALvector;
-typedef CGAL::Aff_transformation_3<K> Transformation;
-typedef K::Segment_3 Segment;
-typedef CGAL::Triangle_3<K> Triangle;
-typedef CGAL::Plane_3<K> Plane;
-typedef CGAL::Line_3<K> Line;
-typedef CGAL::Origin CGAL_ORIGIN;
-typedef CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_primitive<K,std::vector<Triangle>::iterator>>> CGAL_AABB_tree;
+using K = CGAL::Exact_predicates_inexact_constructions_kernel;
+using Polyhedron = CGAL::Polyhedron_3<K>;
+using Triangulation = CGAL::Delaunay_triangulation_3<K>;
+using CGALpoint = K::Point_3;
+using CGALtriangle = K::Triangle_3;
+using CGALvector = K::Vector_3;
+using Transformation = CGAL::Aff_transformation_3<K>;
+using Segment = K::Segment_3;
+using Triangle = CGAL::Triangle_3<K>;
+using Plane = CGAL::Plane_3<K>;
+using Line = CGAL::Line_3<K>;
+using CGAL_ORIGIN = CGAL::Origin;
+using CGAL_AABB_tree = CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_primitive<K,std::vector<Triangle>::iterator>>>;
 
 
 //**********************************************************************************
 class Polyhedra: public Shape{
 	public:
 		//constructor from Vertices
-		Polyhedra(std::vector<Vector3r> V) { createIndex(); v.resize(V.size()); for(int i=0;i<(int) V.size();i++) v[i]=V[i]; Initialize();} 	//contructor of "random" polyhedra
-		Polyhedra(Vector3r xsize, int xseed) { createIndex(); seed=xseed; size=xsize; v.clear(); Initialize();} 
+		Polyhedra(const std::vector<Vector3r> && V);
+		Polyhedra(const Vector3r && xsize, const int && xseed); //contructor of "random" polyhedra
 		virtual ~Polyhedra();
-		Vector3r GetCentroid(){Initialize(); return centroid;}
-		Vector3r GetInertia(){Initialize(); return inertia;}
-		vector<int> GetSurfaceTriangulation(){Initialize(); return faceTri;}
+		Vector3r GetCentroid();
+		Vector3r GetInertia();
+		vector<int> GetSurfaceTriangulation();
 		vector<vector<int>> GetSurfaces() const;
 		void Initialize();
-		bool IsInitialized(){return init;}
-		std::vector<Vector3r> GetOriginalVertices();
-		Real GetVolume(){Initialize(); return volume;}
-		Quaternionr GetOri(){Initialize(); return orientation;}
-		Polyhedron GetPolyhedron(){return P;};
-		void Clear(){v.clear(); P.clear(); init = 0; size = Vector3r(1.,1.,1.); faceTri.clear();};
+		bool IsInitialized() const;
+		Real GetVolume();
+		Quaternionr GetOri();
+		Polyhedron GetPolyhedron() const;
+		void Clear();
 		void setVertices(const std::vector<Vector3r>& v);
 		void setVertices4(const Vector3r& v0, const Vector3r& v1,const Vector3r& v2,const Vector3r& v3);
 
-	protected:	
+	protected:
 		//triangulation of facets for plotting
 		vector<int> faceTri;
 		//centroid = (0,0,0) for random Polyhedra
@@ -91,7 +90,7 @@ class Polyhedra: public Shape{
 		//orientation, that provides diagonal inertia tensor
 		Quaternionr orientation;
 		void GenerateRandomGeometry();
-	
+
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Polyhedra,Shape,"Polyhedral (convex) geometry.",
 			((std::vector<Vector3r>,v,,,"Tetrahedron vertices in global coordinate system."))
 			((int,seed, time(NULL),,"Seed for random generator."))
@@ -165,12 +164,26 @@ REGISTER_SERIALIZABLE(Bo1_Polyhedra_Aabb);
 /*! Elastic material */
 class PolyhedraMat: public FrictMat{
 	public:
-		 Real GetStrength(){return strength;};
+		 Real GetStrength() const;
+		 Real GetStrengthTau() const;
+		 Real GetStrengthSigmaCZ() const;
+		 Real GetStrengthSigmaCD() const;
+		 int GetWeiM() const;
+		 Real GetWeiS0() const;
+		 Real GetWeiV0() const;
+		 Real GetP() const;
 	virtual ~PolyhedraMat(){};
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraMat,FrictMat,"Elastic material with Coulomb friction.",
 		((bool,IsSplitable,0,,"To be splitted ... or not"))
 		((Real,strength,100,,"Stress at which polyhedra of volume 4/3*pi [mm] breaks."))
-		((Real,young,1e8,,"TODO")),
+		((Real,strengthTau,-1,,"Tangential stress at which polyhedra of volume 4/3*pi [mm] breaks."))
+		((Real,sigmaCZ,-1,,"Mohr-Coulomb failure criterium SigmaCZ, Pa, maximal tensile strength (if negative - disabled), [Gladky2017]_"))
+		((Real,sigmaCD,-1,,"Mohr-Coulomb failure criterium SigmaCD, Pa,  maximal compressive strength (if negative - disabled), [Gladky2017]_"))
+		((int,Wei_m,-1,,"Weibull Formulation, Weibull modulus, m, (if negative - disabled), [Gladky2017]_"))
+		((Real,Wei_S0,-1,,"Weibull Formulation, Sigma0, Pa, (if negative - disabled), [Gladky2017]_"))
+		((Real,Wei_V0,1e-9,,"Weibull Formulation, V0, m^3, representative volume, [Gladky2017]_."))
+		((Real,Wei_P,-1,,"Weibull Formulation, failure  probability, P, [Gladky2017]_."))
+		((Real,young,1e8,,"Young modulus")),
 		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(PolyhedraMat,FrictMat);
@@ -184,7 +197,7 @@ class PolyhedraPhys: public FrictPhys{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraPhys,FrictPhys,"Simple elastic material with friction for volumetric constitutive laws",
 		/*attrs*/
 		,
-		/*ctor*/ createIndex();	
+		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(PolyhedraPhys,FrictPhys);
 };

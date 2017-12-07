@@ -12,11 +12,11 @@
 #include <Eigen/Core>
 #include <stdio.h>
 
-# ifdef YADE_MOSEK
+#ifdef YADE_MOSEK
 #include <mosek.h>
 #include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib>
+#include <string>
 #endif
 
 
@@ -33,28 +33,14 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 
 	public :
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-
-
-
 		Real evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial);
 		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
-
 		bool contactPtMosekF2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPt);
-
 		bool customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPt, bool warmstart);
-
-
 		Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial);
-
 		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
 
-
-
-
-
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PP_PP_ScGeom,IGeomFunctor,"EXPERIMENTAL. IGeom functor for PotentialParticle - PotentialParticle pair",
 			((Real, accuracyTol, pow(10,-7),, "accuracy desired, tolerance criteria for SOCP"))
@@ -64,10 +50,6 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 			//mosekTaskEnv = MSK_makeenv(&mosekEnv,NULL,NULL,NULL,NULL);
 			//mosekTaskEnv = MSK_initenv(mosekEnv);
 		);
-
-
-
-
 		FUNCTOR2D(PotentialParticle,PotentialParticle);
 		// needed for the dispatcher, even if it is symmetric
 		DEFINE_FUNCTOR_ORDER_2D(PotentialParticle,PotentialParticle);
@@ -76,7 +58,6 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 };
 
 REGISTER_SERIALIZABLE(Ig2_PP_PP_ScGeom);
-
 
 #ifdef __cplusplus
 extern "C" {

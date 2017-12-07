@@ -99,8 +99,11 @@ public:
 	int Max_id (void) {return maxId;}
 	
 	void	compute ();	//Calcule le centres de Voronoi pour chaque cellule
+	Point   setCircumCenter (const CellHandle& cell, bool force=0); 
+        Point	circumCenter (const Sphere& S0, const Sphere& S1, const Sphere& S2, const Sphere& S3);
 	Point	circumCenter (const CellHandle& cell);
-	Point 	setCircumCenter (const CellHandle& cell, bool force=0);
+        Point	circumCenter (const CellHandle& cell, const short facet, const double wExt, bool& violate, Sphere& SAlpha, CVector& normal);
+        Point	circumCenter (const CellHandle& cell, const short facet, const Sphere& sExt, bool& violate);
 	void	Invalidate () {computed=false;}  //Set the tesselation as "not computed" (computed=false), this will launch tesselation internaly when using functions like computeVolumes())
 	// N.B : compute() must be executed before the functions below are used
 	void	Clear(void);
@@ -122,9 +125,11 @@ public:
 	struct AlphaFace {unsigned int ids[3]; CVector normal;};
         struct AlphaCap {unsigned int id; CVector normal;};
 	void setAlphaFaces(std::vector<AlphaFace>& faces, double alpha=0);
-        std::vector<Vector3r> setExtendedAlphaCaps(std::vector<AlphaCap>& caps, double alpha=0);
+        void setExtendedAlphaCaps(std::vector<AlphaCap>& caps, double alpha, double shrinkedAlpha, bool fixedAlpha);
+        std::vector<Vector3r> getExtendedAlphaGraph(double alpha, double shrinkedAlpha, bool fixedAlpha);
 	CVector alphaVoronoiFaceArea (const Edge& ed_it, const AlphaShape& as, const RTriangulation& Tri);
         CVector alphaVoronoiPartialCapArea (const Edge& ed_it, const AlphaShape& as,std::vector<Vector3r>& vEdges);
+        CVector alphaVoronoiPartialCapArea (Facet facet, const AlphaShape& as, double shrinkedAlpha, std::vector<Vector3r>& vEdges);
 	std::vector<int> getAlphaVertices(double alpha=0);
 	
 // 	FiniteCellsIterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}

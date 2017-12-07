@@ -244,6 +244,17 @@ The following options are available:
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_. 
 
+.. warning:: To provide Qt4->Qt5 migration one needs to provide an additional option USE_QT5.
+ This option is ON by default but should be set according to the Qt version which was used
+ to compile libQGLViewer. On Debian/Ubuntu operating systems libQGLViewer
+ of version 2.6.3 and higher are compiled against Qt5 (for other operating systems
+ refer to the package archive of your distribution), so if you are using
+ such version, please switch this option ON. Otherwise, if you mix Qt-versions a
+ ``Segmentation fault`` will appear just after Yade is started. To provide
+ necessary build dependencies for Qt5, install ``python-pyqt5 pyqt5-dev-tools``
+ instead of ``python-qt4 pyqt4-dev-tools``.
+
+
 If cmake finishes without errors, you will see all enabled 
 and disabled options at the end. Then start the actual compilation process with::
 

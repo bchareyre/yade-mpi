@@ -348,7 +348,7 @@ Real get_en_from_cn(const Real& cn, const Real& m, const Real& kn){
 
 
 #ifdef YADE_DEFORM
-
+// The reference paper [Haustein2017]
 // functor with Raji1999 Eq. 2.52
 template <class T>
 struct fkt_functor
