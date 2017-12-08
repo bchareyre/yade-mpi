@@ -14,7 +14,7 @@
 //it will save compilation time for everyone else
 //when you want it compiled, you can pass -DDFNFLOW to cmake, or just uncomment the following line
 
-// #define DFNFLOW
+//#define DFNFLOW
 
 #ifdef DFNFLOW
 #include "FlowEngine_DFNFlowEngineT.hpp"
@@ -25,7 +25,7 @@ class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 	Real anotherVariable;
 	bool crack;
 	Real crackArea;
-	DFNCellInfo() : crack(false)  {} /// enable to visualize cracked cells in Paraview
+//	DFNCellInfo() : crack(false)  {} /// enable to visualize cracked cells in Paraview
 //	DFNCellInfo() : crack(false), crackArea(0) {}
 // 	void anotherFunction() {};
 	std::vector<int> faceBreakCount;
@@ -319,7 +319,7 @@ void DFNFlowEngine::trickPermeability(Solver* flow)
 					residualAperture = jointResidualAperture;
 					edgeOnJoint = true; 
 				}else{ 
-					residualAperture = inducedResidualAperture;					
+					residualAperture = inducedCracksResidualAperture;					
 					edgeOnJoint = false;
 				}
 				/// for injection slot (different from pre-existing fractures if needed)
