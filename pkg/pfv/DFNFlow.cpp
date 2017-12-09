@@ -285,7 +285,7 @@ void DFNFlowEngine::trickPermeability(RTriangulation::Finite_edges_iterator& edg
 void DFNFlowEngine::trickPermeability(Solver* flow)
 {
 	leakOffRate = 0;	
-	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+	const RTriangulation& Tri = flow->T[solver->currentTes].Triangulation();
 	if (!first) interpolateCrack(solver->T[solver->currentTes], flow->T[flow->currentTes]);
 	const JCFpmPhys* jcfpmphys;
 	const shared_ptr<InteractionContainer> interactions = scene->interactions;
