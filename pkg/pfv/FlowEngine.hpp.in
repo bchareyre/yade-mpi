@@ -73,7 +73,6 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		int retriangulationLastIter;
 		enum {wall_xmin, wall_xmax, wall_ymin, wall_ymax, wall_zmin, wall_zmax};
 		Vector3r normal [6];
-		bool currentTes;
 		bool metisForced;
 		double epsVolCumulative;
 		int ReTrg;

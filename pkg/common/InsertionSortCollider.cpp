@@ -489,10 +489,10 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		Real lmin = (minima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
 		Real lmax = (maxima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
 		Real shiftedMin = (minima[3*id1+axis]-maxima[3*id1+axis])*invSizes[axis]+1.;
-		if((lmax-lmin)>1 || shiftedMin<0){
+		if((lmax-lmin)>0.5 || shiftedMin<0){
 			if (allowBiggerThanPeriod) {periods[axis]=0; continue;}
 			else {
-				LOG_FATAL("Body #"<<((lmax-lmin)>1?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
+				LOG_FATAL("Body #"<<((lmax-lmin)>0.5?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
 				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
 		}
 		int period1 = floor(lmax); 
