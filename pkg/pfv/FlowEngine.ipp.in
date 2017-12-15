@@ -123,11 +123,21 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if (updateTriangulation || ((meshUpdateInterval>0  && ellapsedIter>(0.5*meshUpdateInterval)) && backgroundCompleted)) {
 			if (debug) cerr<<"switch flow solver"<<endl;
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
-			if (fluidBulkModulus>0 || doInterpolate) solver->interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
-			solver=backgroundSolver;
+			if(!fluxChanged){
+				if (fluidBulkModulus>0 || doInterpolate) solver->interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
+				
+				
+
+			//Copy imposed pressures/flow from the old solver
+				backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
+				backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
+				solver=backgroundSolver;
+			} else {
+				fluxChanged=false;
+			}
+			
 			backgroundSolver = shared_ptr<FlowSolver> (new FlowSolver);
 			if (metisForced) {backgroundSolver->eSolver.cholmod().nmethods=1; backgroundSolver->eSolver.cholmod().method[0].ordering=CHOLMOD_METIS;}
-			//Copy imposed pressures/flow from the old solver
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
 			backgroundSolver->imposedF = vector<pair<CGT::Point,Real> >(solver->imposedF);
 			if (debug) cerr<<"switched"<<endl;
@@ -205,6 +215,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if (cell==solver->IPCells[kk]) cerr<<"Both flux and pressure are imposed in the same cell."<<endl;
 		else if  (cell->info().Pcondition) cerr<<"Imposed flux fall in a pressure boundary condition."<<endl;}
 	solver->IFCells.push_back(cell);
+	fluxChanged=true;
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::clearImposedPressure () { solver->imposedP.clear(); solver->IPCells.clear();}
@@ -294,13 +305,13 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
         flow.computePermeability();
 	//This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
-	trickPermeability(&flow);
+	
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
         boundaryConditions ( flow );
         flow.initializePressure ( pZero );
 	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (https://bugs.launchpad.net/yade/+bug/1687355)
-	
+	trickPermeability(&flow);
         if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate)) flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
         if ( waveAction ) flow.applySinusoidalPressure ( flow.tesselation().Triangulation(), sineMagnitude, sineAverage, 30 );
 	else if (boundaryPressure.size()!=0) flow.applyUserDefinedPressure ( flow.tesselation().Triangulation(), boundaryXPos , boundaryPressure);
