@@ -482,8 +482,6 @@ py::tuple Shop::getStressProfile_contact(Real volume, int nCell, Real dz, Real z
 	Real maxPosZ=0.;
 	Scene* scene=Omega::instance().getScene().get();
 	vector<Matrix3r> stressTensorProfile(nCell,Matrix3r::Zero());
-	vector<Matrix3r> kineticStressTensorProfile(nCell,Matrix3r::Zero());
-	vector<Real> granularTemperatureProfile(nCell,0.0);
 	vector<Real> numPart(nCell,0.0);
 
 	const bool isPeriodic = scene->isPeriodic;
@@ -558,7 +556,7 @@ py::tuple Shop::getStressProfile_contact(Real volume, int nCell, Real dz, Real z
 			}
 		}
 	}
-	return py::make_tuple(stressTensorProfile,kineticStressTensorProfile,granularTemperatureProfile);
+	return py::make_tuple(stressTensorProfile);
 }
 
 py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy, int dir){

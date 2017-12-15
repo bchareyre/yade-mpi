@@ -510,7 +510,7 @@ void HydroForceEngine::fluidResolution(double tfin,double dt)
 	  c[j] = - an;
 
 	  // RHS: unsteady, gravity, drag, pressure gradient, lateral wall friction
-	  s[j]= alphafp*ufn[j] + alphafp*std::abs(gravity[0])*dt + dt*taufsi[j]*vxPart[j] - alphafp*dpdx/densFluid*dt - (1.-imp)*dt*alphafp*2./channelWidth*0.125*wallFriction[j]*ufn[j];
+	  s[j]= alphafp*ufn[j] + alphafp*std::abs(gravity[0])*dt + dt*taufsi[j]*vxPart[j] - alphafp*dpdx/densFluid*dt - (1.-imp)*dt*alphafp*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j],2);
         }
       // Implicit solution using tridiag (useful because of potential very high viscosities) 
       doubleq( a, b , c, s , ufnp);
@@ -691,7 +691,7 @@ void HydroForceEngine::calWallFriction(vector<Real> ufn,Real channelWidth,double
    maxiter = 100;	//Maximum number iteration for the resolution
    epsilon = 1e-3;	//Tolerance for the equation resolution
    for (j=0;j<=nCell-1;j++){
-        Re = max(1e-10,ufn[j]*channelWidth/viscof);
+        Re = max(1e-10,fabs(ufn[j])*channelWidth/viscof);
   	ffold=pow(0.32,-2);	//Initial guess of the friction factor
      	delta=1e10;	//Initialize at a random value greater than epsilon
 	q=0;

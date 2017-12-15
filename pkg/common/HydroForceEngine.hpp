@@ -42,7 +42,7 @@ class HydroForceEngine: public PartialEngine{
 		((int,irheolf,0,,"Fluid resolution: effective fluid viscosity option: 0: pure fluid viscosity, 1: Einstein viscosity. "))
 		((int,iturbu,1,,"Fluid resolution: activate the turbulence resolution, 1, or not, 0"))
 		((int,ilm,2,,"Fluid resolution: type of mixing length resolution applied: 0: classical Prandtl mixing length, 1: Prandtl mixing length with free-surface effects, 2: Damp turbulence accounting for the presence of particles [Li1995]_, see [RevilBaudard2013]_ for more details."))
-		((int,iusl,1,,"Fluid resolution: option to set the boundary condition at the top of the fluid, 0:  Dirichlet ($u=0$ en $z=h$) fixed, 1: Neumann   ($du/dz=0$ en $z=h$) free-surface."))
+		((int,iusl,1,,"Fluid resolution: option to set the boundary condition at the top of the fluid, 0:  Dirichlet, fixed ($u=0$ en $z=h$), 1: Neumann, free-surface   ($du/dz=0$ en $z=h$)."))
 		((Real,kappa,0.41,,"Fluid resolution: Von Karman constant. Can be tuned to account for the effect of particles on the fluid turbulence, see e.g. [RevilBaudard2015]_"))
 		((int,viscousSubLayer,0,,"Fluid resolution: solve the viscous sublayer close to the bottom boundary if set to 1"))
 		((bool,fluidWallFriction,false,,"Fluid resolution: if set to true, introduce a sink term to account for the fluid friction at the wall, see [Maurin2015]_ for details. Requires to set the width of the channel. It might slow down significantly the calculation."))
