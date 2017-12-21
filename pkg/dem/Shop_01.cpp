@@ -150,7 +150,7 @@ Real Shop::kineticEnergy(Scene* _scene, Body::id_t* maxId){
 	Real maxE=0; if(maxId) *maxId=Body::ID_NONE;
 	Vector3r spin = scene->cell->getSpin();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-		if(!b || !b->isDynamic()) continue;
+		if(!b || !b->isDynamic() || b->isClumpMember()) continue;
 		const State* state(b->state.get());
 		// ½(mv²+ωIω)
 		Real E=0;
