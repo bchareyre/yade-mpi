@@ -1476,7 +1476,7 @@ Paraview is based on the `Visualization Toolkit <http://www.vtk.org>`_, which de
 * :yref:`fileName<VTKRecorder.fileName>` is the prefix for files being saved. In this case, output files will be named ``/tmp/p1-spheres.0.vtu`` and ``/tmp/p1-facets.0.vtu``, where the number is the number of iteration; many files are created, putting them in a separate directory is advisable.
 * :yref:`recorders<VTKRecorder.recorders>` determines what data to save
 
-:yref:`yade.exporter.VTKExporter` plays a similar role, with the difference that it is more flexible. It will save any user defined variable associated to the bodies.  
+:yref:`yade.export.VTKExporter` plays a similar role, with the difference that it is more flexible. It will save any user defined variable associated to the bodies.
 
 Loading data into Paraview
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1521,7 +1521,7 @@ Another opportunity to display spheres is an using *PointSprite* plugin. This te
 Rendering interactions as force chain
 """""""""""""""""""""""""""""""""""""""""""
 
-Data saved by ``VTKRecorder`` (the steps below generates cones rahter than tubes) or ``export.VTKExporter(...).exportInteractions(what=[('forceN','i.phys.normalForce().norm()')])`` (the steps below generates per interaction tubes with constant radius):
+Data saved by ``VTKRecorder`` (the steps below generates cones rather than tubes) or ``export.VTKExporter(...).exportInteractions(what=[('forceN','i.phys.normalForce().norm()')])`` (the steps below generates per interaction tubes with constant radius):
 
 * Load interactions VTP or VTK files
 * Filters -> Cell Data To Point Data

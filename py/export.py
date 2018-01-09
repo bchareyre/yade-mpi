@@ -404,7 +404,7 @@ class VTKExporter:
 		"""exports spheres (positions and radius) and defined properties.
 		
 		:param [int]|"all" ids: if "all", then export all spheres, otherwise only spheres from integer list
-		:param [tuple(2)] what: what other than then position and radius export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
+		:param [tuple(2)] what: which additional quantities (other than the position and the radius) to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		:param bool useRef: if False (default), use current position of the spheres for export, use reference position otherwise
@@ -581,8 +581,8 @@ class VTKExporter:
 		"""exports interactions and defined properties.
 		
 		:param [(int,int)]|"all" ids: if "all", then export all interactions, otherwise only interactions from (int,int) list
-		:param [tuple(2)] what: what to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the interactions are labeled as i in this function. Scalar, vector and tensor variables are supported. For example, to export stiffness difference from certain value (1e9) (named as dStiff) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
-		:param [tuple(2|3)] verticesWhat: what to export on connected bodies. Bodies are labeled as 'b' (or 'b1' and 'b2' if you need treat both bodies differently)
+		:param [tuple(2)] what: what to export. parameter is a list of (name,command) pair. Name is string under which it is saved to vtk, command is string to evaluate. Note that the interactions are labeled as i in this function. Scalar, vector and tensor variables are supported. For example, to export the stiffness difference (named as dStiff) from a certain value (1e9) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
+		:param [tuple(2|3)] verticesWhat: what to export on connected bodies. Bodies are labeled as 'b' (or 'b1' and 'b2' if you need to treat both bodies differently)
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
 		"""
@@ -695,10 +695,10 @@ class VTKExporter:
 		self.intrsSnapCount += 1
 
 	def exportContactPoints(self,ids='all',what=[],useRef={},comment="comment",numLabel=None):
-		"""exports constact points and defined properties.
+		"""exports contact points (CPs) and defined properties.
 		
 		:param [(int,int)] ids: see exportInteractions
-		:param [tuple(2)] what: what to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the CPs are labeled as i in this function (sccording to their interaction). Scalar, vector and tensor variables are supported. For example, to export stiffness difference from certain value (1e9) (named as dStiff) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
+		:param [tuple(2)] what: what to export. parameter is list of couple (name,command). Name is string under which it is saved to vtk, command is string to evaluate. Note that the CPs are labeled as i in this function (according to their interaction). Scalar, vector and tensor variables are supported. For example, to export the stiffness difference (named as dStiff) from a certain value (1e9) you should write: ... what=[('dStiff','i.phys.kn-1e9'), ...
 		:param {Interaction:Vector3} useRef: if not specified, current position used. Otherwise use position from dict using interactions as keys. Interactions not in dict are not exported
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
@@ -765,7 +765,7 @@ class VTKExporter:
 		self.contactPointsSnapCount += 1
 
 	def exportPeriodicCell(self,comment="comment",numLabel=None):
-		"""exports spheres (positions and radius) and defined properties.
+		"""exports the Cell geometry for periodic simulations.
 		
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
@@ -799,7 +799,7 @@ class VTKExporter:
 		
 		:param ids: if "all", then export all polyhedrons, otherwise only polyhedrons from integer list
 		:type ids: [int] | "all"
-		:param what: what other than then position to export. parameter is list of couple (name,command). Name is string under which it is save to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (with name particleVelocity) and the distance form point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
+		:param what: which additional quantities (in addition to the positions) to export. parameter is list of couple (name,command). Name is string under which it is saved to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (named as particleVelocity) and the distance from point (0,0,0) (named as dist) you should write: ... what=[('particleVelocity','b.state.vel'),('dist','b.state.pos.norm()', ...
 		:type what: [tuple(2)]
 		:param string comment: comment to add to vtk file
 		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
