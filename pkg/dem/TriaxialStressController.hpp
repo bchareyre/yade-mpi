@@ -136,9 +136,9 @@ class TriaxialStressController : public BoundaryController
 		,
 		.def_readonly("strain",&TriaxialStressController::strain,"Current strain in a vector (exx,eyy,ezz). The values reflect true (logarithmic) strain.")
 		.def_readonly("strainRate",&TriaxialStressController::getStrainRate,"Current strain rate in a vector d/dt(exx,eyy,ezz).")
-		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing. |yupdate|")
+		.def_readonly("porosity",&TriaxialStressController::porosity,"Porosity of the packing, computed from :yref:`particlesVolume<TriaxialStressController::particlesVolume>` and :yref:`boxVolume<TriaxialStressController::boxVolume>`. |yupdate|")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"Total packing volume.")
-		.def_readonly("particlesVolume",&TriaxialStressController::particlesVolume,"Total volume of particles (clumps and spheres). |ycomp|")
+		.def_readonly("particlesVolume",&TriaxialStressController::particlesVolume,"Total volume of particles (clumps and :yref:`dynamic<Body::dynamic>` spheres). |ycomp|")
 		.def_readonly("spheresVolume",&TriaxialStressController::particlesVolume,"Shorthand for :yref:`TriaxialStressController::particlesVolume`")
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
 		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"see :yref:`TriaxialStressController::max_vel` |ycomp|")
