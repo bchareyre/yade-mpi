@@ -107,7 +107,7 @@ class Polyhedra: public Shape{
 			.def("GetSurfaceTriangulation",&Polyhedra::GetSurfaceTriangulation,"triangulation of facets (for plotting)")
 			.def("GetSurfaces",&Polyhedra::GetSurfaces,"get indices of surfaces' vertices (for postprocessing)")
 			.def("setVertices",&Polyhedra::setVertices,"set vertices and update receiver. Takes a list/tuple of vertices as argument.\n\n.. note:: Causes memory leaks, so if you want to use it maaaany times, use one of setVertices mentioned lower, passing each vertex as individual argument (currently only setVertices(v1,v2,v3,v4) for tetrahedron is implemented, on request it is easy to implement more vertices).")
-			.def("setVertices",&Polyhedra::setVertices4,"set 4 vertices and update receiver. Each vertex is single argument.")
+			.def("setVertices4",&Polyhedra::setVertices4,"set 4 vertices and update receiver. Each vertex is single argument.")
 		);
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };
