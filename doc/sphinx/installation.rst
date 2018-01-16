@@ -24,8 +24,8 @@ To install the daily-version you need to add the repository to your
 	sudo apt-get update
 	sudo apt-get install yadedaily
 
-If you have another distribution, not Ubuntu Trusty (Version 14.04 LTS), be sure to use the
-correct name in the first line (for instance, xenial, stretch or jessie). For the list
+Be sure to use the
+correct name of your Ubuntu/Debian distribution in the first line (xenial for Ubuntu 16.04 LTS, whereas stretch would be required for Debian 9, for instance). For the list
 of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
 
 After that you can normally start Yade using the command ``yadedaily`` or ``yadedaily-batch``.
