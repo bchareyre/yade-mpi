@@ -814,7 +814,7 @@ Convenience features
 
 Labeling things
 ----------------
-Engines and functors can define that ``label`` attribute. Whenever the ``O.engines`` sequence is modified, python variables of those names are created/update; since it happens in the ``__builtins__`` namespaces, these names are immediately accessible from anywhere. This was used in :ref:`creating-interactions` to change interaction radius in multiple functors at once.
+Engines and functors can define that ``label`` attribute. Whenever the ``O.engines`` sequence is modified, python variables of those names are created/updated; since it happens in the ``__builtins__`` namespaces, these names are immediately accessible from anywhere. This was used in :ref:`creating-interactions` to change interaction radius in multiple functors at once.
 
 .. warning:: Make sure you do not use label that will overwrite (or shadow) an object that you already use under that variable name. Take care not to use syntactically wrong names, such as "er*452" or "my engine"; only variable names permissible in Python can be used.
 
