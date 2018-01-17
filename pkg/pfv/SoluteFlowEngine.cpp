@@ -33,23 +33,28 @@ class SoluteFlowEngine : public SoluteFlowEngineT
 {
 	public :
 		void initializeSoluteTransport();
-		void soluteTransport (double deltatime, double D);
+		void soluteTransport ();
 		double getConcentration(unsigned int id){return solver->T[solver->currentTes].cellHandles[id]->info().solute();	}
 		double insertConcentration(unsigned int id,double conc){
 			solver->T[solver->currentTes].cellHandles[id]->info().solute() = conc;
 			return conc;}
 		void soluteBC(unsigned int bc_id1, unsigned int bc_id2, double bc_concentration1, double bc_concentration2,unsigned int s);
 		double getConcentrationPlane (double Yobs,double Yr, int xyz);
+                double getAverageConcentration();
 		///Elaborate the description as you wish
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(SoluteFlowEngine,SoluteFlowEngineT,"A variant of :yref:`FlowEngine` with solute transport).",
 		///No additional variable yet, else input here
 // 		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
+                ((double,DiffusionCoefficient,0,,"Diffusion coefficient for molecular diffusion"))
 		,,,
-		.def("soluteTransport",&SoluteFlowEngine::soluteTransport,(boost::python::arg("deltatime"),boost::python::arg("D")),"Solute transport (advection and diffusion) engine for diffusion use a diffusion coefficient (D) other than 0.")
+		.def("soluteTransport",&SoluteFlowEngine::soluteTransport,"Solute transport (advection and diffusion) engine for diffusion use a diffusion coefficient (D) other than 0.")
 		.def("getConcentration",&SoluteFlowEngine::getConcentration,(boost::python::arg("id")),"get concentration of pore with ID")
 		.def("insertConcentration",&SoluteFlowEngine::insertConcentration,(boost::python::arg("id"),boost::python::arg("conc")),"Insert Concentration (ID, Concentration)")
 		.def("solute_BC",&SoluteFlowEngine::soluteBC,(boost::python::arg("bc_id1"),boost::python::arg("bc_id2"),boost::python::arg("bc_concentration1"),boost::python::arg("bc_concentration2"),boost::python::arg("s")),"Enter X,Y,Z for concentration observation'.")
-		//I guess there is getConcentrationPlane missing here, but it is not on github
+                .def("initializeSoluteTransport",&SoluteFlowEngine::initializeSoluteTransport,"Initialize Solute Transport")
+                .def("getConcentrationPlane",&SoluteFlowEngine::getConcentrationPlane,(boost::python::arg("Yobs"),boost::python::arg("Yr"),boost::python::arg("xyz")),"get concentration of pore with ID")
+                .def("getAverageConcentration",&SoluteFlowEngine::getAverageConcentration,"The the volume averaged concentration")
+
 		)
 };
 REGISTER_SERIALIZABLE(SoluteFlowEngine);
@@ -59,93 +64,90 @@ REGISTER_SERIALIZABLE(SoluteFlowEngine);
 
 void SoluteFlowEngine::initializeSoluteTransport ()
 {
-	//Prepare a list with concentrations in range of 0,nCells. Or resets the list of concentrations to 0
-// 	typedef typename Solver::element_type Flow;
-// 	typedef typename Flow::Finite_vertices_iterator Finite_vertices_iterator;
-// 	typedef typename Solver::element_type Flow;
-
-	FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles)
-	{
+    FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles)
+    {
 	 cell->info().solute() = 0.0;
-	}
+    }
 }
 
-void SoluteFlowEngine::soluteTransport (double deltatime, double D)
-{
+
+void SoluteFlowEngine::soluteTransport ()
+{       
+        double deltatime = scene->dt;
 	//soluteTransport is a function to solve transport of solutes for advection (+diffusion).
 	//Call this function with a pyRunner in the python script, implement a diffusion coefficient and a dt.
-	//  Optimalization has to be done such that the coefficient matrix is not solved for each time step,only after triangulation.
-	//  Extensive testing has to be done to check its ability to simulate a deforming porous media.
-	double coeff = 0.00;
+	//Optimalization has to be done such that the coefficient matrix is not solved for each time step,only after triangulation.
+	//Extensive testing has to be done to check its ability to simulate a deforming porous media.
+	double coeff = 0.00;    //Ratio of dt and void volume   
 	double coeff1 = 0.00;	//Coefficient for off-diagonal element
-	double coeff2 = 0.00;  //Coefficient for diagonal element
+	double coeff2 = 0.00;   //Coefficient for diagonal element
 	double qin = 0.00;	//Flux into the pore per pore throat 
 	double Qout=0.0;	//Total Flux out of the pore
-	int ncells = 0;		//Number of cells
-	int ID = 0;
-	//double D = 0.0;
+        double dt = 1e9;
 	double invdistance = 0.0;	//Fluid facet area divided by pore throat length for each pore throat
-	double invdistancelocal = 0.0; //Sum of invdistance
-	ncells=solver->T[solver->currentTes].cellHandles.size();
+	double invdistancelocal = 0.0;  //Sum of invdistance
 	
+	
+	//Set vectors & matrix
+	int ncells=solver->T[solver->currentTes].cellHandles.size();
 	Eigen::SparseMatrix<double, Eigen::ColMajor> Aconc(ncells,ncells);
 	typedef Eigen::Triplet<double> ETriplet2;
 	std::vector<ETriplet2> tripletList2;
 	Eigen::SparseLU<Eigen::SparseMatrix<double,Eigen::ColMajor>,Eigen::COLAMDOrdering<int> > eSolver2;	
-
 	// Prepare (copy) concentration vector
 	Eigen::VectorXd eb2(ncells); Eigen::VectorXd ex2(ncells);
 	FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles){
 	  eb2[cell->info().id]=cell->info().solute();
 	}
-		
+	
+	
+	
 	// Fill coefficient matrix
 	FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles){
-	cell->info().invVoidVolume() = 1 / ( std::abs(cell->info().volume()) - std::abs(solver->volumeSolidPore(cell) ) );
-	invdistance=0.0;
-	
-
-	unsigned int i=cell->info().id;
-	for (unsigned int ngb=0;ngb<4;ngb++){
-	  CGT::Point& p2 = cell ->neighbor(ngb)->info();
-	  CGT::Point& p1 = cell->info();
-	  CGT::CVector l = p1-p2;
-	  CGT::Real fluidSurf = sqrt(cell->info().facetSurfaces[ngb].squared_length())*cell->info().facetFluidSurfacesRatio[ngb];
-	  invdistancelocal = (fluidSurf/sqrt(l.squared_length()));
-	  invdistance+=(fluidSurf/sqrt(l.squared_length()));
-	  coeff = deltatime*cell->info().invVoidVolume();
-	      ID = cell->neighbor(ngb)->info().id;
-		 qin=std::abs(cell->info().kNorm() [ngb])* ( cell->neighbor ( ngb )->info().p()-cell->info().p());
-		 Qout=Qout+max(qin,0.0);
-		 coeff1=-1*coeff*(std::abs(max(qin,0.0))-(D*invdistancelocal));
-		 if (coeff1 != 0.0){
-		 tripletList2.push_back(ETriplet2(i,ID,coeff1));
-		 }
-	 
-	}
-	coeff2=1.0+(coeff*std::abs(Qout))+(coeff*D*invdistance);
-	tripletList2.push_back(ETriplet2(i,i,coeff2));
-	Qout=0.0;
+                cell->info().invVoidVolume() = 1.0 / ( std::abs(cell->info().volume()) - std::abs(solver->volumeSolidPore(cell) ) );    
+                for (unsigned int ngb=0;ngb<4;ngb++){
+                    CGT::Point& p2 = cell ->neighbor(ngb)->info();
+                    CGT::Point& p1 = cell->info();
+                    CGT::CVector l = p1-p2;
+                    CGT::Real fluidSurf = sqrt(cell->info().facetSurfaces[ngb].squared_length())*cell->info().facetFluidSurfacesRatio[ngb];
+                    invdistancelocal = (fluidSurf/sqrt(l.squared_length()));
+                    invdistance+=(fluidSurf/sqrt(l.squared_length()));
+                    coeff = deltatime*cell->info().invVoidVolume();
+                    
+                    qin=std::abs(cell->info().kNorm() [ngb])* ( cell->neighbor ( ngb )->info().p()-cell->info().p());
+                    dt = std::min(( std::abs(cell->info().volume()) - std::abs(solver->volumeSolidPore(cell) ) )/ std::abs(qin), dt);
+                    Qout=Qout+qin; //max(qin,0.0);
+                    
+                    coeff1=-1*coeff*(qin+DiffusionCoefficient*invdistancelocal); //(std::abs(max(qin,0.0))-(DiffusionCoefficient*invdistancelocal));       //off-diagonal
+                    
+                    if (coeff1 != 0.0){
+                          tripletList2.push_back(ETriplet2(cell->info().id, cell->neighbor(ngb)->info().id,coeff1));
+                    }
+                }
+                coeff2=1.0+(coeff*Qout)+(coeff*DiffusionCoefficient*invdistance); //diagonal
+                tripletList2.push_back(ETriplet2(cell->info().id,cell->info().id,coeff2));
+                Qout=0.0;
+                invdistancelocal = 0.0;
+                invdistance = 0.0;
 	}   
-	    //Solve Matrix
-	    Aconc.setFromTriplets(tripletList2.begin(), tripletList2.end());
-	    //if (eSolver2.signDeterminant() < 1){cerr << "determinant is negative!!!!!!! " << eSolver2.signDeterminant()<<endl;}
-	    //eSolver2.setPivotThreshold(10e-8);
-	    eSolver2.analyzePattern(Aconc); 						
-	    eSolver2.factorize(Aconc); 						
-	    eSolver2.compute(Aconc);
-	    ex2 = eSolver2.solve(eb2);
+	
+        //Solve Matrix
+	Aconc.setFromTriplets(tripletList2.begin(), tripletList2.end());
+	//if (eSolver2.signDeterminant() < 1){cerr << "determinant is negative!!!!!!! " << eSolver2.signDeterminant()<<endl;}
+	//eSolver2.setPivotThreshold(10e-8);
+        eSolver2.analyzePattern(Aconc); 						
+        eSolver2.factorize(Aconc); 		
+        eSolver2.compute(Aconc);
+        ex2 = eSolver2.solve(eb2);
+
 	    
-	    
-	    double averageConc = 0.0;
-	    FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles){
-	    averageConc+=cell->info().solute();}
-	    
-	    //Copy data to concentration array
-	    FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles){
+        //Copy data to concentration array
+
+        FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles){
 		cell->info().solute()= ex2[cell->info().id];
-	    }
-	    tripletList2.clear();
+        }
+        tripletList2.clear();
+        if(dt != 1e9){scene->dt = dt;}
 	    
   }
 
@@ -174,19 +176,37 @@ double SoluteFlowEngine::getConcentrationPlane (double Yobs,double Yr, int xyz)
 	double concentration=0.0;
 	//Find cells within designated volume
 
-	 FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles)
+	FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles)
 	{
-	CGT::Point& p1 = cell->info();
-	if (std::abs(p1[xyz]) < std::abs(std::abs(Yobs) + std::abs(Yr))){
-	  if(std::abs(p1[xyz]) > std::abs(std::abs(Yobs) - std::abs(Yr))){
-	    sumConcentration += cell->info().solute()*(1-(std::abs(p1[xyz])-std::abs(Yobs))/std::abs(Yr));
-	    sumFraction += (1-(std::abs(p1[xyz])-std::abs(Yobs))/std::abs(Yr));
+            CGT::Point& p1 = cell->info();
+            if (std::abs(p1[xyz]) < std::abs(std::abs(Yobs) + std::abs(Yr))){
+                if(std::abs(p1[xyz]) > std::abs(std::abs(Yobs) - std::abs(Yr))){
+                    sumConcentration += cell->info().solute()*(1-(std::abs(p1[xyz])-std::abs(Yobs))/std::abs(Yr));
+                    sumFraction += (1-(std::abs(p1[xyz])-std::abs(Yobs))/std::abs(Yr));
+                }
+            }
 	}
-	}
-	}
-      concentration = sumConcentration / sumFraction;
-      return concentration;
+        concentration = sumConcentration / sumFraction;
+        return concentration;
 }
+
+
+double SoluteFlowEngine::getAverageConcentration()
+{
+        //Get volume-averaged concentration
+        double summConc = 0.0, summVol = 0.0;
+	FOREACH(CellHandle& cell, solver->T[solver->currentTes].cellHandles)
+	{
+            if(!cell->info().isFictious){
+                summConc += cell->info().solute() * (std::abs(cell->info().volume()) - std::abs(solver->volumeSolidPore(cell) ));
+                summVol += (std::abs(cell->info().volume()) - std::abs(solver->volumeSolidPore(cell) ));
+            }
+	}
+	return(summConc / summVol);
+}
+
+
+
 
 YADE_PLUGIN ( ( SoluteFlowEngine ) );
 
