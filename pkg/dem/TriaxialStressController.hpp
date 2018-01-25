@@ -106,7 +106,7 @@ class TriaxialStressController : public BoundaryController
 		((Real,goal1,0,,"prescribed stress/strain rate on axis 1, as defined by :yref:`TriaxialStressController::stressMask`"))
 		((Real,goal2,0,,"prescribed stress/strain rate on axis 2, as defined by :yref:`TriaxialStressController::stressMask`"))
 		((Real,goal3,0,,"prescribed stress/strain rate on axis 3, as defined by :yref:`TriaxialStressController::stressMask`"))
-		((unsigned int,stressMask,7,,"Bitmask determining wether the imposed :yref:`TriaxialStressController::goal`s are stresses (0 for none, 7 for all, 1 for direction 1, 5 for directions 1 and 3, etc."))
+		((unsigned int,stressMask,7,,"Bitmask determining wether the imposed :yref:`goal<TriaxialStressController::goal1>` values are stresses (0 for none, 7 for all, 1 for direction 1, 5 for directions 1 and 3, etc.) or strain rates"))
 		((Real,maxMultiplier,1.001,,"max multiplier of diameters during internal compaction (initial fast increase - :yref:`TriaxialStressController::finalMaxMultiplier` is used in a second stage)"))
 		((Real,finalMaxMultiplier,1.00001,,"max multiplier of diameters during internal compaction (secondary precise adjustment - :yref:`TriaxialStressController::maxMultiplier` is used in the initial stage)"))
 		((Real,max_vel,1,,"Maximum allowed walls velocity [m/s]. This value superseeds the one assigned by the stress controller if the later is higher. max_vel can be set to infinity in many cases, but sometimes helps stabilizing packings. Based on this value, different maxima are computed for each axis based on the dimensions of the sample, so that if each boundary moves at its maximum velocity, the strain rate will be isotropic (see e.g. :yref:`TriaxialStressController::max_vel1`)."))
