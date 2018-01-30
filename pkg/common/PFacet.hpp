@@ -45,7 +45,7 @@ class Ig2_Sphere_PFacet_ScGridCoGeom: public Ig2_Sphere_GridConnection_ScGridCoG
 					const Vector3r& shift2,
 					const bool& force,
 					const shared_ptr<Interaction>& c);
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_PFacet_ScGridCoGeom,Ig2_Sphere_GridConnection_ScGridCoGeom,"Create/update a :yref:`ScPFaceCoGeom` instance representing intersection of :yref:`Facet` and :yref:`Sphere`.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_PFacet_ScGridCoGeom,Ig2_Sphere_GridConnection_ScGridCoGeom,"Create/update a :yref:`ScGridCoGeom` instance representing intersection of :yref:`PFacet` and :yref:`Sphere`.",
 		((Real,shrinkFactor,((void)"no shrinking",0),,"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multipled by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
 	);
 	DECLARE_LOGGER;
