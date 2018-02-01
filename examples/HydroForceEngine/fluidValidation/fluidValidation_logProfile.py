@@ -30,7 +30,7 @@ kinematicViscoFluid = 1e-6	#Kinematic fluid viscosity, m^2/s, water
 tfin = 1e3		#Total simulated time, in s
 dtFluid = 2e-1		#Resolution time step, in s
 #Mesh
-ndimz = 75000   #Number of grid cells in the height. Needs to be high in order to solve accurately the viscous sublayer
+ndimz = 10000   #Number of grid cells in the height. Needs to be high in order to solve accurately the viscous sublayer
 dz =  fluidHeight/(1.0*(ndimz-1))	#spatial step between two mesh nodes
 
 # Initialization of the fluid velocity
