@@ -773,8 +773,16 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		//We grow only spheres and clumps 
 		if(b->isClump() or sphereIdx == b->shape->getClassIndex()){			
 			if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
-			// for clumps we updated inertia, nothing else to do
-			if (b->isClump()) continue;
+			if (b->isClump())  {
+				//update local Se3 of each clump member
+				//FIXME: the velocity of clump members is invalid after a growth since the growth is not reflected (see Clump::moveMembers)
+				// for clumps we updated inertia, nothing else to do
+				FOREACH(Clump::MemberMap::value_type& B, YADE_PTR_CAST<Clump>(b->shape)->members){
+					// B.first is Body::id_t, B.second is local Se3r of that body in the clump
+					B.second.position *= multiplier;}
+				// for clumps we are done
+				continue;
+			}
 			// for spheres, we update radius
 			(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
 			// and if they are clump members,clump volume variation with homothetic displacement of all members

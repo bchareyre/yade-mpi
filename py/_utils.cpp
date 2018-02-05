@@ -505,7 +505,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("calm",Shop__calm,(py::arg("mask")=-1),"Set translational and rotational velocities of bodies to zero. Applied to all bodies by default. To calm only some bodies, use mask parameter, it will calm only bodies with groupMask compatible to given value");
 	py::def("setNewVerticesOfFacet",setNewVerticesOfFacet,(py::arg("b"),py::arg("v1"),py::arg("v2"),py::arg("v3")),"Sets new vertices (in global coordinates) to given facet.");
 	py::def("setContactFriction",Shop::setContactFriction,py::arg("angleRad"),"Modify the friction angle (in radians) inside the material classes and existing contacts. The friction for non-dynamic bodies is not modified.");
-	py::def("growParticles",Shop::growParticles,(py::args("multiplier"), py::args("updateMass")=true, py::args("dynamicOnly")=true), "Change the size of spheres and sphere clumps by the multiplier. If updateMass=True, then the mass and inertia are updated. dynamicOnly=True will select dynamic bodies.");
+	py::def("growParticles",Shop::growParticles,(py::args("multiplier"), py::args("updateMass")=true, py::args("dynamicOnly")=true), "Change the size of spheres and clumps of spheres by the multiplier. If updateMass=True, then the mass and inertia are updated. dynamicOnly=True will select dynamic bodies.");
 	py::def("growParticle",Shop::growParticle,(py::args("bodyID"),py::args("multiplier"), py::args("updateMass")=true), "Change the size of a single sphere (to be implemented: single clump). If updateMass=True, then the mass is updated.");
 	py::def("intrsOfEachBody",intrsOfEachBody,"returns list of lists of interactions of each body");
 	py::def("numIntrsOfEachBody",numIntrsOfEachBody,"returns list of number of interactions of each body");
