@@ -704,11 +704,11 @@ Let us compare this result to :eq:`eq-dtcr-global`; this necessitates making sev
 
 As all particles have the same parameters, we drop the $i$ index in the following formulas.
 	
-We try to express the average per-particle stiffness from :eq:`eq-dtcr-particle-stiffness`. It is a sum over all interactions where $K_{N}$ and $\xi$ are scalars that will not rotate with interaction, while $\vec{n}_w$ is $w$-th component of unit interaction normal $\vec{n}$. Since we supposed uniform spatial distribution, we can replace $\vec{n}_w^2$ by its average value $\overline{\vec{n}}_w^2$. Recognizing components of $\vec{n}$ as direction cosines, the average values of $\vec{n}_w^2$ is $1/3$. %we find the average value by integrating over all possible orientations, which are uniformly distributed in space:
+We try to express the average per-particle stiffness from :eq:`eq-dtcr-particle-stiffness`. It is a sum over all interactions where $K_{N}$ and $\xi$ are scalars that will not rotate with interaction, while $\vec{n}_w$ is $w$-th component of unit interaction normal $\vec{n}$. Since we supposed uniform spatial distribution, we can replace $\vec{n}_w^2$ by its average value $\overline{\vec{n}}_w^2$. Recognizing components of $\vec{n}$ as direction cosines, the average values of $\vec{n}_w^2$ is $1/3$. We find the average value by integrating over all possible orientations, which are uniformly distributed in space:
 			
 Moreover, since all directions are equal, we can write the per-body stiffness as $K=\vec{K}_w$ for all $w\in\{x,y,z\}$. We obtain 
 
-.. math:: K=\sum K_N\left((1-\xi)\frac{1}{3}+\xi\right)=\sum K_N\frac{1-2\xi}{3}
+.. math:: K=\sum K_N\left((1-\xi)\frac{1}{3}+\xi\right)=\sum K_N\frac{1+2\xi}{3}
 
 and can put constant terms (everything) in front of the summation. $\sum 1$ equals the number of contacts per sphere, i.e. $N$. Arriving at
 
