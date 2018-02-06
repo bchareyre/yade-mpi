@@ -77,4 +77,4 @@ addBodies()
 O.run(10, True)
 O.bodies.erase(64, True)
 
-O.run(50002, True)
+O.run(20002, True)
