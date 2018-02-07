@@ -1,4 +1,247 @@
 ==================================================
+yade-2018.02a
+Wed, Feb 7 20:06:30 2018 +0100
+
+Anton Gladky (15):
+      Remove RELEASE file.
+      Initialize gui in IPython 5.
+      Add dependency on python-pyqt5.qtsvg.
+      Fix PDF-compilation with sphinx>=1.4.9
+      Remove comented lines in CMakeLists
+      Test commit number two.
+      Do not enable LINSOLV if CGAL not found
+      Fix missing AND operator in prevoius commit
+      Extend polyhedra breakage model by Mohr-Coulomb-Weibull failure criterion.
+      Add examples for the PolyhedraBreak model
+      Add one more Yade-Paper
+      Update .gitignore
+      Make newly added labels consistent with other labels.
+      One more thesis, where Yade is mentioned
+      Add RELEASE file
+
+Bruno Chareyre (15):
+      Fix https://bugs.launchpad.net/yade/+bug/1666339 (thx Robert)
+      +5 journal papers
+      +2 journal papers
+      + Christian Jakob's PhD in references
+      Put brackets in the right place (thx Robert).
+      +4 journal papers
+      1+ journal paper by V. Lapcevic
+      Add editor to Yade workshop proceedings (me!)
+      missing comma (sorry)
+      turn ERROR into WARNING when ISCollider does not find spheres to determine verletDist
+      +2 journal papers
+      +2 journal papers
+      +11 conference papers
+      add missing year in a bibtex entry
+      Fix kineticEnergy() for clumps
+
+Chao Yuan (6):
+      add porosity in cell info.
+      fix compile error.
+      add functions to get pore throat radius (by cells or spheres).
+      -split computeEffectiveRadius() for obtaining reff by pos and radius; -clean redundant functions.
+      -fix setPoreThroatRadius
+      -add setPoreBodyRadius.
+
+Francois Kneib (1):
+      Fix typo in installation.rst doc.
+
+Jan Stránský (7):
+      fixed a typo in micro-stress example
+      replaced L3Geom by ScGeom in tutorials
+      Added subengines of CombinedKinematicEngine to labeled engines
+      fixed a bug in ScGeom::getIncidentVel with avoidGranularRatcheting=False and O.periodic=True
+      Updated Body::intrs doc, fixed typo in comment
+      fixed a bug in ymport.UNVReader
+      fixed one Polyhedra python method name
+
+Jerome Duriez (9):
+      Articles .bib entries: fixes https://bugs.launchpad.net/yade/+bug/1671045, plus update of entries data
+      capillaryLaplaceYoung scripts: update of reference labels
+      +1 master thesis
+      A new post-processing engine to measure capillary stresses using alternate expressions than getCapillaryStress()
+      Implementation improvement of new MeasureCapStress engine
+      JCFpm model: code comment precised (https://answers.launchpad.net/yade/+question/644244)
+      -1 check test (regarding NormalInelastic contact law which is about to be erased)
+      -1 contact law (Law2_ScGeom6D_NormalInelasticityPhys_NormalInelasticity and other NormalInelasticPM classes)
+      Typos corrected in installation.rst
+
+Martin Haustein (1):
+      Add constant volume deformation engine.
+
+Robert Caulk (4):
+      Editorial change
+      fix typo
+      Fix typos
+      Roll breakOccurred comments back 1 commit
+
+T Sweijen (12):
+      Dynamic version of two-phase flow,interpolation of saturation field when meshing, merging of tetrahedra to find pore units
+      OMerge branch 'master' of https://github.com/yade/trunk
+      provide access to per pore partial solid surface
+      update of Dynamic Two-Phase Flow engine, removing old definitions, update comments, and added several averaging procedures for water pressure
+      Function to track deforming pore units and to couple this to dynamic two-phase flow + cleaning of functions
+      Minor fix for updating volume change
+      fix for savePoreNetwork function - to avoid odd locations of cells along boundary
+      fix of comments and cleaning up of redundant lines. Also, inclusion of initial and boundary conditions for dynamic imbibition
+      Fix for mergeCells() function, to allow for using it more than once
+      Update of initial conditions to allow for primary and secondary drainage/imbibition. Addition of compatibility check of boundary conditions. Removing some redundant functions.
+      Fix in TPF Engine for simulations with Deformation + optimalization for TPF + deformation simulations, without swelling
+      update of soluteFlowEngine, including a fundamental fix in equations and a function to export average concentration
+
+William Chèvremont (25):
+      Adding Electrostatic interaction
+      Adding Electrostatic interaction (forgot cpp file)
+      Fix the electrostatic law
+      Merge branch 'master' of https://github.com/yade/trunk
+      Correction of ElectrostaticPhys
+      Adding lubrication force w/o FlowEngine
+      Merge branch 'master' of https://github.com/yade/trunk
+      Merge branch 'master' of https://github.com/yade/trunk
+      ElectrostaticMat derive from CohFrictMat instead of FrictMat
+      Merge branch 'master' of https://github.com/yade/trunk
+      Fix lubrication laws
+      set more realistic default values for ElectrostaticMat
+      Lubrication can process other physics
+      Adding yade-oar and Lubrification resolution by implicit method
+      Revert "Adding yade-oar and Lubrification resolution by implicit method"
+      Revert "Revert "Adding yade-oar and Lubrification resolution by implicit method""
+      Merge branch 'master' of https://github.com/yade/trunk
+      fix lubrication
+      fix plot Matrix3 suffix (yz instead of yx)
+      Merge branch 'master' of https://github.com/yade/trunk
+      Fix CMakeList
+      Test
+      Fix warnings
+      Debug lubrification
+      Insert other resolution method
+
+bchareyre (59):
+      fix the flipCell() function
+      fix compile error
+      flipping periodic cell -> small/doc fix
+      move PBC example scripts
+      cleaning examples
+      documentation on changing the boundary conditions in FlowEngine and derivatives
+      Robert Caulk's guide to cloud computing inserted in doc
+      return a consistent set of constrictions in the periodic case (some constrictions were previsously skipped inconsistenty)
+      re-apply the fix of rev 26efbec to getConstrictionFull()
+      fix a compile warning
+      fix an indentation problem in shinx document - hopefully fixing the buildbot
+      fix unicode warning (documentation build)
+      add a reference url
+      fix compiler warning
+      small fix in getConstriction() + a typo
+      new logic for interating on facets in periodic triangulations (following ref. Rev.26efbec and followers)
+      new data 'crackArea' added to DFNFlow cells and updated automatically - first step toward solving the artificial compressibility of fluids in cracks
+      #define DFNFLOW commented out
+      small updates in doc, fixing compile errors and some warnings
+      add exemple script for two-phase flow with 2PFV technique, related to Yuan and Chareyre (2017)
+      extended version of ForceEngine with its own fluid solver (by J. Chauchat)
+      move HydroForceEngine to independent source files.
+      Minor changes in authorship and inline comments
+      Critical bugfix for collision detection in periodic boundary conditions. Bounds lists were left partially unordered,  then some interactions were never detected (my toughest yade debugging until now).
+      Minors & cosmetic.
+      fix feature NewtonIntegrator::densityScaling
+      Introduce a tolerance on overlap determination (in periodic BC only), avoiding false negative due to round-off errors. (usage in a separate commit).
+      A simpler and faster version of spatialOverlapPeri. Only one call to floor(), ~20% speedup for ISCollider::action.  Tolerance introduced to fix detection failures.
+      Keep the values of sorted bounds in the [0,size] range in ISCollider.
+      small scale optimization in ISCollider
+      Fix collision detection again (amending commit c7c8e6f62d452c8). Don't move bounds below the starting point of the sort, else partial (only) ordering can occure.
+      Don't start blinking the 0-body when opening inspector + make it possible to un-highlight before/after closing the inspector by selecting empty space.
+      Fix miscommit in d2211bd747d74eaea569ac88e.
+      remove a function that was declared but undefined (leading to runtime error)
+      cite recent reference on timestep
+      TwoPhaseFlowEngine::getNeighbors now returning less than 4 neighbor cells if some of them are infinite (normally only one)
+      a function + python wrap for invading one single pore and updating the clusters
+      fix cluster invasion/update (thx Son for spotting the bug)
+      fix doctest's target following b5ca352
+      fix doctest in addData (re-apply c011decc36)
+      fix doctest indentation (after 36c016bd)
+      TesselationWrapper wrapping CGAL's AlphaShapes for defining an alpha-contour
+      remove function definitions from FlowEngine.hpp
+      preliminary version of 'extended' alpha shape contour
+      further extension and debugging of alphaShape code
+      nearly working version of the extended alpha-contour
+      small fix
+      proper calculation of alphaCaps areas in TesselationWrapper
+      If FlowEngine::meshUpdateInterval<0 do not update the mesh at fixed intervals
+      fix a compile warning - probably leading to undefined behavior
+      apply d71813b for the periodic flavor of FlowEngine
+      re-insert the comment on Qt4->Qt5 since it may still help (partial revert of 1c06b6ad9d2)
+      Remove the declaration of (redundant and undefined) FlowEngine::currentTess, while there is already Network::currentTess. Fix https://bugs.launchpad.net/yade/+bug/1732210.
+      Use a relevant upperbound (i.e. 0.5*period) for the the maximum body size in periodic boundary conditions.
+      Update the position of the clump members relative to the clump itself ("local" coordinates) when applying growParticles(). It is no longer necessary to perform additional operations (updateProperties()) after growing clumps.
+      make checkClumpHopper.py less time demanding
+      fix bug/1291977 and a typo
+      fix some compile warnings in TwoPhaseFlowEngine
+      enable TWOPHASEFLOW by default
+
+jduriez (15):
+      Email address changes
+      Capillary script solveLiqBridge.m: change in attributes order (with small consequences), plus other minor changes
+      Capillary scripts: removing one useless test, and including commented time measurement commands
+      Capillary scripts: Introducing .py versions for 2 (out of 3) .m files. Plus minor change in one .m file
+      Doc: precising Collider.avoidSelfInteractionMask
+      +2 book/proceedings chapters (and formatting changes)
+      Doc of Shop::aabbExtrema precised
+      Doc typos and small improvements in VTK post-processing descriptions
+      Small doc changes in TriaxialStressController.particlesVolume and porosity
+      Doc: minor change in package installation (distro name)
+      Doc: typo in user manual
+      Misleading comment removed in UnsaturatedEngine.cpp
+      Doc: typo correction in TriaxialStressController.stressMask
+      grids examples: moving qt.View() at the end of the scripts so that the window view is correctly scaled with respect to the model
+      Doc of Ig2_Sphere_PFacet_ScGridCoGeom updated: replacing inexistant ScPFaceCoGeom with ScGridCoGeom, and Facet with PFacet, fixes 4. of https://bugs.launchpad.net/yade/+bug/1746037
+
+luc scholtes (6):
+      update of the JCFPM particle model with new or adapted functionalities to record number of cracks and associated released energy. An example script will be provided.
+      add possibility to define residual friction angle (broken contacts) different from friction angle (bonded contacts)
+      some cleaning and clarifying of crack aperture calculation
+      update of file. mistakes in previous commit
+      update due to mistake. Thank you Robert
+      update due to mistake. Thank you Robert
+
+raphm1 (10):
+      HydroForceEngine: add an optional input parameter to account for convective acceleration The input convective acceleration term take the form of a depth dependent vector
+      yade-article.bib: add a journal paper
+      Add proceedings
+      Add two functions getStressProfile_contact: to evaluate the stress profile considering only the contact contribution getDepthProfile_center: to evaluate solid depth profile (solid velocity and volume fraction) considering particles as points
+      Fix error from commit e4f601d
+      Add 2 references and 1 paper
+      HydroForceEngine: update the 1D RANS fluid coupling Modify the formulation of the fluid resolution in order to merge it with the existing variables of HydroForceEngine. Fix errors in the fluid momentum balance resolution. Clarify the mesh definition. Evaluate all the components necessary to solve the equations inside the fluidModel function. Introduce the possibility to account for fluid lateral wall friction in the equations. Make it possible for the user to access only the fluid resolution without introducing any particles or launching a DEM simulation. Update the documentation.
+      HydroForceEngine: new examples and validations Introduce a new sedimentTransport script, which make use of the fluid coupling (1D RANS) Complete the sedimentTransport example script and add a post-processing example. Add validations for the fluid resolution without particles, considering logarithmic law and poiseuille flow. Add a file commenting the different examples and validation scripts.
+      HydroForceEngine: small modifications
+      HydroForceEngine: fix errors in the fluid resolution
+
+remche (4):
+      Fixing clang compilation
+      Adding path for CGAL ans GMP include dir to cmake (for exotic installations)
+      Merge branch 'master' of https://github.com/yade/trunk
+      Adding the correct include dir for CGAL
+
+robcaulk (15):
+      added tmux command tip
+      Fixed bug with multithread+compressible flow and addressed backgroundAction() FIXME for eigenSolve()
+      fixed inheritence problem when LINSOLV=OFF
+      Added option to let new bond breaks in JCFpmPhys control retriangulation in FlowEngine
+      add fracture interpolation functionality
+      GPU accelerated PFV solver
+      GPU acceleration guide
+      Avoid compiling suitesparse GPU solver if -DCHOLMOD_GPU=OFF
+      improve GPU doc
+      Merge branch 'master' of github.com:yade/trunk
+      improve GPU acceleration guide
+      add the ability to threshold trickpermeability to 2 or more facets, default behavior should remain same as before this commit
+      fix variable naming inconsistencies
+      Merge branch 'master' of github.com:yade/trunk
+      fix multithreading issue with imposed fluxes
+
+williamchevremont (1):
+      Typo
+
+==================================================
 yade-2017.01a
 Thu, Jan 19 22:07:25 2017 +0100
 Anton Gladky (20):
