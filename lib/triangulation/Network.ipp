@@ -1,7 +1,9 @@
 
 #ifdef FLOW_ENGINE
 
-#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
+#if CGAL_VERSION_NR < CGAL_VERSION_NUMBER(4,11,0)
+	#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
+#endif
 #include <iostream>
 #include <fstream>
 #include <new>
@@ -66,7 +68,7 @@ double Network<Tesselation>::volumePoreVoronoiFraction (CellHandle& cell, int& j
                 VertexHandle& SV2 = W[1];
                 VertexHandle& SV3 = W[2];
 
-                cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point()-SV3->point(),SV2->point()-SV3->point());
+                cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point().point()-SV3->point().point(),SV2->point().point()-SV3->point().point());
 		if (cell->info().facetSurfaces[j][0]==0 && cell->info().facetSurfaces[j][1]==0 && cell->info().facetSurfaces[j][2]==0) cerr<<"NULL FACET SURF"<<endl;
                 if (cell->info().facetSurfaces[j]*(p2-p1) > 0) cell->info().facetSurfaces[j] = -1.0*cell->info().facetSurfaces[j];
                 Real Vtot = abs(ONE_THIRD*cell->info().facetSurfaces[j]*(p1-p2));
@@ -74,8 +76,8 @@ double Network<Tesselation>::volumePoreVoronoiFraction (CellHandle& cell, int& j
 		
                 double Vsolid1=0, Vsolid2=0;
                 for (int i=0;i<3;i++) {
-                Vsolid1 += sphericalTriangleVolume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
-                Vsolid2 += sphericalTriangleVolume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);}
+                Vsolid1 += sphericalTriangleVolume(v[permut3[i][0]],v[permut3[i][1]].point(),p1,p2);
+                Vsolid2 += sphericalTriangleVolume(v[permut3[i][0]],v[permut3[i][2]].point(),p1,p2);}
 
 		VSolidTot += Vsolid1 + Vsolid2;
 		vPoral += Vtot - (Vsolid1 + Vsolid2);
@@ -98,7 +100,7 @@ double Network<Tesselation>::volumeSolidPore (const CellHandle& cell)
 {
   double Vsolid=0;
   for (int i=0;i<4;i++) {
-	if ( !cell->vertex(permut4[i][0])->info().isFictious ) Vsolid += sphericalTriangleVolume( cell->vertex(permut4[i][0])->point(), cell->vertex(permut4[i][1])->point(), cell->vertex(permut4[i][2])-> point(), cell->vertex(permut4[i][3])-> point());
+	if ( !cell->vertex(permut4[i][0])->info().isFictious ) Vsolid += sphericalTriangleVolume( cell->vertex(permut4[i][0])->point(), cell->vertex(permut4[i][1])->point().point(), cell->vertex(permut4[i][2])-> point().point(), cell->vertex(permut4[i][3])-> point().point());
   }
   return Vsolid;
 }
@@ -128,8 +130,8 @@ double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, c
         Sphere& SW2 = SV2->point();
         Sphere& SW3 = SV3->point();
 
-        Real Vsolid1 = sphericalTriangleVolume(SW2, AA, PV1, PV2)+sphericalTriangleVolume(SW2, SW3, PV1, PV2);
-        Real Vsolid2 = sphericalTriangleVolume(SW3, BB, PV1, PV2)+sphericalTriangleVolume(SW3, SW2, PV1, PV2);
+        Real Vsolid1 = sphericalTriangleVolume(SW2, AA, PV1, PV2)+sphericalTriangleVolume(SW2, SW3.point(), PV1, PV2);
+        Real Vsolid2 = sphericalTriangleVolume(SW3, BB, PV1, PV2)+sphericalTriangleVolume(SW3, SW2.point(), PV1, PV2);
 	
 	VSolidTot += Vsolid1 + Vsolid2;
 	vPoral += Vtot - (Vsolid1 + Vsolid2);
@@ -151,7 +153,7 @@ double Network<Tesselation>::volumeDoubleFictiousPore(const VertexHandle& SV1, c
         Point AA(A[0],A[1],A[2]);
         Point BB(B[0],B[1],B[2]);
 
-        facetSurface = CGAL::cross_product(SV3->point()-AA,SV3->point()-BB);
+        facetSurface = CGAL::cross_product(SV3->point().point()-AA,SV3->point().point()-BB);
         if (facetSurface*(PV2-PV1) > 0) facetSurface = -1.0*facetSurface;
         Real Vtot = abs(facetSurface*(PV1-PV2))*ONE_THIRD;
 	Vtotalissimo += Vtot;
@@ -179,7 +181,7 @@ double Network<Tesselation>::fastSphericalTriangleArea(const Sphere& STA1, const
         using namespace CGAL;
         double rayon2 = STA1.weight();
         if (rayon2 == 0.0) return 0.0;
-        return rayon2 * fastSolidAngle(STA1,STA2,STA3,PTA1);
+        return rayon2 * fastSolidAngle(STA1.point(),STA2,STA3,PTA1);
 }
 
 template<class Tesselation>
@@ -273,14 +275,14 @@ double Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool sli
                 VertexHandle& SV2 = W[1];
                 VertexHandle& SV3 = W[2];
 
-		Ssolid1 = fastSphericalTriangleArea(SV1->point(), SV2->point(), p1, p2);
-                Ssolid1n = fastSphericalTriangleArea(SV1->point(), SV3->point(), p1, p2);
+		Ssolid1 = fastSphericalTriangleArea(SV1->point(), SV2->point().point(), p1, p2);
+                Ssolid1n = fastSphericalTriangleArea(SV1->point(), SV3->point().point(), p1, p2);
                 cell->info().solidSurfaces[j][0]=Ssolid1+Ssolid1n;
-                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point(),p1, p2);
-                Ssolid2n = fastSphericalTriangleArea(SV2->point(),SV3->point(),p1, p2);
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point().point(),p1, p2);
+                Ssolid2n = fastSphericalTriangleArea(SV2->point(),SV3->point().point(),p1, p2);
                 cell->info().solidSurfaces[j][1]=Ssolid2+Ssolid2n;
-                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, p2);
-                Ssolid3n = fastSphericalTriangleArea(SV3->point(),SV1->point(),p1, p2);
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point().point(),p1, p2);
+                Ssolid3n = fastSphericalTriangleArea(SV3->point(),SV1->point().point(),p1, p2);
                 cell->info().solidSurfaces[j][2]=Ssolid3+Ssolid3n;
 
     }; break;
@@ -292,14 +294,14 @@ double Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool sli
 		Boundary &bi1 =  boundary(SV1->info().id());
                 Ssolid1 = 0;
 		if (bi1.flowCondition && ! slipBoundary) {
-                        Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point()-SV3->point())[bi1.coordinate]);
+                        Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point().point()-SV3->point().point())[bi1.coordinate]);
                         cell->info().solidSurfaces[j][facetF1]=Ssolid1;
                 }
-                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point(),p1, p2);
-                Ssolid2n = fastSphericalTriangleArea(SV2->point(),SV3->point(),p1, p2);
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point().point(),p1, p2);
+                Ssolid2n = fastSphericalTriangleArea(SV2->point(),SV3->point().point(),p1, p2);
                 cell->info().solidSurfaces[j][facetRe1]=Ssolid2+Ssolid2n;
-                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, p2);
-                Ssolid3n = fastSphericalTriangleArea(SV3->point(),SV1->point(),p1, p2);
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point().point(),p1, p2);
+                Ssolid3n = fastSphericalTriangleArea(SV3->point(),SV1->point().point(),p1, p2);
                 cell->info().solidSurfaces[j][facetRe2]=Ssolid3+Ssolid3n;
     }; break;
     case (2) : {
@@ -331,7 +333,7 @@ double Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool sli
                 Ssolid1n = fastSphericalTriangleArea(SV3->point(), BB, p1, p2);
                 cell->info().solidSurfaces[j][facetRe1]=Ssolid1+Ssolid1n;
                 //area vector of triangle (p1,sphere,p2)
-                CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
+                CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point().point()-p2);
                 if (bi1.flowCondition && ! slipBoundary) {
                         //projection on boundary 1
                         Ssolid2 = abs(p1p2v1Surface[bi1.coordinate]);
@@ -377,9 +379,9 @@ double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bo
                 VertexHandle& SV2 = W[1];
                 VertexHandle& SV3 = W[2];
 
-		Ssolid1 = fastSphericalTriangleArea(SV1->point(), SV2->point(), p1, SV3->point());
-                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point(),p1, SV3->point());
-                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, SV1->point());
+		Ssolid1 = fastSphericalTriangleArea(SV1->point(),SV2->point().point(),p1, SV3->point().point());
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV1->point().point(),p1, SV3->point().point());
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point().point(),p1, SV1->point().point());
     }; break;
     case (1) : {
 		VertexHandle SV1 = cell->vertex(facetVertices[j][facetF1]);
@@ -388,9 +390,9 @@ double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bo
 
 		Boundary &bi1 =  boundary(SV1->info().id());
                 Ssolid1 = 0;
-		if (bi1.flowCondition && ! slipBoundary) Ssolid1 = abs(0.5*CGAL::cross_product(p1-SV2->point(), SV2->point()-SV3->point())[bi1.coordinate]);
-                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV3->point(),p1, SV2->point()+bi1.normal);
-                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point(),p1, SV3->point()+bi1.normal);
+		if (bi1.flowCondition && ! slipBoundary) Ssolid1 = abs(0.5*CGAL::cross_product(p1-SV2->point().point(), SV2->point().point()-SV3->point().point())[bi1.coordinate]);
+                Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV3->point().point(),p1, SV2->point().point()+bi1.normal);
+                Ssolid3 = fastSphericalTriangleArea(SV3->point(),SV2->point().point(),p1, SV3->point().point()+bi1.normal);
     }; break;
     case (2) : {
 		double A [3], B[3], C[3];
@@ -413,7 +415,7 @@ double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bo
                 Sphere C1(CC, 0);
                 //FIXME : we are computing triangle area twice here, because its computed in volume_double_fictious already -> optimize
                 Ssolid1 = 0.5*(fastSphericalTriangleArea(SV3->point(), AA, p1, p2)+ fastSphericalTriangleArea(SV3->point(), BB, p1, p2));
-                CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point()-p2);
+                CVector p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,SV3->point().point()-p2);
                 if (bi1.flowCondition && ! slipBoundary) Ssolid2 = 0.5*abs(p1p2v1Surface[bi1.coordinate]);
                 if (bi2.flowCondition && ! slipBoundary) Ssolid3 = 0.5*abs(p1p2v1Surface[bi2.coordinate]); 
     }; break;
@@ -442,7 +444,7 @@ CVector Network<Tesselation>::surfaceSingleFictiousFacet(VertexHandle fSV1, Vert
 //  const Boundary &bi2 = boundary ( fSV2->info().id() );
         CVector mean_height = (bi1.p[bi1.coordinate]-0.5*(SV3->point()[bi1.coordinate]+SV2->point()[bi1.coordinate]))*bi1.normal;
 
-        return CGAL::cross_product(mean_height,SV3->point()-SV2->point());
+        return CGAL::cross_product(mean_height,SV3->point().point()-SV2->point().point());
 }
 
 template<class Tesselation>

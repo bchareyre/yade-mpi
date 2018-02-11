@@ -126,8 +126,8 @@ typename _Tesselation<TT>::RTriangulation & _Tesselation<TT>::Triangulation ( vo
 template<class TT>
 Real _Tesselation<TT>::Volume ( FiniteCellsIterator cell )
 {
-	return ( Tetrahedron ( cell->vertex ( 0 )->point(), cell->vertex ( 1 )->point(),
-						 cell->vertex ( 2 )->point(), cell->vertex ( 3 )->point() ) ).volume();
+	return ( Tetrahedron ( cell->vertex ( 0 )->point().point(), cell->vertex ( 1 )->point().point(),
+						 cell->vertex ( 2 )->point().point(), cell->vertex ( 3 )->point().point() ) ).volume();
 }
 
 template<class TT>
@@ -218,7 +218,7 @@ Point _Tesselation<TT>::circumCenter (const CellHandle& cell, const short facet,
         const Sphere& Sin = cell->vertex (facet)->point();
         CVector surface = 0.5*cross_product ( S0.point()-S1.point(), S0.point()-S2.point() );
         //check if the surface vector is inward or outward
-        double dotP = surface* ( S0-Sin.point() );
+        double dotP = surface* ( S0.point()-Sin.point() );
         if ( dotP<0 ) surface=-surface;
 //         double area = sqrt ( surface.squared_length() );
 //         CVector normal = surface/area; //unit normal
@@ -316,7 +316,7 @@ void _Tesselation<TT>::testAlphaShape(double alpha)
 		Point pp;
 		Point vv;
  		if (as.classify(f->first)==AlphaShape::INTERIOR) {
-			pp= f->first->vertex(f->second)->point();
+			pp= f->first->vertex(f->second)->point().point();
 			if (not computed) f->first->info().setPoint(circumCenter(f->first));
 // 			std::cerr<< "alpha cell:"<<(Point) f->first->info()<<std::endl;
 			vv = f->first->info();
@@ -327,7 +327,7 @@ void _Tesselation<TT>::testAlphaShape(double alpha)
 		else {
 			if (as.classify(f->first->neighbor(f->second))!=AlphaShape::INTERIOR) std::cerr<<"_____________BIG PROB. HERE ___________"<<std::endl;
 
-			pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point();
+			pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point().point();
 			if (not computed) f->first->neighbor(f->second)->info().setPoint(circumCenter(f->first->neighbor(f->second)));
 // 			std::cerr<< "alpha cell:"<<(Point) f->first->neighbor(f->second)->info()<<std::endl;
 			vv = f->first->neighbor(f->second)->info();
@@ -336,7 +336,7 @@ void _Tesselation<TT>::testAlphaShape(double alpha)
 // 			std::cerr << "not an Alpha_shape_3::INTERIOR"<<std::endl;
 		}
 		//check if the surface vector is inward or outward
-		double dotP = surface*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+		double dotP = surface*(f->first->vertex(facetVertices[f->second][0])->point().point()-pp);
 		if (dotP<0) surface=-surface;
 		double area = sqrt(surface.squared_length());
 		CVector normal = surface/area; //unit normal
@@ -375,10 +375,10 @@ void _Tesselation<TT>::setAlphaFaces(std::vector<AlphaFace>& faces, double alpha
 		CVector normal = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
 			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
 		Point pp;
- 		if (as.classify(f->first)==AlphaShape::INTERIOR) pp= f->first->vertex(f->second)->point();
-		else pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point();
+ 		if (as.classify(f->first)==AlphaShape::INTERIOR) pp= f->first->vertex(f->second)->point().point();
+		else pp= f->first->neighbor(f->second)->vertex(Tri->mirror_index(f->first,f->second))->point().point();
 		//check if the normal vector is inward or outward
-		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point()-pp);
+		double dotP = normal*(f->first->vertex(facetVertices[f->second][0])->point().point()-pp);
 		if (dotP<0) normal=-normal;
 		// set the face in the global list 
 		for (int ii=0; ii<3;ii++) faces[k].ids[ii]= f->first->vertex(facetVertices[idx][ii])->info().id();
@@ -615,7 +615,7 @@ CVector _Tesselation<TT>::alphaVoronoiFaceArea (const Edge& ed_it, const AlphaSh
 			//largest sphere
 			double maxWeight = std::max(baseCell->vertex(facetVertices[idx][0])->point().weight(),max(baseCell->vertex(facetVertices[idx][1])->point().weight(), baseCell->vertex(facetVertices[idx][2])->point().weight()));
 			//check if the surface vector is inward or outward
-			double dotP = surface*(baseCell->vertex(facetVertices[idx][0])->point()-baseCell->vertex(idx)->point());
+			double dotP = surface*(baseCell->vertex(facetVertices[idx][0])->point().point()-baseCell->vertex(idx)->point().point());
 			if (dotP<0) surface=-surface;
 			double area = sqrt(surface.squared_length());
 			normal = surface/area; //unit normal
@@ -1088,13 +1088,13 @@ void _Tesselation<TT>::AssignPartialVolume ( FiniteEdgesIterator& ed_it )
 		{
 			if ( !isFictious1 )
 			{
-				r = std::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->second )->point(), cell0->info(), cell1->info(), cell2->info() ) ).volume() );
+				r = std::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->second )->point().point(), cell0->info(), cell1->info(), cell2->info() ) ).volume() );
 				( ed_it->first )->vertex ( ed_it->second )->info().v() += r;
 				TotalFiniteVoronoiVolume+=r;
 			}
 			if ( !isFictious2 )
 			{
-				r = std::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->third )->point(), cell0->info(),  cell1->info(), cell2->info() ) ).volume() );
+				r = std::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->third )->point().point(), cell0->info(),  cell1->info(), cell2->info() ) ).volume() );
 				ed_it->first->vertex ( ed_it->third )->info().v() +=r;
 				TotalFiniteVoronoiVolume+=r;
 			}

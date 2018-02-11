@@ -61,11 +61,11 @@ void PeriodicFlow<_Tesselation>::interpolate(Tesselation& Tes, Tesselation& NewT
 		CellHandle& newCell = *cellIt;
 		if (newCell->info().Pcondition || newCell->info().isGhost) continue;
 		CVector center ( 0,0,0 );
-		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 		else {
 			Real boundPos=0; int coord=0;
 			for ( int k=0;k<4;k++ ) {
-				if (!newCell->vertex (k)->info().isFictious) center= center+0.3333333333*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+				if (!newCell->vertex (k)->info().isFictious) center= center+0.3333333333*(Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 				else {
 					coord=boundary (newCell->vertex(k)->info().id()).coordinate;
 					boundPos=boundary (newCell->vertex(k)->info().id()).p[coord];
@@ -73,7 +73,7 @@ void PeriodicFlow<_Tesselation>::interpolate(Tesselation& Tes, Tesselation& NewT
 			}
 			center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
 		}
-                oldCell = Tri.locate(Point(center[0],center[1],center[2]));
+                oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
 		//FIXME: should use getInfo
                 newCell->info().p() = oldCell->info().shiftedP();
         }
@@ -206,9 +206,9 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 						cell->info().facetSphereCrossSections[j][jj]=0.5*W[jj]->point().weight()*Wm3::FastInvCos1((W[permut3[jj][1]]->point()-W[permut3[jj][0]]->point())*(W[permut3[jj][2]]->point()-W[permut3[jj][0]]->point()));
 #else
 					cell->info().facetSphereCrossSections[j]=CVector(
-					W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
-					W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
-					W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
+					W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1.point()-v0.point())*(v2.point()-v0.point())/sqrt((v1.point()-v0.point()).squared_length()*(v2.point()-v0.point()).squared_length())),
+					W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0.point()-v1.point())*(v2.point()-v1.point())/sqrt((v1.point()-v0.point()).squared_length()*(v2.point()-v1.point()).squared_length())),
+					W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0.point()-v2.point())*(v1.point()-v2.point())/sqrt((v1.point()-v2.point()).squared_length()*(v2.point()-v0.point()).squared_length())));
 #endif
 					//FIXME: it should be possible to skip completely blocked cells, currently the problem is it segfault for undefined areas
 					//if (cell->info().blocked) continue;//We don't need permeability for blocked cells, it will be set to zero anyway

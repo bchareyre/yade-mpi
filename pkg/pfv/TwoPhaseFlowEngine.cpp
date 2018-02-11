@@ -582,7 +582,7 @@ void TwoPhaseFlowEngine::savePoreNetwork(const char* folder)
       double count = 0.0;
       for ( int k=0;k<4;k++ ){ 
 	  if(cell->vertex(k)->info().id() > 5){
-	    center= center + (cell->vertex(k)->point()-CGAL::ORIGIN);
+	    center= center + (cell->vertex(k)->point().point()-CGAL::ORIGIN);
 	    count = count + 1.0;
 	  }
       }

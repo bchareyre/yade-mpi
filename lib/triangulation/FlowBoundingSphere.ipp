@@ -110,7 +110,7 @@ void FlowBoundingSphere<Tesselation>::averageRelativeCellVelocity()
 				CVector Surfk = cell->info()-cell->neighbor(i)->info();
 				Real area = sqrt ( Surfk.squared_length() );
 				Surfk = Surfk/area;
-                        	CVector branch = cell->vertex ( facetVertices[i][0] )->point() - cell->info();
+                        	CVector branch = cell->vertex ( facetVertices[i][0] )->point().point() - cell->info();
                         	posAvFacet = (Point) cell->info() + ( branch*Surfk ) *Surfk;
 				facetFlowRate = (cell->info().kNorm())[i] * (cell->info().shiftedP() - cell->neighbor (i)->info().shiftedP());
 				totFlowRate += facetFlowRate;
@@ -215,7 +215,7 @@ double FlowBoundingSphere<Tesselation>::getPorePressure (double X, double Y, dou
 {
 	if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
-	CellHandle cell = Tri.locate(Point(X,Y,Z));
+	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
 	return cell->info().p();
 }
 
@@ -224,7 +224,7 @@ int FlowBoundingSphere<Tesselation>::getCell (double X, double Y, double Z)
 {
 	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return -1;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
-	CellHandle cell = Tri.locate(Point(X,Y,Z));
+	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
 	return cell->info().id;
 }
 
@@ -245,7 +245,7 @@ void FlowBoundingSphere<Tesselation>::measurePressureProfile(double WallUpy, dou
 	int cell=0;
 	for (int i=0; i<captures; i++){
         for (double Z=min(zMin,zMax); Z<=max(zMin,zMax); Z+=std::abs(Rz)) {
-		permeameter = Tri.locate(Point(X, Y, Z));
+		permeameter = Tri.locate(CGT::Sphere(X, Y, Z));
 		pressure+=permeameter->info().p();
 		cell++;
         }
@@ -264,7 +264,7 @@ double FlowBoundingSphere<Tesselation>::averageSlicePressure(double Y)
   double Rz = (zMax-zMin)/30;
   for (double X=xMin; X<=xMax+Ry/10; X=X+Rx) {
 	for (double Z=zMin; Z<=zMax+Ry/10; Z=Z+Rz) {
-	  P_ave+=Tri.locate(Point(X, Y, Z))->info().p();
+	  P_ave+=Tri.locate(CGT::Sphere(X, Y, Z))->info().p();
 	  n++;
 	}
   }
@@ -433,7 +433,7 @@ template <class Tesselation>
 CVector FlowBoundingSphere<Tesselation>::cellBarycenter(CellHandle& cell)
 {
 	CVector center ( 0,0,0 );
-	for ( int k=0;k<4;k++ ) center= center + 0.25* (cell->vertex(k)->point()-CGAL::ORIGIN);
+	for ( int k=0;k<4;k++ ) center= center + 0.25* (cell->vertex(k)->point().point()-CGAL::ORIGIN);
 	return center;
 }
 
@@ -446,17 +446,17 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 		CellHandle& newCell = *cellIt;
 		if (newCell->info().Pcondition || newCell->info().isGhost) continue;
 		CVector center ( 0,0,0 );
-		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 		else {
 			Real boundPos=0; int coord=0;
-			for ( int k=0;k<4;k++ ) if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+			for ( int k=0;k<4;k++ ) if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 			for ( int k=0;k<4;k++ ) if (newCell->vertex (k)->info().isFictious) {
 					coord=boundary (newCell->vertex(k)->info().id()).coordinate;
 					boundPos=boundary (newCell->vertex(k)->info().id()).p[coord];
 					center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
 				}
 		}
-                oldCell = Tri.locate(Point(center[0],center[1],center[2]));
+                oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
 		newCell->info().getInfo(oldCell->info());
 //                 newCell->info().p() = oldCell->info().shiftedP();
         }
@@ -467,12 +467,12 @@ template <class Tesselation>
 Real FlowBoundingSphere<Tesselation>::checkSphereFacetOverlap(const Sphere& v0, const Sphere& v1, const Sphere& v2)
 {
 	//First, check that v0 projection fall between v1 and v2...
-	Real dist=(v0-v1)*(v2-v1);
+	Real dist=(v0.point()-v1.point())*(v2.point()-v1.point());
 	if (dist<0) return 0;
-	Real v1v2=(v2-v1).squared_length();
+	Real v1v2=(v2.point()-v1.point()).squared_length();
 	if (dist>v1v2) return 0;
 	//... then, check distance
-	Real m=(cross_product(v0-v1,v2-v1)).squared_length()/v1v2;
+	Real m=(cross_product(v0.point()-v1.point(),v2.point()-v1.point())).squared_length()/v1v2;
 	if (m<v0.weight()) {
 		Real d=2*sqrt((v0.weight()-m));
 		Real teta=2*acos(sqrt(m/v0.weight()));
@@ -530,9 +530,9 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 				Sphere& v1 = W[1]->point();
 				Sphere& v2 = W[2]->point();
 				cell->info().facetSphereCrossSections[j]=CVector(
-				   W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1-v0)*(v2-v0)/sqrt((v1-v0).squared_length()*(v2-v0).squared_length())),
-				   W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0-v1)*(v2-v1)/sqrt((v1-v0).squared_length()*(v2-v1).squared_length())),
-				   W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0-v2)*(v1-v2)/sqrt((v1-v2).squared_length()*(v2-v0).squared_length())));
+				   W[0]->info().isFictious ? 0 : 0.5*v0.weight()*acos((v1.point()-v0.point())*(v2.point()-v0.point())/sqrt((v1.point()-v0.point()).squared_length()*(v2.point()-v0.point()).squared_length())),
+				   W[1]->info().isFictious ? 0 : 0.5*v1.weight()*acos((v0.point()-v1.point())*(v2.point()-v1.point())/sqrt((v1.point()-v0.point()).squared_length()*(v2.point()-v1.point()).squared_length())),
+				   W[2]->info().isFictious ? 0 : 0.5*v2.weight()*acos((v0.point()-v2.point())*(v1.point()-v2.point())/sqrt((v1.point()-v2.point()).squared_length()*(v2.point()-v0.point()).squared_length())));
 				//FIXME: it should be possible to skip completely blocked cells, currently the problem is it segfault for undefined areas
 // 				if (cell->info().blocked) continue;//We don't need permeability for blocked cells, it will be set to zero anyway
 				pass+=1;
@@ -795,7 +795,7 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
         
         IPCells.clear();
         for (unsigned int n=0; n<imposedP.size();n++) {
-		CellHandle cell=Tri.locate(imposedP[n].first);
+		CellHandle cell=Tri.locate(CGT::Sphere(imposedP[n].first,0));
 		//check redundancy
 		for (unsigned int kk=0;kk<IPCells.size();kk++){
 			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
@@ -807,7 +807,7 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
 
 	IFCells.clear();
 	for (unsigned int n=0; n<imposedF.size();n++) {
-		CellHandle cell=Tri.locate(imposedF[n].first);
+		CellHandle cell=Tri.locate(CGT::Sphere(imposedF[n].first,0));
 		//check redundancy
 		for (unsigned int kk=0;kk<IPCells.size();kk++){
 			if (cell==IPCells[kk]) cerr<<"Both flux and pressure are imposed in the same cell."<<endl;
@@ -1392,7 +1392,7 @@ double FlowBoundingSphere<Tesselation>::fractionalSolidArea(CellHandle cell, int
     if(j==1){k=0; l=2; m=3;}
     if(j==2){k=1; l=0; m=3;}
     if(j==3){k=1; l=2; m=0;}
-    area = this->fastSphericalTriangleArea(cell->vertex(j)->point(), cell->vertex(k)->point(), cell->vertex(l)-> point(), cell->vertex(m)-> point());
+    area = this->fastSphericalTriangleArea(cell->vertex(j)->point(), cell->vertex(k)->point().point(), cell->vertex(l)-> point().point(), cell->vertex(m)-> point().point());
     return area;
 }
 

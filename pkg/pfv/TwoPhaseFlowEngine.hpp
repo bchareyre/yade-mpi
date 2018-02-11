@@ -323,7 +323,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	
 	int getCell2(double posX, double posY, double posZ){	//Should be fixed properly
 	  RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-	  CellHandle cell = tri.locate(Point(posX,posY,posZ));
+	  CellHandle cell = tri.locate(CGT::Sphere(posX,posY,posZ));
 	  return cell->info().id;
 	}
 

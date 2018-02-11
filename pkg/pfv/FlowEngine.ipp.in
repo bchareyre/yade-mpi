@@ -209,7 +209,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::imposeFlux ( Vector3r pos, Real flux){
         solver->imposedF.push_back ( pair<CGT::Point,Real> ( CGT::Point ( pos[0],pos[1],pos[2] ), flux ) );
-	CellHandle cell=solver->T[solver->currentTes].Triangulation().locate(CGT::Point(pos[0],pos[1],pos[2]));
+	CellHandle cell=solver->T[solver->currentTes].Triangulation().locate(CGT::Sphere(pos[0],pos[1],pos[2]));
 	if (cell->info().isGhost) cerr<<"Imposing pressure in a ghost cell."<<endl;
 	for (unsigned int kk=0;kk<solver->IPCells.size();kk++){
 		if (cell==solver->IPCells[kk]) cerr<<"Both flux and pressure are imposed in the same cell."<<endl;

@@ -9,7 +9,9 @@
 
 // #define XVIEW
 #include "FlowBoundingSphereLinSolv.hpp"//include after #define XVIEW
-#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
+#if CGAL_VERSION_NR < CGAL_VERSION_NUMBER(4,11,0)
+	#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
+#endif
 #include <CGAL/Width_3.h>
 #include <iostream>
 #include <fstream>

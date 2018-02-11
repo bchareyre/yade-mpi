@@ -29,17 +29,17 @@ struct RTraits_for_spatial_sort : public CGT::SimpleTriangulationTypes::RTriangu
 
 	struct Less_x_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
-			return Gt::Less_x_3()(* (p.first),* (q.first));
+			return Gt::Less_x_3()( p.first->point() , q.first->point() );
 		}
 	};
 	struct Less_y_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
-			return Gt::Less_y_3()(* (p.first),* (q.first));
+			return Gt::Less_y_3()( p.first->point(), q.first->point());
 		}
 	};
 	struct Less_z_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
-			return Gt::Less_z_3()(* (p.first),* (q.first));
+			return Gt::Less_z_3()( p.first->point(), q.first->point());
 		}
 	};
 	Less_x_3  less_x_3_object() const {return Less_x_3();}

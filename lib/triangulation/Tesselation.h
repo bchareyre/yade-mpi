@@ -11,6 +11,8 @@
 namespace CGT {
 	
 //Since template inheritance does not automatically give access to the members of the base class, this macro can be used to declare all members at once. 
+#ifdef ALPHASHAPES
+
 #define DECLARE_TESSELATION_TYPES(baseType)\
 		typedef typename baseType::RTriangulation		 	RTriangulation;\
 		typedef typename baseType::AlphaShape		 		AlphaShape;\
@@ -36,6 +38,33 @@ namespace CGT {
 		typedef typename baseType::ListPoint				ListPoint;\
 		typedef typename baseType::VCellIterator			VCellIterator;
 
+#else
+
+#define DECLARE_TESSELATION_TYPES(baseType)\
+		typedef typename baseType::RTriangulation		 	RTriangulation;\
+		typedef typename baseType::VertexInfo				VertexInfo;\
+		typedef typename baseType::CellInfo				CellInfo;\
+		typedef typename baseType::VertexIterator			VertexIterator;\
+		typedef typename baseType::VertexHandle				VertexHandle;\
+		typedef typename baseType::FiniteVerticesIterator		FiniteVerticesIterator;\
+		typedef typename baseType::CellIterator				CellIterator;\
+		typedef typename baseType::FiniteCellsIterator			FiniteCellsIterator;\
+		typedef typename baseType::CellCirculator			CellCirculator;\
+		typedef typename baseType::CellHandle				CellHandle;\
+		typedef typename baseType::Facet				Facet;\
+		typedef typename baseType::FacetIterator			FacetIterator;\
+		typedef typename baseType::FacetCirculator			FacetCirculator;\
+		typedef typename baseType::FiniteFacetsIterator			FiniteFacetsIterator;\
+		typedef typename baseType::LocateType				LocateType;\
+		typedef typename baseType::EdgeIterator				EdgeIterator;\
+		typedef typename baseType::FiniteEdgesIterator			FiniteEdgesIterator;\
+		typedef typename baseType::VectorVertex				VectorVertex;\
+		typedef typename baseType::VectorCell				VectorCell;\
+		typedef typename baseType::ListPoint				ListPoint;\
+		typedef typename baseType::VCellIterator			VCellIterator;
+
+#endif
+
 // Classe Tesselation, contient les fonctions permettant de calculer la Tessalisation
 // d'une RTriangulation et de stocker les centres dans chacune de ses cellules
 
@@ -45,7 +74,9 @@ class _Tesselation
 {
 public:
 	typedef typename TT::RTriangulation							RTriangulation;
+#ifdef ALPHASHAPES
 	typedef typename TT::AlphaShape						 		AlphaShape;
+#endif
 	typedef typename TT::Vertex_Info							VertexInfo;
 	typedef typename TT::Cell_Info								CellInfo;
 	typedef typename RTriangulation::Vertex_iterator		 			VertexIterator;
