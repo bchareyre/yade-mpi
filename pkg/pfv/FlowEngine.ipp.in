@@ -241,10 +241,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.kFactor = permeabilityFactor;
         flow.debugOut = debug;
         flow.useSolver = useSolver;
-	#ifdef EIGENSPARSE_LIB
+	#ifdef CHOLMOD_LIBS
 	flow.numSolveThreads = numSolveThreads;
 	flow.numFactorizeThreads = numFactorizeThreads;
 	#endif
+	flow.factorizeOnly = false;
 	flow.meanKStat = meanKStat;
         flow.viscosity = viscosity;
         flow.tolerance=tolerance;

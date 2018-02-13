@@ -33,7 +33,7 @@
 
 // #define PARDISO //comment this if pardiso lib is not available
 
-#ifdef EIGENSPARSE_LIB
+#ifdef CHOLMOD_LIBS
 extern "C" { void openblas_set_num_threads(int num_threads); }
 #endif
 
@@ -90,12 +90,10 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	pardisoInitialized=false;
 	pTimeInt=0;pTime1N=0;pTime2N=0;
 	pTime1=0;pTime2=0;
-	#ifdef EIGENSPARSE_LIB
+	#ifdef CHOLMOD_LIBS
 	factorizedEigenSolver=false;
 	numFactorizeThreads=1;
 	numSolveThreads=1;
-	#endif
-	#ifdef PFV_GPU
 	cholmod_l_start(&com);
 	com.useGPU=1; //useGPU;
 	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
@@ -140,7 +138,7 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetLinearSystem() {
 	if (F) taucs_supernodal_factor_free(F); F=NULL;
 	if (Fccs) taucs_ccs_free(Fccs); Fccs=NULL;
 #endif
-#ifdef EIGENSPARSE_LIB
+#ifdef CHOLMOD_LIBS
 	factorizedEigenSolver=false;
 #endif
 #ifdef PARDISO
@@ -284,14 +282,12 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 	// 			cerr<<"i="<< i <<" j="<< j<<" v="<<vs[k]<<" clen[j]="<<clen[j]-1<<endl;
 			}
 		#endif //TAUCS_LIB
-		#ifdef EIGENSPARSE_LIB
+		#ifdef CHOLMOD_LIBS
 		} else if (useSolver==3){
 			tripletList.clear(); tripletList.resize(T_nnz);
 			for(int k=0;k<T_nnz;k++) tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
  			A.resize(ncols,ncols);
 			A.setFromTriplets(tripletList.begin(), tripletList.end());
-		#endif
-		#ifdef PFV_GPU
 		}else if (useSolver==4){
 			//com.useGPU=useGPU; //useGPU;
 			cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &com);		
@@ -537,7 +533,7 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::sortV(int k1, int k2, int
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 {
-#ifdef EIGENSPARSE_LIB
+#ifdef CHOLMOD_LIBS
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
 	copyCellsToLin(dt);
 	//FIXME: we introduce new Eigen vectors, then we have to copy from/to c-arrays, can be optimized later
@@ -545,7 +541,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 	for (int k=0; k<ncols; k++) eb[k]=T_bv[k];
 	if (!factorizedEigenSolver) {
 		eSolver.setMode(Eigen::CholmodSupernodalLLt);
-		openblas_set_num_threads(numFactorizeThreads);
+		//openblas_set_num_threads(numFactorizeThreads);
 		eSolver.compute(A);
 		//Check result
 		if (eSolver.cholmod().status>0) {
@@ -557,7 +553,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 	}
 	// backgroundAction only wants to factorize, no need to solve and copy to cells.
 	if (!factorizeOnly){
-		openblas_set_num_threads(numSolveThreads);
+		//openblas_set_num_threads(numSolveThreads);
 		ex = eSolver.solve(eb);
 		for (int k=0; k<ncols; k++) T_x[k]=ex[k];
 		copyLinToCells();
@@ -571,7 +567,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 {
-#ifdef PFV_GPU
+#ifdef CHOLMOD_LIBS
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
 	copyCellsToLin(dt);
 	cholmod_dense* B = cholmod_l_zeros(ncols, 1, Achol->xtype, &com);
@@ -580,7 +576,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	if (!factorizedEigenSolver) {
 		//clock_t t;
 		//t = clock();
-		openblas_set_num_threads(numFactorizeThreads);
+		//openblas_set_num_threads(numFactorizeThreads);
 		L = cholmod_l_analyze(Achol, &com);
 		cholmod_l_factorize(Achol, L, &com);
 		//t = clock() - t;
@@ -591,7 +587,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	if (!factorizeOnly){
 		//clock_t t;
 		//t = clock();
-		openblas_set_num_threads(numSolveThreads);
+		//openblas_set_num_threads(numSolveThreads);
 		cholmod_dense* ex = cholmod_l_solve(CHOLMOD_A, L, B, &com);
 		double* e_x =(double *) ex->x;
 		for (int k=0; k<ncols; k++) T_x[k] = e_x[k];

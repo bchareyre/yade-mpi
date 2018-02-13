@@ -8,17 +8,13 @@
 #ifdef FLOW_ENGINE
 #pragma once
 
-#define CHOLMOD_LIB
-#define EIGENSPARSE_LIB //comment this if CHOLMOD is not available
+#define CHOLMOD_LIBS //comment this if CHOLMOD is not available
 // #define TAUCS_LIB //comment this if TAUCS lib is not available, it will disable PARDISO lib as well
 
-#ifdef EIGENSPARSE_LIB
+#ifdef CHOLMOD_LIBS
 	#include <Eigen/Sparse>
 	#include <Eigen/SparseCore>
 	#include <Eigen/CholmodSupport>
-#endif
-
-#ifdef CHOLMOD_LIB 
 	#include <cholmod.h>
 #endif
 
@@ -70,7 +66,7 @@ public:
 	bool areCellsOrdered;//true when orderedCells is filled, turn it false after retriangulation
 	bool updatedRHS;
 	
-	#ifdef EIGENSPARSE_LIB
+	#ifdef CHOLMOD_LIBS
 	//Eigen's sparse matrix and solver
 	Eigen::SparseMatrix<double> A;
 	typedef Eigen::Triplet<double> ETriplet;
@@ -85,9 +81,8 @@ public:
 	//here we specify both thread numbers independently
 	int numFactorizeThreads;
 	int numSolveThreads;
-	#endif
 
-	#ifdef PFV_GPU
+	// cholmod direct solver (useSolver=4)
 	cholmod_factor* L;
 	cholmod_sparse* Achol;
 	cholmod_common com;
