@@ -81,7 +81,8 @@ public:
 	//here we specify both thread numbers independently
 	int numFactorizeThreads;
 	int numSolveThreads;
-
+	#endif
+	#ifdef SUITESPARSE_VERSION_4
 	// cholmod direct solver (useSolver=4)
 	cholmod_factor* L;
 	cholmod_sparse* Achol;
