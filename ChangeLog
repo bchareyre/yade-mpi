@@ -1,4 +1,32 @@
 ==================================================
+yade-2018.02b
+Tue, Feb 20 18:55:30 2018 +0100
+
+Anton Gladky (4):
+      Remove RELEASE file
+      Do not globally import polyhedra_utils in ymport.py
+      Simplify and fix the checkPolyhedraCrush
+      Add RELEASE file
+
+Bruno Chareyre (1):
+      fix cmake warning + effectively enable TWOPHASEFLOW
+
+Janek Kozicki (3):
+      Update .gitignore and .mailmap
+      Fix warnings that I have during compilaation.
+      Initial fix for cgal 4.11. There are some things still to check:
+
+Jerome Duriez (4):
+      Doc: typo (missing parenthesis) in Ig2_Sphere_Sphere_ScGeom
+      Doc: precising IPhysFunctor docstring
+      Doc: typo in Programmer s manual
+      Doc: other typos in Programmer s manual
+
+Robert Caulk (2):
+      Fix DEM-PFV-check.py failure. Enable CPU usage of direct cholmod solver (useSolver=4)
+      Add support for older versions of SuiteSparse
+
+==================================================
 yade-2018.02a
 Wed, Feb 7 20:06:30 2018 +0100
 
