@@ -275,7 +275,7 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 	like :ysrc:`this<core/Cell.hpp>`.
 
 ``|ycomp|``
-	is used in attribute description for those that should not be provided by the used, but are auto-computed instead; ``|ycomp|`` expands to |ycomp|.
+	is used in attribute description for those that should not be provided by the user, but are auto-computed instead; ``|ycomp|`` expands to |ycomp|.
 
 ``|yupdate|``
 	marks attributes that are periodically update, being subset of the previous. ``|yupdate|`` expands to |yupdate|.
