@@ -94,6 +94,12 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			if (solver->tesselation().maxId>0) boundaryConditions(*solver);//avoids crash at iteration 0, when the packing is not bounded yet
 			else LOG_ERROR("updateBCs not applied");
 			solver->pressureChanged=true;}
+			
+		bool checkMaxId(unsigned id) {//used in other functions
+			if (id>=solver->T[solver->currentTes].cellHandles.size()) {
+				LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size());
+				return false;}
+			return true;}
 
 		void imposeFlux(Vector3r pos, Real flux);
 		unsigned int imposePressure(Vector3r pos, Real p);
@@ -168,8 +174,8 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		template<class Cellhandle>
 		Vector3r cellBarycenterFromHandle (Cellhandle cell) {return makeVector3r(solver->cellBarycenter(cell));}
 		Vector3r cellBarycenterFromId (unsigned long id) {
-			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return Vector3r(0,0,0);}
-			else return cellBarycenterFromHandle(solver->T[solver->currentTes].cellHandles[id]);}
+			if (not checkMaxId(id)) return Vector3r(0,0,0);
+			return cellBarycenterFromHandle(solver->T[solver->currentTes].cellHandles[id]);}
 		void Oedometer_Boundary_Conditions();
 		void averageRealCellVelocity();
 		void saveVtk(const char* folder) {solver->saveVtk(folder);}
@@ -182,20 +188,27 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		unsigned int nCells(){return solver->T[solver->currentTes].cellHandles.size();}
 		CELL_VECTOR_GETTER(,cellCenter)
 		CELL_VECTOR_GETTER(.averageCellVelocity,cellVelocity)
-		CELL_SCALAR_GETTER(double,.p(),cellPressure)
+		CELL_SCALAR_GETTER(Real,.p(),cellPressure)
 		CELL_SCALAR_SETTER_EXTRA(double,.p(),setCellPressure,solver->resetRHS())
 		CELL_SCALAR_GETTER(bool,.Pcondition,cellPImposed)
 		CELL_SCALAR_SETTER_EXTRA(bool,.Pcondition,setCellPImposed,solver->resetLinearSystem())
 		boost::python::list getVertices(unsigned int id){
 			boost::python::list ids;
-			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
+			if (not checkMaxId(id)) return ids;
 			for (unsigned int i=0;i<4;i++) ids.append(solver->T[solver->currentTes].cellHandles[id]->vertex(i)->info().id());
 			return ids;
 		}
 		void blockCell(unsigned int id, bool blockPressure){
-			if (id>=solver->T[solver->currentTes].cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return;}
+			if (not checkMaxId(id)) return;
 			solver->T[solver->currentTes].cellHandles[id]->info().blocked=true;
 			solver->T[solver->currentTes].cellHandles[id]->info().Pcondition=blockPressure;
+		}		
+		Real getDiffusionCoeff(unsigned cellId, unsigned throat){
+			if (not checkMaxId(cellId))  return 0;
+			const CellHandle& cell = solver->tesselation().cellHandles[cellId];
+			Real length = 	sqrt (  (cell->info()
+					- cell->neighbor(throat)->info()).squared_length() );
+			return cell->info().fluidArea(throat) / length;
 		}
 		
 		Vector3r getBoundaryNormal(int index) {
@@ -356,6 +369,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("nCells",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::nCells,"get the total number of finite cells in the triangulation.")
 		.def("blockCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::blockCell,(boost::python::arg("id"),boost::python::arg("blockPressure")),"block cell 'id'. The cell will be excluded from the fluid flow problem and the conductivity of all incident facets will be null. If blockPressure=False, deformation is reflected in the pressure, else it is constantly 0.")
 		.def("getVertices",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getVertices,(boost::python::arg("id")),"get the vertices of a cell")
+		.def("getDiffusionCoeff",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getDiffusionCoeff,(boost::python::arg("cellId"),boost::python::arg("throat")),"get the ratio of throat cross-sectional area and distance between two cells")
 		#ifdef LINSOLV
 		.def("exportMatrix",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::exportMatrix,(boost::python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
 		.def("exportTriplets",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::exportTriplets,(boost::python::arg("filename")="triplets"),"Export system matrix to a file with only non-zero entries.")
@@ -433,7 +447,8 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	inline std::vector<double>& Rh (void) {return rayHydr;}
 	inline CVector& averageVelocity (void) {return averageCellVelocity;}
 	//used for transfering values between two triangulations, overload with more variables in derived classes (see e.g. SoluteFlow)
-	inline void getInfo(const FlowCellInfo_@TEMPLATE_FLOW_NAME@& otherCellInfo) {p()=otherCellInfo.shiftedP();} 
+	inline void getInfo(const FlowCellInfo_@TEMPLATE_FLOW_NAME@& otherCellInfo) {p()=otherCellInfo.shiftedP();}
+	inline Real fluidArea (unsigned throat) {return sqrt(facetSurfaces[throat].squared_length());}
 };
 
 class FlowVertexInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleVertexInfo {
