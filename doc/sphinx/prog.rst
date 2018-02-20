@@ -278,7 +278,7 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 	is used in attribute description for those that should not be provided by the user, but are auto-computed instead; ``|ycomp|`` expands to |ycomp|.
 
 ``|yupdate|``
-	marks attributes that are periodically update, being subset of the previous. ``|yupdate|`` expands to |yupdate|.
+	marks attributes that are periodically updated, being subset of the previous. ``|yupdate|`` expands to |yupdate|.
 	
 ``\$...\$``
 	delimits inline math expressions; they will be replaced by::
@@ -326,7 +326,7 @@ Some c++ might have long or content-rich documentation, which is rather inconven
 
 		'''
 
-.. note:: Boost::python embeds function signatures in the docstring (before the one provided by the user). Therefore,  before creating separate documentation of your function, have a look at its ``__doc__`` attribute and copy the first line (and the blank lie afterwards) in the separate docstring. The first line is then used to create the function signature (arguments and return value).
+.. note:: Boost::python embeds function signatures in the docstring (before the one provided by the user). Therefore,  before creating separate documentation of your function, have a look at its ``__doc__`` attribute and copy the first line (and the blank line afterwards) in the separate docstring. The first line is then used to create the function signature (arguments and return value).
 
 
 Internal c++ documentation
