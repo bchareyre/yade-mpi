@@ -15,7 +15,7 @@ class Ig2_Sphere_Sphere_ScGeom: public IGeomFunctor{
 		YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_ScGeom,IGeomFunctor,
 		"Create/update a :yref:`ScGeom` instance representing the geometry of a contact point between two :yref:`Spheres<Sphere>` s.",
 		((Real,interactionDetectionFactor,1,,"Enlarge both radii by this factor (if >1), to permit creation of distant interactions.\n\nInteractionGeometry will be computed when interactionDetectionFactor*(rad1+rad2) > distance.\n\n.. note::\n\t This parameter is functionally coupled with :yref:`Bo1_Sphere_Aabb::aabbEnlargeFactor`, which will create larger bounding boxes and should be of the same value."))
-		((bool,avoidGranularRatcheting,true,,"Define relative velocity so that ratcheting is avoided. It applies for sphere-sphere contacts. It eventualy also apply for sphere-emulating interactions (i.e. convertible into the ScGeom type), if the virtual sphere's motion is defined correctly (see e.g. :yref:`Ig2_Sphere_ChainedCylinder_CylScGeom`.\n\n"
+		((bool,avoidGranularRatcheting,true,,"Define relative velocity so that ratcheting is avoided. It applies for sphere-sphere contacts. It eventualy also apply for sphere-emulating interactions (i.e. convertible into the ScGeom type), if the virtual sphere's motion is defined correctly (see e.g. :yref:`Ig2_Sphere_ChainedCylinder_CylScGeom`).\n\n"
 		"Short explanation of what we want to avoid :\n\n"
 		"Numerical ratcheting is best understood considering a small elastic cycle at a contact between two grains : assuming b1 is fixed, impose this displacement to b2 :\n\n"
   		"#. translation *dx* in the normal direction\n"

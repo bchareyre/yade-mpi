@@ -34,3 +34,6 @@ doc/sphinx/yade.gridpfacet.rst
 .idea
 trunk.iml
 .vscode
+
+Session??.vim
+*.swp

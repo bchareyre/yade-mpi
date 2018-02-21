@@ -6,7 +6,6 @@ from yade import qt
 from yade.gridpfacet import *
 from numpy import linspace
 
-qt.View()
 
 ### Engines need to be defined first since the function gridConnection creates the interaction
 O.engines=[
@@ -72,6 +71,7 @@ def main():
 		O.bodies[IdSphere].state.vel[2]=0.1
 
 
+qt.View()
 O.saveTmp()
 
 

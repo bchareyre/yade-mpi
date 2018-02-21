@@ -94,7 +94,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	Vector3r force;
 	Vector3r torque;
         FiniteVerticesIterator verticesEnd = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
-	int bodiesLength = scene->bodies->size();
+	size_t bodiesLength = scene->bodies->size();
         for ( FiniteVerticesIterator vIt = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); vIt !=  verticesEnd; vIt++ ) {
 		int vId = vIt->info().id();
 		force = pressureForce ? Vector3r ( vIt->info().forces[0],vIt->info().forces[1],vIt->info().forces[2] ): Vector3r(0,0,0);
@@ -209,7 +209,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::imposeFlux ( Vector3r pos, Real flux){
         solver->imposedF.push_back ( pair<CGT::Point,Real> ( CGT::Point ( pos[0],pos[1],pos[2] ), flux ) );
-	CellHandle cell=solver->T[solver->currentTes].Triangulation().locate(CGT::Point(pos[0],pos[1],pos[2]));
+	CellHandle cell=solver->T[solver->currentTes].Triangulation().locate(CGT::Sphere(pos[0],pos[1],pos[2]));
 	if (cell->info().isGhost) cerr<<"Imposing pressure in a ghost cell."<<endl;
 	for (unsigned int kk=0;kk<solver->IPCells.size();kk++){
 		if (cell==solver->IPCells[kk]) cerr<<"Both flux and pressure are imposed in the same cell."<<endl;
@@ -241,10 +241,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.kFactor = permeabilityFactor;
         flow.debugOut = debug;
         flow.useSolver = useSolver;
-	#ifdef EIGENSPARSE_LIB
+	#ifdef CHOLMOD_LIBS
 	flow.numSolveThreads = numSolveThreads;
 	flow.numFactorizeThreads = numFactorizeThreads;
 	#endif
+	flow.factorizeOnly = false;
 	flow.meanKStat = meanKStat;
         flow.viscosity = viscosity;
         flow.tolerance=tolerance;

@@ -45,7 +45,7 @@ class IPhysFunctor: public Functor2D<
 	/*argument types*/ TYPELIST_3(const shared_ptr<Material>&, const shared_ptr<Material>&, const shared_ptr<Interaction>&)
 >{
 	public: virtual ~IPhysFunctor();
-	YADE_CLASS_BASE_DOC(IPhysFunctor,Functor,"Functor for creating/updating :yref:`Interaction::phys` objects.");
+	YADE_CLASS_BASE_DOC(IPhysFunctor,Functor,"Functor for creating/updating :yref:`Interaction::phys` objects from :yref:`bodies' material<Body::material>` properties.");
 };
 REGISTER_SERIALIZABLE(IPhysFunctor);
 

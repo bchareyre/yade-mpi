@@ -447,7 +447,7 @@ NormalDisplacementDistribution(vector<Edge_iterator>& edges, vector<pair<Real,Re
 			ed_it!=ed_end; ++ed_it) {
 		Vh1= (*ed_it)->first->vertex((*ed_it)->second);
 		Vh2= (*ed_it)->first->vertex((*ed_it)->third);
-		branch = Vh1->point()- Vh2->point();
+		branch = Vh1->point().point()- Vh2->point().point();
 		NORMALIZE(branch);
 		if (consecutive)
 			U = TS1->grain(Vh1->info().id()).translation -
@@ -741,10 +741,11 @@ CVector KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, i
 
 void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet, CVector &V, Tenseur3& T)
 {
-	CVector S = cross_product((cell->vertex(l_vertices[facet][1])->point())
-							  - (cell->vertex(l_vertices[facet][0])->point()),
-							  (cell->vertex(l_vertices[facet][2])->point()) -
-							  (cell->vertex(l_vertices[facet][1])->point())) /2.f;
+	CVector S = cross_product((cell->vertex(l_vertices[facet][1])->point().point())
+							  - (cell->vertex(l_vertices[facet][0])->point().point()),
+							  (cell->vertex(l_vertices[facet][2])->point().point()) -
+							  (cell->vertex(l_vertices[facet][1])->point().point())) /2.f;
+
 	Somme(T, V, S);
 }
 

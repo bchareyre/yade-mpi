@@ -67,8 +67,4 @@ def addPlotData():
 #qt.Controller()
 #V = qt.View()
 
-O.run(250, True); checkForcesBodies(25.44893, 4)
-O.run(50, True); checkForcesBodies(28.791353, 4)
-O.run(10, True); checkForcesBodies(30.731547, 4)
-O.run(20, True); checkForcesBodies(33.483438, 7)
-
+O.run(166, True); checkForcesBodies(-21.7037, 7)

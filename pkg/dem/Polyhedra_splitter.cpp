@@ -149,19 +149,20 @@ void SplitPolyTauMax::action()
 			const Matrix3r eVect = es.eigenvectors();
 			const Vector3r eVals = es.eigenvalues()/p->GetVolume();
 
-			unsigned int S1_i, S2_i, S3_i;
-			Real         S1,   S2,   S3;
+			unsigned int S1_i, /*S2_i,*/ S3_i;  // commented out to remove warning about unused variable - Janek
+			Real         S1,   /*S2,  */ S3;    // commented out to remove warning about unused variable - Janek
 			std::set<unsigned int> inds {1,2,3};
 
 			// Sigmas: indices and values
 			S1 = eVals.maxCoeff(&S1_i); inds.erase(S1_i);
 			S3 = eVals.minCoeff(&S3_i); inds.erase(S3_i);
-			S2_i = *inds.begin(); S2 = eVals[S2_i];
+			// S2_i = *inds.begin();  // commented out to remove warning about unused variable - Janek
+			// S2 = eVals[S2_i];      // commented out to remove warning about unused variable - Janek
 
 			// Taus
-			const Real T1 = 0.5 * std::abs(S2 - S3);
+			// const Real T1 = 0.5 * std::abs(S2 - S3);  // commented out to remove warning about unused variable - Janek
 			const Real T2 = 0.5 * std::abs(S1 - S3);  // Max
-			const Real T3 = 0.5 * std::abs(S1 - S2);
+			// const Real T3 = 0.5 * std::abs(S1 - S2);  // commented out to remove warning about unused variable - Janek
 
 			if ((m->GetStrengthTau() > 0) && (T2 > (getStrength(p->GetVolume(),m->GetStrengthTau())*1000))) {
 				//Split direction, tangential
@@ -186,12 +187,12 @@ void SplitPolyTauMax::action()
 	for (auto s : splitsV) {
 		const auto b = get<0>(s);
 		const auto vec = get<1>(s);
-		Polyhedra* A = static_cast<Polyhedra*>(b->shape.get());
+//		Polyhedra* A = static_cast<Polyhedra*>(b->shape.get());  // commented out to remove warning about unused variable - Janek
 		//PrintPolyhedron(A->GetPolyhedron());
 		shared_ptr<Body> B2 = SplitPolyhedra(b, vec, b->state->pos);
-		A = static_cast<Polyhedra*>(b->shape.get());
+//		A = static_cast<Polyhedra*>(b->shape.get());  // commented out to remove warning about unused variable - Janek
 		//PrintPolyhedron(A->GetPolyhedron());
-		A = static_cast<Polyhedra*>(B2->shape.get());
+//		A = static_cast<Polyhedra*>(B2->shape.get());  // commented out to remove warning about unused variable - Janek
 		//PrintPolyhedron(A->GetPolyhedron());
 	}
 }

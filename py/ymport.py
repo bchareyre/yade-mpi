@@ -3,7 +3,7 @@ Import geometry from various formats ('import' is python keyword, hence the name
 """
 
 from yade.wrapper import *
-from yade import utils, polyhedra_utils
+from yade import utils
 
 from minieigen import *
 
@@ -376,7 +376,7 @@ def unv(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 	unvReader = UNVReader(fileName,shift,scale,returnConnectivityTable,**kw)
 	if returnConnectivityTable:
 		return unvReader.facets, unvReader.nodes, unvReader.elements
-	return facets
+	return unvReader.facets
 
 
 def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):

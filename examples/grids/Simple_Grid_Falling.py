@@ -3,7 +3,6 @@
 from yade import pack,geom,qt
 from yade.gridpfacet import *
 from pylab import *
-qt.View()
 
 
 O.engines=[
@@ -48,5 +47,6 @@ O.bodies[0].dynamic=False
 
 O.dt=1e-05
 O.saveTmp()
+qt.View()
 
 

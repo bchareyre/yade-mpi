@@ -582,7 +582,7 @@ void TwoPhaseFlowEngine::savePoreNetwork(const char* folder)
       double count = 0.0;
       for ( int k=0;k<4;k++ ){ 
 	  if(cell->vertex(k)->info().id() > 5){
-	    center= center + (cell->vertex(k)->point()-CGAL::ORIGIN);
+	    center= center + (cell->vertex(k)->point().point()-CGAL::ORIGIN);
 	    count = count + 1.0;
 	  }
       }
@@ -1920,8 +1920,8 @@ void TwoPhaseFlowEngine::solvePressure()
     
     //Solve Matrix
     aMatrix.setFromTriplets(tripletList.begin(),tripletList.end());
-    eSolver.analyzePattern(aMatrix); 						
-    eSolver.factorize(aMatrix); 						
+    eSolver.analyzePattern(aMatrix);
+    eSolver.factorize(aMatrix);
     eSolver.compute(aMatrix);
     
     
@@ -1996,7 +1996,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	// --------------------------------------find new dt -----------------------------------------------------
 	double dt = 0.0, finalDT = 1e6;
 	int saveID = -1;
-	for(int i = 0; i < numberOfPores; i++){
+	for(unsigned int i = 0; i < numberOfPores; i++){
 	  //Time step for deforming pore units
 	  if(deformation){
 	    dt = -1.0 * listOfPores[i]->info().mergedVolume / (listOfPores[i]->info().accumulativeDV + listOfPores[i]->info().accumulativeDVSwelling);	//Residence time total pore volume
@@ -2054,7 +2054,7 @@ void TwoPhaseFlowEngine::solvePressure()
 	
 	
 	// --------------------------------------update cappilary pressure (need to correct for linearization of ds/dp)-----------------------------------------------------
-	for(int i = 0; i < numberOfPores; i++){
+	for(unsigned int i = 0; i < numberOfPores; i++){
 	  if(hasInterfaceList[i] && !listOfPores[i]->info().isWResInternal && (!deformation || listOfPores[i]->info().saturation != 0.0)){
 	    pressuresList[i] = porePressureFromPcS(listOfPores[i],saturationList[i]);}
 	}
@@ -2279,7 +2279,7 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
   }
   
   
-  for(int i = 0; i < numberOfPores; i++){
+  for(unsigned int i = 0; i < numberOfPores; i++){
     dv = 0.0, dvSwelling =0.0;
     for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
 	if(cell->info().poreId == (int) i){
@@ -2295,7 +2295,7 @@ void TwoPhaseFlowEngine::updateDeformationFluxTPF()
   
   if(swelling){
     //Account for swelling of particles into a non-existing pore (i.e. boundary pores).
-    for(int i = 0; i < numberOfPores; i++){
+    for(unsigned int i = 0; i < numberOfPores; i++){
     if(listOfPores[i]->info().isNWRes){
         double count = 0.0;
         for(unsigned int j = 0; j < listOfPores[i]->info().poreNeighbors.size(); j++){
@@ -2421,9 +2421,9 @@ void TwoPhaseFlowEngine::makeListOfPoresInCells(bool fast)
 	  std::vector<double> listOfEntryPressure;
   	  std::vector<double> listOfThroatArea;
 	  for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++){
-	    if(cell->info().poreId == j){
+	    if(cell->info().poreId == (int) j){
 	      for(unsigned int ngb = 0; ngb <4 ; ngb++){
-		if(cell->neighbor(ngb)->info().poreId != j && cell->neighbor(ngb)->info().poreId != -1 ){
+		if(cell->neighbor(ngb)->info().poreId != (int) j && cell->neighbor(ngb)->info().poreId != -1 ){
 		  cancel = false;
 		  for(unsigned int checkID = 0; checkID < poreNeighbors.size(); checkID++){
 		   if( poreNeighbors[checkID] == cell->neighbor(ngb)->info().poreId){
@@ -2466,7 +2466,7 @@ void TwoPhaseFlowEngine::makeListOfPoresInCells(bool fast)
 
 	  if(!fast){
             for (FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++) {
-                if(cell->info().poreId == j){
+                if(cell->info().poreId == (int) j){
                     cell->info().poreNeighbors = poreNeighbors;
                     cell->info().listOfEntrySaturation = listOfEntrySaturation;
                     cell->info().listOfEntryPressure = listOfEntryPressure;
