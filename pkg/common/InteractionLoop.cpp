@@ -75,8 +75,8 @@ void InteractionLoop::action(){
 			continue;
 		}
     
-    // Skip interaction with clumps
-    if (b1_->isClump() || b2_->isClump()) { continue; }
+		// Skip interaction with clumps
+		if (b1_->isClump() || b2_->isClump()) { continue; }
 		
 		// we know there is no geometry functor already, take the short path
 		if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }

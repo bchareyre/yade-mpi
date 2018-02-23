@@ -34,15 +34,11 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
-                ((Vector3r,NormalForce,Vector3r::Zero(),,"Normal force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
-                ((Vector3r,TangentForce,Vector3r::Zero(),,"Tangeancial force computed at t-dt (Used only by Law2_ScGeom_ImplicitLubricationPhys) [N]"))
                 ((shared_ptr<IPhys>,otherPhys,0,,"Other physics combined (used only by Law2_ScGeom_LubricationPhys)"))
                 , // ctors
                 createIndex();,
                       .def_readonly("eta",&LubricationPhys::eta,"Fluid viscosity [Pa.s]")
                       .def_readonly("eps",&LubricationPhys::eps,"Rugosity [-]")
-                      .def_readonly("NormalForce",&LubricationPhys::NormalForce,"Normal componant of the force [N]")
-                      .def_readonly("TangentForce",&LubricationPhys::TangentForce,"Shear compoannt of the force [N]")
                       .def_readonly("ue",&LubricationPhys::ue,"Surface deflection [m]")
 //                      .def_readonly("ue2",&LubricationPhys::ue2,"Rejected solution of ue [m]")
                       .def_readonly("contact",&LubricationPhys::contact,"Spheres in contact")

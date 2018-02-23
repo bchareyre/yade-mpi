@@ -15,9 +15,7 @@ LubricationPhys::LubricationPhys(const ViscElPhys &obj) :
     phic(0.),
     ue(0.),
     contact(false),
-    slip(false),
-    NormalForce(Vector3r::Zero()),
-    TangentForce(Vector3r::Zero())
+    slip(false)
 {
 }
 
@@ -198,8 +196,16 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Real u(-geom->penetrationDepth);
     const Real pi(3.141596);
 
+    if(debug)
+        LOG_INFO("INTER id1:" << id1 << " id2:" << id2 << " u:" << u << " a:" << a);
+    
+    if(debug)
+	LOG_INFO("Called");
+
     if(u > a)
+    {
         return false;
+    }
 
     // Speeds
     Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*interaction->cellDist.cast<Real>()) : Vector3r::Zero();
@@ -293,8 +299,8 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 #define fdf(d,d_,u,g,k,eps,dt) ((std::exp(d)*(g+k)+(1.-std::exp(d_-d))/dt-g*u-k*eps)/(2.*std::exp(d)*(g+k)+1./dt-g*u-k*eps))
 #define FdF(d) fdf((d),phys->delta,u,G,K,EPS,scene->dt)
 
-            if(debug)
-                LOG_DEBUG("G K EPS dt u d_ " << G << " " << K << " " << EPS << " " << scene->dt << " " << u << " " << phys->delta);
+            //if(debug)
+                //LOG_DEBUG("G K EPS dt u d_ " << G << " " << K << " " << EPS << " " << scene->dt << " " << u << " " << phys->delta);
 
             Real d = phys->delta;
 
@@ -310,11 +316,11 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
                 if(std::abs(F(d)) < 1e-10)
                     break;
 
-                if(debug)
-                    LOG_DEBUG("d F(d) F/(dF/dd) " << d << " " << F(d) << " " << FdF(d));
+                //if(debug)
+                    //LOG_DEBUG("d F(d) F/(dF/dd) " << d << " " << F(d) << " " << FdF(d));
 
-                if(debug && i == 19)
-                    LOG_DEBUG("Max Newton-Rafson steps reach");
+                //if(debug && i == 19)
+                    //LOG_DEBUG("Max Newton-Rafson steps reach");
             }
 
             ue = u - std::exp(d);
@@ -334,7 +340,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     if(activateTangencialLubrication)
     {
-        Vector3r Ft_ = geom->rotate(phys->TangentForce);
+        Vector3r Ft_ = geom->rotate(phys->shearForce);
         Real kt = phys->kso*std::pow(delt,0.5);
         Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+un)*std::log((2.*a+un)/un));
 
@@ -366,10 +372,10 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
 
     // Update Physics memory
-    phys->NormalForce = Fn;
+    phys->normalForce = Fn;
     phys->ue = ue;
     phys->delta = D;
-    phys->TangentForce = Ft;
+    phys->shearForce = Ft;
     phys->contact = contact;
 
     // Rolling and twist torques
