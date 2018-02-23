@@ -97,7 +97,9 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	#endif
 	#ifdef SUITESPARSE_VERSION_4
 	cholmod_l_start(&com);
-	com.useGPU=1; //useGPU;
+		#if (CHOLMOD_GPU == 1)
+		com.useGPU=1; //useGPU, rebuild with CHOLMOD_GPU=0 if compilation fails
+		#endif
 	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
 	#endif
 }
