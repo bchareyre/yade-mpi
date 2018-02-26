@@ -219,19 +219,19 @@ Non-elastic parameters differ for various material models. Usually, though, they
 
 .. _sect-strain-evaluation:
 
-Strain evaluation
-=================
+Kinematic variables
+===================
 In the general case, mutual configuration of two particles has 6 degrees of freedom (DoFs) just like a beam in 3D space: both particles have 6 DoFs each, but the interaction itself is free to move and rotate in space (with both spheres) having 6 DoFs itself; then $12-6=6$. They are shown at `fig-spheres-dofs`_.
 
 .. _fig-spheres-dofs:
 .. figure:: fig/spheres-dofs.*
 
-	Degrees of freedom of configuration of two spheres. Normal strain appears if there is a difference of linear velocity along the interaction axis ($n$); shearing originates from the difference of linear velocities perpendicular to $n$ *and* from the part of $\vec{\omega}_1+\vec{\omega}_2$ perpendicular to $n$; twisting is caused by the part of $\vec{\omega}_1-\vec{\omega}_2$ parallel with $n$; bending comes from the part of $\vec{\omega}_1-\vec{\omega}_2$ perpendicular to $n$.
+	Degrees of freedom of configuration of two spheres. Normal motion appears if there is a difference of linear velocity along the interaction axis ($n$); shearing originates from the difference of linear velocities perpendicular to $n$ *and* from the part of $\vec{\omega}_1+\vec{\omega}_2$ perpendicular to $n$; twisting is caused by the part of $\vec{\omega}_1-\vec{\omega}_2$ parallel with $n$; bending comes from the part of $\vec{\omega}_1-\vec{\omega}_2$ perpendicular to $n$.
 
-We will only describe normal and shear components of strain in the following, leaving torsion and bending aside. The reason is that most constitutive laws for contacts do not use the latter two.
+We will only describe normal and shear components of the relative movement in the following, leaving torsion and bending aside. The reason is that most constitutive laws for contacts do not use the latter two. 
 
-Normal strain
--------------
+Normal deformation
+------------------
 
 .. _sect-normal-strain-constants:
 
@@ -312,8 +312,8 @@ For massively compressive simulations, it might be beneficial to use the logarit
 
 Such definition, however, has the disadvantage of effectively increasing rigidity (up to infinity) of contacts, requiring $\Dt$ to be adjusted, lest the simulation becomes unstable. Such dynamic adjustment is possible using a stiffness-based time-stepper (:yref:`GlobalStiffnessTimeStepper` in Yade).
 
-Shear strain
--------------
+Shear deformation
+-----------------
 In order to keep $\vec{u}_T$ consistent (e.g. that $\vec{u}_T$ must be constant if two spheres retain mutually constant configuration but move arbitrarily in space), then either $\vec{u}_T$ must track spheres' spatial motion or must (somehow) rely on sphere-local data exclusively.
 
 Geometrical meaning of shear strain is shown in `fig-shear-2d`_.
@@ -354,13 +354,13 @@ Finally, we compute
 
 .. _sect-formulation-stress-cundall:
 
-Stress evaluation (example)
-===========================
-Once strain on a contact is computed, it can be used to compute stresses/forces acting on both spheres.
-
-The constitutive law presented here is the most usual DEM formulation, originally proposed by Cundall. While the strain evaluation will be similar to algorithms described in the previous section regardless of stress evaluation, stress evaluation itself depends on the nature of the material being modeled. The constitutive law presented here is the most simple non-cohesive elastic case with dry friction, which Yade implements in :yref:`Law2_ScGeom_FrictPhys_CundallStrack` (all constitutive laws derive from base class :yref:`LawFunctor`).
-		
+Contact model (example)
+=======================
+The kinematic variables of an interaction are used to determine the forces acting on both spheres via a constitutive law.
 In DEM generally, some constitutive laws are expressed using strains and stresses while others prefer displacement/force formulation. The law described here falls in the latter category.
+
+The constitutive law presented here is the most common in DEM, originally proposed by Cundall. While the kinematic variables are described in the previous section regardless of the contact model, the force evaluation depends on the nature of the material being modeled. The constitutive law presented here is the simplest non-cohesive elastic-frictional contact model, which Yade implements in :yref:`Law2_ScGeom_FrictPhys_CundallStrack` (all constitutive laws derive from base class :yref:`LawFunctor`).
+		
 
 When new contact is established (discussed in :ref:`sect-simulation-loop`) it has its properties (:yref:`IPhys`) computed from :yref:`Materials<Material>` associated with both particles. In the simple case of frictional material :yref:`FrictMat`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` creates a new :yref:`FrictPhys` instance, which defines normal stiffness $K_N$, shear stiffness $K_T$ and friction angle $\phi$.
 
@@ -671,7 +671,7 @@ Estimating timestep in absence of interactions is based on the connection betwee
 			 
 In Yade, particles have associated :yref:`Material` which defines density $\rho$ (:yref:`Material.density`), and also may define (in :yref:`ElastMat` and derived classes) particle's "Young's modulus" $E$ (:yref:`ElastMat.young`). $\rho$ is used when particle's mass $m$ is initially computed from its $\rho$, while $E$ is taken in account when creating new interaction between particles, affecting stiffness $K_N$. Knowing $m$ and $K_N$, we can estimate :eq:`eq-dtcr-particle-stiffness` for each particle; we obviously neglect 
 
-* number of interactions per particle $N_i$; for a "reasonable" radius distribution, however, there is a geometrically imposed upper limit (6 for a 2D-packing of spheres with equal radii, for instance);
+* number of interactions per particle $N_i$; for a "reasonable" radius distribution, however, there is a geometrically imposed upper limit (12 for a packing of spheres with equal radii, for instance);
 * the exact relationship the between particles' rigidities $E_i$, $E_j$, supposing only that $K_N$ is somehow proportional to them.
 
 By defining $E$ and $\rho$, particles have continuum-like quantities. Explicit integration schemes for continuum equations impose a critical timestep based on sonic speed $\sqrt{E/\rho}$; the elastic wave must not propagate farther than the minimum distance of integration points $l_{\rm min}$ during one step. Since $E$, $\rho$ are parameters of the elastic continuum and $l_{\rm min}$ is fixed beforehand, we obtain

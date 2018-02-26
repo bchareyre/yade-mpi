@@ -97,7 +97,9 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	#endif
 	#ifdef SUITESPARSE_VERSION_4
 	cholmod_l_start(&com);
-	com.useGPU=1; //useGPU;
+		#if (CHOLMOD_GPU == 1)
+		com.maxGpuMemFraction=0.4; //using (less than) half of the available memory for each solver		
+		#endif
 	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
 	#endif
 }
@@ -572,6 +574,10 @@ template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 {
 #ifdef SUITESPARSE_VERSION_4
+	if (!multithread){
+		cerr << "useSolver=4 requires flow.multithread=True. Nothing computed." << endl;
+		return 1;
+	}
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
 	copyCellsToLin(dt);
 	cholmod_dense* B = cholmod_l_zeros(ncols, 1, Achol->xtype, &com);

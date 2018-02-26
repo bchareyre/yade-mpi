@@ -42,6 +42,7 @@ public:
 	DECLARE_TESSELATION_TYPES(FlowType)
 	typedef typename FlowType::Tesselation	Tesselation;
 	using FlowType::useSolver;
+	using FlowType::multithread;
 	using FlowType::T;
 	using FlowType::currentTes;
 	using FlowType::boundary;
