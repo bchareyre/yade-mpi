@@ -337,12 +337,12 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     // Tangencial force
     Vector3r Ft(Vector3r::Zero());
-
+    Vector3r Ft_ = geom->rotate(phys->shearForce);
+    Real kt = phys->kso*std::pow(delt,0.5);
+    Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+un)*std::log((2.*a+un)/un));
+    
     if(activateTangencialLubrication)
     {
-        Vector3r Ft_ = geom->rotate(phys->shearForce);
-        Real kt = phys->kso*std::pow(delt,0.5);
-        Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+un)*std::log((2.*a+un)/un));
 
         if(solution == 4)
         {
@@ -377,6 +377,12 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     phys->delta = D;
     phys->shearForce = Ft;
     phys->contact = contact;
+    
+    // Compute separate forces    
+    phys->normalContactForce = un*kn*norm;
+    phys->normalLubricationForce = (Fn - un*kn*norm);
+    phys->shearLubricationForce = -nut*(relVT + (Ft-Ft_)/(scene->dt*kt));
+    phys->shearContactForce = Ft - phys->shearLubricationForce;
 
     // Rolling and twist torques
     Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
@@ -403,5 +409,57 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 }
 
 CREATE_LOGGER(Law2_ScGeom_ImplicitLubricationPhys);
+
+void Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(vector<Matrix3r>& NCStresses, vector<Matrix3r>& SCStresses, vector<Matrix3r>& NLStresses, vector<Matrix3r>& SLStresses )
+{
+  	const shared_ptr<Scene>& scene=Omega::instance().getScene();
+	NCStresses.resize(scene->bodies->size());
+	SCStresses.resize(scene->bodies->size());
+	NLStresses.resize(scene->bodies->size());
+	SLStresses.resize(scene->bodies->size());
+	for (size_t k=0;k<scene->bodies->size();k++)
+	{
+		NCStresses[k]=Matrix3r::Zero();
+		SCStresses[k]=Matrix3r::Zero();
+		NLStresses[k]=Matrix3r::Zero();
+		SLStresses[k]=Matrix3r::Zero();
+	}
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		LubricationPhys* phys=YADE_CAST<LubricationPhys*>(I->phys.get());
+		
+		if(phys)
+		{			
+			Vector3r lV1 = (3.0/(4.0*Mathr::PI*pow(geom->refR1,3)))*((geom->contactPoint-Body::byId(I->getId1(),scene)->state->pos));
+			Vector3r lV2 = Vector3r::Zero();
+			if (!scene->isPeriodic)
+				lV2 = (3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos)));
+			else
+				lV2 = (3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos + (scene->cell->hSize*I->cellDist.cast<Real>()))));
+
+			NCStresses[I->getId1()] -= phys->normalContactForce*lV1.transpose();
+			NCStresses[I->getId2()] += phys->normalContactForce*lV2.transpose();
+			SCStresses[I->getId1()] -= phys->shearContactForce*lV1.transpose();
+			SCStresses[I->getId2()] += phys->shearContactForce*lV2.transpose();
+			NLStresses[I->getId1()] -= phys->normalLubricationForce*lV1.transpose();
+			NLStresses[I->getId2()] += phys->normalLubricationForce*lV2.transpose();
+			SLStresses[I->getId1()] -= phys->shearLubricationForce*lV1.transpose();
+			SLStresses[I->getId2()] += phys->shearLubricationForce*lV2.transpose();
+		}
+	}
+}
+
+py::tuple Law2_ScGeom_ImplicitLubricationPhys::PyGetStressForEachBody()
+{
+	py::list nc, sc, nl, sl;
+	vector<Matrix3r> NCs, SCs, NLs, SLs;
+	getStressForEachBody(NCs, SCs, NLs, SLs);
+	FOREACH(const Matrix3r& m, NCs) nc.append(m);
+	FOREACH(const Matrix3r& m, SCs) sc.append(m);
+	FOREACH(const Matrix3r& m, NLs) nl.append(m);
+	FOREACH(const Matrix3r& m, SLs) sl.append(m);
+	return py::make_tuple(nc, sc, nl, sl);
+}
 
 

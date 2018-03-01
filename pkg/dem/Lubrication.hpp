@@ -34,6 +34,10 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
+		((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
+		((Vector3r,shearContactForce,Vector3r::Zero(),,"Frictional contact force"))
+		((Vector3r,normalLubricationForce,Vector3r::Zero(),,"Normal lubrication force"))
+		((Vector3r,shearLubricationForce,Vector3r::Zero(),,"Shear lubrication force"))
                 ((shared_ptr<IPhys>,otherPhys,0,,"Other physics combined (used only by Law2_ScGeom_LubricationPhys)"))
                 , // ctors
                 createIndex();,
@@ -95,6 +99,8 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
         public:
                 bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
                 FUNCTOR2D(GenericSpheresContact,LubricationPhys);
+                static void getStressForEachBody(vector<Matrix3r>& NCStresses, vector<Matrix3r>& SCStresses, vector<Matrix3r>& NLStresses, vector<Matrix3r>& SLStresses );
+		static py::tuple PyGetStressForEachBody();
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,
 			"Material law for lubrication and contact between two spheres, resolved implicitly.",
@@ -112,6 +118,8 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
                           .def_readwrite("activateTwistLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTwistLubrication,"Activate twist lubrication (default: true)")
                           .def_readwrite("activateRollLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateRollLubrication,"Activate roll lubrication (default: true)")
                           .def_readwrite("solution",&Law2_ScGeom_ImplicitLubricationPhys::solution,"Choose resolution method")
+                          .def("getStressForEachBody",&Law2_ScGeom_ImplicitLubricationPhys::PyGetStressForEachBody,"Get stresses for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
+                          .staticmethod("getStressForEachBody")
                 );
                 DECLARE_LOGGER;
 };
