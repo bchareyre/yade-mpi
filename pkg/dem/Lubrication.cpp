@@ -75,15 +75,7 @@ void Ip2_ElastMat_ElastMat_LubricationPhys::go(const shared_ptr<Material> &mater
     phys->kso = Kso;
     phys->phic = frictionAngle;
     phys->nun = pi*eta*3./2.*a*a;
-
-    // Get bodies properties
-    Body::id_t id1 = interaction->getId1();
-    Body::id_t id2 = interaction->getId2();
-    const shared_ptr<Body> b1 = Body::byId(id1,scene);
-    const shared_ptr<Body> b2 = Body::byId(id2,scene);
-    State* s1 = b1->state.get();
-    State* s2 = b2->state.get();
-    phys->delta = std::log((s1->se3.position-s2->se3.position).norm()-2.*a);
+    //phys->delta = -1.;
 
     phys->eta = eta;
     phys->eps = eps;
@@ -193,20 +185,9 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     // geometric parameters
     Real a((geom->radius1+geom->radius2)/2.);
-    Real u(-geom->penetrationDepth);
+    Real un(-geom->penetrationDepth);
     const Real pi(3.141596);
-
-    if(debug)
-        LOG_INFO("INTER id1:" << id1 << " id2:" << id2 << " u:" << u << " a:" << a);
     
-    if(debug)
-	LOG_INFO("Called");
-
-    if(u > a)
-    {
-        return false;
-    }
-
     // Speeds
     Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*interaction->cellDist.cast<Real>()) : Vector3r::Zero();
     Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*interaction->cellDist.cast<Real>()): Vector3r::Zero();
@@ -214,175 +195,113 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Vector3r relV = geom->getIncidentVel(s1, s2, scene->dt, shift2, shiftVel, false );
     Vector3r relVN = relV.dot(norm)*norm; // Normal velocity
     Vector3r relVT = relV - relVN; // Tangeancial velocity
-    Real udot = relV.dot(norm); // Normal velocity norm
+    Real undot = relV.dot(norm); // Normal velocity norm
+    
+    if(un > a)
+    {
+        return undot < 0; // Only go to potential if distance is increasing
+    }
 
     // Normal force
     Vector3r Fn(Vector3r::Zero());
-    Real ue(0.),D(0.),un(0.);
+    Real ue(0.);
     Real delt = max(std::abs(phys->ue),a/100.);
-    //Real delt = std::abs(phys->ue);
-    
-    //delt = a/100.;
+    Real EPS = phys->eps*a;
     
     Real g = 3./2.*phys->kno*std::pow(delt,0.5); // Stiffness for normal surface deflection
-    bool contact = (u - phys->ue) < phys->eps*a;
-
-    if(solution == 2)
-        contact = (u-(1+phys->eps)*phys->ue) < phys->eps*a;
-
-    // Log resolution
-    if(solution == 4)
-        contact = std::exp(phys->delta) < phys->eps*a;
-
+    bool contact = un < phys->eps*a;
     Real kn = (contact) ? g : 0.;
 
     if(debug && contact && !phys->contact) LOG_INFO("CONTACT");
     if(debug && !contact && phys->contact) LOG_INFO("END OF CONTACT");
 
+    
     if(activateNormalLubrication)
     {
         Real G = g/phys->nun;
         Real K = kn/phys->nun;
-        Real EPS = phys->eps*a;
-
-        // Full implicit resolution
-        if(solution == 1 || solution == 2)
+        
+        Real A = -G;
+        Real B = (-G*un - K*un + EPS*K - 1/scene->dt);
+        Real C = -K*un*(un-EPS) - undot + phys->ue/scene->dt;
+        
+        Real rho = B*B-4.*A*C;
+        
+        if(rho >= 0)
         {
-            Real A = G + K;
-            Real B = -1./scene->dt - G*u - 2.*K*u + K*EPS;
-            Real C = phys->ue/scene->dt + udot + K*u*u - K*u*EPS;
-
-            if(solution == 2)
-            {
-                A = -G-(1+phys->eps)*K;
-                B = G*u-K*(EPS-u-u*(1+phys->eps)) - 1/scene->dt;
-                C = phys->ue/scene->dt - udot - K*u*(u-EPS);
-            }
-
-            Real rho = B*B-4.*A*C;
-
-            Real u1 = (-B+std::sqrt(rho))/(2.*A);
-            Real u2 = (-B-std::sqrt(rho))/(2.*A);
-
-            // FIXME: Very ugly...
-            if(rho >= 0)
-            {
-                ue = (std::abs(phys->ue - u1) < std::abs(phys->ue - u2)) ? u1 : u2;
-                //ue2 = (ue == u1) ? u2 : u1;
-                //phys->due = ue - phys->ue;
-            }
-            else
-            {
-                //LOG_DEBUG("Unable to find a solution: rho < 0");
-                ue = phys->ue;// + phys->due;
-            }
+            Real ue1 = (-B+std::sqrt(rho))/(2*A);
+            Real ue2 = (-B-std::sqrt(rho))/(2*A);
+            
+            ue = (std::abs(ue1 - phys->ue) < std::abs(ue2-phys->ue)) ? ue1 : ue2;
         }
-
-        // Semi-implicit resolution
-        if(solution == 3)
+        else
         {
-            ue = (K*(u-phys->ue)*(u-EPS)+udot+phys->ue/scene->dt)/((G+K)*(u-phys->ue)+1/scene->dt);
-           // ue2 = 0.;
+            LOG_WARN("rho < 0");
+            ue = phys->ue;
         }
-
-        un = u - ue;
-
-        //Implicit log-resolution
-        if(solution == 4)
-        {
-
-// Function to be zero
-#define fx(d,d_,u,g,k,eps,dt) (std::exp(2.*d)*(g+k)+std::exp(d)*(1./dt-g*u-k*eps)-std::exp(d_)/dt)
-#define F(d) fx((d),phys->delta,u,G,K,EPS,scene->dt)
-
-// Expression of F(d)/(dF/dd)(d)
-#define fdf(d,d_,u,g,k,eps,dt) ((std::exp(d)*(g+k)+(1.-std::exp(d_-d))/dt-g*u-k*eps)/(2.*std::exp(d)*(g+k)+1./dt-g*u-k*eps))
-#define FdF(d) fdf((d),phys->delta,u,G,K,EPS,scene->dt)
-
-            //if(debug)
-                //LOG_DEBUG("G K EPS dt u d_ " << G << " " << K << " " << EPS << " " << scene->dt << " " << u << " " << phys->delta);
-
-            Real d = phys->delta;
-
-            for(int i(0);i<20;i++)
-            {
-                //Real dd = 0.005;
-                //Real df = (F(d+dd) - F(d-dd))/(2.*dd);
-
-                //d = d - F(d)/df;
-
-                d = d - FdF(d);
-
-                if(std::abs(F(d)) < 1e-10)
-                    break;
-
-                //if(debug)
-                    //LOG_DEBUG("d F(d) F/(dF/dd) " << d << " " << F(d) << " " << FdF(d));
-
-                //if(debug && i == 19)
-                    //LOG_DEBUG("Max Newton-Rafson steps reach");
-            }
-
-            ue = u - std::exp(d);
-            un = std::exp(d);
-            D = d;
-        }
-
-        // calc dtm
-        //phys->dtm = (-2.*phys->ue)/(-3.*(G+K)*phys->ue*phys->ue+udot+K*u*(u-EPS)-(-G*u+K*(EPS-2.*u))*phys->ue);
-
-        //calculate the force
-        Fn = ue*g*norm;
+        
+        Fn = -ue*g*norm;
+        // Calculate separate forces
+        phys->normalContactForce = (un - EPS)*kn*norm;
+        phys->normalLubricationForce = phys->nun*undot/un*norm;
     }
+    else
+    {
+        phys->normalContactForce = Vector3r::Zero();
+        phys->normalLubricationForce = Vector3r::Zero();
+    }
+    
 
+    
+    
     // Tangencial force
+    Real u = ue + un;
     Vector3r Ft(Vector3r::Zero());
     Vector3r Ft_ = geom->rotate(phys->shearForce);
     Real kt = phys->kso*std::pow(delt,0.5);
-    Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+un)*std::log((2.*a+un)/un));
+    Real nut = pi*phys->eta/2.*(-2.*a+(2.*a+u)*std::log((2.*a+u)/u));
     
     if(activateTangencialLubrication)
     {
-
-        if(solution == 4)
-        {
-            nut = pi*phys->eta/2.*(-2.*a+(2.*a+un)*(std::log(2.*a+un)-D));
-        }
-
         phys->slip = false;
-        //LOG_INFO("nut: " << nut);
 
         if(contact)
         {
             Ft = Ft_ - scene->dt*kt*relVT;
-            Real Feps = std::abs(-kn*(u-ue-phys->eps*a));
+            
+            /*
+            Real Feps = phys->normalContactForce.norm();
 
             if(Ft.norm() > Feps*std::tan(phys->phic)) // If slip
             {
                 //LOG_INFO("SLIP");
                 Ft = (Ft_ - scene->dt*kt*relVT*(1.+Feps*std::tan(phys->phic)/relVT.norm()))/(1.+kt/nut*scene->dt);
                 phys->slip = true;
-            }
+            }//*/
         }
         else
         {
             Ft = (Ft_ - scene->dt*kt*relVT)/(1.+kt/nut*scene->dt);
         }
+    
+        // Calculate separate forces
+        phys->shearLubricationForce = -nut*(relVT + (Ft-Ft_)/(scene->dt*kt));
+        phys->shearContactForce = Ft - phys->shearLubricationForce;
     }
-
+    else
+    {
+        phys->shearLubricationForce = Vector3r::Zero();
+        phys->shearContactForce = Vector3r::Zero();
+    }
 
     // Update Physics memory
     phys->normalForce = Fn;
-    phys->ue = ue;
-    phys->delta = D;
     phys->shearForce = Ft;
+    
+    phys->ue = ue;
+    phys->un = un;
     phys->contact = contact;
     
-    // Compute separate forces    
-    phys->normalContactForce = un*kn*norm;
-    phys->normalLubricationForce = (Fn - un*kn*norm);
-    phys->shearLubricationForce = -nut*(relVT + (Ft-Ft_)/(scene->dt*kt));
-    phys->shearContactForce = Ft - phys->shearLubricationForce;
 
     // Rolling and twist torques
     Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
@@ -390,13 +309,13 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
 
     Vector3r Cr = Vector3r::Zero();
-    if(activateRollLubrication) Cr = pi*phys->eta*a*a*a*(3./2.*std::log(a/u)+63./500.*u/a*std::log(a/u))*relRollVelocity;
+    if(activateRollLubrication) Cr = pi*phys->eta*a*a*a*(3./2.*std::log(a/un)+63./500.*un/a*std::log(a/un))*relRollVelocity;
     Vector3r Ct = Vector3r::Zero();
-    if (activateTwistLubrication) Ct = pi*phys->eta*a*u*std::log(a/u)*relTwistVelocity;
+    if (activateTwistLubrication) Ct = pi*phys->eta*a*un*std::log(a/un)*relTwistVelocity;
 
     // total torque
-    Vector3r C1 = (geom->radius1+u/2.)*Ft.cross(norm)+Cr+Ct;
-    Vector3r C2 = (geom->radius2+u/2.)*Ft.cross(norm)-Cr-Ct;
+    Vector3r C1 = (geom->radius1+un/2.)*Ft.cross(norm)+Cr+Ct;
+    Vector3r C2 = (geom->radius2+un/2.)*Ft.cross(norm)-Cr-Ct;
 
     // Apply!
     scene->forces.addForce(id1,Fn+Ft);
