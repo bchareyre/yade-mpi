@@ -324,7 +324,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     phys->contact = contact;
 
 #if 1
-    if(!isfinite(phys->normalForce.norm()) || !isfinite(phys->shearForce.norm()))
+    if(!std::isfinite(phys->normalForce.norm()) || !std::isfinite(phys->shearForce.norm()))
     {
         LOG_INFO("normalForce" << phys->normalForce);
         LOG_INFO("normalContactForce "<< phys->normalContactForce);
