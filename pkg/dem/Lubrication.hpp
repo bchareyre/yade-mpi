@@ -26,7 +26,7 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,kno,0.0,,"Coeficient for normal stiffness"))
                 ((Real,kso,0.0,,"Coeficient for tangeancial stiffness"))
                 ((Real,nun,0.0,,"Normal viscosity coefficient"))
-                ((Real,phic,0.0,,"Critical friction angle [-]"))
+                ((Real,mum,0.3,,"Friction coefficient [-]"))
                 ((Real,ue,0.,,"Surface deflection at t-dt [m]"))
                 ((Real,un,0.,,"u_{nu} at t-dt [m]"))
 //                ((Real,due,0.,,"Last increment of ue"))
