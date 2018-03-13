@@ -7,6 +7,7 @@
 #include<pkg/common/NormShearPhys.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include <boost/thread/mutex.hpp>
+#include <random>
 
 /** This class holds information associated with each body state*/
 class JCFpmState: public State {
