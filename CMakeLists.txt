@@ -59,8 +59,14 @@ INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 
 EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 IF (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-  MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0 and -save-temps")
-  ADD_DEFINITIONS("-ftrack-macro-expansion=0 -save-temps")
+  MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0")
+  ADD_DEFINITIONS("-ftrack-macro-expansion=0")
+ENDIF()
+
+# -save-temps is not supported with ccache
+IF ((GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8) AND ( NOT "${CMAKE_CXX_COMPILER_LAUNCHER}" MATCHES ".*ccache"))
+  MESSAGE(STATUS "GCC Version >= 4.8. Adding -save-temps")
+  ADD_DEFINITIONS("-save-temps")
 ENDIF()
 
 #===========================================================
