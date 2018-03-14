@@ -6,8 +6,8 @@ function writesCapFile()
 %   the capillary file is a bridge configuration. Configurations are
 %   grouped by distance values, then (for any distance value) by capillary
 %   pressure values.
-%   The user is expected to modify l. 10 to 27 to taylor the generation to
-%   his needs.
+%   The user is expected to modify the lines below (~12 to 32) to taylor
+%   the generation to his needs.
 
 % ---------------- Parameters to define by the user -----------------------
 
@@ -18,7 +18,7 @@ dDelta1 = 0.3; % delta1 (see solveLiqBridge.m) increment between two configurati
 
 % Capillary files construction parameters:
 nValUc = 350; % # (at most) of capillary pressure values to consider for 
-% one given distance
+% one given distance: 350, usually
 nValDist = 80; % # of distance values (linearly spaced between 0 and some 
 % rupture distance computed in Preliminary A below) to consider
 % See also if needed l. 147 that defines the capillary file names
@@ -154,7 +154,7 @@ for i =1:length(rRatioVec)
     
     nomCapFic = ['M(r=',num2str(rRatio),')',suffixe];
     fic = fopen(nomCapFic,'w');
-    % first line of the file=rRatio value:
+    % first line of the file: the rRatio value:
     fprintf(fic,[num2str(rRatio),'\n',num2str(nValDist),'\n']);% for direct use in YADE
     % alternatively, you may want to save some details about the
     % construction. If yes, replace with the 2 following lines
