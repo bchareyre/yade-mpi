@@ -26,7 +26,7 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 	Real Va 	= mat1->poisson;
 	Real Vb 	= mat2->poisson;
 
-	//equivalent stiffness from a series pair when (2*Ri*Ei) is the stiffness of a contact point on sphere "i"
+	//half the harmonic average of the two stiffnesses, when (2*Ri*Ei) is the stiffness of a contact point on sphere "i"
 	Real Kn = 2*Ea*Ra*Eb*Rb/(Ea*Ra+Eb*Rb);
 	//same for shear stiffness
 	Real Ks = 2*Ea*Ra*Va*Eb*Rb*Vb/(Ea*Ra*Va+Eb*Rb*Vb);
