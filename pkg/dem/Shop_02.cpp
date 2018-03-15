@@ -369,6 +369,76 @@ Matrix3r Shop::getStress(Real volume){
 }
 
 
+py::list Shop::getDynamicStress()
+{
+	Scene* scene=Omega::instance().getScene().get();
+	py::list kineticStressTensors;
+    Vector3r averageVelocity(Vector3r::Zero());
+
+    FOREACH(const shared_ptr<Body>& b,*Omega::instance().getScene()->bodies)
+    {
+			averageVelocity += b->state->vel;
+	}
+	
+	averageVelocity /= scene->bodies->size();
+
+	//
+	//Dynamic contribution to the stress tensor
+	//
+	for(unsigned int i(0);i<scene->bodies->size();i++)
+    {
+        const shared_ptr<Body>& b = Body::byId(i, scene);
+        Vector3r vFluct = b->state->vel - averageVelocity;
+        
+        Sphere * s = YADE_CAST<Sphere*>(b->shape.get());
+        
+        if(s)
+            kineticStressTensors.append(-(3.0/(4.0*M_PI*pow(s->radius,3)))*b->state->mass*vFluct*vFluct.transpose());
+        else
+            kineticStressTensors.append(Matrix3r::Zero());
+	}
+	
+	return kineticStressTensors;
+}
+
+Matrix3r Shop::getTotalDynamicStress(Real volume)
+{
+	Scene* scene=Omega::instance().getScene().get();
+	Matrix3r kineticStressTensor(Matrix3r::Zero());
+    Vector3r averageVelocity(Vector3r::Zero());
+    
+    if(volume == 0)
+    {
+        if(scene->isPeriodic)
+            volume = scene->cell->getVolume();
+        else
+        {
+            LOG_ERROR("Must provide volume if scene is not periodic!");
+            return kineticStressTensor;
+        }
+    }
+
+    FOREACH(const shared_ptr<Body>& b,*Omega::instance().getScene()->bodies)
+    {
+			averageVelocity += b->state->vel;
+	}
+	
+	averageVelocity /= scene->bodies->size();
+
+	//
+	//Dynamic contribution to the stress tensor
+	//
+	for(unsigned int i(0);i<scene->bodies->size();i++)
+    {
+        const shared_ptr<Body>& b = Body::byId(i, scene);
+        Vector3r vFluct = b->state->vel - averageVelocity;
+
+        kineticStressTensor += -b->state->mass*vFluct*vFluct.transpose();
+	}
+	
+	return kineticStressTensor/volume;
+}
+
 py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ){
 	int minZ=0;
 	int maxZ=0;

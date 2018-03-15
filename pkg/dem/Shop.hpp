@@ -116,6 +116,10 @@ class Shop{
 		//! Define the exact average stress in each particle from contour integral ("LW" stands for Love-Weber, since this is what the contour integral gives).
 		static void getStressLWForEachBody(vector<Matrix3r>& bStresses);
 		static py::list getStressLWForEachBody();
+        
+        //! Compute the dynamic stress tensor for each bodies;
+		static py::list getDynamicStress();
+		static Matrix3r getTotalDynamicStress(Real volume=0);
 		
 		//! Function to compute overall ("macroscopic") stress.
 		static Matrix3r getStress(Real volume=0);
@@ -126,8 +130,8 @@ class Shop{
 		static py::tuple getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ);
 		static py::tuple getStressProfile_contact(Real volume, int nCell, Real dz, Real zRef);	//same, only contact contribution
 
-                //! Compute average depth profile of particle velocity (x,y,z) and solid volume fraction. The direction may be specified by direction argument (default is z).
-                static py::tuple getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond=false, Real radiusPy=0,int direction=2);
+        //! Compute average depth profile of particle velocity (x,y,z) and solid volume fraction. The direction may be specified by direction argument (default is z).
+        static py::tuple getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond=false, Real radiusPy=0,int direction=2);
 		//! Same, but taking into account point particles
 		static py::tuple getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRef,bool activateCond=false, Real radiusPy=0);
 
