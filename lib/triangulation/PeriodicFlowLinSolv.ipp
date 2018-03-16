@@ -139,7 +139,7 @@ int PeriodicFlowLinSolv<_Tesselation>::setLinearSystem(Real dt)
 	}
 	if (!isLinearSystemSet) {
 		if (useSolver>0){
-		#ifdef EIGENSPARSE_LIB
+		#ifdef CHOLMOD_LIBS
 			tripletList.clear(); tripletList.resize(T_nnz);
 			for(int k=0;k<T_nnz;k++) {
 				tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
