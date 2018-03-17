@@ -34,6 +34,8 @@ Welcome to Yade's documentation!
 
   FEMxDEM.rst
 
+  acousticemissions.rst
+
   citing.rst
 
   publications.rst
