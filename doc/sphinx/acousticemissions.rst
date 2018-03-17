@@ -24,7 +24,7 @@ Numerical AE events are simlated by assuming each broken bond (or cluster of bro
 
 	E_o = \sum_i^N E_i
 
-where :math:`F_n` :math:`F_s` and :math:`k_n`, :math:`k_s` are the normal and shear force (N) and stiffness (N/m) components of the interaction prior to failure, respectively. Yade's implementation uses the maximum change of strain energy surrounding each broken bond to estimate the moment magnitude of the AE. As soon as the bond breaks, the total strain energy (:math:`E_o=\sum_i^N E_i`) is computed for the radius (set by the user as no. of avg particle diameters, :math:`\lambda`. :math:`E_o` is used as the reference strain energy to compute :math:`\Delta E=E-E_o` during subsequent time steps. Finally, max(:math:`\Delta E`) is used in the empirical equation derived by [Scholz2003]_:
+where :math:`F_n`, :math:`F_s` and :math:`k_n`, :math:`k_s` are the normal and shear force (N) and stiffness (N/m) components of the interaction prior to failure, respectively. Yade's implementation uses the maximum change of strain energy surrounding each broken bond to estimate the moment magnitude of the AE. As soon as the bond breaks, the total strain energy (:math:`E_o=\sum_i^N E_i`) is computed for the radius (set by the user as no. of avg particle diameters, :math:`\lambda`. :math:`E_o` is used as the reference strain energy to compute :math:`\Delta E=E-E_o` during subsequent time steps. Finally, max(:math:`\Delta E`) is used in the empirical equation derived by [Scholz2003]_:
 
 .. math::
 
