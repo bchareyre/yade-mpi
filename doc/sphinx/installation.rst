@@ -161,7 +161,7 @@ Additional packages, which can become mandatory later::
 For effective usage of direct solvers in the PFV-type fluid coupling, the following libraries are recommended, together with eigen>=3.1: blas, lapack, suitesparse, and metis.
 All four of them are available in many different versions. Different combinations are possible and not all of them will work. The following was found to be effective on recent deb-based systems. On ubuntu 12.04, better compile openblas with USE_OPENMP=1, else yade will run on a single core::
 
-		sudo apt-get install libopenblas-dev libsuitesparse-metis-dev
+		sudo apt-get install libopenblas-dev libsuitesparse-dev libmetis-dev
 
 Some packages listed here are relatively new and they can be absent
 in your distribution (for example, libmetis-dev or python-gts). They can be 
@@ -240,6 +240,7 @@ The following options are available:
 	* CHUNKSIZE: specifiy the chunk size if you want several sources to be compiled at once. Increases compilation speed but RAM-consumption during compilation as well (1 by default)
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 	* USE_QT5: use QT5 for GUI, experimental (ON by default)
+	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_. 
