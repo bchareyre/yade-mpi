@@ -121,13 +121,13 @@ AE are visualized and post processed in a similar manner to JCFpm cracks. As lon
 Consideration of rock heterogeneity
 ===================================
 
-[Caulk2018]_ shows that the spatial distribution of AE in Yade depends on the magnitude of rock model heterogeneity. [Caulk2018]_ hypothesizes that rock heterogeneity depends on the distribution of interacting grain edge lengths. In Yade's :yref:`JCFpm <Law2_ScGeom_JCFpmPhys_JointedCOhesiveFrictionalPM>`, the interaction strength of contacting particles depends on an interaction area :math:`A_{int}`. Thus, [Caulk2018]_  obtained a Weibull rock heterogeneity distribution by analyzing cathodoluminescent imagery of contacting rock grains. The disribution enables probabilistic generation of a correction factor, :math:`\alpha_w`, (shown below), which is used to control the DEM interaction area (:math:`A_{int}`):
+[Caulk2018]_ shows that the spatial distribution of AE in Yade depends on the magnitude of rock model heterogeneity. [Caulk2018]_ hypothesizes that rock heterogeneity depends on the distribution of interacting grain edge lengths. In Yade's :yref:`JCFpm <Law2_ScGeom_JCFpmPhys_JointedCOhesiveFrictionalPM>`, the interaction strength of contacting particles depends on an interaction area :math:`A_{int}`. Thus, [Caulk2018]_  obtained a Weibull rock heterogeneity distribution by analyzing cathodoluminescent imagery of contacting rock grains. The disribution enables probabilistic generation of a correction factor, :math:`\alpha_w`, (`fig-strengthDist`_), which is used to control the DEM interaction area (:math:`A_{int}`):
 
 .. math::
 	
 	A_{int} = \alpha_w \times \text{min}(R_a,R_b)^2\pi
 
-The corresponding tensile strength distributions for various Weibull shape parameters are shown below. Note: a Weibull shape factor of :math:`\infty` is equivalent to the unaugmented JCFpm model.
+The corresponding tensile strength distributions for various Weibull shape parameters are shown in  `fig-weibullDist`_. Note: a Weibull shape factor of :math:`\infty` is equivalent to the unaugmented JCFpm model.
 
 In Yade, this is as simple as passing a Weibull shape parameter to :yref:`JCFpmPhys <Ip2_JCFpmMat_JCFpmMat_JCFpmPhys>`::
 
@@ -139,14 +139,20 @@ In Yade, this is as simple as passing a Weibull shape parameter to :yref:`JCFpmP
 
 where the :yref:`xSectionWeibullShapeParameter <Ip2_JCFpmMat_JCFpmMat_JCFpmPhys.xSectionWeibullShapeParameter>` is the desired Weibull shape parameter. The scale parameter can be assigned in similar fashion. If you want to control the minimum allowable correction factor, you can feed it :yref:`weibullCutoffMin <Ip2_JCFpmMat_JCFpmMat_JCFpmPhys.weibullCutOffMin>`. The maximum correction factor can be controlled in similar fashion.
 
-|pic1| |pic2|
 
-*Weibull distributions for varying shape parameters used to generate :math:`\alpha_w` (left).Maximum DEM particle bond tensile strength distributions for varying Weibull shape parameters (right).
-
+.. _fig-weibullDist:
 .. |pic1| image:: fig/weibullDists.png
-	:width: 50 %
+	:scale: 50 %
+	:align: center
 
+	Weibull distributions for varying shape parameters used to generate :math:`\alpha_w`.
+
+.. _fig-strengthDist:
 .. |pic2| image:: fig/strengthDists.png
-	:width: 50 %
+	:scale: 50 %
+	:align: center
+	
+	Maximum DEM particle bond tensile strength distributions for varying Weibull shape parameters.
+
 
 
