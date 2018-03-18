@@ -55,7 +55,7 @@ readParamsFromTable(noTableOk=True, # unknownOk=True,
 	strainRateCompression=.5,
 	setSpeeds=True,
 	# 1=tension, 2=compression (ANDed; 3=both)
-	doModes=1,
+	doModes=3,
 
 	specimenLength=.15,
 	sphereRadius=3.5e-3,
