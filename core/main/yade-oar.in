@@ -75,8 +75,8 @@ parser.add_argument('--timing-output',type=str,metavar='FILE',dest='timingOut',d
 parser.add_argument('--randomize',action='store_true',dest='randomize',help='Randomize job order (within constraints given by assigned cores).')
 parser.add_argument('--disable-pynotify',action='store_true',dest='disablePynotify',help='Disable screen notifications')
 parser.add_argument('--oar-project',dest='oar_p',help='Project name to pass to oarsub')
-parser.add_argument('--oar-walltime',dest='oar_t',help='Walltime: max running time',default='2:00:00')
-parser.add_argument('--oar-script',dest='oar_script',help='Script passed to oar-sub. Must contain __COMMAND_HERE__ string where the Yade command will be replaced.',default='')
+parser.add_argument('--oar-walltime',dest='oar_t',help='Walltime: max running time. May be overriden by !WALLTIME',default='2:00:00')
+parser.add_argument('--oar-script',dest='oar_script',help='Script passed to oar-sub. Must contain __YADE_COMMAND__ string where the Yade command will be replaced.',default='')
 parser.add_argument('args',nargs=argparse.REMAINDER,help=argparse.SUPPRESS) # see argparse doc, par.disable_interspersed_args() from optargs module
 #parser.add_argument('--serial',action='store_true',dest='serial',default=False,help='Run all jobs serially, even if there are free cores
 opts=parser.parse_args()
@@ -164,6 +164,7 @@ for i,l in enumerate(useLines):
 	jobExecutable=executable
 	jobAffinity=opts.affinity
 	jobCount=opts.timing
+	walltime = opts.oar_t
 	for col in params[l].keys():
 		if col[0]!='!': continue
 		val=params[l][col]
@@ -172,6 +173,7 @@ for i,l in enumerate(useLines):
 		elif col=='!SCRIPT': script=val
 		elif col=='!AFFINITY': jobAffinity=eval(val)
 		elif col=='!COUNT': jobCount=eval(val)
+		elif col=='!WALLTIME' : walltime=val
 		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if not script:
 		raise ValueError('When only batch table is given without script to run, it must contain !SCRIPT column with simulation to be run.')
@@ -191,7 +193,7 @@ for i,l in enumerate(useLines):
 			while logFile2+'.%d'%i in logFiles: i+=1
 			logFile2+='.%d'%i
 		logFiles.append(logFile2)
-		env='YADE_BATCH='
+		env='YADE_WALLTIME=%s YADE_BATCH='%walltime
 		if table: env+='%s:%d'%(table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,script)
 		desc=params[l]['description']
@@ -211,10 +213,14 @@ for job in jobs:
                 
                 with open(opts.oar_script) as infile, open(scriptname, 'w') as outfile:
                         for line in infile:
-                                line = line.replace("__COMMAND_HERE__", job.command)
+                                line = line.replace("__YADE_COMMAND__", job.command)
+                                line = line.replace("__YADE_LOGFILE__", job.log)
+                                line = line.replace("__YADE_ERRFILE__", job.log+'.err')
+                                line = line.replace("__YADE_JOBNO__", str(job.num))
+                                line = line.replace("__YADE_JOBID__", str(job.id))
                                 outfile.write(line)
                 
-                os.chmod(scriptname,0744);               
+                os.chmod(scriptname,0744);
                 #os.system('%s'%(scriptname));
                 os.system('oarsub --project=%s -l/walltime=%s,cores=%i -O %s -E %s.err %s\n'%(project, walltime, job.nCores, job.log,job.log,scriptname));
 
