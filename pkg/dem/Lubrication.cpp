@@ -133,9 +133,8 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     
     phys->normalContactForce = Vector3r::Zero();
-    phys->kn = 0.;
+    phys->kn = g;
     phys->normalLubricationForce = Vector3r::Zero();
-    phys->cn = 0.;
     
     if(activateNormalLubrication)
     {
@@ -198,7 +197,6 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
         Fn = -ue*g*norm;
         // Calculate separate forces and update stiffness
         phys->normalContactForce = (un - EPS)*kn*norm;
-        phys->kn = kn;
         
         if(phys->nun > 0.)
         {
@@ -221,7 +219,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     
     
     phys->shearLubricationForce = Vector3r::Zero();
-    phys->ks = 0.;
+    phys->ks = kt;
     phys->shearContactForce = Vector3r::Zero();
     phys->cs = nut;
     
