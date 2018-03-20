@@ -97,11 +97,19 @@ for i =1:length(rRatioVec)
 
 % Filling angles for contact situation are, if necessary, extrapolated:
     deltaC = guessDeltaContact(data);
-    while deltaC > 1
+    while deltaC > 0.7
         prevMaxDelta1 = max(data(:,5));
         d1MaxUc = 0:dDelta1:prevMaxDelta1;
         ucTried = floor(ucTried*1.2); % floor because no need to take care of digits after comma here
         data = solveLaplace_uc(theta,rRatio,ucTried,d1MaxUc,deltaZ,0);
+        if size(data,1)<2 % for such a high suction we have too few bridges data to extrapolate deltaC
+            ucTried = floor(ucTried/1.2);
+            str1=['We stop at uc* = ',num2str(ucTried),' and a minimum '];
+            str2=['filling angle = ',num2str(deltaC),' degres instead of 0.7'];
+            str3=' because less than two stable bridges are found for uc* = ';
+            disp([str1,str2,str3,num2str(floor(ucTried*1.2))])
+            break
+        end
         deltaC = guessDeltaContact(data);
     end
     maxUc = ucTried ;
