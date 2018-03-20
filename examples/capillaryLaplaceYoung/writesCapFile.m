@@ -93,7 +93,7 @@ for i =1:length(rRatioVec)
     else
         ucTried = floor(maxUc_r(maxUc_r(:,1)==rRatio,2));
     end
-    data = solveLaplace_uc(0,rRatio,ucTried,d1MaxUc,deltaZ,0);
+    data = solveLaplace_uc(theta,rRatio,ucTried,d1MaxUc,deltaZ,0);
 
 % Filling angles for contact situation are, if necessary, extrapolated:
     deltaC = guessDeltaContact(data);
@@ -101,7 +101,7 @@ for i =1:length(rRatioVec)
         prevMaxDelta1 = max(data(:,5));
         d1MaxUc = 0:dDelta1:prevMaxDelta1;
         ucTried = floor(ucTried*1.2); % floor because no need to take care of digits after comma here
-        data = solveLaplace_uc(0,rRatio,ucTried,d1MaxUc,deltaZ,0);
+        data = solveLaplace_uc(theta,rRatio,ucTried,d1MaxUc,deltaZ,0);
         deltaC = guessDeltaContact(data);
     end
     maxUc = ucTried ;
