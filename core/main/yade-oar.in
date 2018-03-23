@@ -63,7 +63,7 @@ parser=argparse.ArgumentParser(usage='%s [options] [ TABLE [SIMULATION.py] | SIM
 parser.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
 parser.add_argument('--job-threads',dest='defaultThreads',type=int,help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to 1.",metavar='NUM',default=1)
 parser.add_argument('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see \-j), even if !THREADS colums specifies more.')
-parser.add_argument('--log',dest='logFormat',help='Format of job log files: must contain a $, %% or @, which will be replaced by script name, line number or by description column respectively (default: $.@.log)',metavar='FORMAT',default='$.@.log')
+parser.add_argument('--log',dest='logFormat',help='Format of job log files: must contain a $, %% or @, which will be replaced by script name, line number or by description column respectively (default: $.%%.log)',metavar='FORMAT',default='$.%%.log')
 parser.add_argument('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to \-\-log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_argument('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_argument('--nice',dest='nice',type=int,help='Nice value of spawned jobs (default: 10)',default=10)
@@ -195,12 +195,14 @@ for i,l in enumerate(useLines):
 		logFiles.append(logFile2)
 		env='YADE_WALLTIME=%s YADE_BATCH='%walltime
 		if table: env+='%s:%d'%(table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
-		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,script)
+		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,os.path.abspath(script))
 		desc=params[l]['description']
 		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
-		jobs.append(JobInfo(jobNum,desc,env+cmd,logFile2,nCores,script=script,table=table,lineNo=l,affinity=jobAffinity))
+		jobs.append(JobInfo(jobNum,desc,env+cmd,os.path.abspath('tmp/'+logFile2),nCores,script=os.path.abspath(script),table=table,lineNo=l,affinity=jobAffinity))
 
+if not os.path.exists('tmp'):
+    os.makedirs('tmp');
 
 print "Job summary:"
 i = 0
@@ -216,7 +218,7 @@ for job in jobs:
                                 line = line.replace("__YADE_COMMAND__", job.command)
                                 line = line.replace("__YADE_LOGFILE__", job.log)
                                 line = line.replace("__YADE_ERRFILE__", job.log+'.err')
-                                line = line.replace("__YADE_JOBNO__", str(job.num))
+                                line = line.replace("__YADE_JOBNO__", str(os.getpid())+'-'+str(job.num))
                                 line = line.replace("__YADE_JOBID__", str(job.id))
                                 outfile.write(line)
                 
