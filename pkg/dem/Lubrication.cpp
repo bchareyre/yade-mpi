@@ -118,15 +118,16 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Vector3r Fn(Vector3r::Zero());
     Real ue(0.);
     Real delt = max(std::abs(phys->ue),a/100.);
-    Real EPS = phys->eps*a;
     
     Real g = 3./2.*phys->kno*std::pow(delt,0.5); // Stiffness for normal surface deflection
-    bool contact = un < phys->eps*a;
-    Real kn = (contact) ? g : 0.;
-    Real u = un;
     
     if(phys->u == -1.)
         phys->u = un;
+    
+    bool contact = phys->u <= phys->eps*(2.*a-phys->ue);
+    Real kn = (contact) ? g : 0.;
+    Real u = phys->u;
+    
 
     if(debug && contact && !phys->contact) LOG_INFO("CONTACT");
     if(debug && !contact && phys->contact) LOG_INFO("END OF CONTACT");
@@ -138,35 +139,14 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     
     if(activateNormalLubrication)
     {
-#if 0
-        // Also work without fluid (nun == 0);
-        //Real A = -g;
-        //Real B = (-g*un - kn*un + EPS*kn - phys->nun/scene->dt);
-        //Real C = -kn*un*(un-EPS) - phys->nun*undot + phys->nun*phys->ue/scene->dt;
-        
-        
-        Real rho = B*B-4.*A*C;
-        
-        if(rho >= 0)
-        {
-            Real ue1 = (-B+std::sqrt(rho))/(2.*A);
-            Real ue2 = (-B-std::sqrt(rho))/(2.*A);
-            
-            ue = (std::abs(ue1 - phys->ue) < std::abs(ue2-phys->ue)) ? ue1 : ue2;
-        }
-        else
-        {
-            LOG_WARN("rho < 0");
-            ue = phys->ue;
-        }
-#else
-        Real A = -g;
-        Real B = (g-kn)*un + kn*EPS - phys->nun/scene->dt;
+        Real A = -g-kn*(1.+phys->eps);
+        //Real B = (g-kn)*un+kn*phys->eps*(un+2.*a)-phys->nun/scene->dt;
+        Real B = g*un+kn*phys->eps*(2.*a-un)-phys->nun/scene->dt;
         Real C = phys->nun * phys->u/scene->dt;
         
         Real rho = B*B-4.*A*C;
         
-        if(rho >= 0)
+        if(rho >= 0.)
         {
             Real u1 = (-B+std::sqrt(rho))/(2.*A);
             Real u2 = (-B-std::sqrt(rho))/(2.*A);
@@ -193,10 +173,10 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
         }
         
         ue = u - un;
-#endif
+        
         Fn = -ue*g*norm;
         // Calculate separate forces and update stiffness
-        phys->normalContactForce = (un - EPS)*kn*norm;
+        phys->normalContactForce = kn*(u-phys->eps*(2.*a-ue))*norm;
         
         if(phys->nun > 0.)
         {
