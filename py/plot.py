@@ -611,7 +611,7 @@ def plot(noShow=False,subPlots=True):
 		if len(figs)==1: return figs[0]
 		else: return figs
 
-def saveDataTxt(fileName,vars=None):
+def saveDataTxt(fileName,vars=None, headers=None):
 	"""Save plot data into a (optionally compressed) text file. The first line contains a comment (starting with ``#``) giving variable name for each of the columns. This format is suitable for being loaded for further processing (outside yade) with ``numpy.genfromtxt`` function, which recognizes those variable names (creating numpy array with named entries) and handles decompression transparently.
 
 	>>> from yade import plot
@@ -631,6 +631,7 @@ def saveDataTxt(fileName,vars=None):
 
 	:param fileName: file to save data to; if it ends with ``.bz2`` / ``.gz``, the file will be compressed using bzip2 / gzip. 
 	:param vars: Sequence (tuple/list/set) of variable names to be saved. If ``None`` (default), all variables in :yref:`yade.plot.plot` are saved.
+	:param headers: Set of parameters to write on header
 	"""
 	import bz2,gzip
 	if not vars:
@@ -638,6 +639,12 @@ def saveDataTxt(fileName,vars=None):
 	if fileName.endswith('.bz2'): f=bz2.BZ2File(fileName,'w')
 	elif fileName.endswith('.gz'): f=gzip.GzipFile(fileName,'w')
 	else: f=open(fileName,'w')
+	
+	if headers:
+		k = headers.keys();
+		for i in range(len(k)):
+			f.write("# "+k[i]+"=\t"+str(headers[k[i]])+"\n");
+	
 	f.write("# "+"\t\t".join(vars)+"\n")
 	for i in range(len(data[vars[0]])):
 		f.write("\t".join([str(data[var][i]) for var in vars])+"\n")
