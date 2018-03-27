@@ -4,7 +4,7 @@
 
 YADE_PLUGIN((Ip2_ElastMat_ElastMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys))
 
-
+//QUESTION: is this needed? I (Bruno) doubt it. If it is needed a problem is that "u" is not set
 LubricationPhys::LubricationPhys(const ViscElPhys &obj) :
     ViscElPhys(obj),
     eta(1.),
@@ -64,18 +64,72 @@ void Ip2_ElastMat_ElastMat_LubricationPhys::go(const shared_ptr<Material> &mater
     Real Kno = 4./3.*E*sqrt(R); // coefficient for normal stiffness
     Real Kso = 2*sqrt(4*R)*G/(2-V); // coefficient for shear stiffness
     Real frictionAngle = std::min(fa,fb);
-
+    
     phys->kno = Kno;
     phys->kso = Kso;
     phys->mum = std::tan(frictionAngle);
     phys->nun = M_PI*eta*3./2.*a*a;
-    phys->u = -1.;
+    phys->u = -1;
+    phys->prevDotU = 0;
 
     phys->eta = eta;
     phys->eps = eps;
     interaction->phys = phys;
 }
 CREATE_LOGGER(Ip2_ElastMat_ElastMat_LubricationPhys);
+
+
+Real Law2_ScGeom_ImplicitLubricationPhys::integrate_u(Real& prevDotU, const Real& un_prev, Real un_curr, const Real& u_prev,
+						      const Real& nu, Real k, const Real& keps, const Real& eps, 
+						      Real dt, bool withContact, bool firstOrder)
+{
+	Real u=0;// gap distance (by which normal lubrication terms are divided)
+	bool hadContact = u_prev<eps;
+	Real initPrevDotU = prevDotU; //backup since it may be necessary to go back to it when switching with/without contact
+	Real /*a=1*/b,c;
+	Real w=nu/(dt*k);
+	
+	// if contact through roughness is assumed it implies modified coefficients in the ODE compared to no-contact solution.
+	// Changes of status are checked at the end
+	if (withContact) {
+		k = k + keps;
+		un_curr = (k*un_curr+keps*eps)/(k+keps);}
+	
+	// polynomial a*u²+b*u+c=0 with a=1, integrating du/dt=k*u*(un-u)/nu
+// 	if (!firstOrder) {b=2*w-un_curr; c=-prevDotU-2.*w*u_prev; /*implicit trapezoidal rule 2nd order*/ } 
+	if (!firstOrder) {b=w/theta-un_curr; c=(-prevDotU*(1-theta)-w*u_prev)/theta; /*implicit theta method*/ } 
+	else {b= nu/dt/k-un_curr; c = -w*u_prev; /*implicit backward Euler 1st order*/}
+	
+	
+
+	Real delta = b*b-4*c;//note: a=1
+	if (delta<0) LOG_WARN("Negative delta should not happen, needs a fix (please report)");
+	Real rr[2]={0.5*(-b+sqrt(delta)),0.5*(-b-sqrt(delta))};//roots	
+// 	cerr<<"1 "<<b<<" "<<c<<" | "<<prevDotU <<" "<< un_prev <<" "<< un_curr<<" "<< u_prev<<" "<< nu<<" "<< k<<" "<< keps<<" "<<dt <<" "<<rr[0]<<" "<<rr[1]<<" "<<(rr[0]>0?rr[0]:rr[1])-un_curr <<endl;
+	
+	if (delta<0 or (rr[0]<0 and rr[1]<0)) {// recursive calls after halving the time increment if no positive solution found
+		LOG_WARN("delta<0 or negative roots, sub-stepping with dt="<<dt/2.);
+		Real un_mid = un_prev+0.5*(un_curr-un_prev);
+		
+		Real u_mid = integrate_u(prevDotU, un_prev,un_mid,u_prev,nu,k,keps,eps,dt/2.,withContact,firstOrder);
+		return integrate_u(prevDotU, un_mid,un_curr,u_mid,nu,k,keps,eps,dt/2.,withContact,firstOrder);}
+	else {	// normal case, keep the positive solution closest to the previous one
+		if ((std::abs(rr[0]-u_prev)<std::abs(rr[1]-u_prev) and rr[0]>0) or rr[1]<0)
+			u = rr[0];
+		else u = rr[1];
+		bool hasContact = u<eps;
+		if (withContact and not hasContact) {
+			LOG_WARN("withContact and not hasContact");
+			prevDotU = initPrevDotU;//re-init for the different scenario
+			return integrate_u(prevDotU, un_prev,un_curr,u_prev,nu,k,keps,eps,dt,false,firstOrder);
+		} else if (not withContact and hasContact) {
+			LOG_WARN("withContact=false and hasContact");
+			prevDotU = initPrevDotU;//re-init for the different scenario
+			return integrate_u(prevDotU, un_prev,un_curr,u_prev,nu,k,keps,eps,dt,true,firstOrder);}
+		const Real& weight=trpzWeight;
+		prevDotU = weight*u*(un_curr-u)+(1-weight)*prevDotU;//set for next iteration
+		return u;}
+}
 
 bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
 {
@@ -111,18 +165,17 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     
     if(un > a)
     {
-        return undot < 0; // Only go to potential if distance is increasing
+        //FIXME: it needs to go to potential always based on distance, the "undot < 0" here is dangerous (let the collider do its job)
+        return undot < 0; // Only go to potential if distance is increasing 
     }
 
     // Normal force
     Vector3r Fn(Vector3r::Zero());
     Real ue(0.);
-    Real delt = max(std::abs(phys->ue),a/100.);
-    
+    Real delt = max(std::abs(phys->ue),a/100.);    
     Real g = 3./2.*phys->kno*std::pow(delt,0.5); // Stiffness for normal surface deflection
     
-    if(phys->u == -1.)
-        phys->u = un;
+    if(phys->u == -1.) phys->u = un;        
     
     bool contact = phys->u <= phys->eps*(2.*a-phys->ue);
     Real kn = (contact) ? g : 0.;
@@ -139,38 +192,45 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     
     if(activateNormalLubrication)
     {
-        Real A = -g-kn*(1.+phys->eps);
-        //Real B = (g-kn)*un+kn*phys->eps*(un+2.*a)-phys->nun/scene->dt;
-        Real B = g*un+kn*phys->eps*(2.*a-un)-phys->nun/scene->dt;
-        Real C = phys->nun * phys->u/scene->dt;
-        
-        Real rho = B*B-4.*A*C;
-        
-        if(rho >= 0.)
-        {
-            Real u1 = (-B+std::sqrt(rho))/(2.*A);
-            Real u2 = (-B-std::sqrt(rho))/(2.*A);
-            
-            if(u1 > 0. && u2 > 0.)
-            {
-                u = (std::abs(u1 - phys->u) < std::abs(u2-phys->u)) ? u1 : u2;
-            }
-            else
-            {
-                u = (u1 > 0.) ? u1 : u2;
-                
-                if(u1*u2 > 0.)
-                {
-                    u = phys->u;
-                    LOG_WARN("u < 0: keeping previous solution");
-                }
-            }
-        }
-        else
-        {
-            LOG_WARN("rho < 0");
-            u = phys->u;
-        }
+        if (phys->trapezoidalScheme) {
+	        u = integrate_u(	phys->prevDotU, phys->prev_un  /*prev. un*/,
+					un, phys->u, phys->nun, phys->kn, phys->kn /*should be keps, currently both are equal*/, 
+					phys->eps, scene->dt, phys->u<phys->eps, phys->firstOrder /*firstOrder*/);
+		phys->prev_un = un;
+	} else {
+		Real A = -g-kn*(1.+phys->eps);
+		//Real B = (g-kn)*un+kn*phys->eps*(un+2.*a)-phys->nun/scene->dt;
+		Real B = g*un+kn*phys->eps*(2.*a-un)-phys->nun/scene->dt;
+		Real C = phys->nun * phys->u/scene->dt;
+		
+		Real rho = B*B-4.*A*C;
+		
+		if(rho >= 0.)
+		{
+		Real u1 = (-B+std::sqrt(rho))/(2.*A);
+		Real u2 = (-B-std::sqrt(rho))/(2.*A);
+		
+		if(u1 > 0. && u2 > 0.)
+		{
+			u = (std::abs(u1 - phys->u) < std::abs(u2-phys->u)) ? u1 : u2;
+		}
+		else
+		{
+			u = (u1 > 0.) ? u1 : u2;
+			
+			if(u1*u2 > 0.)
+			{
+			u = phys->u;
+			LOG_WARN("u < 0: keeping previous solution");
+			}
+		}
+		}
+		else
+		{
+		LOG_WARN("rho < 0");
+		u = phys->u;
+		}
+	}
         
         ue = u - un;
         
@@ -180,7 +240,11 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
         
         if(phys->nun > 0.)
         {
+	    // si l'intégration donne u=~0 (voir =0, ce qui est acceptable avec certain schéma d'intégration) on divise inutilement ici par zéro. Problème de précision.
+		// je suggère:
+// 		phys->normalLubricationForce = Fn - phys->normalContactForce;
             phys->normalLubricationForce = phys->nun*(undot + (ue - phys->ue)/scene->dt)/(un + ue)*norm;
+	  
             
             if(un + ue > 0.)
                 phys->cn = phys->nun/(un + ue);

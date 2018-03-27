@@ -28,12 +28,16 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,nun,0.0,,"Normal viscosity coefficient"))
                 ((Real,mum,0.3,,"Friction coefficient [-]"))
                 ((Real,ue,0.,,"Surface deflection at t-dt [m]"))
-                ((Real,u,0.,,"u at t-dt [m]"))
+                ((Real,u,-1,,"u at t-dt [m]"))
+		((Real,prev_un,0,,"un at t-dt [m]"))
+		((Real,prevDotU,0,Attr::readonly,"nu/k*du/dt from previous integration - used for trapezoidal scheme (:yref:`LubricationPhys::trapezoidalScheme`)"))
 //                ((Real,due,0.,,"Last increment of ue"))
 //                ((Real,dtm,0.,,"dt optim."))
 //                ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
+		((bool,trapezoidalScheme,true,,"use integrate_u() for implicit integration, by the trapezoidal rule (2nd order) or backward Euler (1st order) depending on :yref:`LubricationPhys::firstOrder`."))
+		((bool,firstOrder,false,,"see :yref:`LubricationPhys::trapezoidalScheme`"))
 		((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
 		((Vector3r,shearContactForce,Vector3r::Zero(),,"Frictional contact force"))
 		((Vector3r,normalLubricationForce,Vector3r::Zero(),,"Normal lubrication force"))
@@ -80,6 +84,13 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
                 static py::tuple PyGetStressForEachBody();
                 static void getTotalStresses(Matrix3r& NCStresses, Matrix3r& SCStresses, Matrix3r& NLStresses, Matrix3r& SLStresses);
                 static py::tuple PyGetTotalStresses();
+		
+		// integration of the gap by implicit trapezoidal rule, adaptative sub-stepping is used if solutionless
+		// prevDotU is modified after execution (and ready for next step)
+		Real integrate_u(Real& prevDotU, const Real& un_prev, Real un_curr, const Real& u_prev,
+						      const Real& nu, Real k, const Real& keps, const Real& eps, 
+		   				      Real dt, bool withContact, bool firstOrder);
+		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,
 			"Material law for lubrication and contact between two spheres, resolved implicitly.",
@@ -89,7 +100,10 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
                           ((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
                           ((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
 //                          ((int,solution,4,,"Resolution method (default: 4)"))
-                          ((bool,debug,false,,"Write debug informations"))
+                          ((bool,debug,false,,"Write debug informations"))  
+			  
+			  ((Real,trpzWeight,1,,"a coefficient in the trapezoidal method"))
+			  ((Real,theta,0.5,,"parameter of the 'theta'-method, 1=backward Euler, 0.5=trapezoidal"))
                         ,// CTOR
 			,// PY
                           .def_readwrite("activateNormalLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateNormalLubrication,"Activate normal lubrication (default: true)")
