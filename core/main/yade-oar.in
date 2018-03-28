@@ -233,7 +233,7 @@ for job in jobs:
 
 		os.chmod(scriptname,0744);
 		#os.system('%s'%(scriptname));
-		os.system('oarsub --project=%s %s -l/walltime=%s,cores=%i -O %s -E %s.err %s\n'%(project, prop, walltime, job.nCores, job.log,job.log,scriptname));
+		os.system('oarsub --project=%s %s -l/core=%i,walltime=%s -O %s -E %s.err %s\n'%(project, prop, job.nCores, walltime, job.log,job.log,scriptname));
 
                 
                 
