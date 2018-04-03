@@ -18,8 +18,6 @@ namespace py=boost::python;
 
 class LubricationPhys: public ViscElPhys {
         public:
-                LubricationPhys(ViscElPhys const& ); // "copy" constructor
-                virtual ~LubricationPhys();
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LubricationPhys,ViscElPhys,"IPhys class for Lubrication w/o FlowEngine. Used by Law2_ScGeom_ImplicitLubricationPhys.",
                 ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
                 ((Real,eps,0.001,,"Rugosity: fraction of radius used as rugosity [-]"))
@@ -36,8 +34,6 @@ class LubricationPhys: public ViscElPhys {
 //                ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
-		((bool,trapezoidalScheme,true,,"use integrate_u() for implicit integration, by the trapezoidal rule (2nd order) or backward Euler (1st order) depending on :yref:`LubricationPhys::firstOrder`."))
-		((bool,firstOrder,false,,"see :yref:`LubricationPhys::trapezoidalScheme`"))
 		((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
 		((Vector3r,shearContactForce,Vector3r::Zero(),,"Frictional contact force"))
 		((Vector3r,normalLubricationForce,Vector3r::Zero(),,"Normal lubrication force"))
@@ -62,18 +58,18 @@ class LubricationPhys: public ViscElPhys {
 REGISTER_SERIALIZABLE(LubricationPhys);
 
 
-class Ip2_ElastMat_ElastMat_LubricationPhys: public IPhysFunctor{
+class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
         public:
                 virtual void go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction);
-                FUNCTOR2D(ElastMat,ElastMat);
+                FUNCTOR2D(FrictMat,FrictMat);
                 DECLARE_LOGGER;
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_ElastMat_ElastMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_FrictMat_FrictMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
                         ((Real,eps,0.001,,"Rugosity: fraction of radius used as rugosity"))
                                                   ,,
                 );
 };
-REGISTER_SERIALIZABLE(Ip2_ElastMat_ElastMat_LubricationPhys);
+REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_LubricationPhys);
 
 
 class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
@@ -85,11 +81,14 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
                 static void getTotalStresses(Matrix3r& NCStresses, Matrix3r& SCStresses, Matrix3r& NLStresses, Matrix3r& SLStresses);
                 static py::tuple PyGetTotalStresses();
 		
-		// integration of the gap by implicit trapezoidal rule, adaptative sub-stepping is used if solutionless
-		// prevDotU is modified after execution (and ready for next step)
-		Real integrate_u(Real& prevDotU, const Real& un_prev, Real un_curr, const Real& u_prev,
+				// integration of the gap by implicit trapezoidal rule, adaptative sub-stepping is used if solutionless
+				// prevDotU is modified after execution (and ready for next step)
+				Real normalForce_trapezoidalScheme(Real const& un, LubricationPhys* phys, ScGeom *geom, Scene* scene);
+				Real trpz_integrate_u(Real& prevDotU, const Real& un_prev, Real un_curr, const Real& u_prev,
 						      const Real& nu, Real k, const Real& keps, const Real& eps, 
 		   				      Real dt, bool withContact, bool firstOrder);
+				
+				void shearForce_firsorderScheme(Real const& u, LubricationPhys* phys, ScGeom *geom, Scene* scene);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,
@@ -104,6 +103,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			  
 			  ((Real,trpzWeight,1,,"a coefficient in the trapezoidal method"))
 			  ((Real,theta,0.5,,"parameter of the 'theta'-method, 1=backward Euler, 0.5=trapezoidal"))
+			  ((unsigned int,resolutionMethod,0,,"Change resolution method. 0=>implicit integration, by the trapezoidal rule (2nd order) or backward Euler (1st order) depending on :yref:`Law2_ScGeom_ImplicitLubricationPhys::theta`."))
                         ,// CTOR
 			,// PY
                           .def_readwrite("activateNormalLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateNormalLubrication,"Activate normal lubrication (default: true)")
