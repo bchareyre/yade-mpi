@@ -1,13 +1,31 @@
 
-
 #include "Lubrication.hpp"
 
-YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys))
+YADE_PLUGIN((Ip2_ElastMat_ElastMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys))
 
+//QUESTION: is this needed? I (Bruno) doubt it. If it is needed a problem is that "u" is not set
+// LubricationPhys::LubricationPhys(const ViscElPhys &obj) :
+//     ViscElPhys(obj),
+//     eta(1.),
+//     eps(0.001),
+//     kno(0.),
+//     kso(0.),
+//     nun(0.),
+//     mum(0.3),
+//     ue(0.),
+//     contact(false),
+//     slip(false)
+// {
+// }
+
+LubricationPhys::~LubricationPhys()
+{
+
+}
 
 CREATE_LOGGER(LubricationPhys);
 
-void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
+void Ip2_ElastMat_ElastMat_LubricationPhys::go(const shared_ptr<Material> &material1, const shared_ptr<Material> &material2, const shared_ptr<Interaction> &interaction)
 {
     if (interaction->phys)
         return;
@@ -57,131 +75,64 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
     phys->eps = eps;
     interaction->phys = phys;
 }
-CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
+CREATE_LOGGER(Ip2_ElastMat_ElastMat_LubricationPhys);
 
 
-Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trapezoidalScheme(Real const& un, LubricationPhys* phys, ScGeom* geom, Scene* scene)
-{
-    Real a((geom->radius1+geom->radius2)/2.);
-	
-	Real u = trpz_integrate_u(	phys->prevDotU, phys->prev_un  /*prev. un*/,
-					un, phys->u, phys->nun, phys->kn, phys->kn /*should be keps, currently both are equal*/, 
-					phys->eps*a, scene->dt, phys->u<phys->eps*a, theta == 1. /*firstOrder*/);
-	
-	phys->prev_un = un;
-	phys->contact = u < phys->eps*a;
-	phys->normalForce = phys->kn*(un-u)*geom->normal;
-	phys->normalContactForce = ((phys->contact) ? Vector3r(phys->kn*(u-phys->eps*a)*geom->normal) : Vector3r::Zero());
-	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce;
-			
-	return u;
-}
-
-Real Law2_ScGeom_ImplicitLubricationPhys::trpz_integrate_u(Real& prevDotU, const Real& un_prev, Real un_curr, const Real& u_prev,
+Real Law2_ScGeom_ImplicitLubricationPhys::integrate_u(Real& prevDotU, Real& un_prev, Real& u_prev, Real un_curr,
 						      const Real& nu, Real k, const Real& keps, const Real& eps, 
-						      Real dt, bool withContact, bool firstOrder)
+						      Real dt, bool withContact, int depth)
 {
 	Real u=0;// gap distance (by which normal lubrication terms are divided)
-	bool hadContact = u_prev<eps;
-	Real initPrevDotU = prevDotU; //backup since it may be necessary to go back to it when switching with/without contact
 	Real /*a=1*/b,c;
-	Real w=nu/(dt*k);
-	
+	Real keff, un_eff;//effective values, including roughness if contact
 	// if contact through roughness is assumed it implies modified coefficients in the ODE compared to no-contact solution.
 	// Changes of status are checked at the end
-	if (withContact)
-	{
-		k = k + keps;
-		un_curr = (k*un_curr+keps*eps)/(k+keps);
-	}
+	if (withContact) {
+		keff = k + keps;
+		un_eff = (k*un_curr+keps*eps)/(k+keps);}
+	else {keff=k; un_eff=un_curr;}
+	Real w=nu/(dt*keff);
 	
-	// polynomial a*u²+b*u+c=0 with a=1, integrating du/dt=k*u*(un-u)/nu
-// 	if (!firstOrder) {b=2*w-un_curr; c=-prevDotU-2.*w*u_prev; /*implicit trapezoidal rule 2nd order*/ } 
-	if (!firstOrder)
-	{
-		b=w/theta-un_curr;
-		c=(-prevDotU*(1.-theta)-w*u_prev)/theta; /*implicit theta method*/
-	} 
-	else
-	{
-		b= nu/dt/k-un_curr;
-		c = -w*u_prev; /*implicit backward Euler 1st order*/
-	}
-	
-	Real delta = b*b-4.*c;//note: a=1
-	if (delta<0.) LOG_WARN("Negative delta should not happen, needs a fix (please report)");
-	Real rr[2]={0.5*(-b+sqrt(delta)),0.5*(-b-sqrt(delta))};//roots	
+	if (depth<=maxSubSteps) {
+		// polynomial a*u²+b*u+c=0 with a=1, integrating du/dt=k*u*(un-u)/nu with the theta method
+		b=w/theta-un_eff; c=(-prevDotU*(1-theta)/keff-w*u_prev)/theta;}
+	else {b= nu/dt/keff-un_eff; c = -w*u_prev; /*implicit backward Euler 1st order*/}
+	Real delta = b*b-4*c;//note: a=1
+	Real rr[2]={0,0};
+	if (delta>=0) {rr[0]=0.5*(-b+sqrt(delta)); rr[1]=0.5*(-b-sqrt(delta));} //roots	
 // 	cerr<<"1 "<<b<<" "<<c<<" | "<<prevDotU <<" "<< un_prev <<" "<< un_curr<<" "<< u_prev<<" "<< nu<<" "<< k<<" "<< keps<<" "<<dt <<" "<<rr[0]<<" "<<rr[1]<<" "<<(rr[0]>0?rr[0]:rr[1])-un_curr <<endl;
-	
-	if (delta<0. or (rr[0]<=0. and rr[1]<=0.))
-	{// recursive calls after halving the time increment if no positive solution found
-		LOG_WARN("delta<0 or roots <= 0, sub-stepping with dt="<<dt/2.);
-		Real un_mid = un_prev+0.5*(un_curr-un_prev);
-
-		Real u_mid = trpz_integrate_u(prevDotU, un_prev,un_mid,u_prev,nu,k,keps,eps,dt/2.,withContact,firstOrder);
-		return trpz_integrate_u(prevDotU, un_mid,un_curr,u_mid,nu,k,keps,eps,dt/2.,withContact,firstOrder);
-	}
-	else
-	{	// normal case, keep the positive solution closest to the previous one
-		if ((std::abs(rr[0]-u_prev)<std::abs(rr[1]-u_prev) and rr[0]>0.) or rr[1]<0.)
+	if (delta<0 or (rr[0]<0 and rr[1]<0)) {// recursive calls after halving the time increment if no positive solution found
+		if (depth<maxSubSteps) {//sub-stepping
+ 			//LOG_WARN("delta<0 or negative roots, sub-stepping with dt="<<dt/2.);
+			Real un_mid = un_prev+0.5*(un_curr-un_prev);		
+			Real f_mid = integrate_u(prevDotU, un_prev,u_prev,un_mid,nu,k,keps,eps,dt/2.,withContact, depth+1);
+			return integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt/2.,withContact, depth+1);
+		} else { // switch to backward Euler (theta = 1) by increasing depth again (see above)
+			if (!warnedOnce) {LOG_WARN("minimal sub-step reached (depth="<<maxSubSteps<<"), the result may be innacurate. Increase maxSubSteps?"); /*warnedOnce=true;*/}
+			return integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,withContact, depth+1);
+		}
+	} else {	// normal case, keep the positive solution closest to the previous one, and check contact status
+		if ((std::abs(rr[0]-u_prev)<std::abs(rr[1]-u_prev) and rr[0]>0) or rr[1]<0)
 			u = rr[0];
-		else
-			u = rr[1];
-		
-		//LOG_DEBUG("rr0 " << rr[0] << " rr1 " << rr[1] << " u " << u); 
-		
+		else u = rr[1];
 		bool hasContact = u<eps;
-		if (withContact and not hasContact)
-		{
-			if (debug) LOG_WARN("withContact and not hasContact");
-			prevDotU = initPrevDotU;//re-init for the different scenario
-			return trpz_integrate_u(prevDotU, un_prev,un_curr,u_prev,nu,k,keps,eps,dt,false,firstOrder);
-		}
-		else if (not withContact and hasContact)
-		{
-			if(debug) LOG_WARN("withContact=false and hasContact");
-			prevDotU = initPrevDotU;//re-init for the different scenario
-			return trpz_integrate_u(prevDotU, un_prev,un_curr,u_prev,nu,k,keps,eps,dt,true,firstOrder);
-		}
-		const Real& weight=trpzWeight;
-		prevDotU = weight*u*(un_curr-u)+(1.-weight)*prevDotU;//set for next iteration
-		return u;
-	}
-}
-
-void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firsorderScheme(Real const& u, LubricationPhys* phys, ScGeom *geom, Scene* scene)
-{
-    Vector3r Ft(Vector3r::Zero());
-    Vector3r Ft_ = geom->rotate(phys->shearForce);
-    const Vector3r& dus = geom->shearIncrement();
-	phys->slip = false;
-	const Real& kt = phys->ks;
-	const Real& nut = phys->cs;
-	
-	// Also work without fluid (nut == 0)
-	if(phys->contact) // This come from normal part
-	{
-		Ft = Ft_ + kt*dus; // Trial force
-		phys->shearContactForce = Ft; // If no slip: no lubrication!
-#if 1
-		if(Ft.norm() > phys->normalContactForce.norm()*std::max(0.,phys->mum)) // If slip
-		{
-			//LOG_INFO("SLIP");
-			Ft *= phys->normalContactForce.norm()*std::max(0.,phys->mum)/Ft.norm();
-			phys->shearContactForce = Ft;
-			Ft = (Ft*kt*scene->dt + Ft_*nut + dus*kt*nut)/(kt*scene->dt+nut);
-			phys->slip = true;
-			phys->shearLubricationForce = nut*dus/scene->dt;
-		}
-#endif
-	}
-	else
-	{
-		Ft = (Ft_ + dus*kt)*nut/(nut+kt*scene->dt);
-		phys->shearLubricationForce = Ft;
-	}
-	
-	phys->shearForce = Ft;
+		// if contact appeared/disappeared recalculate with different coefficients (another recursion)
+		if (withContact and not hasContact) {
+// 			LOG_WARN("withContact and not hasContact");
+// 			prevDotU*=keff/k;
+			keff=k; un_eff=un_curr;// for calculating the relevnt prevDotU  
+// 			return integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,false,depth);
+		} else if (not withContact and hasContact) {
+// 			LOG_WARN("withContact=false and hasContact");
+// 			prevDotU*=k/keff;
+			return integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,true,depth);}
+			
+		// The normal case non-recursive case, finally.
+		// After a successful integration update the variables and return total force
+		prevDotU = keff*u*(un_eff-u);//set for next iteration
+		un_prev = un_curr;
+		u_prev = u;
+		return k*(un_curr-u);}
 }
 
 bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
@@ -192,6 +143,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 
     // Geometry
     ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
+    Vector3r norm = geom->normal/geom->normal.norm();
 
     // Get bodies properties
     Body::id_t id1 = interaction->getId1();
@@ -204,7 +156,8 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     // geometric parameters
     Real a((geom->radius1+geom->radius2)/2.);
     Real un(-geom->penetrationDepth);
-
+    bool isNew=false;
+    
     // Speeds
     Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*interaction->cellDist.cast<Real>()) : Vector3r::Zero();
     Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*interaction->cellDist.cast<Real>()): Vector3r::Zero();
@@ -212,81 +165,179 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     Vector3r relV = geom->getIncidentVel(s1, s2, scene->dt, shift2, shiftVel, false );
 //    Vector3r relVN = relV.dot(norm)*norm; // Normal velocity
 //    Vector3r relVT = relV - relVN; // Tangeancial velocity
-    Real undot = relV.dot(geom->normal); // Normal velocity norm
+    Real undot = relV.dot(norm); // Normal velocity norm
     
     if(un > a)
     {
-        //FIXME: it needs to go to potential always based on distance, the "undot < 0" here is dangerous (let the collider do its job)
-        return undot < 0; // Only go to potential if distance is increasing 
+           //FIXME: it needs to go to potential always based on distance, the "undot < 0" here is dangerous (let the collider do its job), ex: if true is returned here the interaction is still alive and it will be included in the stress
+//         return undot < 0; // Only go to potential if distance is increasing 
+	    return false;
     }
 
-    // Normal part : init
-    Real u = un; // u is interface distance
+    // Normal force
+    Vector3r Fn(Vector3r::Zero());
+    Real ue(0.);
+//     Real delt = max(std::abs(phys->ue),a/100.);  
+    Real delt = a/100.;
+    Real g = 3./2.*phys->kno*std::pow(delt,0.5); // Stiffness for normal surface deflection
     
-    if(phys->u == -1)
-	{
-		phys->u = u;
-	}
+     if(phys->u == -1. ) {phys->u = un; isNew=true;}
     
-    Real delt = std::max(phys->ue, a/100.);
+    bool contact = phys->u <= phys->eps*(2.*a-phys->ue);
+    Real kn = (contact) ? g : 0.;
+    Real& u = phys->u;
 	
-    phys->kn = phys->kno*std::pow(delt,0.5);
-	phys->normalForce = Vector3r::Zero();
-    phys->normalContactForce = Vector3r::Zero();
-    phys->normalLubricationForce = Vector3r::Zero();
+    if(debug && contact && !phys->contact) LOG_INFO("CONTACT");
+    if(debug && !contact && phys->contact) LOG_INFO("END OF CONTACT");
+
     
+    phys->normalContactForce = Vector3r::Zero();
+    phys->kn = g;
+    phys->normalLubricationForce = Vector3r::Zero();
+    if(isNew and theta!=0) {//consistent initialization for theta-method
+		phys->prev_un= un-undot*scene->dt; phys->prevDotU=undot*phys->nun ; phys->u = phys->prev_un; } 
+      
     if(activateNormalLubrication)
     {
-        if (resolutionMethod == 0)
-        {
-			// Functions are responsible for setting forces and contact in physics. (And everything else they want)
-	        u = normalForce_trapezoidalScheme(un,phys,geom,scene);
-		}
+        if (theta!=0) {
+		Fn = norm*integrate_u(	phys->prevDotU, phys->prev_un  /*prev. un*/,
+					phys->u, -geom->penetrationDepth, phys->nun, phys->kn, phys->kn /*should be keps, currently both are equal*/, 
+					2*phys->eps*a, scene->dt, phys->u<(2*phys->eps*a),
+					isNew?(maxSubSteps+1):0/* depth = maxSubSteps+1 will trigger backward Euler for initialization*/);
+	} else {
+		Real A = -g-kn*(1.+phys->eps);
+		//Real B = (g-kn)*un+kn*phys->eps*(un+2.*a)-phys->nun/scene->dt;
+		Real B = g*un+kn*phys->eps*(2.*a-un)-phys->nun/scene->dt;
+		Real C = phys->nun * phys->u/scene->dt;
 		
-		phys->u = u;
-		phys->ue = u - un;
+		Real rho = B*B-4.*A*C;
+		
+		if(rho >= 0.)
+		{
+		Real u1 = (-B+std::sqrt(rho))/(2.*A);
+		Real u2 = (-B-std::sqrt(rho))/(2.*A);
+		
+		if(u1 > 0. && u2 > 0.)
+		{
+			u = (std::abs(u1 - phys->u) < std::abs(u2-phys->u)) ? u1 : u2;
+		}
+		else
+		{
+			u = (u1 > 0.) ? u1 : u2;
+			
+			if(u1*u2 > 0.)
+			{
+// 			u = phys->u;
+			LOG_WARN("u < 0: keeping previous solution");
+			}
+		}
+		}
+		else LOG_WARN("rho < 0");
+		Fn = -(u-un)*g*norm;
+	}
+//         u = phys->u;
+        ue = u - un;//only for some postprocessing? (Bruno)
+
+        // Calculate separate forces and update stiffness
+        phys->normalContactForce = kn*(u-phys->eps*(2.*a-ue))*norm;
+        
+        if(phys->nun > 0.)
+        {
+	    // si l'intégration donne u=~0 (voir =0, ce qui est acceptable avec certain schéma d'intégration) on divise inutilement ici par zéro. Problème de précision.
+		// je suggère:
+// 		phys->normalLubricationForce = Fn - phys->normalContactForce;
+            phys->normalLubricationForce = phys->nun*(undot + (ue - phys->ue)/scene->dt)/(un + ue)*norm;
+	  
+            
+            if(un + ue > 0.)
+                phys->cn = phys->nun/(un + ue);
+        }
     }
     
-    // Init shear and torques
-	phys->shearForce = Vector3r::Zero();
-	phys->shearLubricationForce = Vector3r::Zero();
-	phys->shearContactForce = Vector3r::Zero();
-	Vector3r Cr = Vector3r::Zero();
-	Vector3r Ct = Vector3r::Zero();
-	
-    if((phys->eta > 0. && u > 0.) || phys->eta <= 0.)
-	{
-		// Tangencial force
-		phys->ks = phys->kso*std::pow(delt,0.5);
-		phys->cs = (phys->eta > 0.) ? M_PI*phys->eta/2.*(-2.*a+(2.*a+u)*std::log((2.*a+u)/u)) : 0.;
-		phys->cn = phys->nun/u;
-		
-		if(activateTangencialLubrication)
-		{
-			// This function is responsible for setting shears forces (and everything else they want)
-			shearForce_firsorderScheme(u,phys,geom,scene);
-		}
+    // Tangencial force
+    Vector3r Ft(Vector3r::Zero());
+    Vector3r Ft_ = geom->rotate(phys->shearForce);
+    const Vector3r& dus = geom->shearIncrement();
+    Real kt = phys->kso*std::pow(delt,0.5);
+    Real nut = (phys->eta > 0.) ? M_PI*phys->eta/2.*(-2.*a+(2.*a+u)*std::log((2.*a+u)/u)) : 0.;
+   
+    if(debug && u <= 0.)
+        LOG_DEBUG("u<0: " << u << " #" << scene->iter << " nut " << nut << " a " << a  << phys-> normalLubricationForce);
+    
+    
+    phys->shearLubricationForce = Vector3r::Zero();
+    phys->ks = kt;
+    phys->shearContactForce = Vector3r::Zero();
+    phys->cs = nut;
+    
+    if(activateTangencialLubrication)
+    {
+        phys->slip = false;
+        phys->ks = kt;
+        
+        // Also work without fluid (nut == 0)
+        if(contact)
+        {
+            Ft = Ft_ + kt*dus; // Trial force
+            phys->shearContactForce = Ft; // If no slip: no lubrication!
+#if 1
+            if(Ft.norm() > phys->normalContactForce.norm()*std::max(0.,phys->mum)) // If slip
+            {
+                //LOG_INFO("SLIP");
+                Ft *= phys->normalContactForce.norm()*std::max(0.,phys->mum)/Ft.norm();
+                phys->shearContactForce = Ft;
+                Ft = (Ft*kt*scene->dt + Ft_*nut + dus*kt*nut)/(kt*scene->dt+nut);
+                phys->slip = true;
+                phys->shearLubricationForce = nut*dus/scene->dt;
+            }
+#endif
+        }
+        else
+        {
+            Ft = (Ft_ + dus*kt)*nut/(nut+kt*scene->dt);
+            phys->shearLubricationForce = Ft;
+        }
+    }    
 
-		// Rolling and twist torques
-		Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
-		Vector3r relTwistVelocity = relAngularVelocity.dot(geom->normal)*geom->normal;
-		Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
+    // Update Physics memory
+    phys->normalForce = Fn;
+    phys->shearForce = Ft;
+    
+    phys->ue = ue;
+//     phys->u = u;
+    phys->contact = contact;
 
-		if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/u)+63./500.*u/a*std::log(a/u))*relRollVelocity;
-		if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*un*std::log(a/u)*relTwistVelocity;
-	}
-	else
-		LOG_ERROR("u<=0 with lubrication. This should not happen: please report. (shear force and torques calculation disabled for this step) u=" << u);
+#if 1
+    if(debug && (!std::isfinite(phys->normalForce.norm()) || !std::isfinite(phys->shearForce.norm())))
+    {
+        LOG_INFO("normalForce" << phys->normalForce);
+        LOG_INFO("normalContactForce "<< phys->normalContactForce);
+        LOG_INFO("normalLubricationForce "<< phys->normalLubricationForce);
+        LOG_INFO("shearForce" << phys->shearForce);
+        LOG_INFO("shearContactForce "<< phys->shearContactForce);
+        LOG_INFO("shearLubricationForce "<< phys->shearLubricationForce);
+    }
+#endif
+
+    // Rolling and twist torques
+    Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
+    Vector3r relTwistVelocity = relAngularVelocity.dot(norm)*norm;
+    Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
+
+    Vector3r Cr = Vector3r::Zero();
+    if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/un)+63./500.*un/a*std::log(a/un))*relRollVelocity;
+    Vector3r Ct = Vector3r::Zero();
+    if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*un*std::log(a/un)*relTwistVelocity;
 
     // total torque
-    Vector3r C1 = -(geom->radius1+un/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
-    Vector3r C2 = -(geom->radius2+un/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
+    Vector3r C1 = -(geom->radius1+un/2.)*Ft.cross(norm)+Cr+Ct;
+    Vector3r C2 = -(geom->radius2+un/2.)*Ft.cross(norm)-Cr-Ct;
 
-    // Apply to bodies
-    scene->forces.addForce(id1,phys->normalForce+phys->shearForce);
+    // Apply!
+    scene->forces.addForce(id1,Fn+Ft);
     scene->forces.addTorque(id1,C1);
 
-    scene->forces.addForce(id2,-phys->normalForce-phys->shearForce);
+    scene->forces.addForce(id2,-Fn-Ft);
     scene->forces.addTorque(id2,C2);
 
     return true;
