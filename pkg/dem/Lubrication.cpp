@@ -242,7 +242,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 			// Functions are responsible for setting forces and contact in physics. (And everything else they want)
 	        u = normalForce_trapezoidalScheme(un,phys,geom,scene);
 		}
-	
+		
 		phys->u = u;
 		phys->ue = u - un;
     }
@@ -259,6 +259,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 		// Tangencial force
 		phys->ks = phys->kso*std::pow(delt,0.5);
 		phys->cs = (phys->eta > 0.) ? M_PI*phys->eta/2.*(-2.*a+(2.*a+u)*std::log((2.*a+u)/u)) : 0.;
+		phys->cn = phys->nun/u;
 		
 		if(activateTangencialLubrication)
 		{

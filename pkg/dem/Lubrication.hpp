@@ -88,6 +88,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 						      const Real& nu, Real k, const Real& keps, const Real& eps, 
 		   				      Real dt, bool withContact, bool firstOrder);
 				
+				
 				void shearForce_firsorderScheme(Real const& u, LubricationPhys* phys, ScGeom *geom, Scene* scene);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
