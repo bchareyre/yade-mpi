@@ -29,17 +29,17 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,mum,0.3,,"Friction coefficient [-]"))
                 ((Real,ue,0.,,"Surface deflection at t-dt [m]"))
                 ((Real,u,-1,,"u at t-dt [m]"))
-		((Real,prev_un,0,Attr::readonly,"un at t-dt [m]"))
-		((Real,prevDotU,0,Attr::readonly,"nu/k*du/dt from previous integration - used for trapezoidal scheme (:yref:`LubricationPhys::trapezoidalScheme`)"))
+				((Real,prev_un,0,Attr::readonly,"un at t-dt [m]"))
+				((Real,prevDotU,0,Attr::readonly,"nu/k*du/dt from previous integration - used for trapezoidal scheme (:yref:`LubricationPhys::trapezoidalScheme`)"))
 //                ((Real,due,0.,,"Last increment of ue"))
 //                ((Real,dtm,0.,,"dt optim."))
 //                ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
-		((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
-		((Vector3r,shearContactForce,Vector3r::Zero(),,"Frictional contact force"))
-		((Vector3r,normalLubricationForce,Vector3r::Zero(),,"Normal lubrication force"))
-		((Vector3r,shearLubricationForce,Vector3r::Zero(),,"Shear lubrication force"))
+				((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
+				((Vector3r,shearContactForce,Vector3r::Zero(),,"Frictional contact force"))
+				((Vector3r,normalLubricationForce,Vector3r::Zero(),,"Normal lubrication force"))
+				((Vector3r,shearLubricationForce,Vector3r::Zero(),,"Shear lubrication force"))
                 , // ctors
                 createIndex();,
 //                       .def_readonly("eta",&LubricationPhys::eta,"Fluid viscosity [Pa.s]")
@@ -60,18 +60,18 @@ class LubricationPhys: public ViscElPhys {
 REGISTER_SERIALIZABLE(LubricationPhys);
 
 
-class Ip2_ElastMat_ElastMat_LubricationPhys: public IPhysFunctor{
+class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
         public:
                 virtual void go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction);
-                FUNCTOR2D(ElastMat,ElastMat);
+                FUNCTOR2D(FrictMat,FrictMat);
                 DECLARE_LOGGER;
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_ElastMat_ElastMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_FrictMat_FrictMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
                         ((Real,eps,0.001,,"Rugosity: fraction of radius used as rugosity"))
                                                   ,,
                 );
 };
-REGISTER_SERIALIZABLE(Ip2_ElastMat_ElastMat_LubricationPhys);
+REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_LubricationPhys);
 
 
 class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
@@ -85,9 +85,12 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 		
 		// integration of the gap by implicit theta method, adaptative sub-stepping is used if solutionless, the normal force is returned
 		// prevDotU, un_prev, and u_prev are modified after execution (and ready for next step)
-		Real integrate_u(Real& prevDotU, Real& un_prev, Real& u_prev, Real un_curr,
-						      const Real& nu, Real k, const Real& keps, const Real& eps, 
-		   				      Real dt, bool withContact, int depth=0);
+			Real trapz_integrate_u(Real& prevDotU, Real& un_prev, Real& u_prev, Real un_curr,
+							const Real& nu, Real k, const Real& keps, const Real& eps, 
+							Real dt, bool withContact, int depth=0);
+		
+			Real normalForce_trapezoidal(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew /* FIXME: delete those variables */);
+			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,
