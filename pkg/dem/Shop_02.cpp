@@ -375,21 +375,14 @@ py::list Shop::getDynamicStress()
 	py::list kineticStressTensors;
     Vector3r averageVelocity(Vector3r::Zero());
 
-    FOREACH(const shared_ptr<Body>& b,*Omega::instance().getScene()->bodies)
-    {
-			averageVelocity += b->state->vel;
-	}
-	
-	averageVelocity /= scene->bodies->size();
-
 	//
 	//Dynamic contribution to the stress tensor
 	//
 	for(unsigned int i(0);i<scene->bodies->size();i++)
     {
         const shared_ptr<Body>& b = Body::byId(i, scene);
-        Vector3r vFluct = b->state->vel - averageVelocity;
-        
+		Vector3r vFluct = (scene->isPeriodic) ? scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,scene->cell->velGrad) : b->state->vel;
+		
         Sphere * s = YADE_CAST<Sphere*>(b->shape.get());
         
         if(s)
@@ -405,7 +398,6 @@ Matrix3r Shop::getTotalDynamicStress(Real volume)
 {
 	Scene* scene=Omega::instance().getScene().get();
 	Matrix3r kineticStressTensor(Matrix3r::Zero());
-    Vector3r averageVelocity(Vector3r::Zero());
     
     if(volume == 0)
     {
@@ -418,22 +410,12 @@ Matrix3r Shop::getTotalDynamicStress(Real volume)
         }
     }
 
-    FOREACH(const shared_ptr<Body>& b,*Omega::instance().getScene()->bodies)
-    {
-			averageVelocity += b->state->vel;
-	}
-	
-	averageVelocity /= scene->bodies->size();
-
-	//
-	//Dynamic contribution to the stress tensor
-	//
-	for(unsigned int i(0);i<scene->bodies->size();i++)
+    for(unsigned int i(0);i<scene->bodies->size();i++)
     {
         const shared_ptr<Body>& b = Body::byId(i, scene);
-        Vector3r vFluct = b->state->vel - averageVelocity;
-
-        kineticStressTensor += -b->state->mass*vFluct*vFluct.transpose();
+		Vector3r vFluct = (scene->isPeriodic) ? scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,scene->cell->velGrad) : b->state->vel;
+		
+        kineticStressTensor+=b->state->mass*vFluct*vFluct.transpose();
 	}
 	
 	return kineticStressTensor/volume;
