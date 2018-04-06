@@ -75,7 +75,7 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
     phys->eps = eps;
     interaction->phys = phys;
 }
-CREATE_LOGGER(Ip2_ElastMat_ElastMat_LubricationPhys);
+CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
 
 
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trapezoidal(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
@@ -86,10 +86,10 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trapezoidal(LubricationPhy
 	
 	phys->normalForce = geom->normal*trapz_integrate_u(	phys->prevDotU, phys->prev_un  /*prev. un*/,
 					phys->u, -geom->penetrationDepth, phys->nun, phys->kn, phys->kn /*should be keps, currently both are equal*/, 
-					2*phys->eps*a, scene->dt, phys->u<(2*phys->eps*a),
+					2.*phys->eps*a, scene->dt, phys->u<(2*phys->eps*a),
 					isNew?(maxSubSteps+1):0/* depth = maxSubSteps+1 will trigger backward Euler for initialization*/);
 	
-	phys->contact = phys->u < 2*phys->eps*a;
+	phys->contact = phys->u < 2.*phys->eps*a;
 	phys->normalContactForce = ((phys->contact) ? phys->kn*(phys->u - 2*phys->eps*a) : 0.)*geom->normal;
 	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce;
 	phys->ue = -geom->penetrationDepth - phys->u;
