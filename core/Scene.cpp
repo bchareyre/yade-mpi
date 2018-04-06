@@ -34,12 +34,21 @@ void Scene::fillDefaultTags(){
 	struct passwd* pw;
 	char hostname[hostNameMax];
 	gethostname(hostname,hostNameMax);
-	pw=getpwuid(geteuid()); if(!pw) throw runtime_error("getpwuid(geteuid()) failed!");
+	pw=getpwuid(geteuid()); //if(!pw) throw runtime_error("getpwuid(geteuid()) failed!"); // FIXME: Does it really justify an exception??
 	// a few default tags
 	// real name: will have all non-ASCII characters replaced by ? since serialization doesn't handle that
 	// the standard GECOS format is Real Name,,, - first comma and after will be discarded
-	string gecos(pw->pw_gecos), gecos2; size_t p=gecos.find(","); if(p!=string::npos) boost::algorithm::erase_tail(gecos,gecos.size()-p); for(size_t i=0;i<gecos.size();i++){gecos2.push_back(((unsigned char)gecos[i])<128 ? gecos[i] : '?'); }
-	tags.push_back(boost::algorithm::replace_all_copy(string("author=")+gecos2+" ("+string(pw->pw_name)+"@"+hostname+")"," ","~"));
+
+	if(pw) { // May fail in some clusters
+		string gecos(pw->pw_gecos), gecos2;
+		size_t p=gecos.find(",");
+		if(p!=string::npos) boost::algorithm::erase_tail(gecos,gecos.size()-p);
+		for(size_t i=0;i<gecos.size();i++){gecos2.push_back(((unsigned char)gecos[i])<128 ? gecos[i] : '?'); }
+		tags.push_back(boost::algorithm::replace_all_copy(string("author=")+gecos2+" ("+string(pw->pw_name)+"@"+hostname+")"," ","~"));
+	} else {
+		tags.push_back(boost::algorithm::replace_all_copy(string("author=FakeReal Name (FakeReal@")+hostname+")"," ","~"));
+	}
+	
 	tags.push_back(string("isoTime="+boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())));
 	string id=boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())+"p"+boost::lexical_cast<string>(getpid());
 	tags.push_back("id="+id);
