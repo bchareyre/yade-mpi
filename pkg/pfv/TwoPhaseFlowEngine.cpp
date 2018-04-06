@@ -3111,9 +3111,9 @@ void TwoPhaseFlowEngine::computeFacetPoreForcesWithCache(bool onlyCache)
 
 //     else {//use cached values when triangulation doesn't change
 // 		#ifndef parallel_forces
-    for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
-        for (int yy=0; yy<4; yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
-    }
+//     for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
+//         for (int yy=0; yy<4; yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
+//     }
 
 //  		#else
 // 		#pragma omp parallel for num_threads(ompThreads)
