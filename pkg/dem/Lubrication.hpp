@@ -13,6 +13,8 @@
 #include<pkg/dem/ElasticContactLaw.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 
+#define NEWTON_MAX_RECURSION 20
+
 namespace py=boost::python;
 
 
@@ -90,6 +92,10 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 							Real dt, bool withContact, int depth=0);
 		
 			Real normalForce_trapezoidal(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew /* FIXME: delete those variables */);
+			
+			Real normalForce_NewtonRafson(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew);
+			Real newton_integrate_u(Real const& un, Real const& nu, Real const& dt, Real const& k, Real const& g, Real const& u_prev, Real const& eps, bool contact, int depth=0);
+			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
