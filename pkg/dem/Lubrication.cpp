@@ -119,20 +119,20 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u(Real& prevDotU, Real
 	else {b= nu/dt/keff-un_eff; c = -w*u_prev; /*implicit backward Euler 1st order*/}
 	Real delta = b*b-4*c;//note: a=1
 	Real rr[2]={0,0};
-	if (delta>=0) {rr[0]=0.5*(-b+sqrt(delta)); rr[1]=0.5*(-b-sqrt(delta));} //roots	
-// 	cerr<<"1 "<<b<<" "<<c<<" | "<<prevDotU <<" "<< un_prev <<" "<< un_curr<<" "<< u_prev<<" "<< nu<<" "<< k<<" "<< keps<<" "<<dt <<" "<<rr[0]<<" "<<rr[1]<<" "<<(rr[0]>0?rr[0]:rr[1])-un_curr <<endl;
-	if (delta<0 or (rr[0]<0 and rr[1]<0)) {// recursive calls after halving the time increment if no positive solution found
+	if (delta>=0) {rr[0]=0.5*(-b+sqrt(delta)); rr[1]=0.5*(-b-sqrt(delta));} //roots
+	if (delta<0 or rr[0]<0) {// recursive calls after halving the time increment if no positive solution found (no need to check r[1], always smaller)
 		if (depth<maxSubSteps) {//sub-stepping
  			//LOG_WARN("delta<0 or negative roots, sub-stepping with dt="<<dt/2.);
-			Real un_mid = un_prev+0.5*(un_curr-un_prev);		
-			Real f_mid = trapz_integrate_u(prevDotU, un_prev,u_prev,un_mid,nu,k,keps,eps,dt/2.,withContact, depth+1);
+			Real un_mid = un_prev+0.5*(un_curr-un_prev);
+ 			trapz_integrate_u(prevDotU, un_prev,u_prev,un_mid,nu,k,keps,eps,dt/2.,withContact, depth+1);
 			return trapz_integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt/2.,withContact, depth+1);
 		} else { // switch to backward Euler (theta = 1) by increasing depth again (see above)
 			if (!warnedOnce) {LOG_WARN("minimal sub-step reached (depth="<<maxSubSteps<<"), the result may be innacurate. Increase maxSubSteps?"); /*warnedOnce=true;*/}
 			return trapz_integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,withContact, depth+1);
 		}
 	} else {	// normal case, keep the positive solution closest to the previous one, and check contact status
-		if ((std::abs(rr[0]-u_prev)<std::abs(rr[1]-u_prev) and rr[0]>0) or rr[1]<0)
+		// select the nearest strictly positive solution, keep 0 only if there is no positive solution
+		if ((std::abs(rr[0]-u_prev)<std::abs(rr[1]-u_prev) and rr[0]>0) or rr[1]<=0)
 			u = rr[0];
 		else u = rr[1];
 		bool hasContact = u<eps;
@@ -140,8 +140,8 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u(Real& prevDotU, Real
 		if (withContact and not hasContact) {
 // 			LOG_WARN("withContact and not hasContact");
 // 			prevDotU*=keff/k;
-			keff=k; un_eff=un_curr;// for calculating the relevnt prevDotU  
-// 			return integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,false,depth);
+// 			keff=k; un_eff=un_curr;// for calculating the relevant prevDotU later
+			return trapz_integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,false,depth);
 		} else if (not withContact and hasContact) {
 // 			LOG_WARN("withContact=false and hasContact");
 // 			prevDotU*=k/keff;
