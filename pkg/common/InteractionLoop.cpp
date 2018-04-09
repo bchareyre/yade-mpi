@@ -151,7 +151,8 @@ void InteractionLoop::action(){
 		if (!I->functorCache.constLaw->go(I->geom,I->phys,I.get())) scene->interactions->requestErase(I);
 
 		// process callbacks for this interaction
-		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check
+// 		Note: the following condition is algorithmicaly safe, however a possible use of callbacks is to do something special when interactions are deleted, which is impossible if we skip them. The test should be commented out
+ 		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check
 		for(size_t i=0; i<callbacksSize; i++){
 			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}
