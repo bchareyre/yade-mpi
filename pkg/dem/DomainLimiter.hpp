@@ -11,7 +11,7 @@ class DomainLimiter: public PeriodicEngine{
 		((Vector3r,hi,Vector3r(0,0,0),,"Upper corner of the domain."))
 		((long,nDeleted,0,Attr::readonly,"Cummulative number of particles deleted."))
 		((Real,mDeleted,0,,"Mass of deleted particles."))
-		((Real,vDeleted,0,,"Volume of deleted particles."))
+		((Real,vDeleted,0,,"Volume of deleted spheres (clumps not counted, in that case check :yref:`mDeleted<DomainLimiter.mDeleted>`)"))
 		((int,mask,-1,,"If mask is defined, only particles with corresponding groupMask will be deleted."))
 	);
 };
