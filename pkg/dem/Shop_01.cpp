@@ -62,16 +62,20 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		}
 		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::Zero();}
 	} else {
+		if (_flip.determinant()!=1) LOG_WARN("Flipping cell needs det(Id+flip)=1, check your input.");
 		flip=_flip.cast<int>();
 	}
-	Matrix3r flipFloat = flip.cast<Real>();
-	cell->hSize+=cell->hSize*flipFloat;
+	cell->hSize+=cell->hSize*flip.cast<Real>();
 	cell->postLoad(*cell);
 
- 	// adjust Interaction::cellDist for interactions;
-	Matrix3r invFlip = (Matrix3r::Identity() + flipFloat).inverse();
-	// FIXME: is Matrix3i.cast<Real>().cast<int>() really preserving the integer numbers?? problem: there is no inverse() for Matrix3i, even though in this case the inverse _seems_ to be always an integer matrix
-	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = invFlip.cast<int>()*i->cellDist;
+	// adjust Interaction::cellDist for interactions;
+	// adjunct matrix of (Id + flip) is the inverse since det=1, below is the transposed co-factor matrix of (Id+flip).
+	// note that Matrix3::adjoint is not the adjunct, hence the in-place adjunct below
+	Matrix3i invFlip;
+	invFlip << 1-flip(2,1)*flip(1,2), flip(2,1)*flip(0,2)-flip(0,1), flip(0,1)*flip(1,2)-flip(0,2),
+			    flip(1,2)*flip(2,0)-flip(1,0), 1-flip(0,2)*flip(2,0), flip(0,2)*flip(1,0)-flip(1,2),
+			    flip(1,0)*flip(2,1)-flip(2,0), flip(2,0)*flip(0,1)-flip(2,1), 1-flip(1,0)*flip(0,1);
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions) i->cellDist = invFlip*i->cellDist;
 
 	// force reinitialization of the collider
 	bool colliderFound=false;
@@ -80,7 +84,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		if(c){ colliderFound=true; c->invalidatePersistentData(); }
 	}
 	if(!colliderFound) LOG_WARN("No collider found while flipping cell; continuing simulation might give garbage results.");
-	return flipFloat;
+	return flip.cast<Real>();
 }
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
