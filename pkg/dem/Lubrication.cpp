@@ -77,41 +77,56 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
 }
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
 
+
+template <typename T> int sign(T val) {
+    return (int)(T(0) < val) - (val < T(0));
+}
+
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NewtonRafson(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
 {
+	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; }
+	
 	Real a((geom->radius1+geom->radius2)/2.);
 	Real u = newton_integrate_u(-geom->penetrationDepth, phys->nun, scene->dt, phys->kn, phys->kno, phys->u, 2.*a*phys->eps, phys->u < 2.*a*phys->eps);
 	
-	phys->normalForce = -phys->kno*std::pow(-geom->penetrationDepth-u,3./2.)*geom->normal;
-	phys->normalContactForce = phys->kn*(u-2.*a*phys->eps)*geom->normal;
-	phys->normalLubricationForce = phys->normalForce-phys->normalContactForce;
+	phys->normalForce = -phys->kno*std::pow(std::abs(u+geom->penetrationDepth),3./2.)*sign(u+geom->penetrationDepth)*geom->normal;
+	phys->normalContactForce = (phys->nun > 0.) ? phys->kn*std::min((u-2.*a*phys->eps),0.)*geom->normal : phys->normalForce;
+	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce;
+	//phys->normalLubricationForce = phys->nun*(u - phys->u)/(scene->dt*u)*geom->normal;
 	phys->u = u;
+	phys->contact = phys->normalContactForce.norm() != 0;
 	phys->ue = -geom->penetrationDepth - phys->u;
 	
 	return u;
 }
 
-
-Real Law2_ScGeom_ImplicitLubricationPhys::newton_integrate_u(Real const& un, Real const& nu, Real const& dt, Real const& k, Real const& g, Real const& u_prev, Real const& eps, bool contact, int depth)
+Real Law2_ScGeom_ImplicitLubricationPhys::newton_integrate_u(Real const& un, Real const& nu, Real const& dt, Real const& k, Real const& g, Real const& u_prev, Real const& eps, int depth)
 {
-	Real const keff = (contact) ? k : 0.;
+	if(nu <= 0.) // Dry contact
+		return (un < eps) ? eps : un ;
+	
 	Real u = u_prev;
 	
-	for(int i(0);i<NEWTON_MAX_RECURSION;i++)
+	int i;
+	for(i = 0;i<NEWTON_MAX_RECURSION;i++)
 	{
-		Real F = k*u*(u-eps) + nu/dt*(u - u_prev) + g*u*std::pow(un-u,3./2.);
-		u = u - F/(2.*k*u - k*eps+nu/dt+g*(std::pow(un-u,3./2.)-3./2.*std::pow(un-u,0.5)));
+		Real const keff = (u < eps) ? k : 0.;
+		Real F = keff*u*(u-eps) + nu/dt*(u - u_prev) + g*u*std::pow(std::abs(u-un),3./2.)*sign(u-un);
+		u = u - F/(nu/dt + keff*(2.*u-eps) + g*(std::pow(std::abs(u-un),3./2.)*sign(u-un)+u*3./2.*std::pow(std::abs(u-un),1./2.)));
 		
-		if(F/u_prev<1.e-4)
+		//LOG_DEBUG(" u " << u << " F " << F << " contact  " << (u < eps) << " i " << i << " depth " << depth);
+		
+		if(std::abs(F)<1.e-4)
 			break;
 	}
-	
-	bool isContact = u < eps;
-	
-	if(isContact xor contact)
-		return newton_integrate_u(un, nu, dt, k, g, u_prev, eps, !contact, depth);
-	
-	return u;
+
+	if(i < NEWTON_MAX_RECURSION && u > 0.)
+		return u;
+	else {
+		// Substepping
+		Real u_mid = newton_integrate_u(un,nu,dt/2.,k,g,u_prev,eps,depth+1);
+		return newton_integrate_u(un,nu,dt/2.,k,g,u_mid,eps,depth+1);
+	}
 }
 
 
@@ -292,6 +307,10 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 			normalForce_NewtonRafson(phys, geom, undot, isNew);
 		}
 	}
+	else
+	{
+		phys->u = -geom->penetrationDepth;
+	}
 	
 	Vector3r Cr = Vector3r::Zero();
 	Vector3r Ct = Vector3r::Zero();
@@ -309,7 +328,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 		Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
 
 		if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/phys->u)+63./500.*phys->u/a*std::log(a/phys->u))*relRollVelocity;
-		if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*phys->u*std::log(a/phys->u)*relTwistVelocity;
+		if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*a*phys->u*std::log(a/phys->u)*relTwistVelocity;
 	}
 	else
 	{
