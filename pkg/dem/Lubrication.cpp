@@ -90,7 +90,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NewtonRafson(LubricationPh
 	Real u = newton_integrate_u(-geom->penetrationDepth, phys->nun, scene->dt, phys->kn, phys->kno, phys->u, 2.*a*phys->eps, phys->u < 2.*a*phys->eps);
 	
 	phys->normalForce = -phys->kno*std::pow(std::abs(u+geom->penetrationDepth),3./2.)*sign(u+geom->penetrationDepth)*geom->normal;
-	phys->normalContactForce = (phys->nun > 0.) ? phys->kn*std::min((u-2.*a*phys->eps),0.)*geom->normal : phys->normalForce;
+	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(phys->kn*std::min((u-2.*a*phys->eps),0.)*geom->normal) : phys->normalForce;
 	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce;
 	//phys->normalLubricationForce = phys->nun*(u - phys->u)/(scene->dt*u)*geom->normal;
 	phys->u = u;
