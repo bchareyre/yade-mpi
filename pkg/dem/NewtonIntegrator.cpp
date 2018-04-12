@@ -157,8 +157,9 @@ void NewtonIntegrator::action()
 			// numerical damping & kinetic energy
 			if(trackEnergy) updateEnergy(b,state,fluctVel,f,m);
 
-			// whether to use aspherical rotation integration for this body; for no accelerations, spherical integrator is "exact" (and faster)
-			bool useAspherical=(exactAsphericalRot && b->isAspherical() && state->blockedDOFs!=State::DOF_ALL);
+			// whether to use aspherical rotation integration for this body; as soon as one axis of roation is blocked the spherical integrator is "exact" (and faster),
+			// we then switch to it. It also enables imposing clumps angVel directly (rather than momentum of the aspherical case)
+			bool useAspherical=(exactAsphericalRot && b->isAspherical() && ((state->blockedDOFs & State::DOF_RXRYRZ) == State::DOF_NONE));
 
 			// for particles not totally blocked, compute accelerations; otherwise, the computations would be useless
 			if (state->blockedDOFs!=State::DOF_ALL) {
