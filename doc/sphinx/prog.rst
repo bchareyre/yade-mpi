@@ -1107,11 +1107,11 @@ At places which are susceptible of being accessed concurrently from multiple thr
 Timing
 -------
 
-Yade provides 2 services for measuring time spent in different pars of the code. One has the granularity of engine and can be enabled at runtime. The other one is finer, but requires adjusting and recompiling the code being measured.
+Yade provides 2 services for measuring time spent in different parts of the code. One has the granularity of engine and can be enabled at runtime. The other one is finer, but requires adjusting and recompiling the code being measured.
 
 Per-engine timing
 ^^^^^^^^^^^^^^^^^^
-The coarser timing works by merely accumulating numebr of invocations and time (with the precision of the ``clock_gettime`` function) spent in each engine, which can be then post-processed by associated Python module ``yade.timing``. There is a static bool variable controlling whether such measurements take place (disabled by default), which you can change
+The coarser timing works by merely accumulating number of invocations and time (with the precision of the ``clock_gettime`` function) spent in each engine, which can be then post-processed by associated Python module ``yade.timing``. There is a static bool variable controlling whether such measurements take place (disabled by default), which you can change
 
 .. code-block:: c++
 
