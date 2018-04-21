@@ -307,13 +307,15 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
         flow.computePermeability();
 	//This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
-	
+
+	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (https://bugs.launchpad.net/yade/+bug/1687355)
+	trickPermeability(&flow);
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
         boundaryConditions ( flow );
         flow.initializePressure ( pZero );
-	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (https://bugs.launchpad.net/yade/+bug/1687355)
-	trickPermeability(&flow);
+
+	
         if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate)) flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
         if ( waveAction ) flow.applySinusoidalPressure ( flow.tesselation().Triangulation(), sineMagnitude, sineAverage, 30 );
 	else if (boundaryPressure.size()!=0) flow.applyUserDefinedPressure ( flow.tesselation().Triangulation(), boundaryXPos , boundaryPressure);
