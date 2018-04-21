@@ -359,7 +359,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> intrIsOnJoint = vtkSmartPointer<vtkDoubleArray>::New();
 	intrIsOnJoint->SetNumberOfComponents(1);
 	intrIsOnJoint->SetName("isOnJoint");
-	
+	vtkSmartPointer<vtkDoubleArray> eventNumber = vtkSmartPointer<vtkDoubleArray>::New();
+	eventNumber->SetNumberOfComponents(1);
+	eventNumber->SetName("eventNumber");
+
 	// extras for cracks
 	vtkSmartPointer<vtkPoints> crackPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> crackCells = vtkSmartPointer<vtkCellArray>::New();
@@ -521,6 +524,7 @@ void VTKRecorder::action(){
 					intrIsCohesive->InsertNextValue(jcfpmphys->isCohesive);
 					intrIsOnJoint->InsertNextValue(jcfpmphys->isOnJoint);
 					intrForceN->InsertNextValue(fn);
+					eventNumber->InsertNextValue(jcfpmphys->eventNumber);
 				} else {
 					intrForceN->InsertNextValue(fn);
 				}
@@ -1005,6 +1009,7 @@ void VTKRecorder::action(){
 		if (recActive[REC_JCFPM]) { 
 			intrPd->GetCellData()->AddArray(intrIsCohesive);
 			intrPd->GetCellData()->AddArray(intrIsOnJoint);
+			intrPd->GetCellData()->AddArray(eventNumber);
 		}
 		if (recActive[REC_WPM]){
 			intrPd->GetCellData()->AddArray(wpmNormalForce);
