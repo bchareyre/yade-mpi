@@ -34,9 +34,13 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
     shared_ptr<LubricationPhys> phys(new LubricationPhys());
     FrictMat* mat1 = YADE_CAST<FrictMat*>(material1.get());
     FrictMat* mat2 = YADE_CAST<FrictMat*>(material2.get());
-
-    // Copy from HertzMindlin
-    /* from interaction physics */
+	
+    /* from interaction geometry */
+    GenericSpheresContact* scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
+    Real Da = scg->refR1>0 ? scg->refR1 : scg->refR2;
+    Real Db = scg->refR2;
+	
+    /* Physical parameters */
     Real Ea = mat1->young;
     Real Eb = mat2->young;
     Real Va = mat1->poisson;
@@ -44,50 +48,111 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
     Real fa = mat1->frictionAngle;
     Real fb = mat2->frictionAngle;
 
-
-    /* from interaction geometry */
-    GenericSpheresContact* scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
-    Real Da = scg->refR1>0 ? scg->refR1 : scg->refR2;
-    Real Db = scg->refR2;
-    //Vector3r normal=scg->normal;        //The variable set but not used
-
-
+	/* Hertz-like contact */
     /* calculate stiffness coefficients */
-    Real Ga = Ea/(2*(1+Va));
-    Real Gb = Eb/(2*(1+Vb));
-    Real G = (Ga+Gb)/2; // average of shear modulus
-    Real V = (Va+Vb)/2; // average of poisson's ratio
-    Real E = Ea*Eb/((1.-std::pow(Va,2))*Eb+(1.-std::pow(Vb,2))*Ea); // Young modulus
+    Real Ga = Ea/(2.*(1.+Va));
+    Real Gb = Eb/(2.*(1.+Vb));
+    Real G = (Ga+Gb)/2.; // average of shear modulus
+    Real V = (Va+Vb)/2.; // average of poisson's ratio
+    Real E = Ea*Eb/((1.-std::pow(Va,2.))*Eb+(1.-std::pow(Vb,2.))*Ea); // Young modulus
     Real R = Da*Db/(Da+Db); // equivalent radius
-    Real a = (Da+Db)/2.;
     Real Kno = 4./3.*E*sqrt(R); // coefficient for normal stiffness
-    Real Kso = 2*sqrt(4*R)*G/(2-V); // coefficient for shear stiffness
-    Real frictionAngle = std::min(fa,fb);
-    
+    Real Kso = 2.*sqrt(4.*R)*G/(2.-V); // coefficient for shear stiffness
+	
     phys->kno = Kno;
     phys->kso = Kso;
-    phys->mum = std::tan(frictionAngle);
+	
+	/* Cundall-stack-like contact */
+	Real Kn = 2.*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);
+	Real Ks = 2.*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Vb);
+    
+	phys->kn = Kn;
+	phys->ks = Ks;
+	
+	/* Friction */
+    phys->mum = std::tan(std::min(fa,fb));
+	
+	/* Fluid (lubrication) */
+    Real a = (Da+Db)/2.;
     phys->nun = M_PI*eta*3./2.*a*a;
-    phys->u = -1;
-    phys->prevDotU = 0;
-
     phys->eta = eta;
     phys->eps = eps;
+	
+	/* Integration sheme memory */
+    phys->u = -1.;
+    phys->prevDotU = 0.;
+
     interaction->phys = phys;
 }
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
+
+Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NRAdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
+{
+	Real a((geom->radius1+geom->radius2)/2.);
+	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; phys->delta = std::log(phys->u/a); }
+	
+	Real d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
+	
+	phys->normalForce = phys->kn*(-geom->penetrationDepth-a*std::exp(d))*geom->normal;
+	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-a*std::exp(d),0.))*geom->normal) : phys->normalForce;
+	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce;
+	
+	phys->delta = d;
+	phys->u = a*std::exp(d);
+	
+	phys->contact = phys->normalContactForce.norm() != 0;
+	phys->ue = -geom->penetrationDepth - phys->u;
+	
+	return phys->u;
+}
+
+Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, int depth)
+{
+	Real d = prev_d;
+	
+	int i;
+	Real a;
+	
+	for(i=0;i<NewtonRafsonMaxIter;i++)
+	{
+		a = (std::exp(d) < eps) ? alpha : 0.; // Alpha = 0 for non-contact
+		
+		Real ratio = (dt*(theta*(-(1.+a)*std::exp(d) + a*eps + un) + (1.-theta)*std::exp(prev_d - d)*prevDotU) - 1. + std::exp(prev_d - d))/(dt*theta*(-2.*(1.+a)*std::exp(d) + a*eps + un) - 1.);
+		
+ 		Real F = theta*std::exp(d)*(-(1.+a)*std::exp(d) + a*eps+un) + (1.-theta)*std::exp(prev_d)*prevDotU - 1./dt*(std::exp(d) - std::exp(prev_d));
+		
+		d = d - ratio;
+		
+		if(debug) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth);
+		
+		if(std::abs(F) < NewtonRafsonTol)
+			break;
+	}
+	
+	if(i < NewtonRafsonMaxIter || depth > maxSubSteps) {
+		if(depth > maxSubSteps) LOG_WARN("Max Substepping reach: results may be inconsistant");
+		
+		prevDotU = -(1.+a)*std::exp(d) + a*eps + un;
+		return d;
+	} else {
+		// Substepping
+		Real d_mid = NRAdimExp_integrate_u(un, eps, alpha, prevDotU, dt/2., prev_d, depth+1);
+		return NRAdimExp_integrate_u(un, eps, alpha, prevDotU, dt/2., d_mid, depth+1);
+	}
+}
 
 
 template <typename T> int sign(T val) {
     return (int)(T(0) < val) - (val < T(0));
 }
 
+
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NewtonRafson(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
 {
 	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; }
 	
 	Real a((geom->radius1+geom->radius2)/2.);
-	Real u = newton_integrate_u(-geom->penetrationDepth, phys->nun, scene->dt, phys->kn, phys->kno, phys->u, 2.*a*phys->eps, phys->u < 2.*a*phys->eps);
+	Real u = newton_integrate_u(-geom->penetrationDepth, phys->nun, scene->dt, phys->kn, phys->kno, phys->u, 2.*a*phys->eps);
 	
 	phys->normalForce = -phys->kno*std::pow(std::abs(u+geom->penetrationDepth),3./2.)*sign(u+geom->penetrationDepth)*geom->normal;
 	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(phys->kn*std::min((u-2.*a*phys->eps),0.)*geom->normal) : phys->normalForce;
@@ -108,7 +173,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::newton_integrate_u(Real const& un, Rea
 	Real u = u_prev;
 	
 	int i;
-	for(i = 0;i<NEWTON_MAX_RECURSION;i++)
+	for(i = 0;i<NewtonRafsonMaxIter;i++)
 	{
 		Real const keff = (u < eps) ? k : 0.;
 		Real F = keff*u*(u-eps) + nu/dt*(u - u_prev) + g*u*std::pow(std::abs(u-un),3./2.)*sign(u-un);
@@ -116,13 +181,14 @@ Real Law2_ScGeom_ImplicitLubricationPhys::newton_integrate_u(Real const& un, Rea
 		
 		//LOG_DEBUG(" u " << u << " F " << F << " contact  " << (u < eps) << " i " << i << " depth " << depth);
 		
-		if(std::abs(F)<1.e-4)
+		if(std::abs(F)<NewtonRafsonTol)
 			break;
 	}
 
-	if(i < NEWTON_MAX_RECURSION && u > 0.)
+	if((i < NewtonRafsonMaxIter && u > 0.) || depth > maxSubSteps) {
+		if(depth > NewtonRafsonMaxIter) LOG_WARN("Maximum Newton-Rafson iterations/substepping reach. Results may be inconsistant.");
 		return u;
-	else {
+	} else {
 		// Substepping
 		Real u_mid = newton_integrate_u(un,nu,dt/2.,k,g,u_prev,eps,depth+1);
 		return newton_integrate_u(un,nu,dt/2.,k,g,u_mid,eps,depth+1);
@@ -213,13 +279,12 @@ void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firstOrder(LubricationPhys*
     Vector3r Ft_ = geom->rotate(phys->shearForce);
 	Real a((geom->radius1+geom->radius2)/2.);
     const Vector3r& dus = geom->shearIncrement();
-    Real kt = phys->kso*std::pow(a/100.,0.5);
+    Real kt = phys->ks;
     Real nut = (phys->eta > 0.) ? M_PI*phys->eta/2.*(-2.*a+(2.*a+phys->u)*std::log((2.*a+phys->u)/phys->u)) : 0.;
     
 	phys->shearForce = Vector3r::Zero();
     phys->shearLubricationForce = Vector3r::Zero();
     phys->shearContactForce = Vector3r::Zero();
-    phys->ks = kt;
     phys->cs = nut;
     
 	phys->slip = false;
@@ -288,10 +353,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	    return false;
     }
 
-    // Normal force
-    Real delt = a/100.;
-    phys->kn = 3./2.*phys->kno*std::pow(delt,0.5); // Stiffness for normal surface deflection (linear deflection)
-    
+    // inititalization
 	if(phys->u == -1. ) {phys->u = -geom->penetrationDepth; isNew=true;}
 	
 	// reset forces
@@ -301,10 +363,13 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	
     if(activateNormalLubrication)
     {
-        if (theta!=0) {
-			normalForce_trapezoidal(phys,geom, undot, isNew);
-		} else {
-			normalForce_NewtonRafson(phys, geom, undot, isNew);
+		switch(resolution) {
+			case 0: normalForce_trapezoidal(phys,geom, undot, isNew); break;
+			case 1: normalForce_NRAdimExp(phys, geom, undot, isNew); break;
+			case 2: normalForce_NewtonRafson(phys, geom, undot, isNew); break;
+			default:
+			LOG_WARN("Nonexistant resolution method. Using exact (0).");
+			normalForce_trapezoidal(phys,geom, undot, isNew); break;
 		}
 	}
 	else

@@ -13,7 +13,6 @@
 #include<pkg/dem/ElasticContactLaw.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 
-#define NEWTON_MAX_RECURSION 20
 
 namespace py=boost::python;
 
@@ -35,7 +34,7 @@ class LubricationPhys: public ViscElPhys {
 				((Real,prevDotU,0,Attr::readonly,"nu/k*du/dt from previous integration - used for trapezoidal scheme (:yref:`LubricationPhys::trapezoidalScheme`)"))
 //                ((Real,due,0.,,"Last increment of ue"))
 //                ((Real,dtm,0.,,"dt optim."))
-//                ((Real,delta,0,,"exponantial solution"))
+                ((Real,delta,0,,"exponantial solution"))
                 ((bool,contact,false,,"Spheres in contact"))
                 ((bool,slip,false,,"Slip condition"))
 				((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
@@ -96,6 +95,9 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			Real normalForce_NewtonRafson(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew);
 			Real newton_integrate_u(Real const& un, Real const& nu, Real const& dt, Real const& k, Real const& g, Real const& u_prev, Real const& eps, int depth=0);
 			
+			Real normalForce_NRAdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew);
+			Real NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, int depth=0);
+			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
@@ -112,6 +114,9 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			  
 			  ((int,maxSubSteps,4,,"max recursion depth of adaptative timestepping in the theta-method, the minimal time interval is thus :yref:`Omega::dt<O.dt>`$/2^{depth}$. If still not converged the integrator will switch to backward Euler."))
 			  ((Real,theta,0.55,,"parameter of the 'theta'-method, 1: backward Euler, 0.5: trapezoidal rule, 0: not used,  0.55: suggested optimum)"))
+			  ((int,resolution,0,,"Change normal component resolution method, 0: Iterative exact resolution (theta method, analytical resolution), 1: Newton-Rafson dimentionless resolution (theta method, NR resolution), 2: Newton-Rafson with nonlinear surface deflection (Hertzian-like)"))
+			  ((Real, NewtonRafsonTol, 1.e-10,,"Tolerance for Newton-Rafson integration scheme"))
+			  ((int, NewtonRafsonMaxIter, 20,,"Maximum iterations for Newton-Rafson scheme"))
                         ,// CTOR
 			,// PY
 //                           .def_readwrite("activateNormalLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateNormalLubrication,"Activate normal lubrication (default: true)")
