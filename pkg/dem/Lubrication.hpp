@@ -22,38 +22,24 @@ class LubricationPhys: public ViscElPhys {
 //                 LubricationPhys(ViscElPhys const& ); // "copy" constructor
                 virtual ~LubricationPhys();
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LubricationPhys,ViscElPhys,"IPhys class for Lubrication w/o FlowEngine. Used by Law2_ScGeom_ImplicitLubricationPhys.",
-                ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
-                ((Real,eps,0.001,,"Rugosity: fraction of radius used as rugosity [-]"))
-                ((Real,kno,0.0,,"Coeficient for normal stiffness"))
-                ((Real,kso,0.0,,"Coeficient for tangeancial stiffness"))
-                ((Real,nun,0.0,,"Normal viscosity coefficient"))
+                ((Real,eta,1,Attr::readonly,"Fluid viscosity [Pa.s]"))
+                ((Real,eps,0.001,,"Roughness: fraction of radius used as roughness [-]"))
+                ((Real,kno,0.0,,"Coefficient for normal stiffness (Hertzian-like contact) [N/m^(3/2)]"))
+                ((Real,nun,0.0,,"Coefficient for normal lubrication [N.s]"))
                 ((Real,mum,0.3,,"Friction coefficient [-]"))
-                ((Real,ue,0.,,"Surface deflection at t-dt [m]"))
-                ((Real,u,-1,,"u at t-dt [m]"))
-				((Real,prev_un,0,Attr::readonly,"un at t-dt [m]"))
-				((Real,prevDotU,0,Attr::readonly,"nu/k*du/dt from previous integration - used for trapezoidal scheme (:yref:`LubricationPhys::trapezoidalScheme`)"))
-//                ((Real,due,0.,,"Last increment of ue"))
-//                ((Real,dtm,0.,,"dt optim."))
-                ((Real,delta,0,,"exponantial solution"))
-                ((bool,contact,false,,"Spheres in contact"))
-                ((bool,slip,false,,"Slip condition"))
-				((Vector3r,normalContactForce,Vector3r::Zero(),,"Normal contact force"))
-				((Vector3r,shearContactForce,Vector3r::Zero(),,"Frictional contact force"))
-				((Vector3r,normalLubricationForce,Vector3r::Zero(),,"Normal lubrication force"))
-				((Vector3r,shearLubricationForce,Vector3r::Zero(),,"Shear lubrication force"))
+                ((Real,ue,0.,Attr::readonly,"Surface deflection (ue) at t-dt [m]"))
+                ((Real,u,-1,Attr::readonly,"Interfacial distance (u) at t-dt [m]"))
+				((Real,prev_un,0,Attr::readonly,"Nondeformed distance (un) at t-dt [m]"))
+				((Real,prevDotU,0,Attr::readonly,"du/dt from previous integration - used for trapezoidal scheme (see :yref:`Law2_ScGeom_ImplicitLubricationPhys::resolution` for choosing resolution scheme)"))
+                ((Real,delta,0,Attr::readonly,"$\log(u)$ - used for scheme with $\delta=\log(u)$ variable change"))
+                ((bool,contact,false,Attr::readonly,"The spheres are in contact"))
+                ((bool,slip,false,Attr::readonly,"The contact is slipping"))
+				((Vector3r,normalContactForce,Vector3r::Zero(),Attr::readonly,"Normal contact force [N]"))
+				((Vector3r,shearContactForce,Vector3r::Zero(),Attr::readonly,"Frictional contact force [N]"))
+				((Vector3r,normalLubricationForce,Vector3r::Zero(),Attr::readonly,"Normal lubrication force [N]"))
+				((Vector3r,shearLubricationForce,Vector3r::Zero(),Attr::readonly,"Shear lubrication force [N]"))
                 , // ctors
                 createIndex();,
-//                       .def_readonly("eta",&LubricationPhys::eta,"Fluid viscosity [Pa.s]")
-//                       .def_readonly("eps",&LubricationPhys::eps,"Rugosity [-]")
-//                       .def_readonly("ue",&LubricationPhys::ue,"Surface deflection [m]")
-//                       .def_readonly("normalContactForce",&LubricationPhys::normalContactForce,"Normal component of contact force [N]")
-//                       .def_readonly("shearContactForce",&LubricationPhys::shearContactForce,"Shear component of contact force [N]")
-//                       .def_readonly("normalLubricationForce",&LubricationPhys::normalLubricationForce,"Normal component of lubrication force [N]")
-//                       .def_readonly("shearLubricationForce",&LubricationPhys::shearLubricationForce,"Normal component of lubrication force [N]")
-//                      .def_readonly("ue2",&LubricationPhys::ue2,"Rejected solution of ue [m]")
-//                       .def_readonly("contact",&LubricationPhys::contact,"Spheres in contact")
-//                       .def_readonly("slip",&LubricationPhys::slip,"Slip contact")
-//                      .def_readonly("dtm",&LubricationPhys::dtm,"Dtm")
                 );
                 DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(LubricationPhys,ViscElPhys);
@@ -68,7 +54,7 @@ class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
                 DECLARE_LOGGER;
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_FrictMat_FrictMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
-                        ((Real,eps,0.001,,"Rugosity: fraction of radius used as rugosity"))
+                        ((Real,eps,0.001,,"Roughness: fraction of radius enlargement for contact"))
                                                   ,,
                 );
 };
@@ -104,30 +90,23 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			LawFunctor,
 			"Material law for lubrication and contact between two spheres, resolved implicitly.",
 			// ATTR
-			  ((bool,warnedOnce,false,, "some warnings will appear only once, turn this flag false to see them again"))
-                          ((bool,activateNormalLubrication,true,,"Activate normal lubrication (default: true)"))
-                          ((bool,activateTangencialLubrication,true,,"Activate tangencial lubrication (default: true)"))
-                          ((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
-                          ((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
-//                          ((int,solution,4,,"Resolution method (default: 4)"))
-                          ((bool,debug,false,,"Write debug informations"))  
-			  
-			  ((int,maxSubSteps,4,,"max recursion depth of adaptative timestepping in the theta-method, the minimal time interval is thus :yref:`Omega::dt<O.dt>`$/2^{depth}$. If still not converged the integrator will switch to backward Euler."))
-			  ((Real,theta,0.55,,"parameter of the 'theta'-method, 1: backward Euler, 0.5: trapezoidal rule, 0: not used,  0.55: suggested optimum)"))
-			  ((int,resolution,0,,"Change normal component resolution method, 0: Iterative exact resolution (theta method, analytical resolution), 1: Newton-Rafson dimentionless resolution (theta method, NR resolution), 2: Newton-Rafson with nonlinear surface deflection (Hertzian-like)"))
-			  ((Real, NewtonRafsonTol, 1.e-10,,"Tolerance for Newton-Rafson integration scheme"))
-			  ((int, NewtonRafsonMaxIter, 20,,"Maximum iterations for Newton-Rafson scheme"))
-                        ,// CTOR
+			((bool,warnedOnce,false,, "some warnings will appear only once, turn this flag false to see them again"))
+			((bool,activateNormalLubrication,true,,"Activate normal lubrication (default: true)"))
+			((bool,activateTangencialLubrication,true,,"Activate tangencial lubrication (default: true)"))
+			((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
+			((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
+			((bool,debug,false,,"Write debug informations"))
+			((int,maxSubSteps,4,,"max recursion depth of adaptative timestepping in the theta-method, the minimal time interval is thus :yref:`Omega::dt<O.dt>`$/2^{depth}$. If still not converged the integrator will switch to backward Euler."))
+			((Real,theta,0.55,,"parameter of the 'theta'-method, 1: backward Euler, 0.5: trapezoidal rule, 0: not used,  0.55: suggested optimum)"))
+			((int,resolution,0,,"Change normal component resolution method, 0: Iterative exact resolution (theta method, linear contact), 1: Newton-Rafson dimentionless resolution (theta method, linear contact), 2: Newton-Rafson with nonlinear surface deflection (Hertzian-like contact)"))
+			((Real, NewtonRafsonTol, 1.e-10,,"Tolerance for Newton-Rafson resolution"))
+			((int, NewtonRafsonMaxIter, 20,,"Maximum iterations for Newton-Rafson resolution"))
+			,// CTOR
 			,// PY
-//                           .def_readwrite("activateNormalLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateNormalLubrication,"Activate normal lubrication (default: true)")
-//                           .def_readwrite("activateTangencialLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTangencialLubrication,"Activate tangencial lubrication (default: true)")
-//                           .def_readwrite("activateTwistLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateTwistLubrication,"Activate twist lubrication (default: true)")
-//                           .def_readwrite("activateRollLubrication",&Law2_ScGeom_ImplicitLubricationPhys::activateRollLubrication,"Activate roll lubrication (default: true)")
-//                          .def_readwrite("solution",&Law2_ScGeom_ImplicitLubricationPhys::solution,"Choose resolution method")
-                          .def("getStressForEachBody",&Law2_ScGeom_ImplicitLubricationPhys::PyGetStressForEachBody,"Get stresses for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
-                          .staticmethod("getStressForEachBody")
-                          .def("getTotalStresses",&Law2_ScGeom_ImplicitLubricationPhys::PyGetTotalStresses,"Get total stresses: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
-                          .staticmethod("getTotalStresses")
+			.def("getStressForEachBody",&Law2_ScGeom_ImplicitLubricationPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress.")
+			.staticmethod("getStressForEachBody")
+			.def("getTotalStresses",&Law2_ScGeom_ImplicitLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
+			.staticmethod("getTotalStresses")
                 );
                 DECLARE_LOGGER;
 };
