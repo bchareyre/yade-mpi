@@ -35,17 +35,16 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
 
 	/* Hertz-like contact */
     /* calculate stiffness coefficients */
-    Real Ga = Ea/(2.*(1.+Va));
-    Real Gb = Eb/(2.*(1.+Vb));
-    Real G = (Ga+Gb)/2.; // average of shear modulus
-    Real V = (Va+Vb)/2.; // average of poisson's ratio
+ //   Real Ga = Ea/(2.*(1.+Va));
+ //   Real Gb = Eb/(2.*(1.+Vb));
+ //   Real G = (Ga+Gb)/2.; // average of shear modulus
+ //   Real V = (Va+Vb)/2.; // average of poisson's ratio
     Real E = Ea*Eb/((1.-std::pow(Va,2.))*Eb+(1.-std::pow(Vb,2.))*Ea); // Young modulus
     Real R = Da*Db/(Da+Db); // equivalent radius
     Real Kno = 4./3.*E*sqrt(R); // coefficient for normal stiffness
-    Real Kso = 2.*sqrt(4.*R)*G/(2.-V); // coefficient for shear stiffness
+//    Real Kso = 2.*sqrt(4.*R)*G/(2.-V); // coefficient for shear stiffness
 	
     phys->kno = Kno;
-    phys->kso = Kso;
 	
 	/* Cundall-stack-like contact */
 	Real Kn = 2.*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);
@@ -369,7 +368,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	Vector3r C1 = Vector3r::Zero();
 	Vector3r C2 = Vector3r::Zero();
 	
-	computeShearForceAndTorques(phys, geom, C1, C2);
+	computeShearForceAndTorques(phys, geom, s1, s2, C1, C2);
 	
     // Apply!
     scene->forces.addForce(id1,phys->normalForce+phys->shearForce);
@@ -381,7 +380,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     return true;
 }
 
-void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, Vector3r & C1, Vector3r & C2)
+void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
 {
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(phys->eta <= 0. || phys->u > 0.)

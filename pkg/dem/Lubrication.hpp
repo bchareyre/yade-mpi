@@ -31,7 +31,7 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,u,-1,Attr::readonly,"Interfacial distance (u) at t-dt [m]"))
 				((Real,prev_un,0,Attr::readonly,"Nondeformed distance (un) at t-dt [m]"))
 				((Real,prevDotU,0,Attr::readonly,"du/dt from previous integration - used for trapezoidal scheme (see :yref:`Law2_ScGeom_ImplicitLubricationPhys::resolution` for choosing resolution scheme)"))
-                ((Real,delta,0,Attr::readonly,"$\log(u)$ - used for scheme with $\delta=\log(u)$ variable change"))
+                ((Real,delta,0,Attr::readonly,"$\\log(u)$ - used for scheme with $\\delta=\\log(u)$ variable change"))
                 ((bool,contact,false,Attr::readonly,"The spheres are in contact"))
                 ((bool,slip,false,Attr::readonly,"The contact is slipping"))
 				((Vector3r,normalContactForce,Vector3r::Zero(),Attr::readonly,"Normal contact force [N]"))
@@ -86,7 +86,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 			
-			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, Vector3r & Cr, Vector3r & Ct);
+			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,
