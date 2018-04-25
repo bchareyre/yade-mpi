@@ -3,21 +3,6 @@
 
 YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys))
 
-//QUESTION: is this needed? I (Bruno) doubt it. If it is needed a problem is that "u" is not set
-// LubricationPhys::LubricationPhys(const ViscElPhys &obj) :
-//     ViscElPhys(obj),
-//     eta(1.),
-//     eps(0.001),
-//     kno(0.),
-//     kso(0.),
-//     nun(0.),
-//     mum(0.3),
-//     ue(0.),
-//     contact(false),
-//     slip(false)
-// {
-// }
-
 LubricationPhys::~LubricationPhys()
 {
 
@@ -88,6 +73,12 @@ CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
 
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NRAdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
 {
+	// Dry contact
+	if(phys->nun > 0.) {
+		if(!warnedOnce) LOG_WARN("Can't solve with dimentionless-exponential method without fluid! using exact.");
+		warnedOnce = true;
+		return normalForce_trapezoidal(phys, geom, undot, isNew); }
+	
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; phys->delta = std::log(phys->u/a); }
 	
@@ -152,10 +143,10 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NewtonRafson(LubricationPh
 	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; }
 	
 	Real a((geom->radius1+geom->radius2)/2.);
-	Real u = newton_integrate_u(-geom->penetrationDepth, phys->nun, scene->dt, phys->kn, phys->kno, phys->u, 2.*a*phys->eps);
+	Real u = newton_integrate_u(-geom->penetrationDepth, phys->nun, scene->dt, phys->kno, phys->kn, phys->u, 2.*a*phys->eps);
 	
-	phys->normalForce = -phys->kno*std::pow(std::abs(u+geom->penetrationDepth),3./2.)*sign(u+geom->penetrationDepth)*geom->normal;
-	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(phys->kn*std::min((u-2.*a*phys->eps),0.)*geom->normal) : phys->normalForce;
+	phys->normalForce = phys->kn*(-geom->penetrationDepth-u)*geom->normal;
+	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kno*std::pow(std::max((2.*a*phys->eps-u),0.),3./2.)*geom->normal) : phys->normalForce;
 	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce;
 	//phys->normalLubricationForce = phys->nun*(u - phys->u)/(scene->dt*u)*geom->normal;
 	phys->u = u;
@@ -167,19 +158,17 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NewtonRafson(LubricationPh
 
 Real Law2_ScGeom_ImplicitLubricationPhys::newton_integrate_u(Real const& un, Real const& nu, Real const& dt, Real const& k, Real const& g, Real const& u_prev, Real const& eps, int depth)
 {
-	if(nu <= 0.) // Dry contact
-		return (un < eps) ? eps : un ;
-	
 	Real u = u_prev;
 	
 	int i;
 	for(i = 0;i<NewtonRafsonMaxIter;i++)
 	{
-		Real const keff = (u < eps) ? k : 0.;
-		Real F = keff*u*(u-eps) + nu/dt*(u - u_prev) + g*u*std::pow(std::abs(u-un),3./2.)*sign(u-un);
-		u = u - F/(nu/dt + keff*(2.*u-eps) + g*(std::pow(std::abs(u-un),3./2.)*sign(u-un)+u*3./2.*std::pow(std::abs(u-un),1./2.)));
+		Real const keff = (u < eps) ? k*std::pow(eps-u,1./2.) : 0.;
 		
-		//LOG_DEBUG(" u " << u << " F " << F << " contact  " << (u < eps) << " i " << i << " depth " << depth);
+		Real F = u*(g*(un-u) + keff*(eps-u)) - nu*(u-u_prev)/dt;
+		u = u - F/((g*(un-u) + keff*(eps-u)) - u*(g+3./2.*keff) - nu/dt);
+		
+		if(debug) LOG_DEBUG(" u " << u << " F " << F << " contact  " << (u < eps) << " i " << i << " depth " << depth);
 		
 		if(std::abs(F)<NewtonRafsonTol)
 			break;
