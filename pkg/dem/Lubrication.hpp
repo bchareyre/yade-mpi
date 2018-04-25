@@ -85,6 +85,8 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			Real NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, int depth=0);
 			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
+			
+			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, Vector3r & Cr, Vector3r & Ct);
 		
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,

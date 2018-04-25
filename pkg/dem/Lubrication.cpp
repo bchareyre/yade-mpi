@@ -366,33 +366,11 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 		phys->u = -geom->penetrationDepth;
 	}
 	
-	Vector3r Cr = Vector3r::Zero();
-	Vector3r Ct = Vector3r::Zero();
+	Vector3r C1 = Vector3r::Zero();
+	Vector3r C2 = Vector3r::Zero();
 	
-	if(phys->eta <= 0. || phys->u > 0.)
-	{
-		if(activateTangencialLubrication) shearForce_firstOrder(phys,geom);
-		else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
-		
-		if (phys->nun > 0.) phys->cn = phys->nun/phys->u;
-
-		// Rolling and twist torques
-		Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
-		Vector3r relTwistVelocity = relAngularVelocity.dot(geom->normal)*geom->normal;
-		Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
-
-		if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/phys->u)+63./500.*phys->u/a*std::log(a/phys->u))*relRollVelocity;
-		if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*a*phys->u*std::log(a/phys->u)*relTwistVelocity;
-	}
-	else
-	{
-		LOG_WARN("Gap is negative or null with lubrication: inconsistant results: skip shear force and torques calculation");
-	}
-
-    // total torque
-    Vector3r C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
-    Vector3r C2 = -(geom->radius2-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
-
+	computeShearForceAndTorques(phys, geom, C1, C2);
+	
     // Apply!
     scene->forces.addForce(id1,phys->normalForce+phys->shearForce);
     scene->forces.addTorque(id1,C1);
@@ -401,6 +379,37 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     scene->forces.addTorque(id2,C2);
 
     return true;
+}
+
+void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, Vector3r & C1, Vector3r & C2)
+{
+	Real a((geom->radius1+geom->radius2)/2.);
+	if(phys->eta <= 0. || phys->u > 0.)
+	{
+		if(activateTangencialLubrication) shearForce_firstOrder(phys,geom);
+		else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
+		
+		if (phys->nun > 0.) phys->cn = phys->nun/phys->u;
+		
+		Vector3r Cr = Vector3r::Zero();
+		Vector3r Ct = Vector3r::Zero();
+
+		// Rolling and twist torques
+		Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
+		Vector3r relTwistVelocity = relAngularVelocity.dot(geom->normal)*geom->normal;
+		Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
+
+		if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/phys->u)+63./500.*phys->u/a*std::log(a/phys->u))*relRollVelocity;
+		if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*a*phys->u*std::log(a/phys->u)*relTwistVelocity;
+		
+	    // total torque
+		C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
+		C2 = -(geom->radius2-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
+	}
+	else
+	{
+		LOG_WARN("Gap is negative or null with lubrication: inconsistant results: skip shear force and torques calculation");
+	}
 }
 
 CREATE_LOGGER(Law2_ScGeom_ImplicitLubricationPhys);
