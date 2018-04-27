@@ -5,92 +5,121 @@
 
 YADE_PLUGIN((ElectrostaticMat)(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys)(ElectrostaticPhys)(Law2_ScGeom_ElectrostaticPhys))
 
-
-ElectrostaticPhys::ElectrostaticPhys(const CohFrictPhys & obj) : CohFrictPhys(obj), DebyeLength(1.e-6), InterConst(1.e-10), A(1.e-19), eps(0.001)
+// Inheritance constructor
+ElectrostaticPhys::ElectrostaticPhys(LubricationPhys const& obj) :
+	LubricationPhys(obj),
+	DebyeLength(1.e-6),
+	Z(1.e-12),
+	A(1.e-19)
 {
 }
 
-
-CREATE_LOGGER(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys);
-void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction){
-	if (interaction->phys) return;
-
-        // Inheritance
-        Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(material1,material2,interaction);
-
-        CohFrictPhys* ph = YADE_CAST<CohFrictPhys*>(interaction->phys.get());
-
-        // Cast to Electrostatic
-        shared_ptr<ElectrostaticPhys> phys(new ElectrostaticPhys(*ph));
-        interaction->phys = phys;
-
-        // Electrostatic behaviour
-        const Real kB(1.38064852e-23); /* J/K Boltzmann*/
-        const Real nA(6.02214086e26); /* 1/kg Avogadro*/
-        const Real e(1.60217662e-19); /* A.s Electron charge*/
-        const Real VacPerm(8.854187817e-12); /* F/m Permittivity of vacuum*/
-        const Real pi(acos(-1));
-        
-        Real sc(0); // Sum of charges
-        Temp += 273.15; // to Kelvin
-
-        if(DebyeLength == 0)
-        {
-            for(vector<Vector2r>::const_iterator it=Ions.begin();it < Ions.end();it++)
-            {
-                sc += it->x()*it->x()*it->y();
-            }
-
-            if(sc == 0)
-            {
-                LOG_ERROR("Null sum of charge. Assuming Debye Length as 1micron (Debye Length in totaly pure water, pH=7)");
-                phys->DebyeLength=1e-6;
-            }
-            else
-            {
-                Real tmp = RelPerm*VacPerm*kB*Temp/(e*e*nA*sc);
-                phys->DebyeLength = pow(tmp,0.5);
-            }
-        }
-        else
-        {
-            phys->DebyeLength = DebyeLength;
-        }
-        
-        phys->A = A;
-        phys->eps = eps;
-        
-        if(A == 0)
-            LOG_ERROR("Hamaker constant (A) is null. Van Der Waals force will not be calculated");
-        
-        //std::cout << "Debye length^-1: " << phys->DebyeLength << std::endl;
-        if(Z == 0)
-            phys->InterConst = 64.*pi*RelPerm*VacPerm*pow(kB*Temp/e*tanh(z*e*SurfCharge/(4.*kB*Temp)),2);
-        else
-            phys->InterConst = Z;
-        
-        if(phys->InterConst == 0)
-            LOG_ERROR("Interaction constant is null. Set SurfCharge and Temp or Z. Double Layer Electrostatic Interaction will not be calculated.");
-}
-
-
 CREATE_LOGGER(ElectrostaticPhys);
 
-ElectrostaticPhys::~ElectrostaticPhys(){};
+Real Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::getInteractionConstant(Real const& epsr, Real const& T, Real const& z, Real const& phi0)
+{
+	// Physical constants
+	const Real kB(1.38064852e-23); /* J/K Boltzmann*/
+	//const Real nA(6.02214086e26); /* 1/kg Avogadro*/
+	const Real e(1.60217662e-19); /* A.s Electron charge*/
+	const Real VacPerm(8.854187817e-12); /* F/m Permittivity of vacuum*/
+	
+	return 64.*M_PI*epsr*VacPerm*std::pow(kB*T/e*std::tanh(z*e*phi0/(4.*kB*T)),2);
+}
 
+void Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys::go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction)
+{
+	if (interaction->phys) return;
+
+	// Inheritance & cast
+	Ip2_FrictMat_FrictMat_LubricationPhys::go(material1,material2,interaction);
+	LubricationPhys* ph = YADE_CAST<LubricationPhys*>(interaction->phys.get());
+	shared_ptr<ElectrostaticPhys> phys(new ElectrostaticPhys(*ph));
+	interaction->phys = phys;
+
+	// Electrostatic behaviour
+    ElectrostaticMat* mat1 = YADE_CAST<ElectrostaticMat*>(material1.get());
+    ElectrostaticMat* mat2 = YADE_CAST<ElectrostaticMat*>(material2.get());
+	
+	phys->A = std::sqrt(mat1->A*mat2->A);
+	phys->DebyeLength = DebyeLength;
+	phys->Z = Z;
+}
+CREATE_LOGGER(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys);
 
 
 /********************** Law2_ScGeom_ElectrostaticPhys ****************************/
-CREATE_LOGGER(Law2_ScGeom_ElectrostaticPhys);
-bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction){
 
+Real Law2_ScGeom_ElectrostaticPhys::normalForce_DLVO_NR(ElectrostaticPhys* phys, ScGeom* geom, Real const& undot, bool isNew)
+{
+	// Dry contact
+	if(phys->nun <= 0.) {
+		if(!warnedOnce) LOG_WARN("Can't solve with dimentionless-exponential method without fluid!");
+		warnedOnce = true;
+		phys->u = -1;
+		return -1; }
+	
+	Real a((geom->radius1+geom->radius2)/2.);
+	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; phys->delta = std::log(phys->u/a); }
+	
+	Real d = DLVO_NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->A/(6.*phys->kn*a*a), phys->Z/(phys->kn*a), phys->DebyeLength/a, phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
+	
+	phys->normalForce = phys->kn*(-geom->penetrationDepth-a*std::exp(d))*geom->normal;
+	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-a*std::exp(d),0.))*geom->normal) : phys->normalForce;
+	phys->normalDLVOForce = phys->A*a/6.*std::exp(-2.*d) - phys->Z*a/phys->DebyeLength*std::exp(-a*std::exp(d)/phys->DebyeLength);
+	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce - phys->normalDLVOForce;
+	
+	phys->delta = d;
+	phys->u = a*std::exp(d);
+	
+	phys->contact = phys->normalContactForce.norm() != 0;
+	phys->ue = -geom->penetrationDepth - phys->u;
+	
+	return phys->u;
+}
 
-    // Inheritance
-    Law2_ScGeom6D_CohFrictPhys_CohesionMoment::go(iGeom,iPhys,interaction);
+Real Law2_ScGeom_ElectrostaticPhys::DLVO_NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real const& A, Real const& Z, Real const& K, Real & prevDotU, Real const& dt, Real const& prev_d, int depth)
+{
+	Real d = prev_d;
+	
+	int i;
+	Real a(0);
+	
+	for(i=0;i<NewtonRafsonMaxIter;i++)
+	{
+		a = (std::exp(d) < eps) ? alpha : 0.; // Alpha = 0 for non-contact
+		
+		Real ratio = (dt*theta*(un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)) + A*std::exp(-2.*d))-1.+std::exp(prev_d-d)*(1.+dt*(1.-theta)*prevDotU))/(theta*dt*(un-2.*(1+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d))*(1.-K*std::exp(d))) -1.);
+		
+ 		Real F = theta*dt*((un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)))*std::exp(d) + A*std::exp(-d)) + dt*(1.-theta)*std::exp(prev_d)*prevDotU - std::exp(d) + std::exp(prev_d);
+		
+		d = d - ratio;
+		
+		if(debug) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth);
+		
+		if(std::abs(F) < NewtonRafsonTol)
+			break;
+	}
+	
+	if(i < NewtonRafsonMaxIter || depth > maxSubSteps) {
+		if(depth > maxSubSteps) LOG_WARN("Max Substepping reach: results may be inconsistant");
+		
+		prevDotU = un-(1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)) + A*std::exp(-2.*d);
+		return d;
+	} else {
+		// Substepping
+		Real d_mid = DLVO_NRAdimExp_integrate_u(un, eps, alpha, A, Z, K, prevDotU, dt/2., prev_d, depth+1);
+		return DLVO_NRAdimExp_integrate_u(un, eps, alpha, A, Z, K, prevDotU, dt/2., d_mid, depth+1);
+	}
+}
 
-    // Geometric
-    ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
+bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction)
+{
+	// Physic
     ElectrostaticPhys* phys=static_cast<ElectrostaticPhys*>(iPhys.get());
+
+    // Geometry
+    ScGeom* geom=static_cast<ScGeom*>(iGeom.get());
 
     // Get bodies properties
     Body::id_t id1 = interaction->getId1();
@@ -100,36 +129,36 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     State* s1 = b1->state.get();
     State* s2 = b2->state.get();
 
-    // Terms in the force
-    Real& a1(geom->radius1);
-    Real& a2(geom->radius2);
-    Real r((s1->se3.position-s2->se3.position).norm());
-    Real D(r-a1-a2);
-    Real K(1./phys->DebyeLength);
-    Vector3r& normalForce(phys->normalForce);
+    // geometric parameters
+    Real a((geom->radius1+geom->radius2)/2.);
+    bool isNew=false;
+	
+	// Speeds
+    Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*interaction->cellDist.cast<Real>()) : Vector3r::Zero();
+    Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*interaction->cellDist.cast<Real>()): Vector3r::Zero();
 
-    // No longer interact if distance is 10*DebyeLenght
-    if(D > 10*phys->DebyeLength)
-        return false;
+    Vector3r relV = geom->getIncidentVel(s1, s2, scene->dt, shift2, shiftVel, false );
+	Real undot = relV.dot(geom->normal); // Normal velocity norm
+    
+    if(-geom->penetrationDepth > a && -geom->penetrationDepth > 10.*phys->DebyeLength) { return false; }
+	
+	// Solve normal
+	normalForce_DLVO_NR(phys,geom, undot,isNew)
+	
+	// Solve shear and torques
+	Vector3r C1 = Vector3r::Zero();
+	Vector3r C2 = Vector3r::Zero();
+	
+	computeShearForceAndTorques(phys, geom, s1, s2, C1, C2);
+	
+    // Apply!
+    scene->forces.addForce(id1,phys->normalForce+phys->shearForce);
+    scene->forces.addTorque(id1,C1);
 
-    // Rugosity correction
-    D = max(D, phys->eps*(a1+a2)/2);
-
-
-    /* constitutive law */
-    Real DLEF(0.); // Double Layer Electrostatic Force
-    Real VdW(0.);  // Van Der Waals Force
-
-
-    DLEF = phys->InterConst*K*exp(-K*D);
-    VdW = -phys->A/(6.*pow(D,2));
-
-    normalForce = (VdW + DLEF)*a1*a2/(a1+a2)*geom->normal/geom->normal.norm();
-
-    phys->kn = (phys->A/3./pow(D,3.)+pow(K,2.)*phys->InterConst*exp(-K*D))*a1*a2/(a1+a2); // Stiffness
-
-    scene->forces.addForce(id1,normalForce);
-    scene->forces.addForce(id2,-normalForce);
+    scene->forces.addForce(id2,-(phys->normalForce+phys->shearForce));
+    scene->forces.addTorque(id2,C2);
 
     return true;
 }
+
+CREATE_LOGGER(Law2_ScGeom_ElectrostaticPhys);

@@ -11,80 +11,63 @@
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/dem/ElasticContactLaw.hpp>
+#include<pkg/dem/Lubrication.hpp>
 
 namespace py=boost::python;
 
-
-
-class ElectrostaticMat: public CohFrictMat {
+class ElectrostaticMat: public FrictMat {
 	public:
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR(ElectrostaticMat,CohFrictMat,"Electrostatic material, used in Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys and Law2_ScGeom_ElectrostaticPhys.",
-                        //((Real,charge,0,,"Surface potential [mV]"))/*OLD*/
-                        //((Real,DebyeCoef,0.05,,"Proportion of the radius that is the Debye length"))/*OLD*/
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR(ElectrostaticMat,FrictMat,"Electrostatic material, used in :yref:`Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys` and :yref:`Law2_ScGeom_ElectrostaticPhys`.",
+					((Real, A, 1.e-19,,"Hamaker constant for this material[J]"))
 			,
                         createIndex();
 		);
-                REGISTER_CLASS_INDEX(ElectrostaticMat,CohFrictMat);
+                REGISTER_CLASS_INDEX(ElectrostaticMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(ElectrostaticMat);
 
-
-class ElectrostaticPhys: public CohFrictPhys {
+ 
+class ElectrostaticPhys: public LubricationPhys {
         public:
-                ElectrostaticPhys(CohFrictPhys const& ); // "copy" constructor
-                virtual ~ElectrostaticPhys();
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ElectrostaticPhys,CohFrictPhys,"IPhys class containing parameters of ElectrostaticMat. Used by Law2_ScGeom_ElectrostaticPhys.",
-                        ((Real,DebyeLength,1e-8,,"Debye Length [m]"))
-                        ((Real,InterConst,1e-12,,"Double layer interaction constant [J]"))
-                        ((Real,A,1e-19,,"Hamaker constant [J]"))
-                        ((Real, eps, 0.001,,"Rugosity [-]"))
+				explicit ElectrostaticPhys(LubricationPhys const&); // Inheritance constructor
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ElectrostaticPhys,LubricationPhys,"IPhys class containing parameters of DLVO interaction Inherits from LubricationPhys. Used by :yref:`Law2_ScGeom_ElectrostaticPhys`.",
+                        ((Real,DebyeLength,1e-6,,"Debye Length $\\kappa^{-1}$[m]"))
+                        ((Real,Z,1e-12,,"Double layer interaction constant $Z$ [N]"))
+                        ((Real,A,1e-19,,"Hamaker constant $A = \\sqrt{A_1A_2}$ [J]"))
+						((Vector3r,normalDLVOForce,Vector3r::Zero(),,"Normal force due to DLVO interaction"))
 			, // ctors
                         createIndex();,
-                        .def_readonly("DebyeLength",&ElectrostaticPhys::DebyeLength,"Debye Length kappa^-1 [m]")
-                        .def_readonly("InterConst",&ElectrostaticPhys::InterConst,"Interaction Constant Z [J]")
-                        .def_readonly("A",&ElectrostaticPhys::A,"Hamaker Constant A [J]")
 		);
 		DECLARE_LOGGER;
-                REGISTER_CLASS_INDEX(ElectrostaticPhys,CohFrictPhys);
+                REGISTER_CLASS_INDEX(ElectrostaticPhys,LubricationPhys);
 };
 REGISTER_SERIALIZABLE(ElectrostaticPhys);
 
-
-
-
-
-class Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys: public Ip2_CohFrictMat_CohFrictMat_CohFrictPhys{
+class Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys: public Ip2_FrictMat_FrictMat_LubricationPhys{
 	public:
 		virtual void go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction);
+		static Real getInteractionConstant(Real const& epsr=78, Real const& T=293, Real const& z=1, Real const& phi0=0.050);
+		//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getInteractionConstant_overloads, getInteractionConstant, 0, 4)
                 FUNCTOR2D(ElectrostaticMat,ElectrostaticMat);
 		DECLARE_LOGGER;
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys,Ip2_CohFrictMat_CohFrictMat_CohFrictPhys,"Ip2 creating ElectrostaticPhys from two ElectrostaticMat instances.",
-                        ((Real,DebyeLength,0,,"Debye length [m]. If 0, will be calculated from fluid properties"))
-                        ((Real,SurfCharge,50,,"Surface potential [mV]"))
-                        ((Real,Temp,20,,"Temperature into the fluid [°C]"))
-                        ((Real,RelPerm,1,,"Relative permittivity of the fluid [-]"))
-                        ((Real,A,1e-19,,"Hamaker constant [J]"))
-                        ((Real,Z,0,,"Interaction constant [N]. If 0, will be calculated from termal properties"))
-                        ((Real,z,0,,"Surface ion valency [-]"))
-                        ((Real, eps, 0.001,,"Rugosity [-]"))
-                        ((vector<Vector2r>,Ions,vector<Vector2r>({Vector2r(-1,1),Vector2r(1,1)}),,"List of ions's charge and concentration (default is: 1mol/l Na(+1)Cl(-1): [(+1,1),(-1,1)]"))
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys, Ip2_FrictMat_FrictMat_LubricationPhys,"Ip2 creating Electrostatic_Phys from two ElectrostaticMat instances.",
+                        ((Real,DebyeLength,1.e-6,,"Debye length [m]."))
+                        ((Real,Z,1.e-12,,"Interaction constant [N]."))
                     ,,
+					.def("getInteractionConstant", &getInteractionConstant, (py::args("epsr")=78,py::args("T")=293,py::args("z")=1,py::args("phi0")=0.050),"Get the interaction constant from thermal properties").staticmethod("getInteractionConstant")
 		);
 };
 REGISTER_SERIALIZABLE(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys);
 
 
 
-class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom6D_CohFrictPhys_CohesionMoment{
+class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom_ImplicitLubricationPhys{
 	public:
+		Real normalForce_DLVO_NR(ElectrostaticPhys *phys, ScGeom* geom, Real const& undot, bool isNew);
+		DLVO_NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real const& A, Real const& Z, Real const& K, Real & prevDotU, Real const& dt, Real const& prev_d, int depth)
 		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
                 FUNCTOR2D(GenericSpheresContact,ElectrostaticPhys);
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom6D_CohFrictPhys_CohesionMoment,"Material law for electrostatic interaction according to [Mari2013]_.",,,
-//                  ((Real,f_VdW,0,,"Computed Van Der Waals Force"))
-//                  ((Real,f_DLE,0,,"Computed Double Layer Electrostatic Force")),,
-//                            .def_readonly("f_VdW",&Law2_ScGeom_ElectrostaticPhys::f_VdW,"Computed VanDerWaals Force")
-//                            .def_readonly("f_DLE",&Law2_ScGeom_ElectrostaticPhys::f_DLE,"Computed Double Layer Electrostatic Force")
-//		ONLY FOR DEBUGGING PURPOSE BETWEEN 2 PARTICLES
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_ImplicitLubricationPhys,"Material law for lubricated spheres with DLVO interaction between 2 spheres",,,
                 );
 		DECLARE_LOGGER;
 
