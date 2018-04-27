@@ -73,7 +73,7 @@ CREATE_LOGGER(Ip2_FrictMat_FrictMat_LubricationPhys);
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NRAdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
 {
 	// Dry contact
-	if(phys->nun > 0.) {
+	if(phys->nun <= 0.) {
 		if(!warnedOnce) LOG_WARN("Can't solve with dimentionless-exponential method without fluid! using exact.");
 		warnedOnce = true;
 		return normalForce_trapezoidal(phys, geom, undot, isNew); }
@@ -101,7 +101,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(Real const& un, 
 	Real d = prev_d;
 	
 	int i;
-	Real a;
+	Real a(0);
 	
 	for(i=0;i<NewtonRafsonMaxIter;i++)
 	{
