@@ -64,11 +64,21 @@ REGISTER_SERIALIZABLE(Ip2_ElectrostaticMat_ElectrostaticMat_ElectrostaticPhys);
 class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom_ImplicitLubricationPhys{
 	public:
 		Real normalForce_DLVO_NR(ElectrostaticPhys *phys, ScGeom* geom, Real const& undot, bool isNew);
-		DLVO_NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real const& A, Real const& Z, Real const& K, Real & prevDotU, Real const& dt, Real const& prev_d, int depth)
+		Real DLVO_NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real const& A, Real const& Z, Real const& K, Real & prevDotU, Real const& dt, Real const& prev_d, int depth=1);
+		
+		static void getStressForEachBody(vector<Matrix3r>& DLVOStresses);
+		static py::tuple PyGetStressForEachBody();
+		static void getTotalStresses(Matrix3r& DLVOStresses);
+		static py::tuple PyGetTotalStresses();
+		
 		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
-                FUNCTOR2D(GenericSpheresContact,ElectrostaticPhys);
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_ImplicitLubricationPhys,"Material law for lubricated spheres with DLVO interaction between 2 spheres",,,
-                );
+		FUNCTOR2D(GenericSpheresContact,ElectrostaticPhys);
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_ImplicitLubricationPhys,"Material law for lubricated spheres with DLVO interaction between 2 spheres",,,
+			.def("getStressForEachBody",&Law2_ScGeom_ElectrostaticPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, DLVO stress.")
+			.staticmethod("getStressForEachBody")
+			.def("getTotalStresses",&Law2_ScGeom_ElectrostaticPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, DLVO stress")
+			.staticmethod("getTotalStresses")
+		);
 		DECLARE_LOGGER;
 
 };

@@ -62,12 +62,12 @@ Real Law2_ScGeom_ElectrostaticPhys::normalForce_DLVO_NR(ElectrostaticPhys* phys,
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; phys->delta = std::log(phys->u/a); }
 	
-	Real d = DLVO_NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->A/(6.*phys->kn*a*a), phys->Z/(phys->kn*a), phys->DebyeLength/a, phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
+	Real d = DLVO_NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., -phys->A/(6.*phys->kn*a*a), -phys->Z/(phys->kn*a), a/phys->DebyeLength, phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
 	
 	phys->normalForce = phys->kn*(-geom->penetrationDepth-a*std::exp(d))*geom->normal;
 	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-a*std::exp(d),0.))*geom->normal) : phys->normalForce;
-	phys->normalDLVOForce = phys->A*a/6.*std::exp(-2.*d) - phys->Z*a/phys->DebyeLength*std::exp(-a*std::exp(d)/phys->DebyeLength);
-	phys->normalLubricationForce = phys->normalForce - phys->normalContactForce - phys->normalDLVOForce;
+	phys->normalDLVOForce = (phys->A/a/6.*std::exp(-2.*d) - phys->Z*a/phys->DebyeLength*std::exp(-a*std::exp(d)/phys->DebyeLength))*geom->normal;
+	phys->normalLubricationForce = phys->kn*a*phys->prevDotU*geom->normal;
 	
 	phys->delta = d;
 	phys->u = a*std::exp(d);
@@ -89,13 +89,13 @@ Real Law2_ScGeom_ElectrostaticPhys::DLVO_NRAdimExp_integrate_u(Real const& un, R
 	{
 		a = (std::exp(d) < eps) ? alpha : 0.; // Alpha = 0 for non-contact
 		
-		Real ratio = (dt*theta*(un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)) + A*std::exp(-2.*d))-1.+std::exp(prev_d-d)*(1.+dt*(1.-theta)*prevDotU))/(theta*dt*(un-2.*(1+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d))*(1.-K*std::exp(d))) -1.);
+		Real ratio = (dt*theta*(un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)) + A*std::exp(-2.*d))-1.+std::exp(prev_d-d)*(1.+dt*(1.-theta)*prevDotU))/(theta*dt*(un-2.*(1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d))*(1.-K*std::exp(d))) -1.);
 		
  		Real F = theta*dt*((un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)))*std::exp(d) + A*std::exp(-d)) + dt*(1.-theta)*std::exp(prev_d)*prevDotU - std::exp(d) + std::exp(prev_d);
 		
 		d = d - ratio;
 		
-		if(debug) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth);
+		if(debug) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth << " AZK" << A << Z << K);
 		
 		if(std::abs(F) < NewtonRafsonTol)
 			break;
@@ -139,11 +139,14 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
 
     Vector3r relV = geom->getIncidentVel(s1, s2, scene->dt, shift2, shiftVel, false );
 	Real undot = relV.dot(geom->normal); // Normal velocity norm
-    
+	
     if(-geom->penetrationDepth > a && -geom->penetrationDepth > 10.*phys->DebyeLength) { return false; }
+    
+    // inititalization
+	if(phys->u == -1. ) {phys->u = -geom->penetrationDepth; isNew=true;}
 	
 	// Solve normal
-	normalForce_DLVO_NR(phys,geom, undot,isNew)
+	normalForce_DLVO_NR(phys,geom, undot,isNew);
 	
 	// Solve shear and torques
 	Vector3r C1 = Vector3r::Zero();
@@ -159,6 +162,86 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
     scene->forces.addTorque(id2,C2);
 
     return true;
+}
+
+void Law2_ScGeom_ElectrostaticPhys::getStressForEachBody(vector<Matrix3r>& DLVOStresses)
+{
+	const shared_ptr<Scene>& scene=Omega::instance().getScene();
+	DLVOStresses.resize(scene->bodies->size());
+	for (size_t k=0;k<scene->bodies->size();k++)
+	{
+		DLVOStresses[k]=Matrix3r::Zero();
+	}
+	
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(I->geom.get());
+		ElectrostaticPhys* phys=YADE_CAST<ElectrostaticPhys*>(I->phys.get());
+		
+		if(phys)
+		{
+			Vector3r lV1 = (3.0/(4.0*Mathr::PI*pow(geom->refR1,3)))*((geom->contactPoint-Body::byId(I->getId1(),scene)->state->pos));
+			Vector3r lV2 = Vector3r::Zero();
+			if (!scene->isPeriodic)
+				lV2 = (3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos)));
+			else
+				lV2 = (3.0/(4.0*Mathr::PI*pow(geom->refR2,3)))*((geom->contactPoint- (Body::byId(I->getId2(),scene)->state->pos + (scene->cell->hSize*I->cellDist.cast<Real>()))));
+
+			DLVOStresses[I->getId1()] += phys->normalDLVOForce*lV1.transpose();
+			DLVOStresses[I->getId2()] -= phys->normalDLVOForce*lV2.transpose();
+		}
+	}
+}
+
+py::tuple Law2_ScGeom_ElectrostaticPhys::PyGetStressForEachBody()
+{
+	py::list nc, sc, nl, sl, nd;
+	vector<Matrix3r> NCs, SCs, NLs, SLs, NDs;
+	Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(NCs, SCs, NLs, SLs);
+	getStressForEachBody(NDs);
+	FOREACH(const Matrix3r& m, NCs) nc.append(m);
+	FOREACH(const Matrix3r& m, SCs) sc.append(m);
+	FOREACH(const Matrix3r& m, NLs) nl.append(m);
+	FOREACH(const Matrix3r& m, SLs) sl.append(m);
+	FOREACH(const Matrix3r& m, NDs) nd.append(m);
+	return py::make_tuple(nc, sc, nl, sl, nd);
+}
+
+void Law2_ScGeom_ElectrostaticPhys::getTotalStresses(Matrix3r& DLVOStresses)
+{
+	vector<Matrix3r> NDs;
+	getStressForEachBody(NDs);
+    
+  	const shared_ptr<Scene>& scene=Omega::instance().getScene();
+    
+    if(!scene->isPeriodic)
+    {
+        LOG_ERROR("This method can only be used in periodic simulations");
+        return;
+    }
+    
+    for(unsigned int i(0);i<NDs.size();i++)
+    {
+        Sphere * s = YADE_CAST<Sphere*>(Body::byId(i,scene)->shape.get());
+        
+        if(s)
+        {
+            Real vol = 4./3.*M_PI*pow(s->radius,3);
+            
+            DLVOStresses += NDs[i]*vol;
+        }
+    }
+    
+    DLVOStresses /= scene->cell->getVolume();
+}
+
+py::tuple Law2_ScGeom_ElectrostaticPhys::PyGetTotalStresses()
+{
+	Matrix3r nc(Matrix3r::Zero()), sc(Matrix3r::Zero()), nl(Matrix3r::Zero()), sl(Matrix3r::Zero()), nd(Matrix3r::Zero());
+
+    Law2_ScGeom_ImplicitLubricationPhys::getTotalStresses(nc, sc, nl, sl);
+	getTotalStresses(nd);
+	return py::make_tuple(nc, sc, nl, sl, nd);
 }
 
 CREATE_LOGGER(Law2_ScGeom_ElectrostaticPhys);
