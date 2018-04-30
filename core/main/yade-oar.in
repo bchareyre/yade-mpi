@@ -78,6 +78,7 @@ parser.add_argument('--disable-pynotify',action='store_true',dest='disablePynoti
 parser.add_argument('--oar-project',dest='oar_p',help='Project name to pass to oarsub')
 parser.add_argument('--oar-walltime',dest='oar_t',help='Walltime: max running time. May be overriden by !WALLTIME',default='2:00:00')
 parser.add_argument('--oar-script',dest='oar_script',help='Script passed to oar-sub. Must contain __YADE_COMMAND__ string where the Yade command will be replaced.',default='')
+parser.add_argument('--oar-besteffort',dest="oar_best",action='store_true',default=False,help="run jobs as besteffort");
 parser.add_argument('--oar-properties',dest="oar_prop",help="Properties to pass to oarsub. May be overriden by !OARPROPERTIES",default='');
 parser.add_argument('args',nargs=argparse.REMAINDER,help=argparse.SUPPRESS) # see argparse doc, par.disable_interspersed_args() from optargs module
 #parser.add_argument('--serial',action='store_true',dest='serial',default=False,help='Run all jobs serially, even if there are free cores
@@ -198,15 +199,15 @@ for i,l in enumerate(useLines):
 			logFile2+='.%d'%i
 		logFiles.append(logFile2)
 		env='YADE_WALLTIME=%s YADE_BATCH='%walltime
-		if table: env+='%s:%d'%(table,l) # keep YADE_BATCH empty (but still defined) if running a single simulation
+		if table: env+='%s:%d'%(os.path.abspath(table),l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,os.path.abspath(script))
 		desc=params[l]['description']
 		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
-		jobs.append(JobInfo(jobNum,desc,env+cmd,os.path.abspath('tmp/'+logFile2),nCores,script=os.path.abspath(script),table=table,lineNo=l,affinity=jobAffinity,oarprop=oarprops))
+		jobs.append(JobInfo(jobNum,desc,env+cmd,os.path.abspath('tmp/'+str(os.getpid())+'/'+logFile2),nCores,script=os.path.abspath(script),table=table,lineNo=l,affinity=jobAffinity,oarprop=oarprops))
 
-if not os.path.exists('tmp'):
-    os.makedirs('tmp');
+if not os.path.exists('tmp/'+str(os.getpid())):
+    os.makedirs('tmp/'+str(os.getpid()));
 
 print "Job summary:"
 i = 0
@@ -214,7 +215,7 @@ for job in jobs:
 	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command
 	if not dryRun:
 		# Create script file from model
-		scriptname = '/tmp/'+opts.oar_script.split('/')[-1]+'.'+str(i)
+		scriptname = 'tmp/'+str(os.getpid())+'/'+opts.oar_script.split('/')[-1]+'.'+str(i)
 		i = i+1;
 
 		with open(opts.oar_script) as infile, open(scriptname, 'w') as outfile:
@@ -230,10 +231,14 @@ for job in jobs:
 
 		if job.oarprop != '':
 			prop='-p '+job.oarprop;
+			
+		if opts.oar_best:
+			prop+=' -t besteffort'
+
 
 		os.chmod(scriptname,0744);
 		#os.system('%s'%(scriptname));
-		os.system('oarsub --project=%s %s -l/core=%i,walltime=%s -O %s -E %s.err %s\n'%(project, prop, job.nCores, walltime, job.log,job.log,scriptname));
+		os.system('oarsub --project=%s %s -l/cpu=1/core=%i,walltime=%s -O %s -E %s.err %s\n'%(project, prop, job.nCores, walltime, job.log,job.log,scriptname));
 
                 
                 
