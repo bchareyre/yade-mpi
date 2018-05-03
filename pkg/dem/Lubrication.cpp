@@ -303,6 +303,48 @@ void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firstOrder(LubricationPhys*
 	phys->shearForce = Ft;
 }
 
+void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firstOrder_log(LubricationPhys* phys, ScGeom* geom)
+{
+	Vector3r Ft(Vector3r::Zero());
+    Vector3r Ft_ = geom->rotate(phys->shearForce);
+	Real a((geom->radius1+geom->radius2)/2.);
+    const Vector3r& dus = geom->shearIncrement();
+    Real kt = phys->ks;
+    Real nut = (phys->eta > 0.) ? M_PI*phys->eta/2.*a*(-2.+(2.+std::exp(phys->delta))*(std::log(2.+std::exp(phys->delta)) - phys->delta)) : 0.;
+    
+	phys->shearForce = Vector3r::Zero();
+    phys->shearLubricationForce = Vector3r::Zero();
+    phys->shearContactForce = Vector3r::Zero();
+    phys->cs = nut;
+    
+	phys->slip = false;
+	
+	// Also work without fluid (nut == 0)
+	if(phys->contact)
+	{
+		Ft = Ft_ + kt*dus; // Trial force
+		phys->shearContactForce = Ft; // If no slip: no lubrication!
+#if 1
+		if(Ft.norm() > phys->normalContactForce.norm()*std::max(0.,phys->mum)) // If slip
+		{
+			//LOG_INFO("SLIP");
+			Ft *= phys->normalContactForce.norm()*std::max(0.,phys->mum)/Ft.norm();
+			phys->shearContactForce = Ft;
+			Ft = (Ft*kt*scene->dt + Ft_*nut + dus*kt*nut)/(kt*scene->dt+nut);
+			phys->slip = true;
+			phys->shearLubricationForce = nut*dus/scene->dt;
+		}
+#endif
+	}
+	else
+	{
+		Ft = (Ft_ + dus*kt)*nut/(nut+kt*scene->dt);
+		phys->shearLubricationForce = Ft;
+	}
+	
+	phys->shearForce = Ft;
+}
+
 
 bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_ptr<IPhys> &iPhys, Interaction *interaction)
 {
@@ -368,7 +410,10 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	Vector3r C1 = Vector3r::Zero();
 	Vector3r C2 = Vector3r::Zero();
 	
-	computeShearForceAndTorques(phys, geom, s1, s2, C1, C2);
+	if(resolution == 1)
+		computeShearForceAndTorques_log(phys, geom, s1, s2, C1, C2);
+	else
+		computeShearForceAndTorques(phys, geom, s1, s2, C1, C2);
 	
     // Apply!
     scene->forces.addForce(id1,phys->normalForce+phys->shearForce);
@@ -409,6 +454,33 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(Lubricatio
 	{
 		LOG_WARN("Gap is negative or null with lubrication: inconsistant results: skip shear force and torques calculation");
 	}
+}
+
+
+void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
+{
+	Real a((geom->radius1+geom->radius2)/2.);
+	if(resolution != 1 && !warnedOnce) { LOG_DEBUG("This method use log(u/a) for shear and torque component calculation. Make sure phys->delta is set before calling this method."); warnedOnce = true; }
+		
+	if(activateTangencialLubrication) shearForce_firstOrder_log(phys,geom);
+	else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
+	
+	if (phys->nun > 0.) phys->cn = phys->nun/phys->u;
+	
+	Vector3r Cr = Vector3r::Zero();
+	Vector3r Ct = Vector3r::Zero();
+
+	// Rolling and twist torques
+	Vector3r relAngularVelocity = geom->getRelAngVel(s1,s2,scene->dt);
+	Vector3r relTwistVelocity = relAngularVelocity.dot(geom->normal)*geom->normal;
+	Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
+
+	if(activateRollLubrication && phys->eta > 0.) Cr = -M_PI*phys->eta*a*a*a*(3./2.+63./500.*std::exp(phys->delta))*phys->delta*relRollVelocity;
+	if (activateTwistLubrication && phys->eta > 0.) Ct = -M_PI*phys->eta*a*a*a*std::exp(phys->delta)*phys->delta*relTwistVelocity;
+	
+	// total torque
+	C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
+	C2 = -(geom->radius2-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
 }
 
 CREATE_LOGGER(Law2_ScGeom_ImplicitLubricationPhys);
