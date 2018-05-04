@@ -82,7 +82,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			Real newton_integrate_u(Real const& un, Real const& nu, Real const& dt, Real const& k, Real const& g, Real const& u_prev, Real const& eps, int depth=0);
 			
 			Real normalForce_NRAdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew);
-			Real NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, int depth=0);
+			Real NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot, int depth=0);
 			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 			void shearForce_firstOrder_log(LubricationPhys *phys, ScGeom* geom);

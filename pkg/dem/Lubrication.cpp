@@ -81,7 +81,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NRAdimExp(LubricationPhys 
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; phys->delta = std::log(phys->u/a); }
 	
-	Real d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
+	Real d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta, phys->nun/phys->kn/std::pow(a,2)*undot); // Dimentionless-exponential resolution!!
 	
 	phys->normalForce = phys->kn*(-geom->penetrationDepth-a*std::exp(d))*geom->normal;
 	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-a*std::exp(d),0.))*geom->normal) : phys->normalForce;
@@ -96,7 +96,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_NRAdimExp(LubricationPhys 
 	return phys->u;
 }
 
-Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, int depth)
+Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot, int depth)
 {
 	Real d = prev_d;
 	
@@ -126,8 +126,8 @@ Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(Real const& un, 
 		return d;
 	} else {
 		// Substepping
-		Real d_mid = NRAdimExp_integrate_u(un, eps, alpha, prevDotU, dt/2., prev_d, depth+1);
-		return NRAdimExp_integrate_u(un, eps, alpha, prevDotU, dt/2., d_mid, depth+1);
+		Real d_mid = NRAdimExp_integrate_u(un - undot*dt/2., eps, alpha, prevDotU, dt/2., prev_d, undot, depth+1);
+		return NRAdimExp_integrate_u(un, eps, alpha, prevDotU, dt/2., d_mid, undot, depth+1);
 	}
 }
 
