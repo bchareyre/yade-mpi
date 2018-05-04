@@ -62,7 +62,7 @@ Real Law2_ScGeom_ElectrostaticPhys::normalForce_DLVO_NR(ElectrostaticPhys* phys,
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth-undot*scene->dt; phys->delta = std::log(phys->u/a); }
 	
-	Real d = DLVO_NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., -phys->A/(6.*phys->kn*a*a), -phys->Z/(phys->kn*a), a/phys->DebyeLength, phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
+	Real d = DLVO_NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->A/(6.*phys->kn*a*a), phys->Z/(phys->kn*a), a/phys->DebyeLength, phys->prevDotU, scene->dt*a*phys->kn/phys->nun, phys->delta); // Dimentionless-exponential resolution!!
 	
 	phys->normalForce = phys->kn*(-geom->penetrationDepth-a*std::exp(d))*geom->normal;
 	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-a*std::exp(d),0.))*geom->normal) : phys->normalForce;
@@ -89,9 +89,9 @@ Real Law2_ScGeom_ElectrostaticPhys::DLVO_NRAdimExp_integrate_u(Real const& un, R
 	{
 		a = (std::exp(d) < eps) ? alpha : 0.; // Alpha = 0 for non-contact
 		
-		Real ratio = (dt*theta*(un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)) + A*std::exp(-2.*d))-1.+std::exp(prev_d-d)*(1.+dt*(1.-theta)*prevDotU))/(theta*dt*(un-2.*(1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d))*(1.-K*std::exp(d))) -1.);
+		Real ratio = (dt*theta*(un - (1.+a)*std::exp(d) + a*eps + Z*K*std::exp(-K*std::exp(d)) - A*std::exp(-2.*d))-1.+std::exp(prev_d-d)*(1.+dt*(1.-theta)*prevDotU))/(theta*dt*(un-2.*(1.+a)*std::exp(d) + a*eps + Z*K*std::exp(-K*std::exp(d))*(1.-K*std::exp(d))+A*std::exp(-2.*d)) -1.);
 		
- 		Real F = theta*dt*((un - (1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)))*std::exp(d) + A*std::exp(-d)) + dt*(1.-theta)*std::exp(prev_d)*prevDotU - std::exp(d) + std::exp(prev_d);
+ 		Real F = theta*dt*((un - (1.+a)*std::exp(d) + a*eps + Z*K*std::exp(-K*std::exp(d)))*std::exp(d) - A*std::exp(-d)) + dt*(1.-theta)*std::exp(prev_d)*prevDotU - std::exp(d) + std::exp(prev_d);
 		
 		d = d - ratio;
 		
@@ -104,7 +104,7 @@ Real Law2_ScGeom_ElectrostaticPhys::DLVO_NRAdimExp_integrate_u(Real const& un, R
 	if(i < NewtonRafsonMaxIter || depth > maxSubSteps) {
 		if(depth > maxSubSteps) LOG_WARN("Max Substepping reach: results may be inconsistant");
 		
-		prevDotU = un-(1.+a)*std::exp(d) + a*eps - Z*K*std::exp(-K*std::exp(d)) + A*std::exp(-2.*d);
+		prevDotU = un-(1.+a)*std::exp(d) + a*eps + Z*K*std::exp(-K*std::exp(d)) - A*std::exp(-2.*d);
 		return d;
 	} else {
 		// Substepping
