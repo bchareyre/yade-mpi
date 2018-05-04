@@ -152,7 +152,7 @@ bool Law2_ScGeom_ElectrostaticPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhy
 	Vector3r C1 = Vector3r::Zero();
 	Vector3r C2 = Vector3r::Zero();
 	
-	computeShearForceAndTorques(phys, geom, s1, s2, C1, C2);
+	computeShearForceAndTorques_log(phys, geom, s1, s2, C1, C2);
 	
     // Apply!
     scene->forces.addForce(id1,phys->normalForce+phys->shearForce);
