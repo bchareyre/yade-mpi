@@ -90,6 +90,9 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		void updateVolumes (Solver& flow);
 		void initializeVolumes (Solver& flow);
 		void boundaryConditions(Solver& flow);
+		void pyInitializeVolumes () {if (solver) initializeVolumes(*solver); else LOG_WARN("Solver not initialized");}
+		void pyUpdateVolumes () {if (solver) updateVolumes(*solver); else LOG_WARN("Solver not initialized");}
+		
 		void updateBCs () {
 			if (solver->tesselation().maxId>0) boundaryConditions(*solver);//avoids crash at iteration 0, when the packing is not bounded yet
 			else LOG_ERROR("updateBCs not applied");
@@ -327,6 +330,8 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		ellapsedIter=0;
 		metisForced=false;
 		,
+		.def("initializeVolumes",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::pyInitializeVolumes,"initialize pore volumes.")
+		.def("updateVolumes",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::pyUpdateVolumes,"update rates of volume change")
 		.def("imposeFlux",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposeFlux,(boost::python::arg("pos"),boost::python::arg("p")),"Impose a flux in cell located  at 'pos' (i.e. add a source term in the flow problem). Outflux positive, influx negative.")
 		.def("imposePressureFromId",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposePressureFromId,(boost::python::arg("id"),boost::python::arg("p")),"Impose pressure in cell of index 'id' (after remeshing the same condition will apply for the same location, regardless of what the new cell index is at this location). The index of the condition itself is returned (for multiple imposed pressures at different points).")
 		.def("imposePressure",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::imposePressure,(boost::python::arg("pos"),boost::python::arg("p")),"Impose pressure in cell of location 'pos'. The index of the condition is returned (for multiple imposed pressures at different points).")

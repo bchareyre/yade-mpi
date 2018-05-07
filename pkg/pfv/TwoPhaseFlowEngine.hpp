@@ -22,6 +22,12 @@
 // #include <Eigen/SparseCholesky>
 // #include <Eigen/IterativeLinearSolvers>
 #include<Eigen/SparseLU>
+
+
+#ifdef CHOLMOD_LIBS
+      #include <cholmod.h>
+#endif
+
 /// We can add data to the Info types by inheritance
 class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 {
@@ -137,12 +143,35 @@ class PhaseCluster : public Serializable
 {
 		double totalCellVolume;
 // 		CellHandle entryPoreHandle;
+
 	public :
+		typedef std::pair<std::pair<unsigned int,unsigned int>,double> Interface_t;
+		struct Interface : Interface_t {
+			unsigned outerIndex;// local index to outer cell from inner cell (from 0 to 3)			
+			Real volume; // for tracking movements of the interface
+			Real capillaryP; // local capillary pressure
+			Real conductivity; //TODO: to be used instead of default one if not zero
+			TwoPhaseFlowEngineT::CellHandle innerCell;
+			Interface (Interface_t i) : Interface_t(i),outerIndex(100),volume(0),capillaryP(100),conductivity(0)  {};
+		};
 		virtual ~PhaseCluster();
 		vector<TwoPhaseFlowEngineT::CellHandle> pores;
-		vector<std::pair<std::pair<unsigned int,unsigned int>,double> > interfaces;
+		vector<Interface> interfaces;
 		TwoPhaseFlowEngineT::RTriangulation* tri;
+		#ifdef CHOLMOD_LIBS
+		cholmod_common comC;
+		cholmod_factor* LC;
+		cholmod_dense* ex;//the pressure field
+		cholmod_common* pComC;
+// 		cholmod_common* pComC = &comC;
+		cholmod_factor** pLC;
+// 		cholmod_dense** pEx = &ex;
+// 		cholmod_l_start(&comC);
+
+		#endif
+		
 		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear(); interfaces.clear();}
+		void resetSolver() {if (LC) cholmod_l_free_factor(&LC, &comC); if (ex) cholmod_l_free_dense(&ex, &comC);}
 		
 		vector<int> getPores() { vector<int> res;
 			for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
@@ -150,20 +179,37 @@ class PhaseCluster : public Serializable
 			
 		boost::python::list getInterfaces(){
 			boost::python::list ints;
-			for (vector<std::pair<std::pair<unsigned int,unsigned int>,double> >::iterator it =  interfaces.begin(); it!=interfaces.end(); it++)
+			for (vector<Interface>::iterator it =  interfaces.begin(); it!=interfaces.end(); it++)
 				ints.append(boost::python::make_tuple(it->first.first,it->first.second,it->second));
 			return ints;
 		}
-
+		Real getFlux(unsigned nf) {
+			const TwoPhaseFlowEngineT::CellHandle& innerCell = interfaces[nf].innerCell;
+			return innerCell->info().kNorm()[interfaces[nf].outerIndex] *
+				( innerCell->info().p() + interfaces[nf].capillaryP - innerCell->neighbor(interfaces[nf].outerIndex)->info().p());
+		}
+		
+		void setCapPressure(unsigned nf, double pcap) {interfaces[nf].capillaryP=pcap;}
+		void setCapVol(unsigned nf, double vcap) {interfaces[nf].volume=vcap;}
+		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
 		((double,volume,0,,"cumulated volume of all pores."))
 		((double,entryRadius,0,,"smallest entry capillary pressure."))
 		((int,entryPore,-1,,"the pore of the cluster incident to the throat with smallest entry Pc."))
 		((double,interfacialArea,0,,"interfacial area of the cluster"))
-		,,,
+		,((LC,NULL))((ex,NULL))((pComC,&comC))((pLC,&LC)),
+		#ifdef CHOLMOD_LIBS
+		cholmod_l_start(pComC);//initialize cholmod solver
+// 		LC=NULL;
+// 		ex=NULL;
+		#endif
+		,
 		.def("getPores",&PhaseCluster::getPores,"get the list of pores by index")
 		.def("getInterfaces",&PhaseCluster::getInterfaces,"get the list of interfacial pore-throats associated to a cluster, listed as [id1,id2,area] where id2 is the neighbor pore outside the cluster.")
+		.def("getFlux",&PhaseCluster::getFlux,(boost::python::arg("interface")),"get flux at an interface (i.e. velocity of the menicus), the index to be used is the rank of the interface in the same order as in getInterfaces().")
+		.def("setCapPressure",&PhaseCluster::setCapPressure,(boost::python::arg("numf"),boost::python::arg("pCap")),"set local capillary pressure")
+		.def("setCapVol",&PhaseCluster::setCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"set position of the meniscus - in terms of volume")
 		)
 };
 REGISTER_SERIALIZABLE(PhaseCluster);
@@ -234,6 +280,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 		if (label<=1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
 		return clusterInvadePore(clusters[label].get(), solver->T[solver->currentTes].cellHandles[cellId]);}
 	boost::python::list pyClusters();
+	void solveCluster(int clusterId);
 // 	int getMaxCellLabel();
 
 	//compute forces
@@ -524,6 +571,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	// Clusters
 	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
 	.def("clusterInvadePore",&TwoPhaseFlowEngine::pyClusterInvadePore,boost::python::arg("cellId"),"drain the pore identified by cellId and update the clusters accordingly.")
+	.def("solveCluster",&TwoPhaseFlowEngine::solveCluster,(boost::python::arg("clusterId")),"Solve 1-phase flow in one single cluster defined by its id.")
 	// others
 	.def("getCellVolume",&TwoPhaseFlowEngine::cellVolume,"get the volume of each cell")
 	.def("isCellNeighbor",&TwoPhaseFlowEngine::isCellNeighbor,(boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID")),"check if cell1 and cell2 are neigbors.")

@@ -21,7 +21,140 @@ YADE_PLUGIN((TwoPhaseFlowEngineT));
 YADE_PLUGIN((TwoPhaseFlowEngine));
 YADE_PLUGIN((PhaseCluster));
 
-PhaseCluster::~PhaseCluster(){}
+PhaseCluster::~PhaseCluster(){
+	#ifdef CHOLMOD_LIBS
+	if (LC) cholmod_l_free_factor(&LC, &comC);
+	if (ex) cholmod_l_free_dense(&ex, &comC);
+	if (pComC) cholmod_l_finish(pComC);
+	#endif
+}
+
+void TwoPhaseFlowEngine::solveCluster(int clusterId)
+{
+	
+// int count=0;
+// cerr<<"COUNT:"<<count<<endl;
+		if (clusterId >= (int) clusters.size() or clusters[clusterId]->pores.size()==0) {LOG_WARN("nothing to solve for cluster "<<clusterId); return;}
+// 		int dim = clusters[clusterId].pores.size();// dimension of the linear system
+		vector<int> clen;
+		vector<int> is;
+		vector<int> js;
+		int ncols=0;//number of unknown
+		vector<double> vs;
+		vector<double> RHS;
+		vector<double> RHSvol;
+		vector<TwoPhaseFlowEngineT::CellHandle> pCells;//the pores in which pressure will be solved
+#ifdef CHOLMOD_LIBS
+// cerr<<"COUNT:"<<count<<endl;		
+		PhaseCluster& cluster = *(clusters[clusterId]);
+		for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator cellIt =  cluster.pores.begin(); cellIt!=cluster.pores.end(); cellIt++) 
+		{
+			CellHandle cell = *cellIt;
+		  if ((!cell->info().Pcondition) && !cell->info().blocked) {cell->info().index= ncols++; pCells.push_back(cell);}
+		  else cell->info().index=-1;
+		}
+		is.reserve(ncols*3);
+		js.reserve(ncols*3);
+		vs.reserve(ncols*3);
+		RHS.resize(ncols,0);
+		RHSvol.resize(ncols,0);
+// cerr<<"COUNT:"<<count<<endl;
+		unsigned T_nnz=0;
+		for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator cellIt =  pCells.begin(); cellIt!=pCells.end(); cellIt++) 
+		{
+			CellHandle cell = *cellIt;
+// 		  if ((!cell->info().Pcondition) && !cell->info().blocked) {
+			  double diag=0;
+			  for (int j=0;j<4;j++) if (!cell->neighbor(j)->info().blocked) {
+			      diag+= (cell->info().kNorm())[j];
+			       if (not cell->neighbor(j)->info().Pcondition) {
+				 if (cell->info().label == cell->neighbor(j)->info().label) {
+// 				  diag+= (cell->info().kNorm())[j];
+				  // off-diag coeff, only if neighbor cell is part of same cluster and in upper triangular part of the matrix
+				if (cell->info().index < cell->neighbor(j)->info().index) {
+				  T_nnz++;
+				  is.push_back(cell->info().index);
+				  js.push_back(cell->neighbor(j)->info().index);
+				  vs.push_back(-(cell->info().kNorm())[j]);}
+				 }
+			       } else {//imposed pressure in the W-phase
+				    // update the right-hand side
+				    RHS[cell->info().index]+=(cell->info().kNorm())[j]*cell->neighbor(j)->info().p();}
+			}
+			  // define the diag coeff
+			  T_nnz++;
+			  is.push_back(cell->info().index);
+			  js.push_back(cell->info().index);
+			  vs.push_back(diag);
+			  // source term from volume change, to be updated later
+			  RHSvol[cell->info().index]-=cell->info().dv();
+// 			}
+		  }
+// cerr<<"COUNT:"<<count<<endl;
+// 		double capillaryPressure=1000;
+		for (vector<PhaseCluster::Interface>::iterator it =  cluster.interfaces.begin(); it!=cluster.interfaces.end(); it++) {
+// 			cerr <<"throat "<<it->first.first<<" "<<it->first.second<<" "<<solver->tesselation().cellHandles[it->first.first]->info().index<<endl;
+			const CellHandle& innerCell = solver->tesselation().cellHandles[it->first.first];
+			if (innerCell->info().Pcondition) continue;
+// 			CellHandle outerCell = solver->tesselation().cellHandles[it->first.second];
+			RHS[innerCell->info().index]+=(innerCell->info().kNorm())[it->outerIndex]*(innerCell->neighbor(it->outerIndex)->info().p()-it->capillaryP);
+		}
+		//comC.useGPU=useGPU; //useGPU;
+		//FIXME: is it safe to share "comC" among parallel cluster resolution?
+		cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &(cluster.comC));
+		// set all the values for the cholmod triplet matrix
+// 			T->i=&(is[0]);
+// 			T->j=&(js[0]);
+// 			T->x=&(vs[0]);
+
+		
+		for(unsigned k=0;k<T_nnz;k++) {
+			((long*) T->i)[k]=is[k];
+			((long*) T->j)[k]=js[k];
+			((double*) T->x)[k]=vs[k];
+// cerr<<"(i,j,k):"<<is[k]<<" "<<js[k]<<" "<<vs[k]<<endl;
+// 			T->nnz=k+1;
+		}
+		T->nnz=T_nnz;
+// 		} //add_T_entry(T,is[k], js[k], vs[k]);
+// 		cholmod_l_print_triplet(T, "triplet", &comC);
+		
+		// convert triplet list into a cholmod sparse matrix, then factorize it
+		cholmod_sparse* AcholC = cholmod_l_triplet_to_sparse(T, T->nnz, &(cluster.comC));
+// 		AcholC = cholmod_l_triplet_to_sparse(T, T->nnz, &comC);
+		cholmod_l_print_sparse(AcholC, "Achol", cluster.pComC);
+			
+// cerr<<"COUNT:"<<count<<endl;
+// 		if (cluster.pLC) cholmod_l_free_factor(cluster.pLC, cluster.pComC);
+		cluster.LC = cholmod_l_analyze(AcholC, &(cluster.comC));
+		cholmod_l_factorize(AcholC, cluster.LC, &(cluster.comC));
+		
+		cholmod_dense* B = cholmod_l_zeros(ncols, 1, AcholC->xtype, &(cluster.comC));
+		double* B_x =(double *) B->x;
+		for (int k=0; k<ncols; k++) B_x[k]=RHS[k]+RHSvol[k];
+	
+// cerr<<"COUNT:"<<count<<endl;	
+		cluster.ex = cholmod_l_solve(CHOLMOD_A, cluster.LC, B, &(cluster.comC));
+		double* e_x =(double *) cluster.ex->x;
+		
+		for (auto cellIt =  pCells.begin(); cellIt!=pCells.end(); cellIt++) 
+		{
+			const CellHandle& cell = *cellIt;
+			cell->info().p() = e_x[cell->info().index];
+// 			LOG_WARN("pressure="<<cell->info().p());
+		}
+		
+// cerr<<"COUNT:"<<count<<endl;
+		//clean
+		cholmod_l_free_triplet(&T, &(cluster.comC));
+// 		cholmod_l_free_dense(&ex, &comC);
+		cholmod_l_free_dense(&B, &(cluster.comC));
+		cholmod_l_free_sparse(&AcholC, &(cluster.comC));
+// 		cholmod_l_free_factor(&LC, &comC);
+// 		cholmod_l_finish(&comC);
+// cerr<<"COUNT:"<<count<<endl;
+#endif
+}
 
 void TwoPhaseFlowEngine::initialization()
 {
@@ -416,6 +549,13 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 		if (isDrawable){vtkfile.write_data(cell->info().label);}
 	}
 	vtkfile.end_data();
+	
+	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+		if (isDrawable){vtkfile.write_data(cell->info().p());}
+	}
+	vtkfile.end_data();
 }
 void TwoPhaseFlowEngine::savePhaseVtkIncludeBoundingCells(const char* folder)
 {
@@ -424,7 +564,7 @@ void TwoPhaseFlowEngine::savePhaseVtkIncludeBoundingCells(const char* folder)
         char filename[80];
 	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         sprintf(filename,"%s/out_%d.vtk",folder,number++);
-	int firstReal=-1;
+// 	int firstReal=-1;
 
         basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices(), (unsigned int) Tri.number_of_finite_cells());
 
@@ -2620,8 +2760,11 @@ void TwoPhaseFlowEngine:: updateReservoirLabel()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();     
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
       if (cell->info().isNWRes) clusterGetPore(clusters[0].get(),cell);
-      else if (cell->info().isWRes) { clusterGetPore(clusters[1].get(),cell);
-	      for (int facet = 0; facet < 4; facet ++) if (!cell->neighbor(facet)->info().isWRes) clusterGetFacet(clusters[1].get(),cell,facet);}
+      else if (cell->info().isWRes) {
+	      clusterGetPore(clusters[1].get(),cell);
+	      for (int facet = 0; facet < 4; facet ++)
+		      if ((not tri.is_infinite(cell->neighbor(facet))) and  !cell->neighbor(facet)->info().isWRes)
+			      clusterGetFacet(clusters[1].get(),cell,facet);}
       else if (cell->info().label>1) continue;
       else cell->info().label=-1;
     }
@@ -2630,8 +2773,10 @@ void TwoPhaseFlowEngine:: updateReservoirLabel()
 void TwoPhaseFlowEngine::clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet) {
 	cell->info().hasInterface = true;
 	double interfArea = sqrt((cell->info().facetSurfaces[facet]*cell->info().facetFluidSurfacesRatio[facet]).squared_length());
-	cluster->interfaces.push_back(std::pair<std::pair<unsigned int,unsigned int>,double>(
-		std::pair<unsigned int,unsigned int>(cell->info().id,cell->neighbor(facet)->info().id),interfArea));
+	cluster->interfaces.push_back(PhaseCluster::Interface(std::pair<std::pair<unsigned int,unsigned int>,double>(
+		std::pair<unsigned int,unsigned int>(cell->info().id,cell->neighbor(facet)->info().id),interfArea)));
+	cluster->interfaces.back().outerIndex=facet;
+	cluster->interfaces.back().innerCell=cell;
 	cluster->interfacialArea += interfArea;
 	if (cluster->entryRadius < cell->info().poreThroatRadius[facet]){
 		cluster->entryRadius = cell->info().poreThroatRadius[facet];
@@ -3182,7 +3327,9 @@ double TwoPhaseFlowEngine::getPoreThroatRadius(unsigned int cell1, unsigned int 
     else {
         for (unsigned int i=0; i<4; i++) {
             if (solver->T[solver->currentTes].cellHandles[cell1]->neighbor(i)->info().id==cell2)
-                r = solver->T[solver->currentTes].cellHandles[cell1]->info().poreThroatRadius[i];}}
+                r = solver->T[solver->currentTes].cellHandles[cell1]->info().poreThroatRadius[i];
+		break;}
+	}
     return r;
 }
 
