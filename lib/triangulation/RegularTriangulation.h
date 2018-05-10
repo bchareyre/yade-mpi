@@ -30,7 +30,13 @@
 //This include from yade let us use Eigen types
 #include <lib/base/Math.hpp>
 
-const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
+const unsigned facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
+//return the opposite edge (e.g. the opposite of {0,2} is {1,3}) 
+inline void revertEdge (unsigned &i,unsigned &j){
+	if (facetVertices[i][0]==j) {i=facetVertices[i][1];j=facetVertices[i][2];}
+	else if (facetVertices[i][1]==j) {i=facetVertices[i][0];j=facetVertices[i][2];}
+	else {j=facetVertices[i][1]; i=facetVertices[i][0];}
+}
 
 namespace CGT {
 //Robust kernel
