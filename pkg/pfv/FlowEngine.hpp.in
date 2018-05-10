@@ -420,6 +420,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 
 	FlowCellInfo_@TEMPLATE_FLOW_NAME@ (void)
 	{
+		index=0;
 		modulePermeability.resize(4, 0);
 		cellForce.resize(4,CGAL::NULL_VECTOR);
 		facetSurfaces.resize(4,CGAL::NULL_VECTOR);
