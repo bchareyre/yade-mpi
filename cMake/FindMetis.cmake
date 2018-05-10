@@ -5,7 +5,7 @@
 #  METIS_LIBRARY, libraries to link against to use GL2PS.
 #  METIS_FOUND, If false, do not try to use GL2PS.
 
-FIND_PATH(METIS_INCLUDE_DIR metis.h PATHS /usr/include/metis /usr/local/SuiteSparse/include)
+FIND_PATH(METIS_INCLUDE_DIR metis.h parmetis.h PATHS /usr/include/metis /usr/local/SuiteSparse/include)
 FIND_LIBRARY(METIS_LIBRARY NAMES metis parmetis PATHS /usr/lib /usr/local/SuiteSparse/lib)
 
 # handle the QUIETLY and REQUIRED arguments and set LOKI_FOUND to TRUE if
