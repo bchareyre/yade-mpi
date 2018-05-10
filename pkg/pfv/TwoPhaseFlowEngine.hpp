@@ -23,7 +23,6 @@
 // #include <Eigen/IterativeLinearSolvers>
 #include<Eigen/SparseLU>
 
-
 #ifdef CHOLMOD_LIBS
       #include <cholmod.h>
 #endif
@@ -145,17 +144,22 @@ class PhaseCluster : public Serializable
 // 		CellHandle entryPoreHandle;
 
 	public :
+		typedef TwoPhaseFlowEngineT::CellHandle CellHandle;
+		typedef TwoPhaseFlowEngineT::Tesselation Tesselation;
 		typedef std::pair<std::pair<unsigned int,unsigned int>,double> Interface_t;
 		struct Interface : Interface_t {
-			unsigned outerIndex;// local index to outer cell from inner cell (from 0 to 3)			
+			unsigned outerIndex;// local index to outer cell from inner cell (from 0 to 3)
 			Real volume; // for tracking movements of the interface
 			Real capillaryP; // local capillary pressure
 			Real conductivity; //TODO: to be used instead of default one if not zero
-			TwoPhaseFlowEngineT::CellHandle innerCell;
-			Interface (Interface_t i) : Interface_t(i),outerIndex(100),volume(0),capillaryP(100),conductivity(0)  {};
+			CellHandle innerCell;
+			Interface (Interface_t i) : Interface_t(i),outerIndex(100),volume(0),capillaryP(0),conductivity(0)  {};
 		};
 		virtual ~PhaseCluster();
-		vector<TwoPhaseFlowEngineT::CellHandle> pores;
+		PhaseCluster (Tesselation& t) : PhaseCluster() {tes=&t; LC=NULL; ex=NULL; if (not tes) LOG_WARN("invalid initialization");}
+// 		PhaseCluster () {tes=NULL; LOG_WARN("avoid default constructor, 'tes' not initialized");}
+		Tesselation* tes;//point back to the full data structure
+		vector<CellHandle> pores;
 		vector<Interface> interfaces;
 		TwoPhaseFlowEngineT::RTriangulation* tri;
 		#ifdef CHOLMOD_LIBS
@@ -167,14 +171,15 @@ class PhaseCluster : public Serializable
 		cholmod_factor** pLC;
 // 		cholmod_dense** pEx = &ex;
 // 		cholmod_l_start(&comC);
-
+		void solvePressure();
+		void resetSolver() {if (LC) cholmod_l_free_factor(&LC, &comC); if (ex) cholmod_l_free_dense(&ex, &comC);}
 		#endif
 		
 		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear(); interfaces.clear();}
-		void resetSolver() {if (LC) cholmod_l_free_factor(&LC, &comC); if (ex) cholmod_l_free_dense(&ex, &comC);}
+		
 		
 		vector<int> getPores() { vector<int> res;
-			for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
+			for (vector<CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
 			return res;}
 			
 		boost::python::list getInterfaces(){
@@ -184,7 +189,7 @@ class PhaseCluster : public Serializable
 			return ints;
 		}
 		Real getFlux(unsigned nf) {
-			const TwoPhaseFlowEngineT::CellHandle& innerCell = interfaces[nf].innerCell;
+			const CellHandle& innerCell = interfaces[nf].innerCell;
 			return innerCell->info().kNorm()[interfaces[nf].outerIndex] *
 				( innerCell->info().p() + interfaces[nf].capillaryP - innerCell->neighbor(interfaces[nf].outerIndex)->info().p());
 		}
@@ -210,6 +215,7 @@ class PhaseCluster : public Serializable
 		.def("getFlux",&PhaseCluster::getFlux,(boost::python::arg("interface")),"get flux at an interface (i.e. velocity of the menicus), the index to be used is the rank of the interface in the same order as in getInterfaces().")
 		.def("setCapPressure",&PhaseCluster::setCapPressure,(boost::python::arg("numf"),boost::python::arg("pCap")),"set local capillary pressure")
 		.def("setCapVol",&PhaseCluster::setCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"set position of the meniscus - in terms of volume")
+		.def("solvePressure",&PhaseCluster::solvePressure,"Solve 1-phase flow in one single cluster defined by its id.")
 		)
 };
 REGISTER_SERIALIZABLE(PhaseCluster);
@@ -270,17 +276,25 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	///end of invasion model
 	
 	//## Clusters ##
+	//FIXME: clusters have a pointers to solver->tesselation(), they won't be deserialized correctly, probably needs a post_load() and/or something in TPF.initialization()
 	void updateCellLabel();
 	void updateSingleCellLabelRecursion(CellHandle cell, PhaseCluster* cluster);
 	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet);//update cluster inetrfacial area and max entry radius wrt to a facet
 	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//add pore to cluster, updating flags and cluster volume
 	vector<int> clusterInvadePore(PhaseCluster* cluster, CellHandle cell);//remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
+	vector<int> clusterInvadePoreFast(PhaseCluster* cluster, CellHandle cell);
+	vector<int> splitCluster(PhaseCluster* cluster, CellHandle cellInit);
+	unsigned markRecursively(const CellHandle& cell, int newLabel);// mark and count cells with same label as 'cell' and connected to it
 	vector<int> pyClusterInvadePore(int cellId) {
 		int label = solver->T[solver->currentTes].cellHandles[cellId]->info().label;
 		if (label<=1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
 		return clusterInvadePore(clusters[label].get(), solver->T[solver->currentTes].cellHandles[cellId]);}
+	vector<int> pyClusterInvadePoreFast(int cellId) {
+		int label = solver->T[solver->currentTes].cellHandles[cellId]->info().label;
+		if (label<=1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
+		return clusterInvadePoreFast(clusters[label].get(), solver->T[solver->currentTes].cellHandles[cellId]);}
 	boost::python::list pyClusters();
-	void solveCluster(int clusterId);
+	bool connectedAroundEdge(const RTriangulation& Tri, CellHandle& cell, unsigned facet1, unsigned facet2);
 // 	int getMaxCellLabel();
 
 	//compute forces
@@ -507,7 +521,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	((vector<double>, setFractionParticles, vector<double>(scene->bodies->size(),0.0),,"Correction fraction for swelling of particles by mismatch of surface area of particles with those from actual surface area in pore units"))
        	((bool,primaryTPF, true,,"Boolean to indicate whether the initial conditions are for primary drainage of imbibition (dictated by drainageFirst) or secondary drainage or imbibition. Note that during simulations, a switch from drainage to imbibition or vise versa can easily be made by changing waterBoundaryPressure"))
        	((bool,swelling, false,,"If true, include swelling of particles during TPF computations"))
-	
+	((bool,useFastInvasion, false,,"use fast version of invasion"))
+       	
 	
 	//END Latest dynamic/pore merging
 
@@ -518,7 +533,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 
 	
 	,/*TwoPhaseFlowEngineT()*/,
-	clusters.resize(2); clusters[0]=shared_ptr<PhaseCluster>(new PhaseCluster); clusters[1]=shared_ptr<PhaseCluster>(new PhaseCluster);
 	,
 	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"Check the connection between pore and boundary. If true, pore throat connects the boundary.")
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
@@ -571,7 +585,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	// Clusters
 	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
 	.def("clusterInvadePore",&TwoPhaseFlowEngine::pyClusterInvadePore,boost::python::arg("cellId"),"drain the pore identified by cellId and update the clusters accordingly.")
-	.def("solveCluster",&TwoPhaseFlowEngine::solveCluster,(boost::python::arg("clusterId")),"Solve 1-phase flow in one single cluster defined by its id.")
+	.def("clusterInvadePoreFast",&TwoPhaseFlowEngine::pyClusterInvadePoreFast,boost::python::arg("cellId"),"drain the pore identified by cellId and update the clusters accordingly. This 'fast' version is faster and it also preserves interfaces through cluster splitting. OTOH it does not update entry Pc nor culsters volume (it could if needed)")
 	// others
 	.def("getCellVolume",&TwoPhaseFlowEngine::cellVolume,"get the volume of each cell")
 	.def("isCellNeighbor",&TwoPhaseFlowEngine::isCellNeighbor,(boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID")),"check if cell1 and cell2 are neigbors.")

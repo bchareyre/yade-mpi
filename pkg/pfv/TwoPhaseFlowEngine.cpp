@@ -23,19 +23,15 @@ YADE_PLUGIN((PhaseCluster));
 
 PhaseCluster::~PhaseCluster(){
 	#ifdef CHOLMOD_LIBS
-	if (LC) cholmod_l_free_factor(&LC, &comC);
-	if (ex) cholmod_l_free_dense(&ex, &comC);
-	if (pComC) cholmod_l_finish(pComC);
+	resetSolver();
 	#endif
 }
 
-void TwoPhaseFlowEngine::solveCluster(int clusterId)
+#define INFT(cell0) solver->T[solver->currentTes].Triangulation().is_infinite(cell0)
+
+void PhaseCluster::solvePressure()
 {
-	
-// int count=0;
-// cerr<<"COUNT:"<<count<<endl;
-		if (clusterId >= (int) clusters.size() or clusters[clusterId]->pores.size()==0) {LOG_WARN("nothing to solve for cluster "<<clusterId); return;}
-// 		int dim = clusters[clusterId].pores.size();// dimension of the linear system
+		if (pores.size()==0) {LOG_WARN("nothing to solve for cluster "<<label); return;}
 		vector<int> clen;
 		vector<int> is;
 		vector<int> js;
@@ -43,33 +39,27 @@ void TwoPhaseFlowEngine::solveCluster(int clusterId)
 		vector<double> vs;
 		vector<double> RHS;
 		vector<double> RHSvol;
-		vector<TwoPhaseFlowEngineT::CellHandle> pCells;//the pores in which pressure will be solved
+		
+		vector<CellHandle> pCells;//the pores in which pressure will be solved
 #ifdef CHOLMOD_LIBS
-// cerr<<"COUNT:"<<count<<endl;		
-		PhaseCluster& cluster = *(clusters[clusterId]);
-		for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator cellIt =  cluster.pores.begin(); cellIt!=cluster.pores.end(); cellIt++) 
-		{
+		for (vector<CellHandle>::iterator cellIt =  pores.begin(); cellIt!=pores.end(); cellIt++) {
 			CellHandle cell = *cellIt;
-		  if ((!cell->info().Pcondition) && !cell->info().blocked) {cell->info().index= ncols++; pCells.push_back(cell);}
-		  else cell->info().index=-1;
-		}
+			if ((!cell->info().Pcondition) && !cell->info().blocked) {cell->info().index= ncols++; pCells.push_back(cell);}
+			else cell->info().index=-1;}
 		is.reserve(ncols*3);
 		js.reserve(ncols*3);
 		vs.reserve(ncols*3);
 		RHS.resize(ncols,0);
 		RHSvol.resize(ncols,0);
-// cerr<<"COUNT:"<<count<<endl;
 		unsigned T_nnz=0;
-		for (vector<TwoPhaseFlowEngineT::CellHandle>::iterator cellIt =  pCells.begin(); cellIt!=pCells.end(); cellIt++) 
+		for (auto cellIt =  pCells.begin(); cellIt!=pCells.end(); cellIt++) 
 		{
 			CellHandle cell = *cellIt;
-// 		  if ((!cell->info().Pcondition) && !cell->info().blocked) {
 			  double diag=0;
 			  for (int j=0;j<4;j++) if (!cell->neighbor(j)->info().blocked) {
 			      diag+= (cell->info().kNorm())[j];
 			       if (not cell->neighbor(j)->info().Pcondition) {
 				 if (cell->info().label == cell->neighbor(j)->info().label) {
-// 				  diag+= (cell->info().kNorm())[j];
 				  // off-diag coeff, only if neighbor cell is part of same cluster and in upper triangular part of the matrix
 				if (cell->info().index < cell->neighbor(j)->info().index) {
 				  T_nnz++;
@@ -86,79 +76,55 @@ void TwoPhaseFlowEngine::solveCluster(int clusterId)
 			  is.push_back(cell->info().index);
 			  js.push_back(cell->info().index);
 			  vs.push_back(diag);
+			  
 			  // source term from volume change, to be updated later
 			  RHSvol[cell->info().index]-=cell->info().dv();
-// 			}
 		  }
-// cerr<<"COUNT:"<<count<<endl;
-// 		double capillaryPressure=1000;
-		for (vector<PhaseCluster::Interface>::iterator it =  cluster.interfaces.begin(); it!=cluster.interfaces.end(); it++) {
-// 			cerr <<"throat "<<it->first.first<<" "<<it->first.second<<" "<<solver->tesselation().cellHandles[it->first.first]->info().index<<endl;
-			const CellHandle& innerCell = solver->tesselation().cellHandles[it->first.first];
+		for (vector<Interface>::iterator it =  interfaces.begin(); it!=interfaces.end(); it++) {
+			if (not tes) LOG_WARN("no tes!!");
+			const CellHandle& innerCell = tes->cellHandles[it->first.first];
 			if (innerCell->info().Pcondition) continue;
-// 			CellHandle outerCell = solver->tesselation().cellHandles[it->first.second];
 			RHS[innerCell->info().index]+=(innerCell->info().kNorm())[it->outerIndex]*(innerCell->neighbor(it->outerIndex)->info().p()-it->capillaryP);
 		}
 		//comC.useGPU=useGPU; //useGPU;
 		//FIXME: is it safe to share "comC" among parallel cluster resolution?
-		cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &(cluster.comC));
-		// set all the values for the cholmod triplet matrix
-// 			T->i=&(is[0]);
-// 			T->j=&(js[0]);
-// 			T->x=&(vs[0]);
-
-		
+		cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &(comC));
 		for(unsigned k=0;k<T_nnz;k++) {
 			((long*) T->i)[k]=is[k];
 			((long*) T->j)[k]=js[k];
 			((double*) T->x)[k]=vs[k];
-// cerr<<"(i,j,k):"<<is[k]<<" "<<js[k]<<" "<<vs[k]<<endl;
-// 			T->nnz=k+1;
 		}
 		T->nnz=T_nnz;
-// 		} //add_T_entry(T,is[k], js[k], vs[k]);
-// 		cholmod_l_print_triplet(T, "triplet", &comC);
-		
+	
 		// convert triplet list into a cholmod sparse matrix, then factorize it
-		cholmod_sparse* AcholC = cholmod_l_triplet_to_sparse(T, T->nnz, &(cluster.comC));
-// 		AcholC = cholmod_l_triplet_to_sparse(T, T->nnz, &comC);
-		cholmod_l_print_sparse(AcholC, "Achol", cluster.pComC);
+		cholmod_sparse* AcholC = cholmod_l_triplet_to_sparse(T, T->nnz, &(comC));
+		cholmod_l_print_sparse(AcholC, "Achol", pComC);
 			
-// cerr<<"COUNT:"<<count<<endl;
-// 		if (cluster.pLC) cholmod_l_free_factor(cluster.pLC, cluster.pComC);
-		cluster.LC = cholmod_l_analyze(AcholC, &(cluster.comC));
-		cholmod_l_factorize(AcholC, cluster.LC, &(cluster.comC));
+		LC = cholmod_l_analyze(AcholC, &(comC));
+		cholmod_l_factorize(AcholC, LC, &(comC));
 		
-		cholmod_dense* B = cholmod_l_zeros(ncols, 1, AcholC->xtype, &(cluster.comC));
+		cholmod_dense* B = cholmod_l_zeros(ncols, 1, AcholC->xtype, &(comC));
 		double* B_x =(double *) B->x;
 		for (int k=0; k<ncols; k++) B_x[k]=RHS[k]+RHSvol[k];
 	
-// cerr<<"COUNT:"<<count<<endl;	
-		cluster.ex = cholmod_l_solve(CHOLMOD_A, cluster.LC, B, &(cluster.comC));
-		double* e_x =(double *) cluster.ex->x;
+		ex = cholmod_l_solve(CHOLMOD_A, LC, B, &(comC));
+		double* e_x =(double *) ex->x;
 		
 		for (auto cellIt =  pCells.begin(); cellIt!=pCells.end(); cellIt++) 
 		{
 			const CellHandle& cell = *cellIt;
 			cell->info().p() = e_x[cell->info().index];
-// 			LOG_WARN("pressure="<<cell->info().p());
 		}
-		
-// cerr<<"COUNT:"<<count<<endl;
 		//clean
-		cholmod_l_free_triplet(&T, &(cluster.comC));
-// 		cholmod_l_free_dense(&ex, &comC);
-		cholmod_l_free_dense(&B, &(cluster.comC));
-		cholmod_l_free_sparse(&AcholC, &(cluster.comC));
-// 		cholmod_l_free_factor(&LC, &comC);
-// 		cholmod_l_finish(&comC);
-// cerr<<"COUNT:"<<count<<endl;
+		cholmod_l_free_triplet(&T, &(comC));
+		cholmod_l_free_dense(&B, &(comC));
+		cholmod_l_free_sparse(&AcholC, &(comC));
 #endif
 }
 
 void TwoPhaseFlowEngine::initialization()
 {
-// 		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene
+		scene = Omega::instance().getScene().get();//here define the pointer to Yade's scene -necessary if the engine is used outside O.engines
 		setPositionsBuffer(true);//copy sphere positions in a buffer...
 		if(!keepTriangulation){buildTriangulation(0.0,*solver);}//create a triangulation and initialize pressure in the elements (connecting with W-reservoir), everything will be contained in "solver"
 // 		initializeCellIndex();//initialize cell index
@@ -176,7 +142,7 @@ void TwoPhaseFlowEngine::initialization()
 		computePoreBodyVolume();//save capillary volume of all cells, for fast calculating saturation. Also save the porosity of each cell.
 		computeSolidLine();//save cell->info().solidLine[j][y]
 		initializeReservoirs();//initial pressure, reservoir flags and local pore saturation
-// 		if(isCellLabelActivated) updateReservoirLabel();
+		if(isCellLabelActivated) updateCellLabel();
 		solver->noCache = true;
 }
 
@@ -2754,10 +2720,14 @@ void TwoPhaseFlowEngine::actionTPF()
 
 void TwoPhaseFlowEngine:: updateReservoirLabel()
 {
+    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
+    if (clusters.size()<2) {
+	    clusters.resize(2);
+	    clusters[0]=shared_ptr<PhaseCluster>(new PhaseCluster(solver->tesselation()));
+	    clusters[1]=shared_ptr<PhaseCluster>(new PhaseCluster(solver->tesselation()));}
     clusters[0]->reset(); clusters[0]->label=0;
     clusters[1]->reset(); clusters[1]->label=1;
-    RTriangulation& tri = solver->T[solver->currentTes].Triangulation();
-    FiniteCellsIterator cellEnd = tri.finite_cells_end();     
+    FiniteCellsIterator cellEnd = tri.finite_cells_end();    
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
       if (cell->info().isNWRes) clusterGetPore(clusters[0].get(),cell);
       else if (cell->info().isWRes) {
@@ -2801,7 +2771,7 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHan
 	unsigned nPores = cluster->pores.size();
 	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base cluster
 	if (nPores==0) {LOG_WARN("Invading the empty cluster id="<<label); }
-	if (nPores<2) {cluster->reset(); cluster->label = label; return  newClusters;}
+	if (nPores==1) {cluster->reset(); cluster->label = label; return  newClusters;}
 	FOREACH(CellHandle& cell, cluster->pores) {cell->info().label=-1;} //mark all pores, and get them back in again below
 	cell->info().label=0;//mark the invaded one
 	
@@ -2823,13 +2793,137 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHan
 	for (int neighborId=neighborStart+1 ; neighborId<=3; neighborId++) {//should be =1 if the cluster remain the same -1 removed pore
 		const CellHandle& nCell = cell->neighbor(neighborId);
 		if (nCell->info().label != -1 or solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue; //already reached from another neighbour (connected domain): skip, else this is a new cluster
-		shared_ptr<PhaseCluster> clst (new PhaseCluster());
+		shared_ptr<PhaseCluster> clst (new PhaseCluster(solver->tesselation()));
 		clst->label=clusters.size();
 		newClusters.push_back(clst->label);
 		clusters.push_back(clst);
 		updateSingleCellLabelRecursion(nCell,clusters.back().get());
 	}
 	return newClusters;// return list of created clusters
+}
+
+bool TwoPhaseFlowEngine::connectedAroundEdge(const RTriangulation& Tri, CellHandle& cell, unsigned facet1, unsigned facet2)
+{
+		revertEdge(facet1,facet2);
+		RTriangulation::Cell_circulator cell1 = Tri.incident_cells(cell,facet1,facet2,cell);
+		RTriangulation::Cell_circulator cell0 = cell1++;
+		const int& label = cell1->info().label;
+		while (cell1!=cell0 and !Tri.is_infinite(cell1) and (cell1->info().label== label)) cell1++;//around edge looking for contiguous labels
+		return (cell1==cell0);
+}
+
+vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, CellHandle cell)
+{
+	//invade the pore and attach to NW reservoir, label is assigned after reset
+	int label = cell->info().label;
+	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
+#ifdef CHOLMOD_LIBS
+	cluster->resetSolver();
+#endif
+	unsigned id = cell->info().id;
+	cell->info().saturation=0;
+	cell->info().isNWRes=true;
+	clusterGetPore(clusters[0].get(),cell);
+	//update the cluster(s)
+	unsigned nPores = cluster->pores.size();
+	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base cluster
+	if (nPores==0) {LOG_WARN("Invading the empty cluster id="<<label); return  newClusters;}
+	if (nPores==1) {cluster->reset(); cluster->label = label; return  newClusters;}
+	//count neighbors from the same cluster
+	vector<CellHandle> clustNeighbors; vector<unsigned> clustNIdx;
+	for (int k=0;k<4;k++) if (not INFT(cell->neighbor(k)) and cell->neighbor(k)->info().label==label) {
+		clustNeighbors.push_back(cell->neighbor(k)); clustNIdx.push_back(k);}
+	unsigned nN = clustNeighbors.size();
+	unsigned nFaces = 4-nN;
+	//update interfaces, first remove old ones
+	for (int k=cluster->interfaces.size()-1;(k>=0 and nFaces>0);k--) 
+			if (cluster->interfaces[k].first.first==id) {
+				//TODO: what happens to the other interfaces on the same pore? they will be removed but should they give bridges or something?
+				cluster->interfacialArea-=cluster->interfaces[k].second;
+				cluster->interfaces.erase(cluster->interfaces.begin()+k);
+				nFaces--;}
+	//then add new ones (TODO: set capillary pressure and volume?)
+	for (auto cn = clustNeighbors.begin(); cn!=clustNeighbors.end(); cn++) clusterGetFacet(cluster,*cn,(*cn)->index(cell));
+	//now remove the invaded pore
+	auto p = cluster->pores.begin();
+	for (; (*p)!=cell;) {//slow search...
+		p++; if(p==cluster->pores.end()) LOG_ERROR("pore not found");}
+	cluster->pores.erase(p);
+	//it could be that the cluster has been splitted in smaller clusters, before going to complex rebuilding method we try to exit the trivial cases below
+	
+	newClusters.push_back(cluster->label);//we will return at least the original cluster itself
+	
+	//1. case of only one neighbor from cluster connected to the one being erased
+	if (nN ==1) {/*LOG_WARN("nN==1 ?!");*/ return newClusters; }
+	if (nN ==2) { /*LOG_WARN("nN==2 ?!");*/
+		// check if pores connected by the removed one are still directly connected locally around one edge	
+		unsigned i=clustNIdx[0];
+		unsigned j=clustNIdx[1];
+		if (connectedAroundEdge(Tri,cell,i,j)) return newClusters;
+	}
+	if (nN ==3) { /*LOG_WARN("nN==3 ?!");*/
+		// check if pores connected by the removed one are still connected locally around at least two edges		
+		unsigned i=clustNIdx[0];
+		unsigned j=clustNIdx[1];
+		unsigned k=clustNIdx[2];
+		unsigned ij = unsigned(connectedAroundEdge(Tri,cell,i,j));
+		unsigned jk = unsigned(connectedAroundEdge(Tri,cell,j,k));
+		unsigned ki = unsigned(connectedAroundEdge(Tri,cell,k,i));
+		if ((ij+jk+ki)>=2) //the cluster is not splitted by the invasion (2 connexions between three cells)
+			return newClusters;
+	}
+	if (nN ==4) LOG_WARN("nN==4 ?!");
+	//not a trivial case, go for a split (possibly still resuting in one single cluster)
+// 	LOG_WARN("splitting cluster "<<cluster->label);
+// 	LOG_WARN("split");
+	return splitCluster(cluster, cluster->pores[0]);// return list of created clusters
+}
+
+vector<int> TwoPhaseFlowEngine::splitCluster(PhaseCluster* cluster, CellHandle cellInit)
+{
+	unsigned oldSize=cluster->pores.size();
+	if (oldSize==0) {LOG_WARN("empty call "); return vector<int>();}
+	unsigned nextLabel=clusters.size();
+	FOREACH(CellHandle& cell, cluster->pores) {cell->info().label=nextLabel;} //mark all pores, and get them back in again below
+	unsigned nPoresOld=markRecursively(cluster->pores[0],cluster->label);
+	if (nPoresOld==cluster->pores.size()) {/*LOG_WARN("no split, return (label="<<cluster->label <<")");*/ return vector<int>(1,cluster->label);}
+	clusters.push_back(shared_ptr<PhaseCluster> (new PhaseCluster(*cluster->tes)));
+	auto clst = clusters.back();
+	clst->label=nextLabel;
+	unsigned countNew=0;
+	for (int k=cluster->pores.size()-1; k>=0; k--) {
+		const CellHandle& c = cluster->pores[k];
+		if (c->info().label==(int) nextLabel) {
+			cluster->volume-=c->info().poreBodyVolume;
+			clusterGetPore(clst.get(),c);
+			cluster->pores.erase(cluster->pores.begin()+k);//FIXME: definitely needs a rebuild of two lists instead of such 'erase', which is very slow
+			countNew++;
+		}
+	}
+	for (int k = cluster->interfaces.size()-1; k>=0; k--) {
+		const CellHandle& c=solver->tesselation().cellHandles[cluster->interfaces[k].first.first];
+		if (c->info().label==(int) nextLabel) {
+			clst->interfaces.push_back(PhaseCluster::Interface(cluster->interfaces[k]));
+			cluster->interfaces.erase(cluster->interfaces.begin()+k);
+		}
+	}
+	if (countNew>1) {
+		vector<int> clusterList = splitCluster(clst.get(),clst->pores[0]);		
+		clusterList.push_back(cluster->label);
+		return clusterList;
+	} else {
+		vector<int> clusterList = {cluster->label,(int) nextLabel};
+		return clusterList;}
+}
+
+unsigned TwoPhaseFlowEngine::markRecursively(const CellHandle& cell, int newLabel)
+{
+	if (solver->tesselation().Triangulation().is_infinite(cell) or cell->info().label==newLabel) return 0;
+	int originalLabel = cell->info().label;
+	cell->info().label=newLabel;
+	unsigned count = 1;
+	for (int facet = 0; facet < 4; facet ++) if (cell->neighbor(facet)->info().label==originalLabel) count += markRecursively(cell->neighbor(facet),newLabel);
+	return count;
 }
 
 // int TwoPhaseFlowEngine:: getMaxCellLabel()
@@ -2852,7 +2946,7 @@ void TwoPhaseFlowEngine::updateCellLabel()
     FiniteCellsIterator cellEnd = tri.finite_cells_end();
     for ( FiniteCellsIterator cell = tri.finite_cells_begin(); cell != cellEnd; cell++ ) {
         if (cell->info().label==-1) {
-	    shared_ptr<PhaseCluster> clst (new PhaseCluster());
+	    shared_ptr<PhaseCluster> clst (new PhaseCluster(solver->tesselation()));
 	    clst->label=currentLabel;
 	    clusters.push_back(clst);
 	    updateSingleCellLabelRecursion(cell,clusters.back().get());
@@ -2878,6 +2972,7 @@ void TwoPhaseFlowEngine::updateSingleCellLabelRecursion(CellHandle cell, PhaseCl
 	else if (nCell->info().isNWRes) clusterGetFacet(cluster,cell,facet);
     }
 }
+
 
 boost::python::list TwoPhaseFlowEngine::pyClusters() {
 	boost::python::list ret;
@@ -2915,6 +3010,7 @@ void TwoPhaseFlowEngine::invasionSingleCell(CellHandle cell)
 {
     double localPressure=cell->info().p();
     double localSaturation=cell->info().saturation;
+    if (useFastInvasion and cell->info().label>0) clusterInvadePoreFast(clusters[cell->info().label].get(),cell);
     for (int facet = 0; facet < 4; facet ++) {
         CellHandle nCell = cell->neighbor(facet);
         if (solver->T[solver->currentTes].Triangulation().is_infinite(nCell)) continue;
@@ -3005,7 +3101,7 @@ void TwoPhaseFlowEngine::invasion1()
    }
     if(solver->debugOut) {cout<<"----invasion1.update trapped W-phase/NW-phase Pressure----"<<endl;}
 
-    if(isCellLabelActivated) updateCellLabel();
+    if(isCellLabelActivated and !useFastInvasion) updateCellLabel();
     if(solver->debugOut) {cout<<"----update cell labels----"<<endl;}
 }
 
