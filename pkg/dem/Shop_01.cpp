@@ -313,6 +313,24 @@ Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume){
 	return (V-Vs)/V;
 }
 
+Real Shop::getPorosityAlt(){
+	Real V;
+	Real inf=std::numeric_limits<Real>::infinity();
+	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		Vector3r rrr(s->radius,s->radius,s->radius);
+		minimum=minimum.cwiseMin(b->state->pos-(rrr));
+		maximum=maximum.cwiseMax(b->state->pos+(rrr));
+	}
+	Vector3r dim=maximum-minimum;
+	// Vector3r sup = Vector3r(minimum+.5*cutoff*dim);
+	//Vector3r inf = Vector3r(maximum-.5*cutoff*dim);
+	V = (maximum[0] - minimum[0])*(maximum[1] - minimum[1])*(maximum[2] - minimum[2]);
+	Real Vs=Shop::getSpheresVolume();
+	return (V-Vs)/V;
+}
+
 Real Shop::getVoxelPorosity(const shared_ptr<Scene>& _scene, int _resolution, Vector3r _start,Vector3r _end){
 	const shared_ptr<Scene> scene=(_scene?_scene:Omega::instance().getScene());
 	if(_start==_end) throw std::invalid_argument("utils.voxelPorosity: cannot calculate porosity when start==end of the volume box.");

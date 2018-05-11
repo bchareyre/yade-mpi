@@ -80,8 +80,8 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 		
 		if (phys->momentCalculated && phys->momentMagnitude!=0){
 			std::ofstream file (fileMoments.c_str(), !momentsFileExist ? std::ios::trunc : std::ios::app);
-			if(file.tellp()==0){ file <<"i p0 p1 p2 moment numInts eventNum time"<<endl; }
-			file << boost::lexical_cast<string> ( scene->iter )<<" "<< boost::lexical_cast<string> ( phys->momentCentroid[0] ) <<" "<< boost::lexical_cast<string> ( phys->momentCentroid[1] ) <<" "<< boost::lexical_cast<string> ( phys->momentCentroid[2] ) <<" "<< boost::lexical_cast<string> ( phys->momentMagnitude ) << " " << boost::lexical_cast<string> ( phys->clusterInts.size() ) << " " << boost::lexical_cast<string> ( phys->eventNumber ) << " " << boost::lexical_cast<string> (scene->time) << endl;
+			if(file.tellp()==0){ file <<"i p0 p1 p2 moment numInts eventNum time beginTime"<<endl; }
+			file << boost::lexical_cast<string> ( scene->iter )<<" "<< boost::lexical_cast<string> ( phys->momentCentroid[0] ) <<" "<< boost::lexical_cast<string> ( phys->momentCentroid[1] ) <<" "<< boost::lexical_cast<string> ( phys->momentCentroid[2] ) <<" "<< boost::lexical_cast<string> ( phys->momentMagnitude ) << " " << boost::lexical_cast<string> ( phys->clusterInts.size() ) << " " << boost::lexical_cast<string> ( phys->eventNumber ) << " " << boost::lexical_cast<string> (scene->time) << " " << boost::lexical_cast<string> (phys->eventBeginTime) << endl;
 			momentsFileExist=true;
 		}
 		
@@ -391,6 +391,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::checkForCluster(JCFpmPhy
 	}
 	if (!phys->clusteredEvent) {
 		phys->originalClusterEvent = true; // if not clustered, its an original event. We use this interaction as the master for the cluster. Its list of nearbyInts will expand if other ints break nearby. 
+		phys->eventBeginTime=scene->time;
 		phys->originalEvent = contact;
 		eventNumber += 1;
 		phys->eventNumber = eventNumber;

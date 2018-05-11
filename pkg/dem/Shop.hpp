@@ -55,6 +55,8 @@ class Shop{
 		//! Compute porosity; volume must be given for aperiodic simulations
 		static Real getPorosity(const shared_ptr<Scene>& rb=shared_ptr<Scene>(),Real volume=-1);
 
+		static Real getPorosityAlt();
+
 		//! Compute porosity by dividing given volume into a grid of voxels;
 		static Real getVoxelPorosity(const shared_ptr<Scene>& rb=shared_ptr<Scene>(),int resolution=500,Vector3r start=Vector3r(0,0,0),Vector3r end=Vector3r(0,0,0));
 

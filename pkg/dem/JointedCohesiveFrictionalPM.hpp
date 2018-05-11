@@ -84,6 +84,7 @@ class JCFpmPhys: public NormShearPhys {
 			((bool,originalClusterEvent,false,,"the original AE event for a cluster"))
 			((bool,clusteredEvent,false,,"is this interaction part of a cluster?"))
 			((bool,momentBroken,false,,"Flag for moment calculation"))
+			((Real,eventBeginTime,0,,"The time at which event initiated"))			
 			((bool,interactionsAdded,false,,"have we added the ints associated with this event?"))
 			((int,nearbyFound,0,,"Count used to debug moment calc"))
 			((int,eventNumber,0,,"cluster event number"))
