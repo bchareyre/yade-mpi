@@ -98,7 +98,7 @@ void PhaseCluster::solvePressure()
 	
 		// convert triplet list into a cholmod sparse matrix, then factorize it
 		cholmod_sparse* AcholC = cholmod_l_triplet_to_sparse(T, T->nnz, &(comC));
-		cholmod_l_print_sparse(AcholC, "Achol", pComC);
+// 		cholmod_l_print_sparse(AcholC, "Achol", pComC);
 			
 		LC = cholmod_l_analyze(AcholC, &(comC));
 		cholmod_l_factorize(AcholC, LC, &(comC));
@@ -2816,6 +2816,8 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 {
 	//invade the pore and attach to NW reservoir, label is assigned after reset
 	int label = cell->info().label;
+	if (label!=cluster->label) LOG_WARN("wrong label");
+	if (cell->info().Pcondition) {if (solver->debugOut) LOG_WARN("invading a Pcondition pore (ignored)"); return vector<int>(1,label);}
 	const RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
 #ifdef CHOLMOD_LIBS
 	cluster->resetSolver();
@@ -2827,8 +2829,8 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 	//update the cluster(s)
 	unsigned nPores = cluster->pores.size();
 	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base cluster
-	if (nPores==0) {LOG_WARN("Invading the empty cluster id="<<label); return  newClusters;}
-	if (nPores==1) {cluster->reset(); cluster->label = label; return  newClusters;}
+	if (nPores==0) {LOG_WARN("Invading an empty cluster id="<<label); return  newClusters;}
+	if (nPores==1) {LOG_WARN("Invading last pore of cluster id="<<label); cluster->reset(); cluster->label = label; return  newClusters;}
 	//count neighbors from the same cluster
 	vector<CellHandle> clustNeighbors; vector<unsigned> clustNIdx;
 	for (int k=0;k<4;k++) if (not INFT(cell->neighbor(k)) and cell->neighbor(k)->info().label==label) {
@@ -2845,12 +2847,15 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 	//then add new ones (TODO: set capillary pressure and volume?)
 	for (auto cn = clustNeighbors.begin(); cn!=clustNeighbors.end(); cn++) clusterGetFacet(cluster,*cn,(*cn)->index(cell));
 	//now remove the invaded pore
-	auto p = cluster->pores.begin();
-	for (; (*p)!=cell;) {//slow search...
-		p++; if(p==cluster->pores.end()) LOG_ERROR("pore not found");}
-	cluster->pores.erase(p);
+	for (auto p = cluster->pores.begin(); ;) {//slow search...
+		if (p==cluster->pores.end()) { LOG_WARN("pore "<<cell->info().id <<"not found in cluster"<<cluster->label<<" of size "<<cluster->pores.size()); break;}
+		else {
+			if ((*p)==cell) p++;// warning: this is not equivalent to p.id==cell.id for some reason, some wrong positive it seems
+// 			if ((*p)->info().id!=cell->info().id) p++;
+			else { cluster->pores.erase(p); break;}
+		}
+	}
 	//it could be that the cluster has been splitted in smaller clusters, before going to complex rebuilding method we try to exit the trivial cases below
-	
 	newClusters.push_back(cluster->label);//we will return at least the original cluster itself
 	
 	//1. case of only one neighbor from cluster connected to the one being erased
@@ -2872,11 +2877,19 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 		if ((ij+jk+ki)>=2) //the cluster is not splitted by the invasion (2 connexions between three cells)
 			return newClusters;
 	}
-	if (nN ==4) LOG_WARN("nN==4 ?!");
+	if (nN ==4) LOG_WARN("nN==4 ?! for cell"<<cell->info().id <<" "<<cell->neighbor(0)->info().id<<" "<<cell->neighbor(1)->info().id<<" "<<cell->neighbor(2)->info().id<<" "<<cell->neighbor(3)->info().id);
 	//not a trivial case, go for a split (possibly still resuting in one single cluster)
-// 	LOG_WARN("splitting cluster "<<cluster->label);
-// 	LOG_WARN("split");
-	return splitCluster(cluster, cluster->pores[0]);// return list of created clusters
+	CellHandle startingCell=cluster->pores[0];//will be changed below in the case label=1, to keep cluster 1 as the W-reservoir cluster
+	if (cluster->label==1) {
+		bool foundImpP1=false;
+		int k=cluster->pores.size()-1;
+		while (not foundImpP1) {
+			if (cluster->pores[k]->info().Pcondition) {startingCell=cluster->pores[k]; foundImpP1=true;}
+			else if (k>0) k--;
+			else LOG_WARN("no Pcondition pore in cluster 1");
+		} 
+	}
+	return splitCluster(cluster, startingCell);// return list of created clusters
 }
 
 vector<int> TwoPhaseFlowEngine::splitCluster(PhaseCluster* cluster, CellHandle cellInit)
@@ -2885,11 +2898,12 @@ vector<int> TwoPhaseFlowEngine::splitCluster(PhaseCluster* cluster, CellHandle c
 	if (oldSize==0) {LOG_WARN("empty call "); return vector<int>();}
 	unsigned nextLabel=clusters.size();
 	FOREACH(CellHandle& cell, cluster->pores) {cell->info().label=nextLabel;} //mark all pores, and get them back in again below
-	unsigned nPoresOld=markRecursively(cluster->pores[0],cluster->label);
-	if (nPoresOld==cluster->pores.size()) {/*LOG_WARN("no split, return (label="<<cluster->label <<")");*/ return vector<int>(1,cluster->label);}
+	unsigned nPoresOld=markRecursively(cellInit,cluster->label);
+	if (nPoresOld==oldSize) {/*LOG_WARN("no split, return (label="<<cluster->label <<")");*/ return vector<int>(1,cluster->label);}
 	clusters.push_back(shared_ptr<PhaseCluster> (new PhaseCluster(*cluster->tes)));
 	auto clst = clusters.back();
 	clst->label=nextLabel;
+	
 	unsigned countNew=0;
 	for (int k=cluster->pores.size()-1; k>=0; k--) {
 		const CellHandle& c = cluster->pores[k];
@@ -2918,6 +2932,7 @@ vector<int> TwoPhaseFlowEngine::splitCluster(PhaseCluster* cluster, CellHandle c
 
 unsigned TwoPhaseFlowEngine::markRecursively(const CellHandle& cell, int newLabel)
 {
+// 	LOG_WARN("markRecursively "<<cell->info().id<<" "<<cell->info().label<<" "<<newLabel <<" "<<solver->tesselation().Triangulation().is_infinite(cell)<<" "<<clusters[1]->pores[0]->info().id);
 	if (solver->tesselation().Triangulation().is_infinite(cell) or cell->info().label==newLabel) return 0;
 	int originalLabel = cell->info().label;
 	cell->info().label=newLabel;

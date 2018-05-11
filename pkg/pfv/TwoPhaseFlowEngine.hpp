@@ -193,9 +193,12 @@ class PhaseCluster : public Serializable
 			return innerCell->info().kNorm()[interfaces[nf].outerIndex] *
 				( innerCell->info().p() + interfaces[nf].capillaryP - innerCell->neighbor(interfaces[nf].outerIndex)->info().p());
 		}
-		
-		void setCapPressure(unsigned nf, double pcap) {interfaces[nf].capillaryP=pcap;}
-		void setCapVol(unsigned nf, double vcap) {interfaces[nf].volume=vcap;}
+		Real getCapVol(unsigned nf) {return interfaces[nf].volume;}
+
+		void setCapPressure(unsigned nf, Real pcap) {interfaces[nf].capillaryP=pcap;}
+		Real getCapPressure(unsigned nf) {return interfaces[nf].capillaryP;}
+		void setCapVol(unsigned nf, Real vcap) {interfaces[nf].volume=vcap;}
+		Real updateCapVol(unsigned nf, Real dt) {interfaces[nf].volume+=dt*getFlux(nf); return interfaces[nf].volume;}
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
@@ -214,7 +217,10 @@ class PhaseCluster : public Serializable
 		.def("getInterfaces",&PhaseCluster::getInterfaces,"get the list of interfacial pore-throats associated to a cluster, listed as [id1,id2,area] where id2 is the neighbor pore outside the cluster.")
 		.def("getFlux",&PhaseCluster::getFlux,(boost::python::arg("interface")),"get flux at an interface (i.e. velocity of the menicus), the index to be used is the rank of the interface in the same order as in getInterfaces().")
 		.def("setCapPressure",&PhaseCluster::setCapPressure,(boost::python::arg("numf"),boost::python::arg("pCap")),"set local capillary pressure")
+		.def("getCapPressure",&PhaseCluster::getCapPressure,(boost::python::arg("numf")),"get local capillary pressure")
 		.def("setCapVol",&PhaseCluster::setCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"set position of the meniscus - in terms of volume")
+		.def("getCapVol",&PhaseCluster::getCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"get position of the meniscus - in terms of volume")
+		.def("updateCapVol",&PhaseCluster::updateCapVol,(boost::python::arg("numf"),boost::python::arg("dt")),"increments throat's volume by flux*dt")
 		.def("solvePressure",&PhaseCluster::solvePressure,"Solve 1-phase flow in one single cluster defined by its id.")
 		)
 };
@@ -287,11 +293,11 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	unsigned markRecursively(const CellHandle& cell, int newLabel);// mark and count cells with same label as 'cell' and connected to it
 	vector<int> pyClusterInvadePore(int cellId) {
 		int label = solver->T[solver->currentTes].cellHandles[cellId]->info().label;
-		if (label<=1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
+		if (label<1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
 		return clusterInvadePore(clusters[label].get(), solver->T[solver->currentTes].cellHandles[cellId]);}
 	vector<int> pyClusterInvadePoreFast(int cellId) {
 		int label = solver->T[solver->currentTes].cellHandles[cellId]->info().label;
-		if (label<=1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
+		if (label<1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
 		return clusterInvadePoreFast(clusters[label].get(), solver->T[solver->currentTes].cellHandles[cellId]);}
 	boost::python::list pyClusters();
 	bool connectedAroundEdge(const RTriangulation& Tri, CellHandle& cell, unsigned facet1, unsigned facet2);
