@@ -6,7 +6,7 @@ Simulating Acoustic Emissions in Yade
 
 *Suggested citation:*
 
-Caulk, R. (2018), Stochastic Augmentation of the Discrete Element Method for Investigation of Tensile Rupture in Heterogeneous Rock. *Yade Technical Archive*. DOI 10.5281/zenodo.1202040. `download full text <https://www.yade-dem.org/w/images/f/f3/Caulkr_stochasticaugmentationofDEM-031618.pdf>`__
+Caulk, R. (2018), Stochastic Augmentation of the Discrete Element Method for Investigation of Tensile Rupture in Heterogeneous Rock. *Yade Technical Archive*. DOI 10.5281/zenodo.1202039. `download full text <https://www.yade-dem.org/w/images/f/f3/Caulkr_stochasticaugmentationofDEM-031618.pdf>`__
 
 Summary
 =======
@@ -30,13 +30,13 @@ where :math:`F_n`, :math:`F_s` and :math:`k_n`, :math:`k_s` are the normal and s
 
 	M_e = \frac{2}{3}\log \Delta E-3.2
 
-Events are clustered if they occur within spatial and temporal windows of other events, similar to the approach presented by [Hazzard2000]_ and [Hazzard2013]_. The spatial window is simply the user defined :math:`\lambda` and the temporal window is computed as:
+Events are clustered if they occur within spatial and temporal windows of other events, similar to the approach presented by [Hazzard2000]_ and [Hazzard2013]_. The spatial window is simply the user defined :math:`\lambda` and the temporal window :math:`T_{max}` is computed as:
 
 .. math::
 
-	tsteps_{max} = int\Big(\frac{D_{avg} \lambda}{max(v_{p1},v_{p2})dt}\Big)
+	T_{max} = int\Big(\frac{D_{avg} \lambda}{max(v_{p1},v_{p2})\Delta t}\Big)
 	
-where :math:`D_{avg}` is the average diameter of the particles comprising the failed event (m), :math:`v_{p1}` and :math:`v_{p2}` are the P-Wave velocities (m/s) of the particle densities, and :math:`dt` is the time step of the simulation (seconds/time step). As shown in `fig-cluster`_, the final location of a clustered event is simply the average of the clustered event centroids. Here the updated reference strain energy is computed by adding the strain energy of the unique interactions surrounding the new broken bond to the original reference strain energy (:math:`E_o`):
+where :math:`D_{avg}` is the average diameter of the particles comprising the failed event (m), :math:`v_{p1}` and :math:`v_{p2}` are the P-Wave velocities (m/s) of the particle densities, and :math:`\Delta t` is the time step of the simulation (seconds/time step). As shown in `fig-cluster`_, the final location of a clustered event is simply the average of the clustered event centroids. Here the updated reference strain energy is computed by adding the strain energy of the unique interactions surrounding the new broken bond to the original reference strain energy (:math:`E_o`):
 
 - Original bond breaks, sum strain energy of broken bonds (:math:`N_{orig}`) within spatial window :math:`E_{orig,o} = \sum_{i=1}^{N_{orig}} E_i`
 - New broken bond detected within spatial and temporal window of original bond break
@@ -112,7 +112,7 @@ Visualizing and post processing acoustic emissions
 AE are visualized and post processed in a similar manner to JCFpm cracks. As long as :yref:`recordMoments=True <Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.recordMoments>` and :yref:`recorder=['moments'] <VTKRecorder.recorders>`, the simulation will produce timestamped .vtu files for easy Paraview post processing. Within Paraview, the *AE can be filtered according to magnitude, number of constitiuent interactions, and event time*. `fig-aeexample`_ shows AE collected during a three point bending test and filtered according to magnitude and time
 
 .. _fig-aeexample:
-.. figure:: fig/AEmagnitudeexample2.*
+.. figure:: fig/AEmagnitudeexample2.png
 	:scale: 100%
 	:align: center
 
@@ -141,14 +141,14 @@ In Yade, the application of rock heterogeneity is as simple as passing a Weibull
 where the :yref:`xSectionWeibullShapeParameter <Ip2_JCFpmMat_JCFpmMat_JCFpmPhys.xSectionWeibullShapeParameter>` is the desired Weibull shape parameter. The scale parameter can be assigned in similar fashion. If you want to control the minimum allowable correction factor, you can feed it :yref:`weibullCutoffMin <Ip2_JCFpmMat_JCFpmMat_JCFpmPhys.weibullCutOffMin>`. The maximum correction factor can be controlled in similar fashion.
 
 .. _fig-weibullDist:
-.. figure:: fig/weibullDists.*
+.. figure:: fig/weibullDists.png
 	:scale: 50 %
 	:align: center
 
 	Weibull distributions for varying shape parameters used to generate :math:`\alpha_w`.
 
 .. _fig-strengthDist:
-.. figure:: fig/strengthDists.*
+.. figure:: fig/strengthDists.png
 	:scale: 50 %
 	:align: center
 	
