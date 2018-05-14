@@ -1144,11 +1144,11 @@ Exec count and time can be accessed and manipulated through ``Engine::timingInfo
 In-engine and in-functor timing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Timing within engines (and functors) is based on :yref:`TimingDeltas` class. It is made for timing loops (functors' loop is in their respective dispatcher) and stores cummulatively time differences between *checkpoints*.
+Timing within engines (and functors) is based on :yref:`TimingDeltas` class which is by default instantiated in engines and functors as Engine::timingDeltas and Functor::timingDeltas (:yref:`Engine.timingDeltas` and :yref:`Functor.timingDeltas` in Python). It is made for timing loops (functors' loop is in their respective dispatcher) and stores cummulatively time differences between *checkpoints*.
 
 .. note:: Fine timing with ``TimingDeltas`` will only work if timing is enabled globally (see previous section). The code would still run, but giving zero times and exec counts.
 
-#. Engine::timingDeltas must point to an instance of :yref:`TimingDeltas` (prefferably instantiate :yref:`TimingDeltas` in the constructor):
+#. Preferably define the timingDeltas attributes in the constructor:
 
 	.. code-block:: c++
 		
