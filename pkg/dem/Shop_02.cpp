@@ -842,9 +842,9 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
-		int ci1=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
-		int ci2=(*(scene->bodies))[ii->getId2()]->shape->getClassIndex();
 		if (ii->isReal()) {
+			int ci1=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
+			int ci2=(*(scene->bodies))[ii->getId2()]->shape->getClassIndex();
 			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
 			if ((!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic()) && ci1==sphereIdx)
 				contact->refR1 = YADE_CAST<Sphere*>((* (scene->bodies))[ii->getId1()]->shape.get())->radius;
