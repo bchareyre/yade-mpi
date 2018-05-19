@@ -458,7 +458,7 @@ std::vector<Vector3r> _Tesselation<TT>::getExtendedAlphaGraph (double alpha, dou
 
 
 template<class TT>
-void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, double alpha, double shrinkedAlpha, bool fixedAlpha )
+void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, double alpha, double shrinkedAlpha, bool fixedAlpha)
 {
 	std::vector<CVector> areas;
 	//initialize area vectors in a list accessed via ids (hence the size), later refactored into a shorter list in "faces"
@@ -471,10 +471,10 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
 	else {
 		as.set_alpha ( alpha );
 		if (alpha<minAlpha) cerr<<"TesselationWrapper: Using alpha<minAlpha will not work. Consider using default alpha (=0)"<<endl;
-	}	
-	if (fixedAlpha) {//insert one sphere per regular facet, with a fixed size shrinkedAlpha
-		std::list<Facet> facets;
-		as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
+	}
+	std::list<Facet> facets;
+	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
+	if (fixedAlpha) {//insert one sphere per regular facet, with a fixed size shrinkedAlpha	
 		for ( auto fp=facets.begin(); fp!=facets.end(); fp++ ) {
 			Facet f = *fp;    
 			if (as.classify(f.first)!=AlphaShape::INTERIOR) f=as.mirror_facet(f);
@@ -483,10 +483,7 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
 			VertexHandle Vh = Tri->insert(Sphere(sph.point(), shrinkedAlpha));
 			if ( Vh!=NULL ) Vh->info().isFictious = true;
 			else cerr << " : __Vh==NULL__ :(" << endl;}
-			
-			
-	} else {//insert one sphere per exterior/infinite cell, the radius is derived from the alpha value of the corresponding cell or 4*alpha for infinite cells  
-		
+	} else {//insert one sphere per exterior/infinite cell, the radius is derived from the alpha value of the corresponding cell or 4*alpha for infinite cells		
 		double alphaRad=sqrt(alpha);
 		double deltaAlpha=alphaRad-sqrt(shrinkedAlpha);
 		std::list<Facet> facets;
@@ -511,7 +508,6 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
 			}
 		}
 	}
-	
 	for (auto e = Tri->finite_facets_begin(); e != Tri->finite_facets_end(); e++){
 		short countFictious=e->first->vertex(facetVertices[e->second][0])->info().isFictious
 		+ e->first->vertex(facetVertices[e->second][1])->info().isFictious
@@ -524,10 +520,9 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
 			const Point& p1 = e->first->vertex(facetVertices[e->second][ftx>0? ftx-1:2])->point().point();
 			const Point& p2 = e->first->vertex(facetVertices[e->second][ftx<2? ftx+1:0])->point().point();
 			CVector u = setCircumCenter(e->first)-setCircumCenter(e->first->neighbor(e->second));
-			CVector area = 0.5*cross_product(u,p1-CGAL::ORIGIN);
-			if (u*cross_product(p2-p1,fictV-p1)<0) area=-area;//make sure we are always circulating clockwise
-			areas[id1]=area+areas[id1];
-			areas[id2]=areas[id2]-area;
+			int makeClockWise = u*cross_product(p2-p1,fictV-p1)>0? 1:-1;
+			areas[id1]=areas[id1]+(makeClockWise*0.5)*cross_product(u,setCircumCenter(e->first)-p1);
+			areas[id2]=areas[id2]-(makeClockWise*0.5)*cross_product(u,setCircumCenter(e->first)-p2);
 		}
 	}
 	
