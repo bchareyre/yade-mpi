@@ -414,6 +414,15 @@ boost::python::list TesselationWrapper::getAlphaCaps(double alpha, double shrink
   return ret;
 }
 
+void TesselationWrapper::applyAlphaForces(Matrix3r stress, double alpha, double shrinkedAlpha, bool fixedAlpha)
+{
+	Scene* scene = Omega::instance().getScene().get();
+	if (Tes->Triangulation().number_of_vertices()<=0) build_triangulation_with_ids(scene->bodies,*this,true);//if not already triangulated do it now	
+	vector<AlphaCap> caps;
+	Tes->setExtendedAlphaCaps(caps,alpha,shrinkedAlpha,fixedAlpha);
+	for (auto f=caps.begin();f!=caps.end();f++) scene->forces.setPermForce(f->id,stress*makeVector3r(f->normal));
+}
+
 boost::python::list TesselationWrapper::getAlphaGraph(double alpha, double shrinkedAlpha, bool fixedAlpha)
 {
   vector<Vector3r> segments=Tes->getExtendedAlphaGraph(alpha,shrinkedAlpha,fixedAlpha);
