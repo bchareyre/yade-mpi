@@ -486,8 +486,6 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
 	} else {//insert one sphere per exterior/infinite cell, the radius is derived from the alpha value of the corresponding cell or 4*alpha for infinite cells		
 		double alphaRad=sqrt(alpha);
 		double deltaAlpha=alphaRad-sqrt(shrinkedAlpha);
-		std::list<Facet> facets;
-		as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
 		for ( auto fp=facets.begin(); fp!=facets.end(); fp++ ) {
 			Facet f = *fp;    
 			if (as.classify(f.first)!=AlphaShape::INTERIOR) f=as.mirror_facet(f);
