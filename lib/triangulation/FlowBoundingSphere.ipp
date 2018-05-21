@@ -437,30 +437,40 @@ CVector FlowBoundingSphere<Tesselation>::cellBarycenter(CellHandle& cell)
 	return center;
 }
 
-template <class Tesselation> 
+template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
-        CellHandle oldCell;
-        RTriangulation& Tri = Tes.Triangulation();
-	for (typename VectorCell::iterator cellIt=NewTes.cellHandles.begin(); cellIt!=NewTes.cellHandles.end(); cellIt++){
-		CellHandle& newCell = *cellIt;
-		if (newCell->info().Pcondition || newCell->info().isGhost) continue;
-		CVector center ( 0,0,0 );
-		if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
-		else {
-			Real boundPos=0; int coord=0;
-			for ( int k=0;k<4;k++ ) if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
-			for ( int k=0;k<4;k++ ) if (newCell->vertex (k)->info().isFictious) {
-					coord=boundary (newCell->vertex(k)->info().id()).coordinate;
-					boundPos=boundary (newCell->vertex(k)->info().id()).p[coord];
-					center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
+	CellHandle oldCell;    
+	RTriangulation& Tri = Tes.Triangulation();
+	#ifdef YADE_OPENMP
+		const long size = NewTes.cellHandles.size();
+	#pragma omp parallel for num_threads(ompThreads>0 ? ompThreads : 1)
+    	for (long i=0; i<size; i++){
+			CellHandle& newCell = NewTes.cellHandles[i];
+	#else	
+		for (typename VectorCell::iterator cellIt=NewTes.cellHandles.begin(); cellIt!=NewTes.cellHandles.end(); cellIt++){
+			CellHandle& newCell = *cellIt;
+	#endif
+			if (newCell->info().Pcondition || newCell->info().isGhost) continue;
+			CVector center ( 0,0,0 );
+			if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+			else {
+				Real boundPos=0; int coord=0;
+				for ( int k=0;k<4;k++ ){
+					if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
 				}
-		}
-                oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
+				for ( int k=0;k<4;k++ ) {
+					if (newCell->vertex (k)->info().isFictious) {
+						coord=boundary (newCell->vertex(k)->info().id()).coordinate;
+						boundPos=boundary (newCell->vertex(k)->info().id()).p[coord];
+						center=CVector(coord==0?boundPos:center[0],coord==1?boundPos:center[1],coord==2?boundPos:center[2]);
+					}
+				}
+			}
+        oldCell = Tri.locate(Point(center[0],center[1],center[2]));
 		newCell->info().getInfo(oldCell->info());
 //                 newCell->info().p() = oldCell->info().shiftedP();
-        }
-//  	Tes.Clear();//Don't reset to avoid segfault when getting pressure in scripts just after interpolation
+		}
 }
 
 template <class Tesselation> 
