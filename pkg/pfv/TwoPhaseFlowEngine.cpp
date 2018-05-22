@@ -2759,6 +2759,32 @@ void TwoPhaseFlowEngine::clusterGetPore(PhaseCluster* cluster, CellHandle cell) 
 	cluster->pores.push_back(cell);
 }
 
+vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsigned facetIdx) {
+	if (facetIdx>=cluster->interfaces.size()) LOG_WARN("invalid facet idx");
+	CellHandle& origin = solver->tesselation().cellHandles[cluster->interfaces[facetIdx].first.first];
+	CellHandle& newPore = solver->tesselation().cellHandles[cluster->interfaces[facetIdx].first.second];
+	cluster->resetSolver();//reset the linear system
+	unsigned facet; 
+	clusterGetPore(cluster,newPore);
+	vector<unsigned> interfacesToRemove = {facetIdx};
+	vector<unsigned> interfacesToAdd;
+	bool updateIntfs=false;//if turned true later we will have to clean interfaces
+	
+	for (int k=0;k<4;k++) {
+		if (INFT(newPore->neighbor(k)) or (newPore->neighbor(k)==origin)) continue;
+		if (newPore->neighbor(k)->info().label==0) clusterGetFacet(cluster,newPore,k);    
+		else {
+// 			updateIntfs=true;
+			if ( newPore->neighbor(k)->info().label!=cluster->label) cluster->mergeCluster(*clusters[newPore->neighbor(k)->info().label],newPore);
+			else updateIntfs=true; //one more interface needs to be removed, FIXME: this may lead to long copy operations
+		}
+	}
+	if (updateIntfs) {
+		for (int k=cluster->interfaces.size()-1;k>=0;k--)
+			if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label == cluster->label) cluster->interfaces.erase(cluster->interfaces.begin()+k);
+	}
+}
+
 vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHandle cell)
 {
 	//invade the pore and attach to NW reservoir, label is assigned after reset

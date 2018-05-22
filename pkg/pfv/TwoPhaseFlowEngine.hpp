@@ -175,8 +175,19 @@ class PhaseCluster : public Serializable
 		void resetSolver() {if (LC) cholmod_l_free_factor(&LC, &comC); if (ex) cholmod_l_free_dense(&ex, &comC);}
 		#endif
 		
-		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear(); interfaces.clear();}
+		void reset() {label=entryPore=-1;volume=entryRadius=interfacialArea=0; pores.clear(); interfaces.clear(); resetSolver();}
 		
+		//merge another cluster into the current one, interfaces are duplicated selectively
+		//start is the cell leading to connectivity (preconditon: there's only one connecting cell)
+		void mergeCluster (PhaseCluster& otherCluster, const CellHandle& start) {
+			this->resetSolver();
+			for (auto p=otherCluster.pores.begin();p!=otherCluster.pores.end();p++) (*p)->info().label=label;
+// 			for (auto i=otherCluster.interfaces.begin();i!=otherCluster.interfaces.end();i++) i->first.firstlabel=label;
+			pores.insert(pores.end(), otherCluster.pores.begin(), otherCluster.pores.end());
+			for (auto itf = otherCluster.interfaces.begin(); itf != otherCluster.interfaces.end(); itf++)
+				if (itf->first.second != start->info().id) interfaces.push_back(*itf);
+			otherCluster.reset();
+		}
 		
 		vector<int> getPores() { vector<int> res;
 			for (vector<CellHandle>::iterator it =  pores.begin(); it!=pores.end(); it++) res.push_back((*it)->info().id);
@@ -286,11 +297,13 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void updateCellLabel();
 	void updateSingleCellLabelRecursion(CellHandle cell, PhaseCluster* cluster);
 	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet);//update cluster inetrfacial area and max entry radius wrt to a facet
-	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//add pore to cluster, updating flags and cluster volume
+	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//simple add pore to cluster, updating flags and cluster volume
 	vector<int> clusterInvadePore(PhaseCluster* cluster, CellHandle cell);//remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
-	vector<int> clusterInvadePoreFast(PhaseCluster* cluster, CellHandle cell);
-	vector<int> splitCluster(PhaseCluster* cluster, CellHandle cellInit);
-	unsigned markRecursively(const CellHandle& cell, int newLabel);// mark and count cells with same label as 'cell' and connected to it
+	vector<int> clusterInvadePoreFast(PhaseCluster* cluster, CellHandle cell);//nearly the same as above but faster and using splitCLuster() internally, warning: entry pcap is NOT updated since this function is supposed to be used for viscous invasion, OTOH interfaces are updated
+	vector<int> clusterOutvadePore(PhaseCluster* cluster, unsigned facetIdx); //imbibe adjacent pore, including merge clusters if necessary 
+// 	vector<int> clusterAddPore(PhaseCluster* cluster, CellHandle cell);// add a pore to a cluster, merge existing clusters if needed and return the merged ones
+	vector<int> splitCluster(PhaseCluster* cluster, CellHandle cellInit);//an attempt to optimize cluster splitting by skipping some simple cases before triggering a long recursive process
+	unsigned markRecursively(const CellHandle& cell, int newLabel);// mark and count accessible cells with same label as 'cell' and connected to it
 	vector<int> pyClusterInvadePore(int cellId) {
 		int label = solver->T[solver->currentTes].cellHandles[cellId]->info().label;
 		if (label<1) {LOG_WARN("the pore is not in a cluster, label="<<label); return vector<int>();}
