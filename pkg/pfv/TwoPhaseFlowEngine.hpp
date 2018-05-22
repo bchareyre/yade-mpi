@@ -18,11 +18,6 @@
 // #define TWOPHASEFLOW
 #ifdef TWOPHASEFLOW
 #include "FlowEngine_TwoPhaseFlowEngineT.hpp"
-// #include <Eigen/Sparse>
-// #include <Eigen/SparseCore>
-// #include <Eigen/CholmodSupport>
-// #include <Eigen/SparseCholesky>
-// #include <Eigen/IterativeLinearSolvers>
 #include<Eigen/SparseLU>
 
 #ifdef CHOLMOD_LIBS
@@ -222,8 +217,6 @@ class PhaseCluster : public Serializable
 		,((LC,NULL))((ex,NULL))((pComC,&comC))((pLC,&LC)),
 		#ifdef CHOLMOD_LIBS
 		cholmod_l_start(pComC);//initialize cholmod solver
-// 		LC=NULL;
-// 		ex=NULL;
 		#endif
 		,
 		.def("getPores",&PhaseCluster::getPores,"get the list of pores by index")
