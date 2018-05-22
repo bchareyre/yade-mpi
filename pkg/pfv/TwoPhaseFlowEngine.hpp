@@ -7,6 +7,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifndef FLOW_GUARD
+#define FLOW_GUARD
 
 // This is an example of how to derive a new FlowEngine with additional data and possibly completely new behaviour.
 // Every functions of the base engine can be overloaded, and new functions can be added
@@ -618,4 +620,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 REGISTER_SERIALIZABLE(TwoPhaseFlowEngine);
 
 #endif //TwoPhaseFLOW
+
+#endif // FLOW_GUARD
  

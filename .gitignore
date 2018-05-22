@@ -1,3 +1,7 @@
+# note to others: if you want to ignore some files that are related to your personal workflow
+# without cluttering everyone's .gitignore file, you can use file .git/info/exclude
+# https://stackoverflow.com/questions/1753070/how-do-i-configure-git-to-ignore-some-files-locally
+
 tags
 .project
 VERSION

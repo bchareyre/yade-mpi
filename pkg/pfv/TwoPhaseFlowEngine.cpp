@@ -2764,7 +2764,7 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsign
 	CellHandle& origin = solver->tesselation().cellHandles[cluster->interfaces[facetIdx].first.first];
 	CellHandle& newPore = solver->tesselation().cellHandles[cluster->interfaces[facetIdx].first.second];
 	cluster->resetSolver();//reset the linear system
-	unsigned facet; 
+	//unsigned facet; // Note by Janek: warning: unused variable ‘facet’ [-Wunused-variable]
 	clusterGetPore(cluster,newPore);
 	vector<unsigned> interfacesToRemove = {facetIdx};
 	vector<unsigned> interfacesToAdd;
@@ -2783,6 +2783,7 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsign
 		for (int k=cluster->interfaces.size()-1;k>=0;k--)
 			if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label == cluster->label) cluster->interfaces.erase(cluster->interfaces.begin()+k);
 	}
+	// Note by Janek: FIXME: warning: no return statement in function returning non-void [-Wreturn-type]
 }
 
 vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHandle cell)

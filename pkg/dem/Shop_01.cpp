@@ -323,7 +323,7 @@ Real Shop::getPorosityAlt(){
 		minimum=minimum.cwiseMin(b->state->pos-(rrr));
 		maximum=maximum.cwiseMax(b->state->pos+(rrr));
 	}
-	Vector3r dim=maximum-minimum;
+	//Vector3r dim=maximum-minimum; // Note by Janek: warning: variable ‘dim’ set but not used [-Wunused-but-set-variable]
 	// Vector3r sup = Vector3r(minimum+.5*cutoff*dim);
 	//Vector3r inf = Vector3r(maximum-.5*cutoff*dim);
 	V = (maximum[0] - minimum[0])*(maximum[1] - minimum[1])*(maximum[2] - minimum[2]);
