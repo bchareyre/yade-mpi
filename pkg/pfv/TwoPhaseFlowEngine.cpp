@@ -2784,6 +2784,7 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsign
 			if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label == cluster->label) cluster->interfaces.erase(cluster->interfaces.begin()+k);
 	}
 	// Note by Janek: FIXME: warning: no return statement in function returning non-void [-Wreturn-type]
+	return {}; // I am adding this for now, just to get rid of this warning. But then maybe this should be just a void function? :)
 }
 
 vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHandle cell)
