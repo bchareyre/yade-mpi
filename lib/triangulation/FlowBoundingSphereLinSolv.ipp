@@ -70,7 +70,6 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::~FlowBoundingSphereLinSolv()
 		cholmod_l_free_sparse(&Achol, &com);
 		cholmod_l_free_factor(&L, &com);
 		cholmod_l_finish(&com);
-		//cout << "Achol memory freed and cholmod finished" <<endl;
 	}
 	#endif
 }
@@ -295,15 +294,13 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		#endif
 		#ifdef SUITESPARSE_VERSION_4
 		}else if (useSolver==4){
-			//com.useGPU=useGPU; //useGPU;
+
 			cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &com);		
 			// set all the values for the cholmod triplet matrix
 			for(int k=0;k<T_nnz;k++){
 				add_T_entry(T,is[k]-1, js[k]-1, vs[k]);
 			}
-			//cholmod_l_print_triplet(T, "triplet", &com);
 			Achol = cholmod_l_triplet_to_sparse(T, T->nnz, &com);
-			//cholmod_l_print_sparse(Achol, "Achol", &com);
 			cholmod_l_free_triplet(&T, &com);
 		#endif
 		}
@@ -547,7 +544,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 	for (int k=0; k<ncols; k++) eb[k]=T_bv[k];
 	if (!factorizedEigenSolver) {
 		eSolver.setMode(Eigen::CholmodSupernodalLLt);
-		//openblas_set_num_threads(numFactorizeThreads);
+		openblas_set_num_threads(numFactorizeThreads);
 		eSolver.compute(A);
 		//Check result
 		if (eSolver.cholmod().status>0) {
@@ -559,7 +556,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 	}
 	// backgroundAction only wants to factorize, no need to solve and copy to cells.
 	if (!factorizeOnly){
-		//openblas_set_num_threads(numSolveThreads);
+		openblas_set_num_threads(numSolveThreads);
 		ex = eSolver.solve(eb);
 		for (int k=0; k<ncols; k++) T_x[k]=ex[k];
 		copyLinToCells();
@@ -574,10 +571,6 @@ template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 {
 #ifdef SUITESPARSE_VERSION_4
-	if (!multithread){
-		cerr << "useSolver=4 requires flow.multithread=True. Nothing computed." << endl;
-		return 1;
-	}
 	if (!isLinearSystemSet || (isLinearSystemSet && reApplyBoundaryConditions()) || !updatedRHS) ncols = setLinearSystem(dt);
 	copyCellsToLin(dt);
 	cholmod_dense* B = cholmod_l_zeros(ncols, 1, Achol->xtype, &com);
