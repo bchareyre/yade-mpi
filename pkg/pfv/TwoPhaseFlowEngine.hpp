@@ -295,7 +295,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//simple add pore to cluster, updating flags and cluster volume
 	vector<int> clusterInvadePore(PhaseCluster* cluster, CellHandle cell);//remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
 	vector<int> clusterInvadePoreFast(PhaseCluster* cluster, CellHandle cell);//nearly the same as above but faster and using splitCLuster() internally, warning: entry pcap is NOT updated since this function is supposed to be used for viscous invasion, OTOH interfaces are updated
-	vector<int> clusterOutvadePore(PhaseCluster* cluster, unsigned facetIdx); //imbibe adjacent pore, including merge clusters if necessary 
+	vector<int> clusterOutvadePore(PhaseCluster* cluster, unsigned facetIdx); //imbibe adjacent pore, including merge clusters if necessary. Returns ids of merged clusters. 
 // 	vector<int> clusterAddPore(PhaseCluster* cluster, CellHandle cell);// add a pore to a cluster, merge existing clusters if needed and return the merged ones
 	vector<int> splitCluster(PhaseCluster* cluster, CellHandle cellInit);//an attempt to optimize cluster splitting by skipping some simple cases before triggering a long recursive process
 	unsigned markRecursively(const CellHandle& cell, int newLabel);// mark and count accessible cells with same label as 'cell' and connected to it

@@ -2763,13 +2763,16 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsign
 	vector<unsigned> interfacesToRemove = {facetIdx};
 	vector<unsigned> interfacesToAdd;
 	bool updateIntfs=false;//if turned true later we will have to clean interfaces
+	vector<int> merged = {cluster->label};
 	
 	for (int k=0;k<4;k++) {
 		if (INFT(newPore->neighbor(k)) or (newPore->neighbor(k)==origin)) continue;
 		if (newPore->neighbor(k)->info().label==0) clusterGetFacet(cluster,newPore,k);    
 		else {
 // 			updateIntfs=true;
-			if ( newPore->neighbor(k)->info().label!=cluster->label) cluster->mergeCluster(*clusters[newPore->neighbor(k)->info().label],newPore);
+			if ( newPore->neighbor(k)->info().label!=cluster->label) {
+				merged.push_back(newPore->neighbor(k)->info().label);
+				cluster->mergeCluster(*clusters[newPore->neighbor(k)->info().label],newPore);}
 			else updateIntfs=true; //one more interface needs to be removed, FIXME: this may lead to long copy operations
 		}
 	}
@@ -2777,8 +2780,7 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsign
 		for (int k=cluster->interfaces.size()-1;k>=0;k--)
 			if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label == cluster->label) cluster->interfaces.erase(cluster->interfaces.begin()+k);
 	}
-	// Note by Janek: FIXME: warning: no return statement in function returning non-void [-Wreturn-type]
-	return {}; // I am adding this for now, just to get rid of this warning. But then maybe this should be just a void function? :)
+	return merged;
 }
 
 vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHandle cell)
