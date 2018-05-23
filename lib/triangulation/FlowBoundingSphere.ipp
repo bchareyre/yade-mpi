@@ -453,11 +453,11 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 	#endif
 			if (newCell->info().Pcondition || newCell->info().isGhost) continue;
 			CVector center ( 0,0,0 );
-			if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+			if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 			else {
 				Real boundPos=0; int coord=0;
 				for ( int k=0;k<4;k++ ){
-					if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);
+					if (!newCell->vertex (k)->info().isFictious) center= center+(1./(4.-newCell->info().fictious()))*(Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 				}
 				for ( int k=0;k<4;k++ ) {
 					if (newCell->vertex (k)->info().isFictious) {
@@ -467,7 +467,7 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 					}
 				}
 			}
-        oldCell = Tri.locate(Point(center[0],center[1],center[2]));
+        oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
 		newCell->info().getInfo(oldCell->info());
 //                 newCell->info().p() = oldCell->info().shiftedP();
 		}

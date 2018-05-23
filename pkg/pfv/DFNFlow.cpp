@@ -213,9 +213,9 @@ void DFNFlowEngine::interpolateCrack(Tesselation& Tes,Tesselation& NewTes){
 	FOREACH(CellHandle& newCell, NewTes.cellHandles){
         #endif
 		CVector center (0,0,0);
-		if (newCell->info().fictious()==0) for (int k=0;k<4;k++) center = center + 0.25*(Tes.vertex(newCell->vertex(k)->info().id())->point()-CGAL::ORIGIN);		
+		if (newCell->info().fictious()==0) for (int k=0;k<4;k++) center = center + 0.25*(Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 		
-		CellHandle oldCell = Tri.locate(Point(center[0],center[1],center[2]));
+		CellHandle oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
 		newCell->info().crack = oldCell->info().crack;
 //		For later commit newCell->info().fractureTip = oldCell->info().fractureTip;
 //		For later commit newCell->info().cellHalfWidth = oldCell->info().cellHalfWidth;
