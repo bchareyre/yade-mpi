@@ -715,9 +715,9 @@ Expected parameters are indicated by macro name components separated with unders
 	will be put directly into the generated constructor's body. Mostly used for calling createIndex(); in the constructor.
 
 	.. note:: 
-		The code must not contain commas ouside parentheses (since preprocessor uses commas to separate macro arguments). If you need complex things at construction time, create a separate init() function and call it from the constructor instead.
+		The code must not contain commas outside parentheses (since preprocessor uses commas to separate macro arguments). If you need complex things at construction time, create a separate init() function and call it from the constructor instead.
 ``py``
-	will be appeneded directly after generated python code that registers the class and all its attributes. You can use it to access class methods from python, for instance, to override an existing attribute with the same name etc:
+	will be appended directly after generated python code that registers the class and all its attributes. You can use it to access class methods from python, for instance, to override an existing attribute with the same name etc:
 
 	.. code-block:: c++
 
