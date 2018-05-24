@@ -2849,7 +2849,8 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 	unsigned id = cell->info().id;
 	cell->info().saturation=0;
 	cell->info().isNWRes=true;
-	clusterGetPore(clusters[0].get(),cell);
+	cell->info().isWRes=false;
+	clusterGetPore(clusters[0].get(),cell);//this will update cell label as well
 	//update the cluster(s)
 	unsigned nPores = cluster->pores.size();
 	vector<int> newClusters; //for returning the list of possible sub-clusters, empty if we are removing the last pore of the base cluster
@@ -2874,7 +2875,7 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 	for (auto p = cluster->pores.begin(); ;) {//slow search...
 		if (p==cluster->pores.end()) { LOG_WARN("pore "<<cell->info().id <<"not found in cluster"<<cluster->label<<" of size "<<cluster->pores.size()); break;}
 		else {
-			if ((*p)==cell) p++;// warning: this is not equivalent to p.id==cell.id for some reason, some wrong positive it seems
+			if ((*p)!=cell) p++;// warning: this is not equivalent to p.id==cell.id for some reason, some wrong positive it seems
 // 			if ((*p)->info().id!=cell->info().id) p++;
 			else { cluster->pores.erase(p); break;}
 		}
