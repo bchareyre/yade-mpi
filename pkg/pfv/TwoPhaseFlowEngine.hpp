@@ -295,7 +295,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);//simple add pore to cluster, updating flags and cluster volume
 	vector<int> clusterInvadePore(PhaseCluster* cluster, CellHandle cell);//remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
 	vector<int> clusterInvadePoreFast(PhaseCluster* cluster, CellHandle cell);//nearly the same as above but faster and using splitCLuster() internally, warning: entry pcap is NOT updated since this function is supposed to be used for viscous invasion, OTOH interfaces are updated
-	vector<int> clusterOutvadePore(PhaseCluster* cluster, unsigned facetIdx); //imbibe adjacent pore, including merge clusters if necessary. Returns ids of merged clusters. 
+	vector<int> clusterOutvadePore(unsigned startingId, unsigned imbibedId, int index); //imbibe adjacent pore, including merge clusters if necessary. Returns ids of merged clusters. Giving index of the facet in cluster::interfaces should speedup its removal 
 // 	vector<int> clusterAddPore(PhaseCluster* cluster, CellHandle cell);// add a pore to a cluster, merge existing clusters if needed and return the merged ones
 	vector<int> splitCluster(PhaseCluster* cluster, CellHandle cellInit);//an attempt to optimize cluster splitting by skipping some simple cases before triggering a long recursive process
 	unsigned markRecursively(const CellHandle& cell, int newLabel);// mark and count accessible cells with same label as 'cell' and connected to it
@@ -561,6 +561,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("setCellSaturation",&TwoPhaseFlowEngine::setCellSaturation,"change saturation of one pore")
 	.def("computeOnePhaseFlow",&TwoPhaseFlowEngine::computeOnePhaseFlow,"compute pressure and fluxes in the W-phase")
 	.def("initialization",&TwoPhaseFlowEngine::initialization,"Initialize invasion setup. Build network, compute pore geometry info and initialize reservoir boundary conditions. ")
+	.def("updatePressure",&TwoPhaseFlowEngine::updatePressure,"Apply the values of :yref:`FlowEngine::bndCondValue` to the boundary cells. Note: boundary pressure will be updated automatically in many cases, this function is for some low-level manipulations.")
 	.def("getPoreThroatRadiusList",&TwoPhaseFlowEngine::cellporeThroatRadius,(boost::python::arg("cell_ID")),"get 4 pore throat radii of a cell.")
 	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,"get 4 neigboring cells")
 	.def("getCellHasInterface",&TwoPhaseFlowEngine::cellHasInterface,"indicates whether a NW-W interface is present within the cell")
@@ -600,6 +601,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")
 	.def("clusterInvadePore",&TwoPhaseFlowEngine::pyClusterInvadePore,boost::python::arg("cellId"),"drain the pore identified by cellId and update the clusters accordingly.")
 	.def("clusterInvadePoreFast",&TwoPhaseFlowEngine::pyClusterInvadePoreFast,boost::python::arg("cellId"),"drain the pore identified by cellId and update the clusters accordingly. This 'fast' version is faster and it also preserves interfaces through cluster splitting. OTOH it does not update entry Pc nor culsters volume (it could if needed)")
+	.def("clusterOutvadePore",&TwoPhaseFlowEngine::clusterOutvadePore,(boost::python::arg("startingId"),boost::python::arg("imbibedId"),boost::python::arg("index")=0),"imbibe the pore identified by imbibedId and merge the newly connected clusters if it happens. startingId->imbibedId defines the throat through which imbibition occurs. Giving index of the facet in cluster::interfaces should speedup its removal")
 	// others
 	.def("getCellVolume",&TwoPhaseFlowEngine::cellVolume,"get the volume of each cell")
 	.def("isCellNeighbor",&TwoPhaseFlowEngine::isCellNeighbor,(boost::python::arg("cell1_ID"), boost::python::arg("cell2_ID")),"check if cell1 and cell2 are neigbors.")

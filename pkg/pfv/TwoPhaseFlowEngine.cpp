@@ -2753,13 +2753,15 @@ void TwoPhaseFlowEngine::clusterGetPore(PhaseCluster* cluster, CellHandle cell) 
 	cluster->pores.push_back(cell);
 }
 
-vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsigned facetIdx) {
-	if (facetIdx>=cluster->interfaces.size()) LOG_WARN("invalid facet idx");
-	CellHandle& origin = solver->tesselation().cellHandles[cluster->interfaces[facetIdx].first.first];
-	CellHandle& newPore = solver->tesselation().cellHandles[cluster->interfaces[facetIdx].first.second];
+vector<int> TwoPhaseFlowEngine::clusterOutvadePore(unsigned startingId, unsigned imbibedId, int index) {
+	CellHandle& origin = solver->tesselation().cellHandles[startingId];
+	CellHandle& newPore = solver->tesselation().cellHandles[imbibedId];
+	PhaseCluster* cluster = clusters[origin->info().label].get();
 	cluster->resetSolver();//reset the linear system
 	//unsigned facet; // Note by Janek: warning: unused variable ‘facet’ [-Wunused-variable]
 	clusterGetPore(cluster,newPore);
+	unsigned facetIdx;
+	for (facetIdx=0; cluster->interfaces[facetIdx].first.first != startingId or cluster->interfaces[facetIdx].first.second!=imbibedId; facetIdx++) {if ((facetIdx+1)>=cluster->interfaces.size()) LOG_WARN("interface not found");}
 	vector<unsigned> interfacesToRemove = {facetIdx};
 	vector<unsigned> interfacesToAdd;
 	bool updateIntfs=false;//if turned true later we will have to clean interfaces
@@ -2780,6 +2782,21 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(PhaseCluster* cluster, unsign
 		for (int k=cluster->interfaces.size()-1;k>=0;k--)
 			if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label == cluster->label) cluster->interfaces.erase(cluster->interfaces.begin()+k);
 	}
+	PhaseCluster* cluster0 = clusters[0].get();
+	for (auto p = cluster0->pores.begin(); ;) {//slow search...
+		if (p==cluster0->pores.end()) { LOG_WARN("pore "<<newPore->info().id <<"not found in cluster"<<cluster0->label<<" of size "<<cluster0->pores.size()); break;}
+		else {
+			if ((*p)!=newPore) p++;// warning: this is not equivalent to p.id==cell.id for some reason, some wrong positive it seems
+// 			if ((*p)->info().id!=cell->info().id) p++;
+			else { cluster0->pores.erase(p); break;}
+		}}
+		
+	for (int k=cluster->interfaces.size()-1;k>=0 ;k--) 
+		if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label==cluster->label) {
+			//TODO: what happens to the other interfaces on the same pore? they will be removed but should they give bridges or something?
+// 			cluster->interfacialArea-=cluster->interfaces[k].second;
+			LOG_WARN("erasing"<<k)
+			cluster->interfaces.erase(cluster->interfaces.begin()+k);}
 	return merged;
 }
 
@@ -2803,7 +2820,7 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHan
 	unsigned neighborStart=0;
 	while ( (cell->neighbor(neighborStart)->info().label != -1 or
 		   solver->T[solver->currentTes].Triangulation().is_infinite(cell->neighbor(neighborStart))) 
-		   and neighborStart<3 ) ++neighborStart;	
+		   and neighborStart<3 ) ++neighborStart;
 	if (neighborStart==3 and cell->neighbor(neighborStart)->info().label != -1) cerr<<"This is not supposed to happen (line "<<__LINE__<<")"<<endl;
 
 	auto nCell = cell->neighbor(neighborStart); //use the remaining pore to start reconstruction of the cluster
