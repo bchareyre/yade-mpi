@@ -50,35 +50,44 @@ void PhaseCluster::solvePressure()
 		{
 			CellHandle cell = *cellIt;
 			  double diag=0;
-			  for (int j=0;j<4;j++) if (!cell->neighbor(j)->info().blocked) {
+			  for (int j=0;j<4;j++) if ((not tes->Triangulation().is_infinite(cell->neighbor(j))) and  !cell->neighbor(j)->info().blocked) {
 			      diag+= (cell->info().kNorm())[j];
-			       if (not cell->neighbor(j)->info().Pcondition) {
+// 			      cerr <<"("<< cell->info().id<< " "<<cell->neighbor(j)->info().id<<  ") diag+= "<< cell->info().id<<" = "<<(cell->info().kNorm())[j]<<endl;
+			       if ((not cell->neighbor(j)->info().Pcondition) and not cell->neighbor(j)->info().isNWRes) {
 				 if (cell->info().label == cell->neighbor(j)->info().label) {
 				  // off-diag coeff, only if neighbor cell is part of same cluster and in upper triangular part of the matrix
-				if (cell->info().index < cell->neighbor(j)->info().index) {
-				  T_nnz++;
-				  is.push_back(cell->info().index);
-				  js.push_back(cell->neighbor(j)->info().index);
-				  vs.push_back(-(cell->info().kNorm())[j]);}
-				 }
-			       } else {//imposed pressure in the W-phase
-				    // update the right-hand side
+					if (cell->info().index < cell->neighbor(j)->info().index) {
+// 						cerr<<"("<< cell->info().id<<" "<<cell->neighbor(j)->info().id <<") coeff="<<-(cell->info().kNorm())[j]<<endl;
+						
+						
+						T_nnz++;
+						is.push_back(cell->info().index);
+						js.push_back(cell->neighbor(j)->info().index);
+						vs.push_back(-(cell->info().kNorm())[j]);}
+					}
+					else {LOG_WARN("adjacent pores from different W-clusters:"<< cell->info().id<<" "<<cell->neighbor(j)->info().id );}
+			       } else {//imposed pressure can be in the W-phase or the NW-phase but capillary pressure will be added in another loop
+				    // for the moment add neighbor pressure regadless of the phase
 				    RHS[cell->info().index]+=(cell->info().kNorm())[j]*cell->neighbor(j)->info().p();}
 			}
+			else {if (tes->Triangulation().is_infinite(cell->neighbor(j))) LOG_WARN("infinite neighbour");}
+// 			/*if (debugTPF)*/ cerr<<"diag: "<< cell->info().id<<" = "<<diag<<endl;
 			  // define the diag coeff
-			  T_nnz++;
-			  is.push_back(cell->info().index);
-			  js.push_back(cell->info().index);
-			  vs.push_back(diag);
+			 T_nnz++;
+			is.push_back(cell->info().index);
+			js.push_back(cell->info().index);
+			vs.push_back(diag);
 			  
 			  // source term from volume change, to be updated later
-			  RHSvol[cell->info().index]-=cell->info().dv();
+			  //FIXME: needs to be commented in for full coupling - currently off for debugging other things
+// 			  RHSvol[cell->info().index]-=cell->info().dv();
 		  }
 		for (vector<Interface>::iterator it =  interfaces.begin(); it!=interfaces.end(); it++) {
 			if (not tes) LOG_WARN("no tes!!");
 			const CellHandle& innerCell = tes->cellHandles[it->first.first];
 			if (innerCell->info().Pcondition) continue;
-			RHS[innerCell->info().index]+=(innerCell->info().kNorm())[it->outerIndex]*(innerCell->neighbor(it->outerIndex)->info().p()-it->capillaryP);
+			RHS[innerCell->info().index]-=innerCell->info().kNorm()[it->outerIndex]*it->capillaryP;
+// 			/*if (debugTPF) */cerr<<"("<< innerCell->info().id<<" "<<innerCell->neighbor(it->outerIndex)->info().id <<") RHS(cap)-="<<innerCell->info().kNorm()[it->outerIndex]*it->capillaryP<<" "<<innerCell->info().kNorm()[it->outerIndex]<<" "<<it->capillaryP<<endl;
 		}
 		//comC.useGPU=useGPU; //useGPU;
 		//FIXME: is it safe to share "comC" among parallel cluster resolution?
@@ -2749,6 +2758,9 @@ void TwoPhaseFlowEngine::clusterGetFacet(PhaseCluster* cluster, CellHandle cell,
 
 void TwoPhaseFlowEngine::clusterGetPore(PhaseCluster* cluster, CellHandle cell) {
 	cell->info().label=cluster->label;
+	cell->info().saturation= cluster->label==0? 0:1;
+	cell->info().isNWRes = cluster->label==0? true:false;
+	cell->info().isWRes = cluster->label==0? false:true;
 	cluster->volume+=cell->info().poreBodyVolume;
 	cluster->pores.push_back(cell);
 }
@@ -2795,7 +2807,6 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(unsigned startingId, unsigned
 		if (solver->tesselation().cellHandles[cluster->interfaces[k].first.second]->info().label==cluster->label) {
 			//TODO: what happens to the other interfaces on the same pore? they will be removed but should they give bridges or something?
 // 			cluster->interfacialArea-=cluster->interfaces[k].second;
-			LOG_WARN("erasing"<<k)
 			cluster->interfaces.erase(cluster->interfaces.begin()+k);}
 	return merged;
 }
@@ -2806,6 +2817,7 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePore(PhaseCluster* cluster, CellHan
 	int label = cell->info().label;
 	cell->info().saturation=0;
 	cell->info().isNWRes=true;
+	cell->info().isWRes=false;
 	clusterGetPore(clusters[0].get(),cell);
 	
 	//update the cluster(s)
@@ -2867,6 +2879,7 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 	cell->info().saturation=0;
 	cell->info().isNWRes=true;
 	cell->info().isWRes=false;
+// 	cell->info().Pcondition=true;
 	clusterGetPore(clusters[0].get(),cell);//this will update cell label as well
 	//update the cluster(s)
 	unsigned nPores = cluster->pores.size();
@@ -2928,7 +2941,7 @@ vector<int> TwoPhaseFlowEngine::clusterInvadePoreFast(PhaseCluster* cluster, Cel
 		while (not foundImpP1) {
 			if (cluster->pores[k]->info().Pcondition) {startingCell=cluster->pores[k]; foundImpP1=true;}
 			else if (k>0) k--;
-			else LOG_WARN("no Pcondition pore in cluster 1");
+			else {LOG_WARN("no Pcondition pore in cluster 1"); break;}
 		} 
 	}
 	return splitCluster(cluster, startingCell);// return list of created clusters
@@ -3476,13 +3489,14 @@ double TwoPhaseFlowEngine::getPoreThroatRadius(unsigned int cell1, unsigned int 
 {
     double r =-1.;
     if (isCellNeighbor(cell1,cell2)==false) {
-        cout<<"cell1 and cell2 are not neighbors."<<endl;}
+        cerr<<"cell1 and cell2 are not neighbors."<<endl;}
     else {
         for (unsigned int i=0; i<4; i++) {
-            if (solver->T[solver->currentTes].cellHandles[cell1]->neighbor(i)->info().id==cell2)
+            if (solver->T[solver->currentTes].cellHandles[cell1]->neighbor(i)->info().id==cell2) {
                 r = solver->T[solver->currentTes].cellHandles[cell1]->info().poreThroatRadius[i];
 		break;}
 	}
+    }
     return r;
 }
 

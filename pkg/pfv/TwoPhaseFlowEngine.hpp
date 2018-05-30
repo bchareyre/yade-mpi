@@ -158,14 +158,12 @@ class PhaseCluster : public Serializable
 		Tesselation* tes;//point back to the full data structure
 		vector<CellHandle> pores;
 		vector<Interface> interfaces;
-		TwoPhaseFlowEngineT::RTriangulation* tri;
+// 		TwoPhaseFlowEngineT::RTriangulation* tri;
 		#ifdef CHOLMOD_LIBS
 		cholmod_common comC;
 		cholmod_factor* LC;
 		cholmod_dense* ex;//the pressure field
 		cholmod_common* pComC;
-// 		cholmod_common* pComC = &comC;
-		cholmod_factor** pLC;
 // 		cholmod_dense** pEx = &ex;
 // 		cholmod_l_start(&comC);
 		void solvePressure();
@@ -206,7 +204,7 @@ class PhaseCluster : public Serializable
 		void setCapPressure(unsigned nf, Real pcap) {interfaces[nf].capillaryP=pcap;}
 		Real getCapPressure(unsigned nf) {return interfaces[nf].capillaryP;}
 		void setCapVol(unsigned nf, Real vcap) {interfaces[nf].volume=vcap;}
-		Real updateCapVol(unsigned nf, Real dt) {interfaces[nf].volume+=dt*getFlux(nf); return interfaces[nf].volume;}
+		Real updateCapVol(unsigned nf, Real dt) {interfaces[nf].volume+=dt*getFlux(nf); /*LOG_WARN(interfaces[nf].volume);*/ return interfaces[nf].volume;}
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
@@ -214,7 +212,7 @@ class PhaseCluster : public Serializable
 		((double,entryRadius,0,,"smallest entry capillary pressure."))
 		((int,entryPore,-1,,"the pore of the cluster incident to the throat with smallest entry Pc."))
 		((double,interfacialArea,0,,"interfacial area of the cluster"))
-		,((LC,NULL))((ex,NULL))((pComC,&comC))((pLC,&LC)),
+		,((LC,NULL))((ex,NULL))((pComC,&comC)),
 		#ifdef CHOLMOD_LIBS
 		cholmod_l_start(pComC);//initialize cholmod solver
 		#endif
