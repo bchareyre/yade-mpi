@@ -88,6 +88,7 @@ public:
 	cholmod_factor* L;
 	cholmod_sparse* Achol;
 	cholmod_common com;
+	bool factorExists;
 	void add_T_entry(cholmod_triplet* T, long r, long c, double x)
 	{
 		size_t k = T->nnz;

@@ -96,6 +96,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	#endif
 	#ifdef SUITESPARSE_VERSION_4
 	cholmod_l_start(&com);
+	factorExists=false;
 		#if (CHOLMOD_GPU == 1)
 		com.maxGpuMemFraction=0.4; //using (less than) half of the available memory for each solver		
 		#endif
@@ -158,6 +159,14 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetLinearSystem() {
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 {
+
+	if (!multithread && factorExists && useSolver==4){
+		cholmod_l_free_sparse(&Achol, &com);
+		cholmod_l_free_factor(&L, &com);
+		cholmod_l_finish(&com);
+		cholmod_l_start(&com);
+		factorExists=false;	
+	}
 
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int n_cells=Tri.number_of_finite_cells();
@@ -584,6 +593,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 		cholmod_l_factorize(Achol, L, &com);
 		//t = clock() - t;
 		//cout << "CHOLMOD Time to factorize on GPU " << ((float)t)/CLOCKS_PER_SEC << endl;
+		factorExists = true;
 		factorizedEigenSolver=true;
 	}
 	
