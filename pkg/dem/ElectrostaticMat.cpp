@@ -95,14 +95,14 @@ Real Law2_ScGeom_ElectrostaticPhys::DLVO_NRAdimExp_integrate_u(Real const& un, R
 		
 		d = d - ratio;
 		
-		if(debug) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth << " AZK" << A << Z << K);
+		if(verbose) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth << " AZK" << A << Z << K);
 		
 		if(std::abs(F) < NewtonRafsonTol)
 			break;
 	}
 	
 	if(i < NewtonRafsonMaxIter || depth > maxSubSteps) {
-		if(depth > maxSubSteps) LOG_WARN("Max Substepping reach: results may be inconsistant");
+		if(depth > maxSubSteps && debug) LOG_WARN("Max Substepping reach: results may be inconsistant");
 		
 		prevDotU = un-(1.+a)*std::exp(d) + a*eps + Z*K*std::exp(-K*std::exp(d)) - A*std::exp(-2.*d);
 		return d;

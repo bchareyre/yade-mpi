@@ -100,6 +100,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
 			((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
 			((bool,debug,false,,"Write debug informations"))
+			((bool,verbose,false,,"Write all debug informations"))
 			((int,maxSubSteps,4,,"max recursion depth of adaptative timestepping in the theta-method, the minimal time interval is thus :yref:`Omega::dt<O.dt>`$/2^{depth}$. If still not converged the integrator will switch to backward Euler."))
 			((Real,theta,0.55,,"parameter of the 'theta'-method, 1: backward Euler, 0.5: trapezoidal rule, 0: not used,  0.55: suggested optimum)"))
 			((int,resolution,0,,"Change normal component resolution method, 0: Iterative exact resolution (theta method, linear contact), 1: Newton-Rafson dimentionless resolution (theta method, linear contact), 2: Newton-Rafson with nonlinear surface deflection (Hertzian-like contact)"))
