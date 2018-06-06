@@ -261,6 +261,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.permeabilityMap = permeabilityMap;
         flow.fluidBulkModulus = fluidBulkModulus;
 	flow.multithread = multithread;
+	flow.getCHOLMODPerfTimings=getCHOLMODPerfTimings;
 //         flow.tesselation().Clear();
         flow.tesselation().maxId=-1;
 	flow.blockedCells.clear();
@@ -297,7 +298,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         triangulate ( flow );
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
         flow.tesselation().compute();
-
         flow.defineFictiousCells();
 	// For faster loops on cells define this vector
 	flow.tesselation().cellHandles.clear();

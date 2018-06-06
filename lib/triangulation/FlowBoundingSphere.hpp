@@ -46,7 +46,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		bool pressureChanged;//are imposed pressures modified (on python side)? When it happens, we have to reApplyBoundaryConditions
 		int errorCode;
 		bool factorizeOnly;
-		
+		bool getCHOLMODPerfTimings;
+
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
 		vector<CellHandle> IPCells;

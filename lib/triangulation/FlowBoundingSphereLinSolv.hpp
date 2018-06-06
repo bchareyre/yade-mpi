@@ -59,6 +59,7 @@ public:
 	using FlowType::tesselation;
 	using FlowType::resetRHS;
 	using FlowType::factorizeOnly;  // used for backgroundAction()
+	using FlowType::getCHOLMODPerfTimings;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
@@ -66,6 +67,7 @@ public:
 	bool isFullLinearSystemGSSet;
 	bool areCellsOrdered;//true when orderedCells is filled, turn it false after retriangulation
 	bool updatedRHS;
+	struct timeval start, end;
 	
 	#ifdef CHOLMOD_LIBS
 	//Eigen's sparse matrix and solver

@@ -310,6 +310,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((bool, viscousNormalBodyStress, false,,"compute normal viscous stress applied on each body"))
 		((bool, viscousShearBodyStress, false,,"compute shear viscous stress applied on each body"))
 		((bool, multithread, false,,"Build triangulation and factorize in the background (multi-thread mode)"))
+		((bool, getCHOLMODPerfTimings, false,,"Print CHOLMOD build, analyze, and factorize timings"))
 		#ifdef CHOLMOD_LIBS
 		((int, numSolveThreads, 1,,"number of openblas threads in the solve phase."))
 		((int, numFactorizeThreads, 1,,"number of openblas threads in the factorization phase"))
