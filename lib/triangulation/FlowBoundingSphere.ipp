@@ -1115,10 +1115,11 @@ void FlowBoundingSphere<Tesselation>::displayStatistics()
 
 	num_particles = real;
 }
+
 template <class Tesselation> 
-void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
+basicVTKwritter FlowBoundingSphere<Tesselation>::saveMesh(const char* folder, bool withBoundaries,vector<int>& allIds, vector<int>& fictiousN)
 {
-	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return;}
+	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return basicVTKwritter(0,0);}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number = 0;
         char filename[250];
@@ -1128,8 +1129,8 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 	
 	vector<pair<vector<int>,unsigned> > extraPoly; //for fictious cells on the boundaries
 	vector<CGT::CVector > extraVertices; //for projections of real vertices on the boundaries
-	vector<int> allIds;//an ordered list of cell ids (from begin() to end(), for vtk table lookup), some ids will appear multiple times since boundary cells are splitted into multiple tetrahedra 
-		
+
+	vector<int> fictiousNExtra;	
 	//count fictious vertices and cells
 	vtkInfiniteVertices=vtkInfiniteCells=0;
 	unsigned extraV=0, extraCells=0;
@@ -1142,12 +1143,12 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 		if (fict>0) {
 			vtkInfiniteCells+=1;
 			cerr<<" fict="<<fict<<endl;
+			int newId = -(extraVertices.size()+1);//negative ids starting from -1 for fictious vertices
 			switch (fict) {
-				case 1:
+				case 1:{
 					int k=0;
 					for (;k<4; k++) if (fictV[k]) break;//find the fictious one
 					vector<int> poly;
-					int newId = -(extraVertices.size()+1);//negative ids starting from -1 for fictious vertices
 					for (int j=0; j<4; j++) {
 						if (!fictV[j]) {
 							Real dist = (cell->vertex(k)->point().point()-cell->vertex(j)->point().point()).squared_length();
@@ -1162,26 +1163,102 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 					poly.push_back(newId--); poly.push_back(newId--); poly.push_back(newId--);
 					// store the extra poly for later use and update counters
 					extraPoly.push_back(pair<vector<int>,int> (poly,cell->info().id) );//
-					extraCells+=3; extraV+=3; break;
-// 				case 2:
-// 					unsigned k=0; unsigned k1, k2; 
-// 					for (k<4; k++) if (fictV[k]) {k1=k; k++; break;}//find the first fictious
-// 					for (k<4; k++) if (fictV[k]) {k2=k; k++; break;}//find the first fictious
-// 					vector<int> poly;
-// 					unsigned newId = -extraVertices.size()-1;//negative ids starting from -1 for fictious vertices
-// 					for (int j=0; j<4; j++) {
-// 						if (!fictV[k]) {
-// 							extraVertices.push_back(cell->vertex(k)->point().point()-cell->vertex(j)->point().point());
-// 							poly.push_back(cell->vertex(k)->info().id());}
-// 					}
-// 					poly.push_back(newId--); poly.push_back(newId--); poly.push_back(newId--);
-// 					extraCells+=6; extraV+=6; break;
-// 				case 3:
-// 					extraCells+=6; extraV+=7; break;
+					for (int kk=0;kk<3;kk++) fictiousNExtra.push_back(1);
+					extraCells+=3; extraV+=3;} break;
+				case 2: {
+					unsigned k=0; unsigned k1=0, k2=0,s1=0,s2=0; 
+					for (;k<4; k++) if (fictV[k]) {k1=k; k++; break;}//find the first fictious
+					for (;k<4; k++) if (fictV[k]) {k2=k; k++; break;}//find the second fictious					
+					for (k=0; k<4; k++) if (!fictV[k]) {s1=k; k++; break;}//find the first real
+					for (;k<4; k++) if (!fictV[k]) {s2=k; k++; break;}//find the second real
+					
+					CVector c1 = cell->vertex(s1)->point().point()-CGAL::ORIGIN;
+					CVector c2 = cell->vertex(s2)->point().point()-CGAL::ORIGIN;
+					CVector v11 = cell->vertex(k1)->point().point()-cell->vertex(s1)->point().point();
+					CVector v21 = cell->vertex(k1)->point().point()-cell->vertex(s2)->point().point();
+					CVector v12 = cell->vertex(k2)->point().point()-cell->vertex(s1)->point().point();
+					CVector v22 = cell->vertex(k2)->point().point()-cell->vertex(s2)->point().point();
+					CVector v13;
+					CVector v23;
+					
+					Real dist11 = v11.squared_length();
+					dist11 = 1. - sqrt(cell->vertex(k1)->point().weight()/dist11);
+					v11=v11*dist11;
+					Real dist21 = v21.squared_length();
+					dist21 = 1. - sqrt(cell->vertex(k1)->point().weight()/dist21);
+					v21=v21*dist21;
+					Real dist12 = v12.squared_length();
+					dist12 = 1. - sqrt(cell->vertex(k2)->point().weight()/dist12);
+					v12=v12*dist12;
+					Real dist22 = v22.squared_length();
+					dist22 = 1. - sqrt(cell->vertex(k2)->point().weight()/dist22);
+					v22=v22*dist22;
+					v13=v12+v11;
+					v23=v22+v21;
+					vector<int> poly1,poly2;//split the cube in two prisms
+					poly1.push_back(cell->vertex(s1)->info().id()); poly2.push_back(cell->vertex(s1)->info().id());
+					extraVertices.push_back(c1+v13); poly1.push_back(newId); poly2.push_back(newId--);
+					extraVertices.push_back(c1+v11); poly1.push_back(newId--);
+					extraVertices.push_back(c1+v12); poly2.push_back(newId--);
+					poly1.push_back(cell->vertex(s2)->info().id()); poly2.push_back(cell->vertex(s2)->info().id());
+					extraVertices.push_back(c2+v23); poly1.push_back(newId); poly2.push_back(newId--);
+					extraVertices.push_back(c2+v21); poly1.push_back(newId--);
+					extraVertices.push_back(c2+v22); poly2.push_back(newId--);
+					extraPoly.push_back(pair<vector<int>,int> (poly1,cell->info().id) );
+					extraPoly.push_back(pair<vector<int>,int> (poly2,cell->info().id) );
+					for (int kk=0;kk<6;kk++) fictiousNExtra.push_back(2);
+					extraCells+=6; extraV+=6;}
+					break;
+
+ 				case 3:{
+// 					k=0; unsigned k1=0, k2=0,s1=0,s2=0; 
+// 					for (;k<4; k++) if (fictV[k]) {k1=k; k++; break;}//find the first fictious
+// 					for (;k<4; k++) if (fictV[k]) {k2=k; k++; break;}//find the second fictious
+					unsigned s1=0, k1=0,k2=0,k3=0;
+					for (unsigned k=0; k<4; k++) if (!fictV[k]) {s1=k; k++; break;}//find the first real
+					k1= facetVertices[s1][0];//handy...
+					k3= facetVertices[s1][1];
+					k2= facetVertices[s1][2];
+					
+// 					for (;k<4; k++) if (!fictV[k]) {s2=k; k++; break;}//find the second real
+					
+					CVector c = cell->vertex(s1)->point().point()-CGAL::ORIGIN;
+					CVector v11 = cell->vertex(k1)->point().point()-cell->vertex(s1)->point().point();
+					CVector v12 = cell->vertex(k2)->point().point()-cell->vertex(s1)->point().point();
+					CVector v13 = cell->vertex(k3)->point().point()-cell->vertex(s1)->point().point();
+					
+					Real dist11 = v11.squared_length(); dist11 = 1. - sqrt(cell->vertex(k1)->point().weight()/dist11); v11=v11*dist11;
+					Real dist12 = v12.squared_length(); dist12 = 1. - sqrt(cell->vertex(k2)->point().weight()/dist12); v12=v12*dist12;
+					Real dist13 = v13.squared_length(); dist13 = 1. - sqrt(cell->vertex(k3)->point().weight()/dist13); v13=v13*dist13;
+					
+// 					CVector v2_3 = v12+v13;
+					CVector v1v2 = v11+v12;
+// 					CVector v1_3 = v11+v13;
+// 					CVector v1_2_3 = v11+v13+v12;
+					
+					vector<int> poly1,poly2;//split the cube in two prisms
+					poly1.push_back(cell->vertex(s1)->info().id()); poly2.push_back(cell->vertex(s1)->info().id());
+					extraVertices.push_back(c+v1v2); poly1.push_back(newId); poly2.push_back(newId--);
+					extraVertices.push_back(c+v11); poly1.push_back(newId--);
+					extraVertices.push_back(c+v12); poly2.push_back(newId--);
+					extraVertices.push_back(c+v13); poly1.push_back(newId); poly2.push_back(newId--);
+					extraVertices.push_back(c+v1v2+v13); poly1.push_back(newId); poly2.push_back(newId--);
+					extraVertices.push_back(c+v11+v13); poly1.push_back(newId--);
+					extraVertices.push_back(c+v12+v13); poly2.push_back(newId--);
+					
+					extraPoly.push_back(pair<vector<int>,int> (poly1,cell->info().id) );
+					extraPoly.push_back(pair<vector<int>,int> (poly2,cell->info().id) );
+					for (int kk=0;kk<6;kk++) fictiousNExtra.push_back(3);
+					extraCells+=6; extraV+=7;}
+					break;
 			}
 		} 
-		else allIds.push_back(cell->info().id);
+		else {
+			allIds.push_back(cell->info().id);
+			fictiousN.push_back(0);}
 	}
+	fictiousN.insert(fictiousN.end(),fictiousNExtra.begin(),fictiousNExtra.end());
+	
 	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                 if (!v->info().isReal()) vtkInfiniteVertices+=1;
                 else if (firstReal==-1) firstReal=vtkInfiniteVertices;}
@@ -1236,30 +1313,273 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 		}
 	}
 	// now the extra tetrahedra
-	int id4,id5,id6,id7;
+	int id4,id5;
 	for (auto p = extraPoly.begin(); p!=extraPoly.end(); p++) {
 // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
 		switch (p->first.size()) {
 			case 6:
-			id0 = p->first[0]; id1 = p->first[1]; id2 = p->first[2];//real spheres, positive ids
-			id3 = p->first[3]; id4 = p->first[4]; id5 = p->first[5];// extra vertices, negative ids
 			allIds.push_back(p->second); allIds.push_back(p->second); allIds.push_back(p->second);
 			if (minId != 0) {
-				cerr<<"___type1____not tested"<<endl;
+				id0 = p->first[0]; id1 = p->first[1]; id2 = p->first[2];
+				id3 = p->first[3]; id4 = p->first[4]; id5 = p->first[5];// extra vertices, negative ids
+				cerr<<"___type1____ saveVtk with bounding cells not tested when minId!=0"<<endl;
 				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id3],vertexIdMap[id4],vertexIdMap[id5]);
 				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id5],vertexIdMap[id1],vertexIdMap[id2]);
 				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id1],vertexIdMap[id4],vertexIdMap[id5]);}
 			else {
+				//real spheres ave positive ids, fictious ones ahave negative, that's how we guess the rank in the liste
 				cerr<<"___type2____"<<id0<<" "<<numVertices-id3-1<<" "<<numVertices-id4-1<<" "<<numVertices-id5-1<<" "<<numVertices-id5-1<<" "<<id1<<" "<<id2<<" "<<numVertices-id4-1<<" "<<numVertices-id5-1<<endl;
-		
-				vtkfile.write_cell(id0-firstReal, numVertices-id3-1, numVertices-id4-1, numVertices-id5-1);
-				vtkfile.write_cell(id0-firstReal, numVertices-id5-1, id1-firstReal, id2-firstReal);
-				vtkfile.write_cell(id0-firstReal, id1-firstReal, numVertices-id4-1, numVertices-id5-1);}
+				id0 = p->first[0]>0? p->first[0]-firstReal : numVertices-p->first[0]-1;
+				id1 = p->first[1]>0? p->first[1]-firstReal : numVertices-p->first[1]-1;
+				id2 = p->first[2]>0? p->first[2]-firstReal : numVertices-p->first[2]-1;
+				id3 = p->first[3]>0? p->first[3]-firstReal : numVertices-p->first[3]-1;
+				id4 = p->first[4]>0? p->first[4]-firstReal : numVertices-p->first[4]-1;
+				id5 = p->first[5]>0? p->first[5]-firstReal : numVertices-p->first[5]-1;
+				vtkfile.write_cell(id0, id3, id4, id5);
+				vtkfile.write_cell(id0, id5, id1, id2);
+				vtkfile.write_cell(id0, id1, id4, id5);}
 		}
 	}
 	cerr<<"done__"<<endl;
         vtkfile.end_cells();
+	return vtkfile;
+}
 
+
+template <class Tesselation> 
+void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBoundaries)
+{
+	vector<int> allIds;//an ordered list of cell ids (from begin() to end(), for vtk table lookup), some ids will appear multiple times since boundary cells are splitted into multiple tetrahedra 
+	vector<int> fictiousN;
+	
+	
+// 	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return;}
+// 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+//         static unsigned int number = 0;
+//         char filename[250];
+// 	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+//         sprintf(filename,"%s/out_%d.vtk",folder,number++);
+// 	int firstReal=-1;
+// 	
+// 	vector<pair<vector<int>,unsigned> > extraPoly; //for fictious cells on the boundaries
+// 	vector<CGT::CVector > extraVertices; //for projections of real vertices on the boundaries
+// 
+// 	vector<int> fictiousNExtra;	
+// 	//count fictious vertices and cells
+// 	vtkInfiniteVertices=vtkInfiniteCells=0;
+// 	unsigned extraV=0, extraCells=0;
+// 	
+//  	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+//         for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
+// 		bool fictV [4];
+// 		for (unsigned k=0; k<4; k++) fictV[k] = !cell->vertex(k)->info().isReal();
+// 		unsigned fict = unsigned(fictV[0]) + unsigned(fictV[1]) + unsigned(fictV[2]) + unsigned(fictV[3]);
+// 		if (fict>0) {
+// 			vtkInfiniteCells+=1;
+// 			cerr<<" fict="<<fict<<endl;
+// 			int newId = -(extraVertices.size()+1);//negative ids starting from -1 for fictious vertices
+// 			switch (fict) {
+// 				case 1:{
+// 					int k=0;
+// 					for (;k<4; k++) if (fictV[k]) break;//find the fictious one
+// 					vector<int> poly;
+// 					for (int j=0; j<4; j++) {
+// 						if (!fictV[j]) {
+// 							Real dist = (cell->vertex(k)->point().point()-cell->vertex(j)->point().point()).squared_length();
+// 							dist = 1. - sqrt(cell->vertex(k)->point().weight()/dist);
+// 							// OX = OC+(1-infRad/C1C2)*C1C2
+// 							CVector C1C2 = dist*(cell->vertex(k)->point().point()-cell->vertex(j)->point().point());
+// 							extraVertices.push_back((cell->vertex(j)->point().point()+ C1C2)-CGAL::ORIGIN );
+// 							// insert real vertices first, extraVertices appended later
+// 							poly.push_back(cell->vertex(j)->info().id());}
+// 					}
+// 					// then the real ones
+// 					poly.push_back(newId--); poly.push_back(newId--); poly.push_back(newId--);
+// 					// store the extra poly for later use and update counters
+// 					extraPoly.push_back(pair<vector<int>,int> (poly,cell->info().id) );//
+// 					for (int kk=0;kk<3;kk++) fictiousNExtra.push_back(1);
+// 					extraCells+=3; extraV+=3;} break;
+// 				case 2: {
+// 					unsigned k=0; unsigned k1=0, k2=0,s1=0,s2=0; 
+// 					for (;k<4; k++) if (fictV[k]) {k1=k; k++; break;}//find the first fictious
+// 					for (;k<4; k++) if (fictV[k]) {k2=k; k++; break;}//find the second fictious					
+// 					for (k=0; k<4; k++) if (!fictV[k]) {s1=k; k++; break;}//find the first real
+// 					for (;k<4; k++) if (!fictV[k]) {s2=k; k++; break;}//find the second real
+// 					
+// 					CVector c1 = cell->vertex(s1)->point().point()-CGAL::ORIGIN;
+// 					CVector c2 = cell->vertex(s2)->point().point()-CGAL::ORIGIN;
+// 					CVector v11 = cell->vertex(k1)->point().point()-cell->vertex(s1)->point().point();
+// 					CVector v21 = cell->vertex(k1)->point().point()-cell->vertex(s2)->point().point();
+// 					CVector v12 = cell->vertex(k2)->point().point()-cell->vertex(s1)->point().point();
+// 					CVector v22 = cell->vertex(k2)->point().point()-cell->vertex(s2)->point().point();
+// 					CVector v13;
+// 					CVector v23;
+// 					
+// 					Real dist11 = v11.squared_length();
+// 					dist11 = 1. - sqrt(cell->vertex(k1)->point().weight()/dist11);
+// 					v11=v11*dist11;
+// 					Real dist21 = v21.squared_length();
+// 					dist21 = 1. - sqrt(cell->vertex(k1)->point().weight()/dist21);
+// 					v21=v21*dist21;
+// 					Real dist12 = v12.squared_length();
+// 					dist12 = 1. - sqrt(cell->vertex(k2)->point().weight()/dist12);
+// 					v12=v12*dist12;
+// 					Real dist22 = v22.squared_length();
+// 					dist22 = 1. - sqrt(cell->vertex(k2)->point().weight()/dist22);
+// 					v22=v22*dist22;
+// 					v13=v12+v11;
+// 					v23=v22+v21;
+// 					vector<int> poly1,poly2;//split the cube in two prisms
+// 					poly1.push_back(cell->vertex(s1)->info().id()); poly2.push_back(cell->vertex(s1)->info().id());
+// 					extraVertices.push_back(c1+v13); poly1.push_back(newId); poly2.push_back(newId--);
+// 					extraVertices.push_back(c1+v11); poly1.push_back(newId--);
+// 					extraVertices.push_back(c1+v12); poly2.push_back(newId--);
+// 					poly1.push_back(cell->vertex(s2)->info().id()); poly2.push_back(cell->vertex(s2)->info().id());
+// 					extraVertices.push_back(c2+v23); poly1.push_back(newId); poly2.push_back(newId--);
+// 					extraVertices.push_back(c2+v21); poly1.push_back(newId--);
+// 					extraVertices.push_back(c2+v22); poly2.push_back(newId--);
+// 					extraPoly.push_back(pair<vector<int>,int> (poly1,cell->info().id) );
+// 					extraPoly.push_back(pair<vector<int>,int> (poly2,cell->info().id) );
+// 					for (int kk=0;kk<6;kk++) fictiousNExtra.push_back(2);
+// 					extraCells+=6; extraV+=6;}
+// 					break;
+// 
+//  				case 3:{
+// // 					k=0; unsigned k1=0, k2=0,s1=0,s2=0; 
+// // 					for (;k<4; k++) if (fictV[k]) {k1=k; k++; break;}//find the first fictious
+// // 					for (;k<4; k++) if (fictV[k]) {k2=k; k++; break;}//find the second fictious
+// 					unsigned s1=0, k1=0,k2=0,k3=0;
+// 					for (unsigned k=0; k<4; k++) if (!fictV[k]) {s1=k; k++; break;}//find the first real
+// 					k1= facetVertices[s1][0];//handy...
+// 					k3= facetVertices[s1][1];
+// 					k2= facetVertices[s1][2];
+// 					
+// // 					for (;k<4; k++) if (!fictV[k]) {s2=k; k++; break;}//find the second real
+// 					
+// 					CVector c = cell->vertex(s1)->point().point()-CGAL::ORIGIN;
+// 					CVector v11 = cell->vertex(k1)->point().point()-cell->vertex(s1)->point().point();
+// 					CVector v12 = cell->vertex(k2)->point().point()-cell->vertex(s1)->point().point();
+// 					CVector v13 = cell->vertex(k3)->point().point()-cell->vertex(s1)->point().point();
+// 					
+// 					Real dist11 = v11.squared_length(); dist11 = 1. - sqrt(cell->vertex(k1)->point().weight()/dist11); v11=v11*dist11;
+// 					Real dist12 = v12.squared_length(); dist12 = 1. - sqrt(cell->vertex(k2)->point().weight()/dist12); v12=v12*dist12;
+// 					Real dist13 = v13.squared_length(); dist13 = 1. - sqrt(cell->vertex(k3)->point().weight()/dist13); v13=v13*dist13;
+// 					
+// // 					CVector v2_3 = v12+v13;
+// 					CVector v1v2 = v11+v12;
+// // 					CVector v1_3 = v11+v13;
+// // 					CVector v1_2_3 = v11+v13+v12;
+// 					
+// 					vector<int> poly1,poly2;//split the cube in two prisms
+// 					poly1.push_back(cell->vertex(s1)->info().id()); poly2.push_back(cell->vertex(s1)->info().id());
+// 					extraVertices.push_back(c+v1v2); poly1.push_back(newId); poly2.push_back(newId--);
+// 					extraVertices.push_back(c+v11); poly1.push_back(newId--);
+// 					extraVertices.push_back(c+v12); poly2.push_back(newId--);
+// 					extraVertices.push_back(c+v13); poly1.push_back(newId); poly2.push_back(newId--);
+// 					extraVertices.push_back(c+v1v2+v13); poly1.push_back(newId); poly2.push_back(newId--);
+// 					extraVertices.push_back(c+v11+v13); poly1.push_back(newId--);
+// 					extraVertices.push_back(c+v12+v13); poly2.push_back(newId--);
+// 					
+// 					extraPoly.push_back(pair<vector<int>,int> (poly1,cell->info().id) );
+// 					extraPoly.push_back(pair<vector<int>,int> (poly2,cell->info().id) );
+// 					for (int kk=0;kk<6;kk++) fictiousNExtra.push_back(3);
+// 					extraCells+=6; extraV+=7;}
+// 					break;
+// 			}
+// 		} 
+// 		else {
+// 			allIds.push_back(cell->info().id);
+// 			fictiousN.push_back(0);}
+// 	}
+// 	fictiousN.insert(fictiousN.end(),fictiousNExtra.begin(),fictiousNExtra.end());
+// 	
+// 	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+//                 if (!v->info().isReal()) vtkInfiniteVertices+=1;
+//                 else if (firstReal==-1) firstReal=vtkInfiniteVertices;}
+// 
+//         basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-vtkInfiniteVertices+extraV, (unsigned int) Tri.number_of_finite_cells()-vtkInfiniteCells+extraCells);
+// 
+//         vtkfile.open(filename,"test");
+// 	
+// 	//!TEMPORARY FIX:
+// 	//paraview needs zero-based vertex ids (from 0 ... numRealVertices)
+// 	//in presence of clumps vertex ids are not zero-based anymore
+// 	//to fix the vkt output vertex ids will be replaced by zero-based ones (CAUTION: output vertex ids != Yade vertex ids!)
+// 	
+// 	map<int,int> vertexIdMap;
+// 	int numVertices = 0;
+// 	unsigned int minId = 1;
+// 	
+// 	vtkfile.begin_vertices();
+// 	double x,y,z;
+//         for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+// 		if (v->info().isReal()) {
+// 			x = (double)(v->point().point()[0]);
+// 			y = (double)(v->point().point()[1]);
+// 			z = (double)(v->point().point()[2]);
+// 			vtkfile.write_point(x,y,z);
+// 			vertexIdMap[v->info().id()-firstReal] = numVertices;
+// 			minId = min(minId,v->info().id()-firstReal);
+// 			numVertices += 1;
+// 		}
+// 	}
+// 	// now the extra vertices
+// 	int extra=-1;
+// 	int numAllVertices=numVertices;
+// 	for (auto pt = extraVertices.begin(); pt != extraVertices.end(); pt++) {
+// 			vtkfile.write_point((double)(*pt)[0],(double)(*pt)[1],(double)(*pt)[2]);
+// 			vertexIdMap[extra--] = numAllVertices++;
+// 			cerr <<"writing extra="<<extra<<" point:"<< (double)(*pt)[0]<<" "<<(double)(*pt)[1]<<" "<<(double)(*pt)[2]<<endl;
+// 	}
+// 	vtkfile.end_vertices();
+// 	
+// 	vtkfile.begin_cells();
+// 	int id0,id1,id2,id3;
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+// 		if (isDrawable) {
+// 			id0 = cell->vertex(0)->info().id()-firstReal;
+// 			id1 = cell->vertex(1)->info().id()-firstReal;
+// 			id2 = cell->vertex(2)->info().id()-firstReal;
+// 			id3 = cell->vertex(3)->info().id()-firstReal;
+// 			if (minId != 0) vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id1],vertexIdMap[id2],vertexIdMap[id3]);
+// 			else vtkfile.write_cell(id0, id1, id2, id3);
+// 		}
+// 	}
+// 	// now the extra tetrahedra
+// 	int id4,id5;
+// 	for (auto p = extraPoly.begin(); p!=extraPoly.end(); p++) {
+// // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		switch (p->first.size()) {
+// 			case 6:
+// 			allIds.push_back(p->second); allIds.push_back(p->second); allIds.push_back(p->second);
+// 			if (minId != 0) {
+// 				id0 = p->first[0]; id1 = p->first[1]; id2 = p->first[2];
+// 				id3 = p->first[3]; id4 = p->first[4]; id5 = p->first[5];// extra vertices, negative ids
+// 				cerr<<"___type1____ saveVtk with bounding cells not tested when minId!=0"<<endl;
+// 				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id3],vertexIdMap[id4],vertexIdMap[id5]);
+// 				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id5],vertexIdMap[id1],vertexIdMap[id2]);
+// 				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id1],vertexIdMap[id4],vertexIdMap[id5]);}
+// 			else {
+// 				//real spheres ave positive ids, fictious ones ahave negative, that's how we guess the rank in the liste
+// 				cerr<<"___type2____"<<id0<<" "<<numVertices-id3-1<<" "<<numVertices-id4-1<<" "<<numVertices-id5-1<<" "<<numVertices-id5-1<<" "<<id1<<" "<<id2<<" "<<numVertices-id4-1<<" "<<numVertices-id5-1<<endl;
+// 				id0 = p->first[0]>0? p->first[0]-firstReal : numVertices-p->first[0]-1;
+// 				id1 = p->first[1]>0? p->first[1]-firstReal : numVertices-p->first[1]-1;
+// 				id2 = p->first[2]>0? p->first[2]-firstReal : numVertices-p->first[2]-1;
+// 				id3 = p->first[3]>0? p->first[3]-firstReal : numVertices-p->first[3]-1;
+// 				id4 = p->first[4]>0? p->first[4]-firstReal : numVertices-p->first[4]-1;
+// 				id5 = p->first[5]>0? p->first[5]-firstReal : numVertices-p->first[5]-1;
+// 				vtkfile.write_cell(id0, id3, id4, id5);
+// 				vtkfile.write_cell(id0, id5, id1, id2);
+// 				vtkfile.write_cell(id0, id1, id4, id5);}
+// 		}
+// 	}
+// 	cerr<<"done__"<<endl;
+//         vtkfile.end_cells();
+
+	basicVTKwritter vtkfile = saveMesh(folder,withBoundaries,allIds,fictiousN);
+	
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	if (permeabilityMap){
 	vtkfile.begin_data("Permeability",CELL_DATA,SCALARS,FLOAT);
 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
@@ -1269,20 +1589,19 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 	vtkfile.end_data();}
 	else{
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
-	for (int kk=0; kk<allIds.size(); kk++) {
-// 	for (auto id = allIds.begin(); id != allIds.end(); id++) {
-		cerr<<"__id__"<<allIds[kk]<<"/"<<tesselation().cellHandles.size() <<endl;
-		vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().p());
+	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().p());
+	vtkfile.end_data();
+		
+	vtkfile.begin_data("fictious",CELL_DATA,SCALARS,INT);
+	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(fictiousN[kk]);
+	vtkfile.end_data();
+	
+	vtkfile.begin_data("id",CELL_DATA,SCALARS,INT);
+	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(allIds[kk]);
+	vtkfile.end_data();
+	
+	
 	}
-	cerr<<"done((((((("<<endl;
-// 	{
-// // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-// 		const CellHandle& cell =  tesselation().cellHandles[*id];
-// 		vtkfile.write_data(tesselation().cellHandles[*id]->info().p());
-// // 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-// // 		if (isDrawable){vtkfile.write_data(cell->info().p());}
-// 	}
-	vtkfile.end_data();}
 
 // 	if (1){
 // 	averageRelativeCellVelocity();
