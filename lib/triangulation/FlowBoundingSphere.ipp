@@ -1125,19 +1125,68 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         sprintf(filename,"%s/out_%d.vtk",folder,number++);
 	int firstReal=-1;
-
+	
+	vector<pair<vector<int>,unsigned> > extraPoly; //for fictious cells on the boundaries
+	vector<CGT::CVector > extraVertices; //for projections of real vertices on the boundaries
+	vector<int> allIds;//an ordered list of cell ids (from begin() to end(), for vtk table lookup), some ids will appear multiple times since boundary cells are splitted into multiple tetrahedra 
+		
 	//count fictious vertices and cells
 	vtkInfiniteVertices=vtkInfiniteCells=0;
+	unsigned extraV=0, extraCells=0;
+	
  	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
         for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (!isDrawable) vtkInfiniteCells+=1;
+		bool fictV [4];
+		for (unsigned k=0; k<4; k++) fictV[k] = !cell->vertex(k)->info().isReal();
+		unsigned fict = unsigned(fictV[0]) + unsigned(fictV[1]) + unsigned(fictV[2]) + unsigned(fictV[3]);
+		if (fict>0) {
+			vtkInfiniteCells+=1;
+			cerr<<" fict="<<fict<<endl;
+			switch (fict) {
+				case 1:
+					int k=0;
+					for (;k<4; k++) if (fictV[k]) break;//find the fictious one
+					vector<int> poly;
+					int newId = -(extraVertices.size()+1);//negative ids starting from -1 for fictious vertices
+					for (int j=0; j<4; j++) {
+						if (!fictV[j]) {
+							Real dist = (cell->vertex(k)->point().point()-cell->vertex(j)->point().point()).squared_length();
+							dist = 1. - sqrt(cell->vertex(k)->point().weight()/dist);
+							// OX = OC+(1-infRad/C1C2)*C1C2
+							CVector C1C2 = dist*(cell->vertex(k)->point().point()-cell->vertex(j)->point().point());
+							extraVertices.push_back((cell->vertex(j)->point().point()+ C1C2)-CGAL::ORIGIN );
+							// insert real vertices first, extraVertices appended later
+							poly.push_back(cell->vertex(j)->info().id());}
+					}
+					// then the real ones
+					poly.push_back(newId--); poly.push_back(newId--); poly.push_back(newId--);
+					// store the extra poly for later use and update counters
+					extraPoly.push_back(pair<vector<int>,int> (poly,cell->info().id) );//
+					extraCells+=3; extraV+=3; break;
+// 				case 2:
+// 					unsigned k=0; unsigned k1, k2; 
+// 					for (k<4; k++) if (fictV[k]) {k1=k; k++; break;}//find the first fictious
+// 					for (k<4; k++) if (fictV[k]) {k2=k; k++; break;}//find the first fictious
+// 					vector<int> poly;
+// 					unsigned newId = -extraVertices.size()-1;//negative ids starting from -1 for fictious vertices
+// 					for (int j=0; j<4; j++) {
+// 						if (!fictV[k]) {
+// 							extraVertices.push_back(cell->vertex(k)->point().point()-cell->vertex(j)->point().point());
+// 							poly.push_back(cell->vertex(k)->info().id());}
+// 					}
+// 					poly.push_back(newId--); poly.push_back(newId--); poly.push_back(newId--);
+// 					extraCells+=6; extraV+=6; break;
+// 				case 3:
+// 					extraCells+=6; extraV+=7; break;
+			}
+		} 
+		else allIds.push_back(cell->info().id);
 	}
 	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
                 if (!v->info().isReal()) vtkInfiniteVertices+=1;
                 else if (firstReal==-1) firstReal=vtkInfiniteVertices;}
 
-        basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-vtkInfiniteVertices, (unsigned int) Tri.number_of_finite_cells()-vtkInfiniteCells);
+        basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-vtkInfiniteVertices+extraV, (unsigned int) Tri.number_of_finite_cells()-vtkInfiniteCells+extraCells);
 
         vtkfile.open(filename,"test");
 	
@@ -1163,6 +1212,14 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 			numVertices += 1;
 		}
 	}
+	// now the extra vertices
+	int extra=-1;
+	int numAllVertices=numVertices;
+	for (auto pt = extraVertices.begin(); pt != extraVertices.end(); pt++) {
+			vtkfile.write_point((double)(*pt)[0],(double)(*pt)[1],(double)(*pt)[2]);
+			vertexIdMap[extra--] = numAllVertices++;
+			cerr <<"writing extra="<<extra<<" point:"<< (double)(*pt)[0]<<" "<<(double)(*pt)[1]<<" "<<(double)(*pt)[2]<<endl;
+	}
 	vtkfile.end_vertices();
 	
 	vtkfile.begin_cells();
@@ -1178,6 +1235,29 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 			else vtkfile.write_cell(id0, id1, id2, id3);
 		}
 	}
+	// now the extra tetrahedra
+	int id4,id5,id6,id7;
+	for (auto p = extraPoly.begin(); p!=extraPoly.end(); p++) {
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+		switch (p->first.size()) {
+			case 6:
+			id0 = p->first[0]; id1 = p->first[1]; id2 = p->first[2];//real spheres, positive ids
+			id3 = p->first[3]; id4 = p->first[4]; id5 = p->first[5];// extra vertices, negative ids
+			allIds.push_back(p->second); allIds.push_back(p->second); allIds.push_back(p->second);
+			if (minId != 0) {
+				cerr<<"___type1____not tested"<<endl;
+				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id3],vertexIdMap[id4],vertexIdMap[id5]);
+				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id5],vertexIdMap[id1],vertexIdMap[id2]);
+				vtkfile.write_cell(vertexIdMap[id0],vertexIdMap[id1],vertexIdMap[id4],vertexIdMap[id5]);}
+			else {
+				cerr<<"___type2____"<<id0<<" "<<numVertices-id3-1<<" "<<numVertices-id4-1<<" "<<numVertices-id5-1<<" "<<numVertices-id5-1<<" "<<id1<<" "<<id2<<" "<<numVertices-id4-1<<" "<<numVertices-id5-1<<endl;
+		
+				vtkfile.write_cell(id0-firstReal, numVertices-id3-1, numVertices-id4-1, numVertices-id5-1);
+				vtkfile.write_cell(id0-firstReal, numVertices-id5-1, id1-firstReal, id2-firstReal);
+				vtkfile.write_cell(id0-firstReal, id1-firstReal, numVertices-id4-1, numVertices-id5-1);}
+		}
+	}
+	cerr<<"done__"<<endl;
         vtkfile.end_cells();
 
 	if (permeabilityMap){
@@ -1189,20 +1269,29 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder)
 	vtkfile.end_data();}
 	else{
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().p());}
+	for (int kk=0; kk<allIds.size(); kk++) {
+// 	for (auto id = allIds.begin(); id != allIds.end(); id++) {
+		cerr<<"__id__"<<allIds[kk]<<"/"<<tesselation().cellHandles.size() <<endl;
+		vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().p());
 	}
+	cerr<<"done((((((("<<endl;
+// 	{
+// // 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		const CellHandle& cell =  tesselation().cellHandles[*id];
+// 		vtkfile.write_data(tesselation().cellHandles[*id]->info().p());
+// // 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+// // 		if (isDrawable){vtkfile.write_data(cell->info().p());}
+// 	}
 	vtkfile.end_data();}
 
-	if (1){
-	averageRelativeCellVelocity();
-	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().averageVelocity()[0],cell->info().averageVelocity()[1],cell->info().averageVelocity()[2]);}
-	}
-	vtkfile.end_data();}
+// 	if (1){
+// 	averageRelativeCellVelocity();
+// 	vtkfile.begin_data("Velocity",CELL_DATA,VECTORS,FLOAT);
+// 	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+// 		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
+// 		if (isDrawable){vtkfile.write_data(cell->info().averageVelocity()[0],cell->info().averageVelocity()[1],cell->info().averageVelocity()[2]);}
+// 	}
+// 	vtkfile.end_data();}
 }
 
 #ifdef XVIEW
