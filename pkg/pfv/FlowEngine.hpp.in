@@ -349,7 +349,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("edgeSize",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::edgeSize,"Return the number of interactions.")
 		.def("surfaceSolidThroatInPore",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::surfaceSolidThroatInPore,(boost::python::arg("cellId"),boost::python::arg("throatIndex")),"returns solid area in the throat (index 0-3), keeping only that part of the throat in cell.")
 		.def("OSI",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::OSI,"Return the number of interactions only between spheres.")
-		.def("saveVtk",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::saveVtk,(boost::python::arg("folder")="./VTK",boost::python::arg("withBoundaries")=false),"Save pressure field in vtk format. Specify a folder name for output.")
+		.def("saveVtk",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::saveVtk,(boost::python::arg("folder")="./VTK",boost::python::arg("withBoundaries")=false),"Save pressure field in vtk format. Specify a folder name for output. The cells adjacent to the bounding spheres are generated conditionally based on :yref:`withBoundaries` (not compatible with periodic boundaries)")
 		.def("avFlVelOnSph",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::avFlVelOnSph,(boost::python::arg("idSph")),"compute a sphere-centered average fluid velocity")
 		.def("fluidForce",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::fluidForce,(boost::python::arg("idSph")),"Return the fluid force on sphere idSph.")
 		.def("shearLubForce",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::shearLubForce,(boost::python::arg("idSph")),"Return the shear lubrication force on sphere idSph.")

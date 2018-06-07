@@ -1193,10 +1193,8 @@ basicVTKwritter FlowBoundingSphere<Tesselation>::saveMesh(const char* folder, bo
 							if (!fictV[j]) {
 								Real dist = (cell->vertex(k)->point().point()-cell->vertex(j)->point().point()).squared_length();
 								dist = 1. - sqrt(cell->vertex(k)->point().weight()/dist);
-								// OX = OC+(1-infRad/C1C2)*C1C2
 								CVector C1C2 = dist*(cell->vertex(k)->point().point()-cell->vertex(j)->point().point());
 								extraVertices.push_back((cell->vertex(j)->point().point()+ C1C2)-CGAL::ORIGIN );
-								// insert real vertices first, extraVertices appended later
 								poly.push_back(cell->vertex(j)->info().id());}
 						}
 						// then the real ones
