@@ -247,7 +247,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreBodyVolume();
 	void computePoreBodyRadius();
 	void computeSolidLine();
-	void savePhaseVtk(const char* folder);
+	void savePhaseVtk(const char* folder, bool withBoundaries);
 	void savePhaseVtkIncludeBoundingCells(const char* folder);
 
 	//compute entry pore throat radius (drainage)
@@ -417,7 +417,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 
 	//post-processing
 	void savePoreNetwork(const char* folder);
-	void saveVtk(const char* folder) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder); solver->noCache=initT;}
+// 	void saveVtk(const char* folder, bool withBoundaries) {bool initT=solver->noCache; solver->noCache=false; solver->saveVtk(folder,withBoundaries); solver->noCache=initT;}
 		
 	boost::python::list cellporeThroatRadius(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
 	  boost::python::list ids;
@@ -549,7 +549,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getCellIsFictious",&TwoPhaseFlowEngine::cellIsFictious,"Check the connection between pore and boundary. If true, pore throat connects the boundary.")
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
 	.def("setCellIsWRes",&TwoPhaseFlowEngine::setCellIsWRes,"set status whether 'wetting reservoir' state")
-	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk"),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
+	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk",boost::python::arg("withBoundaries")=true),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	.def("savePhaseVtkIncludeBoundingCells",&TwoPhaseFlowEngine::savePhaseVtkIncludeBoundingCells,(boost::python::arg("folder")="./PhaseVtkIncludeBoundingCells"),"Save the saturation of local pores in vtk format. The cells along the boundaries are inclued. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	.def("getCellIsWRes",&TwoPhaseFlowEngine::cellIsWRes,"get status wrt 'wetting reservoir' state")
 	.def("getCellIsNWRes",&TwoPhaseFlowEngine::cellIsNWRes,"get status wrt 'non-wetting reservoir' state")
@@ -593,7 +593,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getSaturation",&TwoPhaseFlowEngine::getSaturation,(boost::python::arg("isSideBoundaryIncluded")),"Get saturation of entire packing. If isSideBoundaryIncluded=false (default), the pores of side boundary are excluded in saturation calculating; if isSideBoundaryIncluded=true (only in isInvadeBoundary=true drainage mode), the pores of side boundary are included in saturation calculating.")
 	.def("invasion",&TwoPhaseFlowEngine::invasion,"Run the drainage invasion.")
 	.def("computeCapillaryForce",&TwoPhaseFlowEngine::computeCapillaryForce,"Compute capillary force. ")
-	.def("saveVtk",&TwoPhaseFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK"),"Save pressure field in vtk format. Specify a folder name for output.")
+// 	.def("saveVtk",&TwoPhaseFlowEngine::saveVtk,(boost::python::arg("folder")="./VTK",boost::python::arg("withBoundaries")=false),"Save pressure field in vtk format. Specify a folder name for output.")
 	.def("getPotentialPendularSpheresPair",&TwoPhaseFlowEngine::getPotentialPendularSpheresPair,"Get the list of sphere ID pairs of potential pendular liquid bridge.")
 	// Clusters
 	.def("getClusters",&TwoPhaseFlowEngine::pyClusters/*,(boost::python::arg("folder")="./VTK")*/,"Get the list of clusters.")

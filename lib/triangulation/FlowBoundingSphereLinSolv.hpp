@@ -60,6 +60,7 @@ public:
 	using FlowType::resetRHS;
 	using FlowType::factorizeOnly;  // used for backgroundAction()
 	using FlowType::getCHOLMODPerfTimings;
+	using FlowType::saveMesh;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;

@@ -420,7 +420,61 @@ double TwoPhaseFlowEngine::computeTriRadian(double a, double b, double c)
   return alpha;
 }
 
-void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
+void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
+{
+	vector<int> allIds;//an ordered list of cell ids (from begin() to end(), for vtk table lookup), some ids will appear multiple times since boundary cells are splitted into multiple tetrahedra 
+	vector<int> fictiousN;
+	bool initNoCache=solver->noCache;
+	solver->noCache=false;
+	basicVTKwritter vtkfile = solver->saveMesh(folder,withBoundaries,allIds,fictiousN);
+	solver->noCache=initNoCache;
+	
+	RTriangulation& Tri = solver->tesselation().Triangulation();
+	
+	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
+	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(solver->tesselation().cellHandles[allIds[kk]]->info().p());
+	vtkfile.end_data();
+		
+	vtkfile.begin_data("fictious",CELL_DATA,SCALARS,INT);
+	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(fictiousN[kk]);
+	vtkfile.end_data();
+
+	vtkfile.begin_data("id",CELL_DATA,SCALARS,INT);
+	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(allIds[kk]);
+	vtkfile.end_data();
+	
+	#define SAVE_CELL_INFO(INFO) vtkfile.begin_data(#INFO,CELL_DATA,SCALARS,FLOAT); for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(solver->tesselation().cellHandles[allIds[kk]]->info().INFO); vtkfile.end_data();
+
+// 		vtkfile.begin_data("Saturation",CELL_DATA,SCALARS,FLOAT);
+// 		for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().saturation);
+// 	vtkfile.end_data();
+// 	
+// 	vtkfile.begin_data("HasInterface",CELL_DATA,SCALARS,FLOAT);
+// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().hasInterface);
+// 	vtkfile.end_data();
+// 	vtkfile.begin_data("Pcondition",CELL_DATA,SCALARS,FLOAT);
+// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().Pcondition);
+// 	vtkfile.end_data();
+// 	vtkfile.begin_data("flux",CELL_DATA,SCALARS,FLOAT);
+// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().flux);
+// 	vtkfile.end_data();
+// 	vtkfile.begin_data("mergedID",CELL_DATA,SCALARS,FLOAT);
+// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().mergedID);
+// 	vtkfile.end_data();
+// 	vtkfile.begin_data("deltaVolume",CELL_DATA,SCALARS,FLOAT);
+// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().deltaVolume);
+// 	vtkfile.end_data();
+	SAVE_CELL_INFO(saturation)
+	SAVE_CELL_INFO(hasInterface)
+	SAVE_CELL_INFO(Pcondition)
+	SAVE_CELL_INFO(flux)
+	SAVE_CELL_INFO(mergedID)
+	SAVE_CELL_INFO(accumulativeDV)
+	SAVE_CELL_INFO(porosity)
+	SAVE_CELL_INFO(label)
+}
+/*
+void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
 {
 // 	RTriangulation& Tri = T[solver->noCache?(!currentTes):currentTes].Triangulation();
 	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
@@ -525,7 +579,7 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder)
 		if (isDrawable){vtkfile.write_data(cell->info().p());}
 	}
 	vtkfile.end_data();
-}
+}*/
 void TwoPhaseFlowEngine::savePhaseVtkIncludeBoundingCells(const char* folder)
 {
 	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
