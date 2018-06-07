@@ -182,7 +182,7 @@ for i,l in enumerate(useLines):
 		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if not script:
 		raise ValueError('When only batch table is given without script to run, it must contain !SCRIPT column with simulation to be run.')
-	logFile=logFormat.replace('$',script).replace('%',str(l)).replace('@',params[l]['description'])
+	logFile=logFormat.replace('$',script.split('/')[-1]).replace('%',str(l)).replace('@',params[l]['description'])
 	
 	if (len(logFile)>230):                              #For very long files, to prevent system errors. 
 		logFile = logFile[0:230]+'_'+str(l)+logFile[-4:]  #l is added to prevent name duplications.
