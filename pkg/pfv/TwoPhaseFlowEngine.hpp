@@ -248,7 +248,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	void computePoreBodyRadius();
 	void computeSolidLine();
 	void savePhaseVtk(const char* folder, bool withBoundaries);
-	void savePhaseVtkIncludeBoundingCells(const char* folder);
 
 	//compute entry pore throat radius (drainage)
 	void computePoreThroatRadiusMethod1();//MS-P method
@@ -550,7 +549,6 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("setCellIsNWRes",&TwoPhaseFlowEngine::setCellIsNWRes,"set status whether 'wetting reservoir' state")
 	.def("setCellIsWRes",&TwoPhaseFlowEngine::setCellIsWRes,"set status whether 'wetting reservoir' state")
 	.def("savePhaseVtk",&TwoPhaseFlowEngine::savePhaseVtk,(boost::python::arg("folder")="./phaseVtk",boost::python::arg("withBoundaries")=true),"Save the saturation of local pores in vtk format. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
-	.def("savePhaseVtkIncludeBoundingCells",&TwoPhaseFlowEngine::savePhaseVtkIncludeBoundingCells,(boost::python::arg("folder")="./PhaseVtkIncludeBoundingCells"),"Save the saturation of local pores in vtk format. The cells along the boundaries are inclued. Sw(NW-pore)=0, Sw(W-pore)=1. Specify a folder name for output.")
 	.def("getCellIsWRes",&TwoPhaseFlowEngine::cellIsWRes,"get status wrt 'wetting reservoir' state")
 	.def("getCellIsNWRes",&TwoPhaseFlowEngine::cellIsNWRes,"get status wrt 'non-wetting reservoir' state")
 	.def("getCellIsTrapW",&TwoPhaseFlowEngine::cellIsTrapW,"get status wrt 'trapped wetting phase' state")

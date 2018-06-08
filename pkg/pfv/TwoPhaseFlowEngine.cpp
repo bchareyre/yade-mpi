@@ -427,8 +427,7 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
 	bool initNoCache=solver->noCache;
 	solver->noCache=false;
 	basicVTKwritter vtkfile = solver->saveMesh(folder,withBoundaries,allIds,fictiousN);
-	solver->noCache=initNoCache;
-	
+	solver->noCache=initNoCache;	
 	RTriangulation& Tri = solver->tesselation().Triangulation();
 	
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
@@ -444,26 +443,6 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
 	vtkfile.end_data();
 	
 	#define SAVE_CELL_INFO(INFO) vtkfile.begin_data(#INFO,CELL_DATA,SCALARS,FLOAT); for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(solver->tesselation().cellHandles[allIds[kk]]->info().INFO); vtkfile.end_data();
-
-// 		vtkfile.begin_data("Saturation",CELL_DATA,SCALARS,FLOAT);
-// 		for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().saturation);
-// 	vtkfile.end_data();
-// 	
-// 	vtkfile.begin_data("HasInterface",CELL_DATA,SCALARS,FLOAT);
-// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().hasInterface);
-// 	vtkfile.end_data();
-// 	vtkfile.begin_data("Pcondition",CELL_DATA,SCALARS,FLOAT);
-// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().Pcondition);
-// 	vtkfile.end_data();
-// 	vtkfile.begin_data("flux",CELL_DATA,SCALARS,FLOAT);
-// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().flux);
-// 	vtkfile.end_data();
-// 	vtkfile.begin_data("mergedID",CELL_DATA,SCALARS,FLOAT);
-// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().mergedID);
-// 	vtkfile.end_data();
-// 	vtkfile.begin_data("deltaVolume",CELL_DATA,SCALARS,FLOAT);
-// 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(tesselation().cellHandles[allIds[kk]]->info().deltaVolume);
-// 	vtkfile.end_data();
 	SAVE_CELL_INFO(saturation)
 	SAVE_CELL_INFO(hasInterface)
 	SAVE_CELL_INFO(Pcondition)
@@ -472,160 +451,6 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
 	SAVE_CELL_INFO(accumulativeDV)
 	SAVE_CELL_INFO(porosity)
 	SAVE_CELL_INFO(label)
-}
-/*
-void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
-{
-// 	RTriangulation& Tri = T[solver->noCache?(!currentTes):currentTes].Triangulation();
-	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-        static unsigned int number = 0;
-        char filename[80];
-	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        sprintf(filename,"%s/out_%d.vtk",folder,number++);
-	int firstReal=-1;
-
-	//count fictious vertices and cells
-	solver->vtkInfiniteVertices=solver->vtkInfiniteCells=0;
- 	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
-        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (!isDrawable) solver->vtkInfiniteCells+=1;
-	}
-	for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-                if (!v->info().isReal()) solver->vtkInfiniteVertices+=1;
-                else if (firstReal==-1) firstReal=solver->vtkInfiniteVertices;}
-
-        basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices()-solver->vtkInfiniteVertices, (unsigned int) Tri.number_of_finite_cells()-solver->vtkInfiniteCells);
-
-        vtkfile.open(filename,"test");
-
-        vtkfile.begin_vertices();
-        double x,y,z;
-        for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-		if (v->info().isReal()){
-		x = (double)(v->point().point()[0]);
-                y = (double)(v->point().point()[1]);
-                z = (double)(v->point().point()[2]);
-                vtkfile.write_point(x,y,z);}
-        }
-        vtkfile.end_vertices();
-
-        vtkfile.begin_cells();
-        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-        	if (isDrawable){vtkfile.write_cell(cell->vertex(0)->info().id()-firstReal, cell->vertex(1)->info().id()-firstReal, cell->vertex(2)->info().id()-firstReal, cell->vertex(3)->info().id()-firstReal);}
-        }
-        vtkfile.end_cells();
-
-	vtkfile.begin_data("Saturation",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().saturation);}
-	}
-	vtkfile.end_data();
-	
-	vtkfile.begin_data("HasInterface",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().hasInterface);}
-	}
-	vtkfile.end_data();
-	
-	vtkfile.begin_data("Pcondition",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().Pcondition);}
-	}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("flux",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().flux);}
-	}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("mergedID",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().mergedID);}
-	}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("deltaVolume",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().accumulativeDV);}
-	}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("Porosity",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().porosity);}
-	}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("Label",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().label);}
-	}
-	vtkfile.end_data();
-	
-	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal()  && cell->vertex(3)->info().isReal();
-		if (isDrawable){vtkfile.write_data(cell->info().p());}
-	}
-	vtkfile.end_data();
-}*/
-void TwoPhaseFlowEngine::savePhaseVtkIncludeBoundingCells(const char* folder)
-{
-	RTriangulation& Tri = solver->T[solver->currentTes].Triangulation();
-        static unsigned int number = 0;
-        char filename[80];
-	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        sprintf(filename,"%s/out_%d.vtk",folder,number++);
-// 	int firstReal=-1;
-
-        basicVTKwritter vtkfile((unsigned int) Tri.number_of_vertices(), (unsigned int) Tri.number_of_finite_cells());
-
-        vtkfile.open(filename,"test");
-
-        vtkfile.begin_vertices();
-        double x,y,z;
-        for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
-		x = (double)(v->point().point()[0]);
-                y = (double)(v->point().point()[1]);
-                z = (double)(v->point().point()[2]);
-                vtkfile.write_point(x,y,z);}
-        vtkfile.end_vertices();
-
-        vtkfile.begin_cells();
-        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		vtkfile.write_cell(cell->vertex(0)->info().id(), cell->vertex(1)->info().id(), cell->vertex(2)->info().id(), cell->vertex(3)->info().id());}
-        vtkfile.end_cells();
-	
-	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-	vtkfile.write_data(cell->info().p());}
-	vtkfile.end_data();
-	
-	vtkfile.begin_data("Saturation",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		vtkfile.write_data(cell->info().saturation);}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("Porosity",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		vtkfile.write_data(cell->info().porosity);}
-	vtkfile.end_data();
-
-	vtkfile.begin_data("Label",CELL_DATA,SCALARS,FLOAT);
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
-		vtkfile.write_data(cell->info().label);}
-	vtkfile.end_data();
 }
 
 void TwoPhaseFlowEngine::computePoreThroatRadiusTrickyMethod1()
