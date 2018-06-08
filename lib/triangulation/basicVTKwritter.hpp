@@ -21,7 +21,7 @@ struct basicVTKwritter
 	
 	
 	basicVTKwritter(unsigned int nV, unsigned int nC) : nbVertices(nV),nbCells(nC),hasPointData(false),hasCellData(false) {}
-	
+	void setNums(unsigned int nV, unsigned int nC) {nbVertices=nV; nbCells=nC;}
 	bool open(const char * filename, const char * comment);
 	bool close();
 	
@@ -34,7 +34,7 @@ struct basicVTKwritter
 	void end_cells();
 
 	void begin_data(const char * dataname, DataPosition pos, DataName name, DataType type);
-    void write_data(float value);
+    	void write_data(float value);
 	void write_data(float x, float y, float z);
 	void write_data(float t11, float t12, float t13,
 					float t21, float t22, float t23,

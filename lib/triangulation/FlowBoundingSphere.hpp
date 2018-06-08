@@ -117,7 +117,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void saveVtk (const char* folder, bool withBoundaries);
 		//write vertices, cells, return ids and no. of fictious neighbors, allIds is an ordered list of cell ids (from begin() to end(), for vtk table lookup),
 		// some ids will appear multiple times if withBoundaries==true since boundary cells are splitted into multiple tetrahedra 
-		basicVTKwritter saveMesh(const char* folder, bool withBoundaries, vector<int>& allIds,  vector<int>& fictiousN);
+		void saveMesh(basicVTKwritter& writer, bool withBoundaries, vector<int>& allIds,  vector<int>& fictiousN, const char* folder);
 #ifdef XVIEW
 		void dessineTriangulation ( Vue3D &Vue, RTriangulation &T );
 		void dessineShortTesselation ( Vue3D &Vue, Tesselation &Tes );

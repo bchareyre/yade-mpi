@@ -233,6 +233,7 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 			//vtk.write_data((float) epsilon.Deviatoric()(1,1)-epsilon.Deviatoric()(0,0));}
 	}
 	vtk.end_data();
+	vtk.close();
 	return true;
 }
 

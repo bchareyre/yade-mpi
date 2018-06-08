@@ -426,8 +426,14 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
 	vector<int> fictiousN;
 	bool initNoCache=solver->noCache;
 	solver->noCache=false;
-	basicVTKwritter vtkfile = solver->saveMesh(folder,withBoundaries,allIds,fictiousN);
-	solver->noCache=initNoCache;	
+	
+	static unsigned int number = 0;
+        char filename[250];
+	mkdir(folder, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"%s/out_%d.vtk",folder,number++);
+	basicVTKwritter vtkfile(0,0);
+	solver->saveMesh(vtkfile,withBoundaries,allIds,fictiousN,filename);
+	solver->noCache=initNoCache;
 	RTriangulation& Tri = solver->tesselation().Triangulation();
 	
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
@@ -3296,28 +3302,26 @@ void TwoPhaseFlowEngine::computeFacetPoreForcesWithCache(bool onlyCache)
                 }
         }
         solver->noCache=false;//cache should always be defined after execution of this function
-    }
-    if (onlyCache) return;
-
-//     else {//use cached values when triangulation doesn't change
+        if (onlyCache) return;
+    } 
+    else {//use cached values when triangulation doesn't change
 // 		#ifndef parallel_forces
-//     for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
-//         for (int yy=0; yy<4; yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
-//     }
-
-//  		#else
-// 		#pragma omp parallel for num_threads(ompThreads)
-// 		for (int vn=0; vn<= solver->T[solver->currentTes].maxId; vn++) {
-// 			VertexHandle& v = solver->T[solver->currentTes].vertexHandles[vn];
-// 			const int& id =  v->info().id();
-// 			CVector tf (0,0,0);
-// 			int k=0;
-// 			for (vector<const Real*>::iterator c = solver->perVertexPressure[id].begin(); c != solver->perVertexPressure[id].end(); c++)
-// 				tf = tf + (*(solver->perVertexUnitForce[id][k++]))*(**c);
-// 			v->info().forces = tf;
-// 		}
-// 		#endif
-//     }
+    	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
+        	for (int yy=0; yy<4; yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();
+   	 }
+/*		#else
+		#pragma omp parallel for num_threads(ompThreads)
+		for (int vn=0; vn<= solver->T[solver->currentTes].maxId; vn++) {
+			VertexHandle& v = solver->T[solver->currentTes].vertexHandles[vn];
+			const int& id =  v->info().id();
+			CVector tf (0,0,0);
+			int k=0;
+			for (vector<const Real*>::iterator c = solver->perVertexPressure[id].begin(); c != solver->perVertexPressure[id].end(); c++)
+				tf = tf + (*(solver->perVertexUnitForce[id][k++]))*(**c);
+			v->info().forces = tf;
+		}
+		#endif*/
+    }
     if (solver->debugOut) {
         CVector totalForce = nullVect;
         for (FiniteVerticesIterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v)	{
