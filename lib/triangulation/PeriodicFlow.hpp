@@ -36,7 +36,7 @@ namespace CGT{
 		using BaseFlowSolver::noCache; using BaseFlowSolver::rAverage; using BaseFlowSolver::distanceCorrection; using BaseFlowSolver::minPermLength; using BaseFlowSolver::checkSphereFacetOverlap; using BaseFlowSolver::viscosity; using BaseFlowSolver::kFactor; using BaseFlowSolver::permeabilityMap; using BaseFlowSolver::maxKdivKmean; using BaseFlowSolver::clampKValues; using BaseFlowSolver::KOptFactor; using BaseFlowSolver::meanKStat; using BaseFlowSolver::fluidBulkModulus; using BaseFlowSolver::relax; using BaseFlowSolver::tolerance; using BaseFlowSolver::minKdivKmean; using BaseFlowSolver::resetRHS;
 		
 		//same for functions
-		using _N::defineFictiousCells; using _N::addBoundingPlanes; using _N::boundary;
+		using _N::defineFictiousCells; using _N::addBoundingPlanes; using _N::boundary; using _N::tesselation; using _N::surfaceSolidThroatInPore;
 		
 		void interpolate(Tesselation& Tes, Tesselation& NewTes);
 		void computeFacetForcesWithCache(bool onlyCache=false);
