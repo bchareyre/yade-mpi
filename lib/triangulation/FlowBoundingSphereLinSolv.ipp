@@ -105,7 +105,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	com.nmethods= 1; // nOrderingMethods; //1;
 	com.method[0].ordering = CHOLMOD_METIS; // orderingMethod; //CHOLMOD_METIS;
 		#if (CHOLMOD_GPU == 1)
-		com.maxGpuMemFraction=0.4; //using (less than) half of the available memory for each solver		
+		if (multithread) com.maxGpuMemFraction=0.4; //using (less than) half of the available memory for each solver		
 		#endif
 	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
 	#endif
@@ -613,6 +613,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	double* B_x =(double *) B->x;
 	for (int k=0; k<ncols; k++) B_x[k]=T_bv[k];
 	if (!factorizedEigenSolver) {
+		openblas_set_num_threads(ompThreads);
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);	
 		L = cholmod_l_analyze(Achol, &com);
 		if (getCHOLMODPerfTimings){		
@@ -630,6 +631,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	}
 	
 	if (!factorizeOnly){
+		openblas_set_num_threads(ompThreads);
 		cholmod_dense* ex = cholmod_l_solve(CHOLMOD_A, L, B, &com);
 		double* e_x =(double *) ex->x;
 		for (int k=0; k<ncols; k++) T_x[k] = e_x[k];	

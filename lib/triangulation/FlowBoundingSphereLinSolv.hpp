@@ -61,6 +61,7 @@ public:
 	using FlowType::factorizeOnly;  // used for backgroundAction()
 	using FlowType::getCHOLMODPerfTimings;
 	using FlowType::saveMesh;
+	using FlowType::ompThreads;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
