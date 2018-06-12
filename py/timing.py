@@ -51,7 +51,8 @@ def _delta_stats(deltas,totalTime,level):
 def _engines_stats(engines,totalTime,level):
 	lines=0; hereLines=0
 	for e in engines:
-		if not isinstance(e,Functor): print _formatLine(u'"'+e.label+'"' if e.label else e.__class__.__name__,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
+		if not isinstance(e,Functor):
+			print _formatLine(u'"'+e.label+'"' if e.label else e.__class__.__name__,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
 		if e.timingDeltas: 
 			if isinstance(e,Functor):
 				print _formatLine(e.__class__.__name__,sum(d[1] for d in e.timingDeltas.data),sum(d[2] for d in e.timingDeltas.data),totalTime,level); lines+=1; hereLines+=1
@@ -63,7 +64,14 @@ def _engines_stats(engines,totalTime,level):
 			lines+=_engines_stats(e.geomDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.physDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.lawDispatcher.functors,e.execTime,level+1)
-		elif isinstance(e,ParallelEngine): lines+=_engines_stats(e.slave,e.execTime,level+1)
+		elif isinstance(e,ParallelEngine):
+			for slave in e.slaves:
+				print "\\"
+				if not isinstance(slave,list): lines+=_engines_stats([slave],slave.execTime,level+1)
+				else:
+					for se in slave:
+						lines+=_engines_stats([se],se.execTime,level+1)
+				
 	if hereLines>1 and not isinstance(e,Functor):
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1
 	return lines
