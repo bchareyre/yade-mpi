@@ -67,11 +67,18 @@ def _engines_stats(engines,totalTime,level):
 		elif isinstance(e,ParallelEngine):
 			for slave in e.slaves:
 				print "\\"
-				if not isinstance(slave,list): lines+=_engines_stats([slave],slave.execTime,level+1)
-				else:
-					for se in slave:
-						lines+=_engines_stats([se],se.execTime,level+1)
+#<<<<<<< Updated upstream
+				#if not isinstance(slave,list): lines+=_engines_stats([slave],slave.execTime,level+1)
+				#else:
+					#for se in slave:
+						#lines+=_engines_stats([se],se.execTime,level+1)
 				
+#=======
+				if not isinstance(slave,list): lines+=_engines_stats([slave],e.execTime,level+1)
+				else:
+					for el in slave: _engines_stats([el],e.execTime,level+1)
+			print "/"
+#>>>>>>> Stashed changes
 	if hereLines>1 and not isinstance(e,Functor):
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1
 	return lines
