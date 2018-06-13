@@ -87,7 +87,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         ///compute flow and and forces here
 	if (pressureForce){
 		solver->gaussSeidel(scene->dt);
-		timingDeltas->checkpoint ( "Gauss-Seidel (includes matrix construct and factorization in single-thread mode)" );
+		timingDeltas->checkpoint ( "Factorize + Solve" );
 		solver->computeFacetForcesWithCache();}
         timingDeltas->checkpoint ( "compute_Forces" );
         ///Application of vicscous forces
