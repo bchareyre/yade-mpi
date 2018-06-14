@@ -12,7 +12,6 @@ void ParallelEngine::action(){
 	// openMP warns if the iteration variable is unsigned...
 	const int size=(int)slaves.size();
 	const bool TimingInfo_enabled=TimingInfo::enabled; 
-	TimingInfo::delta last=TimingInfo::getNow(); 
 	#ifdef YADE_OPENMP
 		//nested parallel regions are disabled by default on some platforms, we enable them since some of the subengine may be also parallel
 		omp_set_nested(1);
@@ -20,6 +19,7 @@ void ParallelEngine::action(){
 
 	#endif
 	for(int i=0; i<size; i++){
+		TimingInfo::delta last=TimingInfo::getNow(); 
 		// run every slave group sequentially
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {
 			e->scene=scene;

@@ -592,6 +592,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::eigenSolve(Real dt)
 	}
 	// backgroundAction only wants to factorize, no need to solve and copy to cells.
 	if (!factorizeOnly){
+// 		cerr<<"setting openblas_set_num_threads="<<numSolveThreads<<endl;
 		openblas_set_num_threads(numSolveThreads);
 		ex = eSolver.solve(eb);
 		for (int k=0; k<ncols; k++) T_x[k]=ex[k];
@@ -613,7 +614,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	double* B_x =(double *) B->x;
 	for (int k=0; k<ncols; k++) B_x[k]=T_bv[k];
 	if (!factorizedEigenSolver) {
-		openblas_set_num_threads(ompThreads);
+		openblas_set_num_threads(numFactorizeThreads);
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);	
 		L = cholmod_l_analyze(Achol, &com);
 		if (getCHOLMODPerfTimings){		
@@ -631,7 +632,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	}
 	
 	if (!factorizeOnly){
-		openblas_set_num_threads(ompThreads);
+		openblas_set_num_threads(numSolveThreads);
 		cholmod_dense* ex = cholmod_l_solve(CHOLMOD_A, L, B, &com);
 		double* e_x =(double *) ex->x;
 		for (int k=0; k<ncols; k++) T_x[k] = e_x[k];	
