@@ -391,6 +391,7 @@ Eigen provides full rich linear algebra functionality. Some code firther uses th
 In Python, basic numeric types are wrapped and imported from the ``minieigen`` module; the types drop the ``r`` type qualifier at the end, the syntax is otherwise similar. ``Se3r`` is not wrapped at all, only converted automatically, rarely as it is needed, from/to a ``(Vector3,Quaternion)`` tuple/list.
 
 .. ipython::
+	:okexcept:
 
 	@suppress
 	Yade [0]: from math import pi
@@ -423,6 +424,7 @@ Since serialization and dispatchers need extended type and inheritance informati
 Some RTTI information can be accessed from python:
 
 .. ipython::
+	:okexcept:
 	
 	@suppress
 	Yade [1]: import yade.system
@@ -554,6 +556,7 @@ and this is the implementation:
 We can create a mini-simulation (with only one GravityEngine):
 
 .. ipython::
+	:okexcept:
 
 	Yade [1]: O.engines=[GravityEngine(gravity=Vector3(0,0,-9.81))]
 
@@ -1453,6 +1456,7 @@ This scenario leads to special design, which allows fast parallel write access:
 Synchronization is handled automatically if values are read from python:
 
 .. ipython::
+	:okexcept:
 
 	Yade [0]: O.bodies.append(Body())
 
@@ -1627,6 +1631,7 @@ Each class deriving from :yref:`Serializable` is automatically exposed to python
 Wrapped classes define special constructor taking keyword arguments corresponding to class attributes; therefore, it is the same to write:
 
 .. ipython::
+	:okexcept:
 
 	Yade [1]: f1=ForceEngine()
 
@@ -1637,6 +1642,7 @@ Wrapped classes define special constructor taking keyword arguments correspondin
 and 
 
 .. ipython::
+	:okexcept:
 
 	Yade [1]: f2=ForceEngine(ids=[0,4,5],force=Vector3(0,-1,-2))
 

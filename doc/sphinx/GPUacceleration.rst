@@ -48,7 +48,7 @@ The following instructions to install CUDA are a boiled down version of `these i
 	export PATH=/usr/local/cuda/bin\${PATH:+:\${PATH}}
 	export LD_LIBRARY_PATH=/usr/local/cuda/lib64\ \${LD_LIBRARY_PATH:+:\${LD_LIBRARY_PATH}}
 
-**Note: use `this tool <https://developer.nvidia.com/cuda-downloads>`__ to determine your ``<distro>_<version>_<architecture>`` values.
+**Note**: use `this tool <https://developer.nvidia.com/cuda-downloads>`__ to determine your ``<distro>_<version>_<architecture>`` values.
 
 Restart your computer.
 
@@ -68,7 +68,7 @@ Execute the following command:
 
 ::
 
-sudo apt-get install libopenblas-dev liblapack-dev 
+	sudo apt-get install libopenblas-dev liblapack-dev 
 
 
 Install SuiteSparse

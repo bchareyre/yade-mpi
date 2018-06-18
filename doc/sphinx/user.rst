@@ -862,6 +862,7 @@ Python variable lifetime is limited; in particular, if you save simulation, vari
 :yref:`saveVars<yade.utils.saveVars>` takes dictionary (variable names and their values) and a *mark* (identification string for the variable set); it saves the dictionary inside the simulation. These variables can be re-created (after the simulation was loaded from a XML file, for instance) in the ``yade.params.``\ *mark* namespace by calling :yref:`loadVars<yade.utils.loadVars>` with the same identification *mark*:
 
 .. ipython::
+	:okwarning:
 
 	Yade [3]: a=45; b=pi/3
 

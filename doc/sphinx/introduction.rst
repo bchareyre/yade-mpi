@@ -109,6 +109,7 @@ Creating simulation
 To create simulation, one can either use a specialized class of type :yref:`FileGenerator` to create full scene, possibly receiving some parameters. Generators are written in c++ and their role is limited to well-defined scenarios. For instance, to create triaxial test scene:
 
 .. ipython::
+	:okexcept:
 
 	In [1]: TriaxialTest(numberOfGrains=200).load()
 
@@ -312,6 +313,7 @@ In each case, return value is :yref:`Body.id` of the body inserted.
 Since till now the simulation was empty, its id is 0 for the first sphere and 1 for the second one. Saving the id value is not necessary, unless you want access this particular body later; it is remembered internally in :yref:`Body` itself. You can address bodies by their id:
 
 .. ipython::
+	:okexcept:
 
 	In [1]: O.bodies[1].state.pos
 	<Body instance at 0x92e8f60>
@@ -322,6 +324,7 @@ Since till now the simulation was empty, its id is 0 for the first sphere and 1 
 Adding the same body twice is, for reasons of the id uniqueness, not allowed:
 
 .. ipython::
+	:okexcept:
 	
 	In [1]: O.bodies.append(s)
 
@@ -359,6 +362,7 @@ Suppose now interactions have been already created. We can access them by the id
 
 
 .. ipython::
+	:okexcept:
 
 	In [1]: O.interactions[0,1]
 	<Interaction instance at 0x93f9528>
@@ -386,6 +390,7 @@ Generalized forces
 Generalized forces include force, torque and forced displacement and rotation; they are stored only temporarliy, during one computation step, and reset to zero afterwards. For reasons of parallel computation, they work as accumulators, i.e. only can be added to, read and reset.
 
 .. ipython::
+	:okexcept:
 
 	Yade [1]: O.forces.f(0)
 

@@ -33,9 +33,9 @@ Start by signing into the console on `Amazon
 EC2 <https://aws.amazon.com/?nc2=h_lgl>`__. This will require an
 existing or new Amazon account. Once you’ve signed in, you should find
 the EC2 console by clicking on ‘services’ in the upper left hand corner
-of the AWS homepage. Start by clicking on the \`\`launch an instance“
+of the AWS homepage. Start by clicking on the ``launch an instance``
 blue button (Fig. `fig-console`_). Select the Amazon
-Machine Image (AMI): \`\`Ubuntu Server 16.04 LTS\`\` (Fig.
+Machine Image (AMI): ``Ubuntu Server 16.04 LTS`` (Fig.
 `fig-ubuntu`_).
 
 .. _fig-ubuntu:
@@ -53,7 +53,7 @@ document will not go into detail in the selection of size, but you can
 find plenty of `YADE specific performance
 reports <https://yade-dem.org/publi/1stWorkshop/booklet.pdf>`__ that
 will help you decide. However, the instance type is an important
-selection. The \`\`Compute Optimized" instances are necessary for most
+selection. The ``Compute Optimized`` instances are necessary for most
 YADE simulations because they provide access to high performing
 processors and guaranteed computing power. The C3.2xlarge (Fig.
 `fig-type`_) is equivalent to an 8 core 2.8ghz Xeon E5
@@ -65,11 +65,11 @@ scale YADE simulations.
 	:scale: 60 %
 	:align: center
 
-	 Compute optimized (C3) instance tier
+	Compute optimized (C3) instance tier
 
 
-Before launching, you will be asked to \`\`select an existing key pair
-or create a new key pair". Create a new one, download it, and place it
+Before launching, you will be asked to ``select an existing key pair
+or create a new key pair``. Create a new one, download it, and place it
 in a folder that you know the path to. Modify the permissions on the
 file by navigating to the same directory in the terminal and typing:
 
@@ -86,7 +86,7 @@ unix systems this is as easy as typing:
 
 into the terminal. There are other options such as using PuTTY, or even
 a java based terminal on the AWS website. You can find the necessary
-information by navigating to \`\`Instances" in the left menu of the AWS
+information by navigating to ``Instances`` in the left menu of the AWS
 console. Right click on the instance as shown in Fig.
 `fig-connect`_ and click connect.
 
@@ -132,12 +132,12 @@ yadedaily, python, and some other useful tools:
 	# install htop
 	sudo apt-get -y install htop
 
-| Note that \`\`..packages/ xenial/" should match the Ubuntu
+Note that ``..packages/ xenial/`` should match the Ubuntu
 distribution. 16.04 LTS is Xenial, but if you chose to start Ubuntu
 14.04, you will need to change ‘xenial’ to ‘trusty’.
 
 Finally, you will need to upload the necessary YADE files. If you have a
-folder with the contents of your simulation titled \`\`yadeSimulation"
+folder with the contents of your simulation titled ``yadeSimulation``
 you can upload the folder and its contents by issuing the following
 command:
 

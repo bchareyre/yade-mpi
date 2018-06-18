@@ -176,6 +176,7 @@ Lists
 Lists are variable-length sequences, which can be modified; they are written with braces ``[...]``, and their elements are accessed with numerical indices:
 
 .. ipython::
+	:okexcept:
 
 	Yade [3]: a=[1,2,3]          # list of numbers
 
@@ -217,6 +218,7 @@ Tuples
 Tuples are constant sequences:
 	
 .. ipython::
+	:okexcept:
 
 	Yade [1]: b=(1,2,3)
 
@@ -374,6 +376,7 @@ Look inside
 The simulation can be inspected in several ways. All data can be accessed from python directly:
 
 .. ipython::
+	:okexcept:
 
 	Yade [1]: len(O.bodies)
 

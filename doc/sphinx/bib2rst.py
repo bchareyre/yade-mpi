@@ -43,7 +43,7 @@ def formatRest(db):
 			if i.has_key('author'): line+='%s '%author
 			if i.has_key('year'): line+='(%s), '%i['year']
 			line+='**%s**. *%s*'%(i['title'],i['journal'])
-			if i.has_key('issue'): line+=i['issue']
+			if i.has_key('issue'): line+=' %s'%i['issue']
 			if i.has_key('volume'): line+=' (%s)'%i['volume']
 			if i.has_key('pages'): line+=', pages %s'%i['pages']
 			line+='.'
