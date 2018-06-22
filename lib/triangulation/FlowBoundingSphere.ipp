@@ -1165,6 +1165,16 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 template <class Tesselation> 
 void FlowBoundingSphere<Tesselation>::saveMesh(basicVTKwritter& vtkfile, bool withBoundaries,vector<int>& allIds, vector<int>& fictiousN, const char* filename)
 {
+	
+	/*
+	Most of this code is actually to handle the special cases along the bounding walls/spheres, where irregular polyhedra needs to be decomposed in many tetrahedra for vtk display.
+	- fictious=1: take a triangular (pseudo-)prism formed by 3 spheres and 3 projections and split it in 3 tetrahedra
+	- fictious=2: take a rectangular (pseudo-)prism formed by 2 spheres and 6 projections and split it in 6 tetrahedra
+	- fictious=3: take a rectangular (pseudo-)prism formed by 1 sphere and 7 projections and split it in 6 tetrahedra
+	"extraVertices" and "extraPoly" contains the additional points and polyhedra.  
+	
+	*/
+
 	if (noCache && T[!currentTes].Max_id()<=0) {cout<<"Triangulation does not exist. Sorry."<<endl; return;}
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         int firstReal=-1;
@@ -1326,7 +1336,6 @@ void FlowBoundingSphere<Tesselation>::saveMesh(basicVTKwritter& vtkfile, bool wi
 	for (auto pt = extraVertices.begin(); pt != extraVertices.end(); pt++) {
 			vtkfile.write_point((double)(*pt)[0],(double)(*pt)[1],(double)(*pt)[2]);
 			vertexIdMap[extra--] = numAllVertices++;
-			cerr <<"writing extra="<<extra<<" point:"<< (double)(*pt)[0]<<" "<<(double)(*pt)[1]<<" "<<(double)(*pt)[2]<<endl;
 	}
 	vtkfile.end_vertices();
 	
