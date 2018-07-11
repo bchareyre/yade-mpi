@@ -149,6 +149,7 @@ class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys : public IPhysFunctor
 		((bool,setCohesionOnNewContacts,false,,"If true, assign cohesion at all new contacts. If false, only existing contacts can be cohesive (also see :yref:`Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::setCohesionNow`), and new contacts are only frictional."))	
 		((shared_ptr<MatchMaker>,normalCohesion,,,"Instance of :yref:`MatchMaker` determining tensile strength"))
 		((shared_ptr<MatchMaker>,shearCohesion,,,"Instance of :yref:`MatchMaker` determining cohesive part of the shear strength (a frictional term might be added depending on :yref:`CohFrictPhys::cohesionDisablesFriction`)"))
+                ((shared_ptr<MatchMaker>,frictAngle,,,"Instance of :yref:`MatchMaker` determining how to compute interaction's friction angle. If ``None``, minimum value is used.")) // added from Frictphys.hpp
 		,
 		cohesionDefinitionIteration = -1;
 		);

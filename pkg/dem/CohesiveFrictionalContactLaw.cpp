@@ -260,8 +260,9 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 			Real Vb 	= sdec2->poisson;
 			Real Da 	= geom->radius1;
 			Real Db 	= geom->radius2;
-			Real fa 	= sdec1->frictionAngle;
-			Real fb 	= sdec2->frictionAngle;
+			// Real fa 	= sdec1->frictionAngle;
+			// Real fb 	= sdec2->frictionAngle;
+			Real frictionAngle = (!frictAngle) ? std::min(sdec1->frictionAngle,sdec2->frictionAngle) : (*frictAngle)(sdec1->id,sdec2->id,sdec1->frictionAngle,sdec2->frictionAngle); // modified in accordance to FrictPhys.cpp
 			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 
 			// harmonic average of alphas parameters
@@ -277,7 +278,8 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 
 			contactPhysics->kr = Da*Db*Ks*AlphaKr;
 			contactPhysics->ktw = Da*Db*Ks*AlphaKtw;
-			contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(fa,fb));
+			// contactPhysics->tangensOfFrictionAngle = std::tan(std::min(fa,fb));
+			contactPhysics->tangensOfFrictionAngle = std::tan(frictionAngle); //  modified in accordance to FrictPhys.cpp
 
 			if ((setCohesionOnNewContacts || setCohesionNow) && sdec1->isCohesive && sdec2->isCohesive)
 			{
