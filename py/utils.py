@@ -212,7 +212,7 @@ def box(center,extents,orientation=Quaternion(1,0,0,0),dynamic=None,fixed=False,
 	"""Create box (cuboid) with given parameters.
 
 	:param Vector3 extents: half-sizes along x,y,z axes. Use can be made of *orientation* parameter in case those box-related axes do not conform the simulation axes
-	:param Quaternion orientation: assigned to :yref:`Body.state.orientation`, which corresponds to rotating the *extents* axes
+	:param Quaternion orientation: assigned to the :yref:`body's orientation<State.ori>`, which corresponds to rotating the *extents* axes
 
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
