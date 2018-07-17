@@ -74,6 +74,11 @@ class pyBodyContainer{
 	const shared_ptr<BodyContainer> proxee;
 	pyBodyIterator pyIter(){return pyBodyIterator(proxee);}
 	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
+	// raw access to the underlying 
+	const shared_ptr<BodyContainer> raw_bodies_get(void) {return proxee;}
+	void raw_bodies_set(const shared_ptr<BodyContainer>& source) {proxee->body = source->body;}
+	
+	
 	shared_ptr<Body> pyGetitem(Body::id_t _id){
 		int id=(_id>=0 ? _id : proxee->size()+_id);
 		if(id<0 || (size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); py::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
@@ -900,7 +905,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("getRoundness",&pyBodyContainer::getRoundness,(py::arg("excludeList")=py::list()),"Returns roundness coefficient RC = R2/R1. R1 is the equivalent sphere radius of a clump. R2 is the minimum radius of a sphere, that imbeds the clump. If just spheres are present RC = 1. If clumps are present 0 < RC < 1. Bodies can be excluded from the calculation by giving a list of ids: *O.bodies.getRoundness([ids])*.\n\nSee :ysrc:`examples/clumps/replaceByClumps-example.py` for an example script.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,(py::arg("eraseClumpMembers")=0),"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step. If a clump is erased use *O.bodies.erase(clumpId,True)* to erase the clump AND its members.")
-		.def("replace",&pyBodyContainer::replace);
+		.def("replace",&pyBodyContainer::replace)
+		.add_property("rawBodies",&pyBodyContainer::raw_bodies_get,&pyBodyContainer::raw_bodies_set,"Bodies in the current simulation in the form of pickle-friendly raw container. In typical situations it is better to access bodies as 'O.bodies', which offers better python support. This one may be used for debugging or advanced manipulations.");
 	py::class_<pyBodyIterator>("BodyIterator",py::init<pyBodyIterator&>())
 		.def("__iter__",&pyBodyIterator::pyIter)
 		.def("next",&pyBodyIterator::pyNext);
