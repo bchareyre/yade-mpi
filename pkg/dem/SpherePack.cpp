@@ -311,26 +311,6 @@ py::tuple SpherePack::psd(int bins, bool mass) const {
 	return py::make_tuple(edges,cumm);
 }
 
-
-long SpherePack::particleSD2(const vector<Real>& radii, const vector<Real>& passing, int numSph, bool periodic, Real cloudPorosity, int seed){
-	//deprecated (https://bugs.launchpad.net/yade/+bug/1024443)
-	LOG_ERROR("particleSD2() has been removed. Please use makeCloud() instead.");
-	return 1;
-};
-
-// Discrete particle size distribution
-long SpherePack::particleSD(Vector3r mn, Vector3r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
-	//deprecated (https://bugs.launchpad.net/yade/+bug/1024443)
-	LOG_ERROR("particleSD() has been removed. Please use makeCloud() instead.");
-	return 1;
-}
-
-long SpherePack::particleSD_2d(Vector2r mn, Vector2r mx, Real rMean, bool periodic, string name, int numSph, const vector<Real>& radii, const vector<Real>& passing, bool passingIsNotPercentageButCount, int seed){
-	//deprecated (https://bugs.launchpad.net/yade/+bug/1024443)
-	LOG_ERROR("particleSD_2d() has been removed. Please use makeCloud() instead.");
-	return 1;
-}
-
 long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack> >& _clumps, bool periodic, int num, int seed){
 	// recenter given clumps and compute their margins
 	vector<SpherePack> clumps; /* vector<Vector3r> margins; */ Vector3r boxMargins(Vector3r::Zero()); Real maxR=0;
