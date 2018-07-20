@@ -126,6 +126,10 @@ void NewtonIntegrator::action()
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 			// clump members are handled inside clumps
 			if(b->isClumpMember()) continue;
+#define YADE_MPI
+#ifdef YADE_MPI
+			if(scene->subdomain!=b->subdomain) continue;
+#endif
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
 			Vector3r f=Vector3r::Zero(); 
 			Vector3r m=Vector3r::Zero();
