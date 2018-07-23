@@ -83,9 +83,8 @@ class Body: public Serializable{
 		((int,flags,FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
 #define YADE_MPI
 #ifdef YADE_MPI
-		((int,subDomain,0,,"the subdomain this body belongs to."))
+		((int,subdomain,0,,"the subdomain this body belongs to."))
 #endif
-		((mask_t,groupMask,1,,"Bitmask for determining interactions."))
 		((shared_ptr<Material>,material,,,":yref:`Material` instance associated with this body."))
 		((shared_ptr<State>,state,new State,,"Physical :yref:`state<State>`."))
 		((shared_ptr<Shape>,shape,,,"Geometrical :yref:`Shape`."))

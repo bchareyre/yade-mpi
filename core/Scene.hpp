@@ -89,7 +89,7 @@ class Scene: public Serializable{
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 #define YADE_MPI
 #ifdef YADE_MPI
-		((int,subDomain,0,,"the subdomain this scene is assigned in MPI/domain decomposition."))
+		((int,subdomain,0,,"the subdomain this scene is assigned in MPI/domain decomposition."))
 #endif
 		((list<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
 		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))
