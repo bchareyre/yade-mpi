@@ -452,7 +452,7 @@ Updating particle orientation $\curr{q}$ proceeds in an analogous way to positio
 
 .. math:: \curraaccel_i&=\vec{T}_i/\vec{I}_{11},
 
-We use the same approximation scheme, obtaining an equation analogous to :eq:`eq-leapfrog-nnextvel`
+We use the same approximation scheme, obtaining an equation analogous to :eq:`eq-leapfrog-nextvel`
 
 .. math:: \nnextangvel&=\pprevangvel+\Dt\curraaccel.
 
