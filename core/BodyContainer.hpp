@@ -75,7 +75,7 @@ class BodyContainer: public Serializable{
 		bool erase(Body::id_t id, bool eraseClumpMembers);
 		
 		YADE_CLASS_BASE_DOC_ATTRS(BodyContainer,Serializable,"Standard body container for a scene",
-		((ContainerT,body,,,"Unique label of this cluster, should be reflected in pores of this cluster."))
+		((ContainerT,body,,,"The underlying vector<shared_ptr<Body> >"))
 		)
 // 		REGISTER_CLASS_AND_BASE(BodyContainer,Serializable);
 // 		REGISTER_ATTRIBUTES(Serializable,(body));
