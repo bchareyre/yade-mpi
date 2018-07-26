@@ -33,7 +33,7 @@ void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 		if(!b->isBounded() || !shape) return;
 		if(b->bound) {
 			Real& sweepLength = b->bound->sweepLength;
-			if (targetInterv>=0) {
+			if (targetInterv>=0 and scene->iter>0) {//at iteration zero checking displacement makes no sense
 				Vector3r disp = b->state->pos-b->bound->refPos;
 				Real dist = max(std::abs(disp[0]),max(std::abs(disp[1]),std::abs(disp[2])));
 				if (dist){
