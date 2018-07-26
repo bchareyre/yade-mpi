@@ -1,5 +1,6 @@
-This directory contains some scripits, which are
+This directory contains some scripts, which are
 using SPH method. This is highly experimental for
-the moment.
+the moment and may require a YADE_SPH enabled
+YADE version.
 
 <2014-04-09 Wed>
