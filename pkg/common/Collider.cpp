@@ -9,10 +9,19 @@
 
 YADE_PLUGIN((Collider));
 
+#define YADE_MPI
+
 int Collider::avoidSelfInteractionMask = 0 ;
 
-bool Collider::mayCollide(const Body* b1, const Body* b2){
+bool Collider::mayCollide(const Body* b1, const Body* b2
+		#ifdef YADE_MPI
+		,Body::id_t subdomain
+		#endif 
+		) {
 	return 
+		#ifdef YADE_MPI //skip interactions outside subdomain, and between the subdomain and its own bodies
+		((subdomain==b1->subdomain or subdomain==b2->subdomain) and not (b1->subdomain==b2->subdomain and (b1->getSubdomain() or b2->getSubdomain()))) &&
+		#endif 
 		// might be called with deleted bodies, i.e. NULL pointers
 		(b1!=NULL && b2!=NULL) &&
 		// only collide if at least one particle is standalone or they belong to different clumps

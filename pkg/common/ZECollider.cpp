@@ -24,7 +24,7 @@ void ZECollider::handleOverlap(const CGBox& a, const CGBox& b){
 	//existing interaction?
 	if (interactions->found(id1,id2)) return;
 	//if it doesn't exist and bounds overlap, create a virtual interaction
-	else if (Collider::mayCollide(Body::byId(id1,sscene).get(),Body::byId(id2,sscene).get()))
+	else if (Collider::mayCollide(Body::byId(id1,sscene).get(),Body::byId(id2,sscene).get(),scene->subdomain))
 		interactions->insert(shared_ptr<Interaction>(new Interaction(id1,id2)));
 }
 

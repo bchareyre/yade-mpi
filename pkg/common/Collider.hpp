@@ -14,6 +14,8 @@
 
 #include<pkg/common/Dispatching.hpp>
 
+#define YADE_MPI
+
 class Collider: public GlobalEngine {
 	public:
 		static int avoidSelfInteractionMask;
@@ -23,7 +25,11 @@ class Collider: public GlobalEngine {
 		 *
 		 * Concrete collider implementations should call this function if
 		 * the bodies are in potential interaction geometrically. */
-		static bool mayCollide(const Body*, const Body*);
+		static bool mayCollide(const Body*, const Body*
+		#ifdef YADE_MPI
+		,Body::id_t subdomain
+		#endif 
+		);
 		/*! Invalidate all persistent data (if the collider has any), forcing reinitialization at next run.
 		The default implementation does nothing, colliders should override it if it is applicable.
 
