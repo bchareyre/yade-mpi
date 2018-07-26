@@ -680,9 +680,13 @@ class pyOmega{
 	void resetTime(){ OMEGA.getScene()->iter=0; OMEGA.getScene()->time=0; OMEGA.timeInit(); }
 	void switchScene(){ std::swap(OMEGA.scenes[OMEGA.currentSceneNb],OMEGA.sceneAnother); }
 	void resetAllScenes(){Py_BEGIN_ALLOW_THREADS; OMEGA.stop(); Py_END_ALLOW_THREADS; OMEGA.resetAllScenes(); OMEGA.createSimulationLoop();}
-	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
-	int addScene(){return OMEGA.addScene();}
 	void switchToScene(int i){OMEGA.switchToScene(i);}
+	int addScene(){return OMEGA.addScene();}
+	
+	// Scene manipulation in multithread situations as python object or as a string (e.g. FEMxDEM, MPI, ...)
+	shared_ptr<Scene> scene_get(){ return OMEGA.getScene(); }
+	void scene_set(const shared_ptr<Scene>& source){ Py_BEGIN_ALLOW_THREADS; reset(); Py_END_ALLOW_THREADS; assertScene(); OMEGA.setScene(source); }
+	
 	string sceneToString(){
 		ostringstream oss;
 		yade::ObjectIO::save<decltype(OMEGA.getScene()),boost::archive::binary_oarchive>(oss,"scene",OMEGA.getScene());
@@ -859,7 +863,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n\nFor example:\n\n\t *O.engines=[InsertionSortCollider(label='collider')]*\n\n\t *collider.nBins=5 # collider has become a variable after assignment to O.engines automatically*")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
-		.def("_sceneObj",&pyOmega::scene_get,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
+// 		.def("_sceneObj",&pyOmega::scene_get,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
+		.add_property("_sceneObj",&pyOmega::scene_get,&pyOmega::scene_set,"Return the :yref:`scene <Scene>` object. Debugging only, all (or most) :yref:`Scene` functionality is proxies through :yref:`Omega`.")
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (corresponds to Scene::engines in C++ source code).")
 		.add_property("_currEngines",&pyOmega::currEngines_get,"Currently running engines; debugging only!")
 		.add_property("_nextEngines",&pyOmega::nextEngines_get,"Engines for the next step, if different from the current ones, otherwise empty; debugging only!")
