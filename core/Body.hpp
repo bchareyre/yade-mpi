@@ -30,7 +30,7 @@ class Body: public Serializable{
 		// groupMask type
 
 		// bits for Body::flags
-		enum { FLAG_BOUNDED=1, FLAG_ASPHERICAL=2 }; /* add powers of 2 as needed */
+		enum { FLAG_BOUNDED=1, FLAG_ASPHERICAL=2, FLAG_SUBDOMAIN=4 }; /* add powers of 2 as needed */
 		//! symbolic constant for body that doesn't exist.
 		static const Body::id_t ID_NONE;
 		//! get Body pointer given its id. 
@@ -52,6 +52,8 @@ class Body: public Serializable{
 		void setDynamic(bool d){ assert(state); if(d){ state->blockedDOFs=State::DOF_NONE; } else { state->blockedDOFs=State::DOF_ALL; state->vel=state->angVel=Vector3r::Zero(); } }
 		bool isBounded() const {return flags & FLAG_BOUNDED; }
 		void setBounded(bool d){ if(d) flags|=FLAG_BOUNDED; else flags&=~(FLAG_BOUNDED); }
+		bool getSubdomain() const {return flags & FLAG_SUBDOMAIN; }
+		void setSubdomain(bool d){ if(d) flags|=FLAG_SUBDOMAIN; else flags&=~(FLAG_SUBDOMAIN); }
 		bool isAspherical() const {return flags & FLAG_ASPHERICAL; }
 		void setAspherical(bool d){ if(d) flags|=FLAG_ASPHERICAL; else flags&=~(FLAG_ASPHERICAL); }
 		
@@ -102,7 +104,7 @@ class Body: public Serializable{
 		.add_property("dynamic",&Body::isDynamic,&Body::setDynamic,"Whether this body will be moved by forces. (In c++, use ``Body::isDynamic``/``Body::setDynamic``) :ydefault:`true`")
 		.add_property("bounded",&Body::isBounded,&Body::setBounded,"Whether this body should have :yref:`Body.bound` created. Note that bodies without a :yref:`bound <Body.bound>` do not participate in collision detection. (In c++, use ``Body::isBounded``/``Body::setBounded``) :ydefault:`true`")
 		.add_property("aspherical",&Body::isAspherical,&Body::setAspherical,"Whether this body has different inertia along principal axes; :yref:`NewtonIntegrator` makes use of this flag to call rotation integration routine for aspherical bodies, which is more expensive. :ydefault:`false`")
-		.add_property("mask",boost::python::make_getter(&Body::groupMask,boost::python::return_value_policy<boost::python::return_by_value>()),boost::python::make_setter(&Body::groupMask,boost::python::return_value_policy<boost::python::return_by_value>()),"Shorthand for :yref:`Body::groupMask`")
+		.add_property("isSubdomain",&Body::getSubdomain,&Body::setSubdomain,"Whether this body is a subdomain should have :yref:`Body.bound` created. Subdomains` do not participate to collision detection with their own bodies, they may interact with external bodies and other subdomains through virtual interactions. (In c++, use ``Body::getSubdomain``/``Body::setSubdomain``) :ydefault:`false`")		.add_property("mask",boost::python::make_getter(&Body::groupMask,boost::python::return_value_policy<boost::python::return_by_value>()),boost::python::make_setter(&Body::groupMask,boost::python::return_value_policy<boost::python::return_by_value>()),"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")
 		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise.")
