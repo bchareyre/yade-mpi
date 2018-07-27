@@ -53,7 +53,7 @@ class State: public Serializable, public Indexable{
 		((Vector3r,refPos,Vector3r::Zero(),,"Reference position"))
 		((Quaternionr,refOri,Quaternionr::Identity(),,"Reference orientation"))
 		((unsigned,blockedDOFs,,,"[Will be overridden]"))
-		((bool,isDamped,true,,"Damping in :yref:`Newtonintegrator` can be deactivated for individual particles by setting this variable to FALSE. E.g. damping is inappropriate for particles in free flight under gravity but it might still be applicable to other particles in the same simulation."))
+		((bool,isDamped,true,,"Damping in :yref:`NewtonIntegrator` can be deactivated for individual particles by setting this variable to FALSE. E.g. damping is inappropriate for particles in free flight under gravity but it might still be applicable to other particles in the same simulation."))
 		((Real,densityScaling,-1,,"|yupdate| see :yref:`GlobalStiffnessTimeStepper::targetDt`."))
 #ifdef YADE_SPH
 		((Real,rho, -1.0,, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
