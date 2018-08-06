@@ -89,7 +89,7 @@ void VTKRecorder::action(){
 		else if(rec=="liquidcontrol") recActive[REC_LIQ]=true;
 		else if(rec=="bstresses") recActive[REC_BSTRESS]=true;
 		else if(rec=="coordNumber") recActive[REC_COORDNUMBER]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, moments pericell, liquidcontrol, bstresses). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, moments, pericell, liquidcontrol, bstresses). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -568,46 +568,20 @@ void VTKRecorder::action(){
 				
 				if (recActive[REC_BSTRESS]) {
 				  const Matrix3r& bStress = bStresses[b->getId()];
-				  Eigen::SelfAdjointEigenSolver<Matrix3r> solver(bStress); // bStress is probably not symmetric (= self-adjoint for real matrices), but the solver hopefully works (considering only one half of bStress). And, moreover, existence of (real) eigenvalues is not sure for not symmetric bStress..
+				  Eigen::SelfAdjointEigenSolver<Matrix3r> solver(bStress); // bStress is probably not symmetric (= self-adjoint for real matrices), but the solver still works, considering only one half of bStress. Which is good since existence of (real) eigenvalues is not sure for not symmetric bStress..
 				  Matrix3r dirAll = solver.eigenvectors();
-				  Vector3r eigenVal = solver.eigenvalues(); // cf http://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#a30caf3c3884a7f4a46b8ec94efd23c5e to be sure that eigenVal[i] * dirAll.col(i) = bStress * dirAll.col(i)
-				  int whereSigI(-1), whereSigII(-1), whereSigIII(-1); // all whereSig_i are in [0;2] : whereSigI = 2 => sigI=eigenVal[2]
-				  if ( eigenVal[0] > std::max(eigenVal[1],eigenVal[2]) ) {
-				    whereSigI = 0;
-				    if (eigenVal[1]>eigenVal[2]) {
-				      whereSigII=1;
-				      whereSigIII=2; }
-				    else { //eigenVal[0] > eigenVal[2] >= eigenVal[1]
-				      whereSigII = 2;
-				      whereSigIII=1; } }
-				  else { // max(lambda1,lambda2) >= lambda0 // lambda = eigenVal in the comments
-				    if (eigenVal[1]>=eigenVal[2]) {//max(lambda1,lambda2) = lambda1 : lambda 1 >= lambda2
-				      whereSigI = 1;
-				      if (eigenVal[2]>=eigenVal[0]) {//lambda1 >= lambda2 >= lambda0
-					whereSigII=2;
-					whereSigIII=0; }
-				      else { //lambda1 >= lambda0 > lambda2
-					whereSigII=0;
-					whereSigIII=2; } }
-				    else { //max(lambda1,lambda2) = lambda2 : lambda2 > lambda1
-				      whereSigI = 2;
-				      if (eigenVal[1] > eigenVal[0]) {
-					whereSigII = 1;
-					whereSigIII = 0; }
-				      else {
-					whereSigIII = 1;
-					whereSigII = 0; } } }
+				  Vector3r eigenVal = solver.eigenvalues(); // cf http://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html#a30caf3c3884a7f4a46b8ec94efd23c5e to be sure that eigenVal[i] * dirAll.col(i) = bStress * dirAll.col(i) and that eigenVal[0] <= eigenVal[1] <= eigenVal[2]
 					
-				  spheresSigI->InsertNextValue(eigenVal[whereSigI]);
-				  spheresSigII->InsertNextValue(eigenVal[whereSigII]);
-				  spheresSigIII->InsertNextValue(eigenVal[whereSigIII]);
-				  Real dirI[3] { (Real) dirAll(0,whereSigI), (Real) dirAll(1,whereSigI), (Real) dirAll(2,whereSigI) };
+				  spheresSigI->InsertNextValue(eigenVal[2]);
+				  spheresSigII->InsertNextValue(eigenVal[1]);
+				  spheresSigIII->InsertNextValue(eigenVal[0]);
+				  Real dirI[3] { (Real) dirAll(0,2), (Real) dirAll(1,2), (Real) dirAll(2,2) };
 				  spheresDirI->InsertNextTupleValue(dirI);
 				  
-				  Real dirII[3] { (Real) dirAll(0,whereSigII), (Real) dirAll(1,whereSigII), (Real) dirAll(2,whereSigII) };
+				  Real dirII[3] { (Real) dirAll(0,1), (Real) dirAll(1,1), (Real) dirAll(2,1) };
 				  spheresDirII->InsertNextTupleValue(dirII);
 				  
-				  Real dirIII[3] { (Real) dirAll(0,whereSigIII), (Real) dirAll(1,whereSigIII), (Real) dirAll(2,whereSigIII) };
+				  Real dirIII[3] { (Real) dirAll(0,0), (Real) dirAll(1,0), (Real) dirAll(2,0) };
 				  spheresDirIII->InsertNextTupleValue(dirIII); }
 				
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
