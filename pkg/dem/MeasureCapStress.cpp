@@ -3,7 +3,7 @@
 #include <pkg/dem/CapillaryPhys.hpp>
 #include <pkg/dem/ScGeom.hpp>
 #include <pkg/common/Sphere.hpp>
-#include<pkg/dem/Shop.hpp> // for direct use of aabbExtrema
+#include <pkg/dem/Shop.hpp> // for direct use of aabbExtrema
 
 
 YADE_PLUGIN((MeasureCapStress));
@@ -11,18 +11,19 @@ YADE_PLUGIN((MeasureCapStress));
 void MeasureCapStress::action() {
   shared_ptr<BodyContainer>& bodies = scene->bodies;
 
-  Matrix3r matAglob = Matrix3r::Zero();
-  Matrix3r matBglob = Matrix3r::Zero();
-  Matrix3r matLGInt = Matrix3r::Zero();
-  
-  vLiq= 0; // was the case at the creation of the Engine, but has to be reset at each execution...
+  muSsw = Matrix3r::Zero();
+  muGamma = Matrix3r::Zero();
+  muSnw = Matrix3r::Zero();
+    
+  vW= 0; // was the case at the creation of the Engine, but has to be reset at each execution...
   
   FOREACH(const shared_ptr<Interaction>& interaction, *scene->interactions){ // not possible or meaningfull to use parallel loops here.. (http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg11018.html)
     if ( !interaction->isReal()) continue;
     const shared_ptr<CapillaryPhys> phys = YADE_PTR_CAST<CapillaryPhys>(interaction->phys);
     const shared_ptr<ScGeom> geom = YADE_PTR_CAST<ScGeom>(interaction->geom);
     if (phys->meniscus) {
-      vLiq += phys->vMeniscus;
+
+      vW += phys->vMeniscus;
       
       Body* b1 = (*bodies)[interaction->getId1()].get();
       Body* b2 = (*bodies)[interaction->getId2()].get();
@@ -45,34 +46,34 @@ void MeasureCapStress::action() {
       }
       
       // Body 1 consideration: vecN = z axis with respect to Fig 3.18 [Khosravani2014]
-      matAglob += matA_BodyGlob( deltaB1 * Mathr::DEG_TO_RAD,rB1,vecN);
-      matBglob += matBp_BodyGlob( deltaB1 * Mathr::DEG_TO_RAD,wettAngle,surfaceTension,rB1,vecN);
+      muSsw += matA_BodyGlob( deltaB1 * Mathr::DEG_TO_RAD,rB1,vecN);
+      muGamma += matBp_BodyGlob( deltaB1 * Mathr::DEG_TO_RAD,wettAngle,rB1,vecN);
       
       // Body 2 consideration: vecN = - z axis with respect to Fig 3.18 [Khosravani2014]
-      matAglob += matA_BodyGlob( deltaB2 * Mathr::DEG_TO_RAD , rB2 , -vecN);
-      matBglob += matBp_BodyGlob(deltaB2 * Mathr::DEG_TO_RAD,wettAngle,surfaceTension,rB2,-vecN);
+      muSsw += matA_BodyGlob( deltaB2 * Mathr::DEG_TO_RAD , rB2 , -vecN);
+      muGamma += matBp_BodyGlob(deltaB2 * Mathr::DEG_TO_RAD,wettAngle,rB2,-vecN);
       
       // liq-gas interface term
-      matLGInt += matLG_bridgeGlob(phys->nn11,phys->nn33,surfaceTension,vecSmallToBig);
+      muSnw += matLG_bridgeGlob(phys->nn11,phys->nn33,vecSmallToBig);
       }
   }
+
+  // last microstructural tensor:
+  muVw = vW * Matrix3r::Identity();
+
   Real volume = 0;
   if (scene->isPeriodic)
     volume = scene->cell->hSize.determinant();
   else {
-    //    boost::python::tuple extrema = Shop::aabbExtrema();
-//     volume = boost::python::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
-    volume = 1.0;
+	  vector<Vector3r> extrema = Shop::aabbExtrema();
+	  volume = (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]);
   }
   if (debug) cout << "c++ : volume = " << volume << endl;
-//   if (volume ==0) LOG_ERROR("Could not get a non-zero volume value");
+  if (volume ==0) LOG_ERROR("Could not get a non-zero volume value");
 //   else { // error: ‘else’ without a previous ‘if’ ?????????!!!!!##########
-  capStrTens1 = vLiq * Matrix3r::Identity() * capillaryPressure / volume ;
-  capStrTens2 = matAglob * capillaryPressure / volume;
-  capStrTens3 = matLGInt / volume;
-  capStrTens4 =  matBglob / volume;
+
+  sigmaCap = 1 / volume * (  capillaryPressure*(muVw + muSsw) + surfaceTension*(muGamma + muSnw) );
 //   }
-  capStrTens = capStrTens1 + capStrTens2 + capStrTens3 + capStrTens4;
 }
 
 
@@ -88,24 +89,23 @@ Matrix3r MeasureCapStress::matA_BodyGlob(Real alpha,Real radius,Vector3r vecN){
     return globToLocRet * A_BodyGlob * globToLocRet.transpose() ;
 }
 
-Matrix3r MeasureCapStress::matLG_bridgeGlob(Real nn11,Real nn33,Real surfTens, Vector3r vecN){
+Matrix3r MeasureCapStress::matLG_bridgeGlob(Real nn11,Real nn33, Vector3r vecN){
         Matrix3r LG_bridgeGlob ;
         
         LG_bridgeGlob << nn11 + nn33 , 0 , 0 , // useless to write lgArea - nn11 = 2*nn11 + nn33 - nn11
         0 , nn11 + nn33 , 0 ,
         0 , 0 , 2*nn11; // trace = 2*(2*nn11 + nn33) = 2*lgArea
         
-        LG_bridgeGlob *= surfTens;
         Matrix3r globToLocRet = matGlobToLoc(vecN);
         return globToLocRet * LG_bridgeGlob * globToLocRet.transpose() ;
 }
 
-Matrix3r MeasureCapStress::matBp_BodyGlob(Real alpha,Real wettAngle, Real surfTens, Real radius,Vector3r vecN){ //  matrix B prime, defined at body scale (see (3.49) p.65), expressed in global framework
+Matrix3r MeasureCapStress::matBp_BodyGlob(Real alpha,Real wettAngle, Real radius,Vector3r vecN){ // matrix B prime (the surface tension coefficient excepted), defined at body scale (see (3.49) p.65), expressed in global framework
     Matrix3r Bp_BodyGlob ;
     Bp_BodyGlob << - pow(sin(alpha),2) * cos(alpha+wettAngle) , 0 , 0 ,
                    0 , - pow(sin(alpha),2) * cos(alpha+wettAngle) , 0 ,
                    0 , 0 , sin(2*alpha) * sin(alpha+wettAngle);
-    Bp_BodyGlob *= Mathr::PI * pow(radius,2.0) * surfTens ;
+    Bp_BodyGlob *= Mathr::PI * pow(radius,2.0);
     Matrix3r globToLocRet = matGlobToLoc(vecN);
     return globToLocRet * Bp_BodyGlob * globToLocRet.transpose() ;    
 }
