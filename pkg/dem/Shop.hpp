@@ -162,7 +162,7 @@ class Shop{
 		static void growParticle(Body::id_t bodyID, Real multiplier, bool updateMass);
 		
 		/* \todo implement groupMask */
-		static py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false);
+		static vector<Vector3r> aabbExtrema(Real cutoff=0.0, bool centers=false);
 		
 		//! evaluation of 2D quantities
 		static Real getSpheresVolume2D(const shared_ptr<Scene>& rb=shared_ptr<Scene>(), int mask=-1);

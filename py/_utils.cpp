@@ -4,8 +4,8 @@
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
 py::tuple negPosExtremeIds(int axis, Real distFactor){
-	py::tuple extrema=Shop::aabbExtrema();
-	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();
+	vector<Vector3r> extrema=Shop::aabbExtrema();
+	Real minCoord=extrema[0][axis],maxCoord=extrema[1][axis];
 	py::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;

@@ -263,8 +263,8 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	// *** Fabric tensor ***/
 	fabric=Matrix3r::Zero(); 
 	int count=0; // number of interactions
-	py::tuple aabb = Shop::aabbExtrema(cutoff);
-	Vector3r bbMin = py::extract<Vector3r>(aabb[0]), bbMax = py::extract<Vector3r>(aabb[1]);
+	vector<Vector3r> aabb = Shop::aabbExtrema(cutoff);
+	Vector3r bbMin = aabb[0], bbMax = aabb[1];
 	Vector3r cp;
 	
 	Fmean=0; // initialize average contact force for split = 1 fabric measurements
@@ -349,8 +349,8 @@ Matrix3r Shop::getStress(Real volume){
 	Scene* scene=Omega::instance().getScene().get();
 	Real volumeNonPeri = 0;
 	if ( volume==0 && !scene->isPeriodic ) {
-	  py::tuple extrema = Shop::aabbExtrema();
-	  volumeNonPeri = py::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
+	  vector<Vector3r> extrema = Shop::aabbExtrema();
+	  volumeNonPeri = (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]);
 	}
 	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():volumeNonPeri;
 	Matrix3r stressTensor = Matrix3r::Zero();
@@ -871,18 +871,22 @@ void Shop::growParticle(Body::id_t bodyID, Real multiplier, bool updateMass)
 	}
 }
 
-py::tuple Shop::aabbExtrema(Real cutoff, bool centers){
+vector<Vector3r> Shop::aabbExtrema(Real cutoff, bool centers){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		if(!b) continue;
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
 		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
 	}
 	Vector3r dim=maximum-minimum;
-	return py::make_tuple(Vector3r(minimum+.5*cutoff*dim),Vector3r(maximum-.5*cutoff*dim));
+	vector<Vector3r> ret;
+	ret.push_back(minimum+.5*cutoff*dim);
+	ret.push_back(maximum-.5*cutoff*dim);
+	return ret;
 }
 
 /*! Added function for 2D calculation: sphere volume. Optional. By Ning Guo */

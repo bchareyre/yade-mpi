@@ -60,8 +60,9 @@ void MeasureCapStress::action() {
   if (scene->isPeriodic)
     volume = scene->cell->hSize.determinant();
   else {
-    boost::python::tuple extrema = Shop::aabbExtrema();
-    volume = boost::python::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
+    //    boost::python::tuple extrema = Shop::aabbExtrema();
+//     volume = boost::python::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
+    volume = 1.0;
   }
   if (debug) cout << "c++ : volume = " << volume << endl;
 //   if (volume ==0) LOG_ERROR("Could not get a non-zero volume value");
