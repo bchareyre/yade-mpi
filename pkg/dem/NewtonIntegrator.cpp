@@ -119,7 +119,7 @@ void NewtonIntegrator::action()
 
 	const bool trackEnergy(scene->trackEnergy);
 	const bool isPeriodic(scene->isPeriodic);
-
+	
 	#ifdef YADE_OPENMP
 		FOREACH(Real& thrMaxVSq, threadMaxVelocitySq) { thrMaxVSq=0; }
 	#endif
@@ -128,7 +128,7 @@ void NewtonIntegrator::action()
 			if(b->isClumpMember()) continue;
 #define YADE_MPI
 #ifdef YADE_MPI
-			if(scene->subdomain!=b->subdomain) continue;
+			if(scene->subdomain!=b->subdomain or b->getIsSubdomain()) continue;//this thread will not move bodies from other subdomains
 #endif
 			State* state=b->state.get(); const Body::id_t& id=b->getId();
 			Vector3r f=Vector3r::Zero(); 
