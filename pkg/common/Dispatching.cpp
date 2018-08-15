@@ -31,18 +31,6 @@ void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 {
 		shared_ptr<Shape>& shape=b->shape;
 		if(!b->isBounded() || !shape) return;
-		if(b->bound) {
-			Real& sweepLength = b->bound->sweepLength;
-			if (targetInterv>=0 and scene->iter>0) {//at iteration zero checking displacement makes no sense
-				Vector3r disp = b->state->pos-b->bound->refPos;
-				Real dist = max(std::abs(disp[0]),max(std::abs(disp[1]),std::abs(disp[2])));
-				if (dist){
-					Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
-					newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
-					sweepLength=max(minSweepDistFactor*sweepDist,min(newLength,sweepDist));}
-				else sweepLength=0;
-			} else sweepLength=sweepDist;
-		} 
 		#ifdef BV_FUNCTOR_CACHE
 		if(!shape->boundFunctor){ shape->boundFunctor=this->getFunctor1D(shape); if(!shape->boundFunctor) return; }
 		shape->boundFunctor->go(shape,b->bound,b->state->se3,b.get());
@@ -50,9 +38,18 @@ void BoundDispatcher::processBody(const shared_ptr<Body>& b)
 		operator()(shape,b->bound,b->state->se3,b.get());
 		#endif
 		if(!b->bound) return; // the functor did not create new bound
+		Real& sweepLength = b->bound->sweepLength;
+		if (targetInterv>=0 and scene->iter>0) {//at iteration zero checking displacement makes no sense
+			Vector3r disp = b->state->pos-b->bound->refPos;
+			Real dist = max(std::abs(disp[0]),max(std::abs(disp[1]),std::abs(disp[2])));
+			if (dist){
+				Real newLength = dist*targetInterv/(scene->iter-b->bound->lastUpdateIter);
+				newLength = max(0.9*sweepLength,newLength);//don't decrease size too fast to prevent time consuming oscillations
+				sweepLength=max(minSweepDistFactor*sweepDist,min(newLength,sweepDist));}
+			else sweepLength=0;
+		} else sweepLength=sweepDist; 
 		b->bound->refPos=b->state->pos;
 		b->bound->lastUpdateIter=scene->iter;
-		const Real& sweepLength = b->bound->sweepLength;
 		if(sweepLength>0){			
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
 			aabb->min-=Vector3r(sweepLength,sweepLength,sweepLength);

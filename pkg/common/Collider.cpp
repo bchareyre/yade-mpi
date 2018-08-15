@@ -20,7 +20,7 @@ bool Collider::mayCollide(const Body* b1, const Body* b2
 		) {
 	return 
 		#ifdef YADE_MPI //skip interactions outside subdomain, and between the subdomain and its own bodies
-		((subdomain==b1->subdomain or subdomain==b2->subdomain) and not (b1->subdomain==b2->subdomain and (b1->getSubdomain() or b2->getSubdomain()))) &&
+		((subdomain==b1->subdomain or subdomain==b2->subdomain) and not (b1->subdomain==b2->subdomain and (b1->getIsSubdomain() or b2->getIsSubdomain()))) &&
 		#endif 
 		// might be called with deleted bodies, i.e. NULL pointers
 		(b1!=NULL && b2!=NULL) &&
