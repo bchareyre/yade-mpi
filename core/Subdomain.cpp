@@ -21,6 +21,7 @@ void Subdomain::setMinMax()
 // 	Vector3r min, max;
 	Real inf=std::numeric_limits<Real>::infinity();
 	boundsMin=Vector3r(inf,inf,inf); boundsMax=Vector3r(-inf,-inf,-inf);
+	if (ids.size()==0) LOG_WARN("empty subdomain!");
 	if (ids.size()>0 and Body::byId(ids[0],scene)->subdomain != scene->subdomain) LOG_WARN("setMinMax executed with deprecated data (body->subdomain != scene->subdomain)");
 	FOREACH(const Body::id_t& id, ids){
 		const shared_ptr<Body>& b = Body::byId(id,scene);
