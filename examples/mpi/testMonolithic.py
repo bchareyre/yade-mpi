@@ -1,5 +1,6 @@
-#run  'python testMonolithic.py N M'
-# for reference time to be compared to testMPI.py
+#run  'python testMonolithic.py'
+#     'python testMonolithic.py N M'
+# for reference time to be compared to testMPIxN.py
 import sys
 import time
 from os.path import expanduser
@@ -13,8 +14,7 @@ This script is meant to be executed non-parallel, for comparison with the MPI fl
 
 '''
 
-MAX_SUBDOMAIN = 8
-NSTEPS=400 #turn it >0 to see time iterations, else only initilization
+NSTEPS=100 #turn it >0 to see time iterations, else only initilization
 VERBOSE_OUTPUT=False
 
 
@@ -48,8 +48,9 @@ def mprint(m): #this one will print regardless of VERBOSE_OUTPUT
 
 
 
-#based on "O" some what follows looks as usual to yade users
+#based on "O" some of what follows looks as usual to yade users
 from yadeimport import *
+from yadeimport import O,sphere,box
 #O=yade.Omega()
 
 #RULES:
@@ -90,15 +91,13 @@ if 1: #this is the master process
 	if len(sys.argv)>1: #we then assume N,M are provided as 1st and 2nd cmd line arguments
 		N=int(sys.argv[0]); M=int(sys.argv[1])
 	else:
-		N=4; M=2; #(columns, rows)
-	sub1=[] #ids in subdomain 1
+		N=900; M=100; #(columns, rows)
 	for i in range(N): #NxM spheres
 		for j in range(M):
-			id=yade.Omega().bodies.append(sphere((i+j/3.,j,0),0.51))
-			if (i<(N+1)/2): sub1.append(id)
+			id=yade.Omega().bodies.append(sphere((i+j/3000.,j,0),0.5))
 	WALL_ID=O.bodies.append(box(center=(0,-0.5,0),extents=(10000,0,10000),fixed=True))
 	
-	collider.boundDispatcher.functors=collider.boundDispatcher.functors+[Bo1_Subdomain_Aabb()]
+	collider.boundDispatcher.functors=collider.boundDispatcher.functors+[yade.Bo1_Subdomain_Aabb()]
 	collider.verletDist = 0.3 
 	
 	#BEGIN Garbage (should go to some init(), usually done in collider.__call__() but in the mpi case we want to collider.boundDispatcher.__call__() before collider.__call__()
@@ -106,9 +105,11 @@ if 1: #this is the master process
 	collider.boundDispatcher.minSweepDistFactor=collider.minSweepDistFactor;
 	collider.boundDispatcher.targetInterv=collider.targetInterv;
 	collider.boundDispatcher.updatingDispFactor=collider.updatingDispFactor;
+	#collider.fastestBodyMaxDist=0.0000000001
 	#END Garbage
 	
 	##### RUN MPI #########
+	O.step()
 	start=time.time()
 	cppRun=False
 	if not cppRun:
@@ -121,5 +122,6 @@ if 1: #this is the master process
 	mass=0
 	for b in O.bodies: mass+=b.state.mass
 	mprint ( "TOTAL FORCE ON FLOOR="+str(O.forces.f(WALL_ID)[1])+" vs. total weight "+str(mass*10) )
-	mprint ( "monolithic (cppRun="+str(cppRun)+"): done "+str(N*M)+" bodies in "+str(totTime)+ " sec, at "+str(N*M*NSTEPS/totTime)+" body*iter/second")
+	mprint ( "monolithic (cppRun="+str(cppRun)+"): done "+str(len(O.bodies)-1)+" bodies in "+str(totTime)+ " sec, at "+str(N*M*NSTEPS/totTime)+" body*iter/second")
+	mprint ( "num. collision detection "+str(collider.numAction))
     
