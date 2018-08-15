@@ -202,8 +202,9 @@ class InsertionSortCollider: public Collider{
 		((Real,updatingDispFactor,-1,,"(experimental) Displacement factor used to trigger bound update: the bound is updated only if updatingDispFactor*disp>sweepDist when >0, else all bounds are updated."))
 		((Real,verletDist,((void)"Automatically initialized",-.5),,"Length by which to enlarge particle bounds, to avoid running collider at every step. Stride disabled if zero. Negative value will trigger automatic computation, so that the real value will be *verletDist* × minimum spherical particle radius; if there are no spherical particles, it will be disabled. The actual length added to one bound can be only a fraction of verletDist when :yref:`InsertionSortCollider::targetInterv` is > 0."))
 		((Real,minSweepDistFactor,0.1,,"Minimal distance by which enlarge all bounding boxes; superseeds computed value of verletDist when lower that (minSweepDistFactor x verletDist)."))
-		((Real,fastestBodyMaxDist,-1,,"Normalized maximum displacement of the fastest body since last run; if >= 1, we could get out of bboxes and will trigger full run. |yupdate|"))
+		((Real,fastestBodyMaxDist,0,,"Normalized maximum displacement of the fastest body since last run; if >= 1, we could get out of bboxes and will trigger full run. |yupdate|"))
 		((int,numReinit,0,Attr::readonly,"Cummulative number of bound array re-initialization."))
+		((int,numAction,0,,"Cummulative number of collision detection."))
 		((Real,useless,,,"for compatibility of scripts defining the old collider's attributes - see deprecated attributes")) 
 		((bool,doSort,false,,"Do forced resorting of interactions."))
 		, /* ctor */
