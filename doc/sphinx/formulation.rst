@@ -341,7 +341,7 @@ The classical incremental algorithm is widely used in DEM codes and is described
       :nowrap:
 
       \begin{align*}
-          \vec{v}_{12}&=\left(\pprev{\vec{v}}_2+\prev{\vec{\omega}}_2\times(-d_2 \currn)\right)-\left(\pprev{\vec{v}}_1+\pprev{\vec{\omega}}_1\times(d_1 \currn)\right) \\
+          \vec{v}_{12}&=\left(\pprev{\vec{v}}_2+\pprev{\vec{\omega}}_2\times(-d_2 \currn)\right)-\left(\pprev{\vec{v}}_1+\pprev{\vec{\omega}}_1\times(d_1 \currn)\right) \\
          \vec{v}_{12}^{\perp}&=\vec{v}_{12}-(\curr{\vec{n}} \cdot \vec{v}_{12})\currn \\
          (\Delta \uT)_3&=-\Delta t \vec{v}_{12}^{\perp}
       \end{align*}
