@@ -1,8 +1,35 @@
-#mpiexec -n 4 python testMPI.py N M
+#mpiexec -n 4 python testMPIxN.py
+#mpiexec -n 4 python testMPIxN.py N M
 # get non-MPI reference time using testMonolithic.py
 
 
-#TODO: getIntersections must fill firt item with subdomains
+'''
+This script simulates spheres falling on a plate using a distributed memory approach based on mpi4py
+The number of spheres assigned to one particular process (aka 'worker') is N*M, they form a regular array.
+The master process (rank=0) has no spheres assigned presently; it is in charge of getting the total force on the plate (in more advanced simulations it could handle boundary conditions).
+The number of subdomains depends on argument 'n' of mpiexec. Since rank=0 is not assigned a regular subdomain the total number of spheres is n*N*M
+
+
+The logic is as follows:
+1. Instanciate a complete, ordinary, yade scene with the plate and spheres (only done by rank=0)
+2. Insert subdomains as special yade bodies. This is somehow similar to adding a clump body on the top of clump members
+3. Broadcast this scene to all workers. In the initialization phase the workers will:
+	- define the bounding box of their assigned bodies and return it to other workers
+	- detect which assigned bodies are virtually in interaction with other domains (based on their bounding boxes) and communicate the lists to the relevant workers
+	- erase the bodies which are neither assigned nor virtually interacting with the subdomain
+4. Run a number of 'regular' iterations without re-running collision detection (verlet dist mechanism)
+5. In each regular iteration the workers will:
+	- calculate internal and cross-domains interactions
+	- execute Newton on assigned bodies (modified Newton skips other domains)
+	- send updated positions to other workers and partial force on floor to master
+
+Yet to be implemented is the global update of domain bounds and new collision detection. It could be simply achieved by importing all bodies back in master process and re-running an initialization/distribution but there are certainly mmore efficient techniques to find.
+
+Performance:
+The default settings of testMPIxN.py and testMonolithic.py correspond to 90k spheres and 3 subdomains, for this problem size the MPI version runs approximately as fast as monolithic (actually a bit faster), the performance is expected to increase for more threads and/or more bodies per thread
+
+
+'''
 
 import sys
 import time
