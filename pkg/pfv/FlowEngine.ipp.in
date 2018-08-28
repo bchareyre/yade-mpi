@@ -86,6 +86,8 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
         ///compute flow and and forces here
 	if (pressureForce){
+		if (fixTriUpdatePermint>0) permUpdateIters++;
+		if (fixTriUpdatePermInt>0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
 		solver->gaussSeidel(scene->dt);
 		timingDeltas->checkpoint ( "Factorize + Solve" );
 		solver->computeFacetForcesWithCache();}
@@ -797,6 +799,18 @@ Vector3r TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselat
                 volume+=std::abs ( cell->info().volume() );
         }
         return ( meanVel/volume );
+}
+
+template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
+void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::updateLinearSystem (Solver& flow)
+{
+	trickPermeability(&flow);
+        flow.isLinearSystemSet = false;
+	flow.factorizedEigenSolver = false;
+	meshUpdateInterval = -1;
+	defTolerance = -1; 
+	permUpdateIters = 0;
+	
 }
 
 #endif //FLOW_ENGINE

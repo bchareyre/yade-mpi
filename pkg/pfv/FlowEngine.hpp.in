@@ -79,6 +79,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		double epsVolCumulative;
 		int ReTrg;
 		int ellapsedIter;
+		int permUpdateIters;
 		void initSolver (FlowSolver& flow);
 		#ifdef LINSOLV
 		void setForceMetis (bool force);
@@ -91,6 +92,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		void updateVolumes (Solver& flow);
 		void initializeVolumes (Solver& flow);
 		void boundaryConditions(Solver& flow);
+		void updateLinearSystem (Solver& flow);
 		void pyInitializeVolumes () {if (solver) initializeVolumes(*solver); else LOG_WARN("Solver not initialized");}
 		void pyUpdateVolumes () {if (solver) updateVolumes(*solver); else LOG_WARN("Solver not initialized");}
 		
@@ -318,6 +320,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((vector<Real>, boundaryPressure,vector<Real>(),,"values defining pressure along x-axis for the top surface. See also :yref:`@TEMPLATE_FLOW_NAME@::boundaryXPos`"))
 		((vector<Real>, boundaryXPos,vector<Real>(),,"values of the x-coordinate for which pressure is defined. See also :yref:`@TEMPLATE_FLOW_NAME@::boundaryPressure`"))
 		((string,blockHook,"",,"Python command to be run when remeshing. Anticipated usage: define blocked cells (see also :yref:`TemplateFlowEngine_@TEMPLATE_FLOW_NAME@.blockCell`), or apply exotic types of boundary conditions which need to visit the newly built mesh"))
+		((int, fixTriUpdatePermInt, -1,,"If positive, triangulation is fixed and DFNFlow trickPermeability is run according to the interval. Activating this automatically sets :yref:`FlowEngine::meshUpdateInt` and :yref:`FlowEngine::defTolerance` to -1 (never retriangulate)."))
 		,
 		/*deprec*/
 		((meanK_opt,clampKValues,"the name changed"))

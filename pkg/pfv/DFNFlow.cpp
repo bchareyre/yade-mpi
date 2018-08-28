@@ -54,7 +54,7 @@ class DFNBoundingSphere : public CGT::FlowBoundingSphere<DFNTesselation>
 #endif
 {
 public:
-  void saveVtk(const char* folder)
+  void saveVtk(const char* folder, bool withBoundaries) //FIXME: withBoundaries does nothing in DFNFlow right now. Needed for consistent templating.
   {
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         static unsigned int number=0;
