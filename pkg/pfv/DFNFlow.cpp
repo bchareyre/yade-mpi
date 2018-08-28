@@ -180,24 +180,24 @@ REGISTER_SERIALIZABLE(DFNFlowEngine);
 YADE_PLUGIN((DFNFlowEngine));
 
 /// In this version, we never update positions when !updatePositions, i.e. keep triangulating the same positions
-void DFNFlowEngine::setPositionsBuffer(bool current)
-{
-	vector<posData>& buffer = current? positionBufferCurrent : positionBufferParallel;
-	if ( !updatePositions && buffer.size()>0 ) return;
-	buffer.clear();
-	buffer.resize(scene->bodies->size());
-	shared_ptr<Sphere> sph(new Sphere);
-        const int Sph_Index = sph->getClassIndexStatic();
-	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
-                if ( !b || ignoredBody==b->getId() ) continue;
-                posData& dat = buffer[b->getId()];
-		dat.id = b->getId();
-		dat.pos = b->state->pos;
-		dat.isSphere = (b->shape->getClassIndex()==Sph_Index);
-		if (dat.isSphere) dat.radius = YADE_CAST<Sphere*>(b->shape.get())->radius;
-		dat.exists=true;
-	}
-}
+//void DFNFlowEngine::setPositionsBuffer(bool current)
+//{
+//	vector<posData>& buffer = current? positionBufferCurrent : positionBufferParallel;
+//	if ( !updatePositions && buffer.size()>0 ) return;
+//	buffer.clear();
+//	buffer.resize(scene->bodies->size());
+//	shared_ptr<Sphere> sph(new Sphere);
+//        const int Sph_Index = sph->getClassIndexStatic();
+//	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
+//                if ( !b || ignoredBody==b->getId() ) continue;
+//                posData& dat = buffer[b->getId()];
+//		dat.id = b->getId();
+//		dat.pos = b->state->pos;
+//		dat.isSphere = (b->shape->getClassIndex()==Sph_Index);
+//		if (dat.isSphere) dat.radius = YADE_CAST<Sphere*>(b->shape.get())->radius;
+//		dat.exists=true;
+//	}
+//}
 
 /// function allows us to interpolate information about fractured/non fractured cells so we can identify newly fractured cells, monitor half width, and identify fracture tip. We also use the loop to compute leakoff rate
 void DFNFlowEngine::interpolateCrack(Tesselation& Tes,Tesselation& NewTes){

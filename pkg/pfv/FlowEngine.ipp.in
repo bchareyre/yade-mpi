@@ -86,7 +86,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
         ///compute flow and and forces here
 	if (pressureForce){
-		if (fixTriUpdatePermint>0) permUpdateIters++;
+		if (fixTriUpdatePermInt>0) permUpdateIters++;
 		if (fixTriUpdatePermInt>0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
 		solver->gaussSeidel(scene->dt);
 		timingDeltas->checkpoint ( "Factorize + Solve" );
