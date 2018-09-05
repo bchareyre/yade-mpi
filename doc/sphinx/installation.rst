@@ -214,7 +214,7 @@ syntax::
 
 	cmake -DOPTION1=VALUE1 -DOPTION2=VALUE2
 	
-The following options are available:
+As of Yade version git-2315bd8 (or 2018.02b release), the following options are available: (see the `source code <https://github.com/yade/trunk/blob/master/CMakeLists.txt>` for a most up-to-date list)
 	
 	* CMAKE_INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
@@ -231,15 +231,19 @@ The following options are available:
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
 	* ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
 	* ENABLE_PFVFLOW: enable PFVFLOW-option, FlowEngine (ON by default)
+	* ENABLE_TWOPHASEFLOW: enable TWOPHASEFLOW-option, TwoPhaseFlowEngine (ON by default)
 	* ENABLE_LBMFLOW: enable LBMFLOW-option, LBM_ENGINE (ON by default)
 	* ENABLE_SPH: enable SPH-option, Smoothed Particle Hydrodynamics (OFF by default)
 	* ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013]_ for details (OFF by default)
 	* ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 	* ENABLE_PROFILING: enable profiling, e.g., shows some more metrics, which can define bottlenecks of the code (OFF by default)
+	* ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
+	* ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
+	* ENABLE_OAR: generate a script for oar-based task scheduler (OFF by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same as runtime directory (/usr/local by default)
 	* CHUNKSIZE: specifiy the chunk size if you want several sources to be compiled at once. Increases compilation speed but RAM-consumption during compilation as well (1 by default)
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
-	* USE_QT5: use QT5 for GUI, experimental (ON by default)
+	* USE_QT5: use QT5 for GUI (ON by default)
 	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 
 For using more extended parameters of cmake, please follow the corresponding

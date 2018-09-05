@@ -27,6 +27,7 @@
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 #  USE_QT5: use QT5 for GUI (ON by default)
+#  CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8.11)
