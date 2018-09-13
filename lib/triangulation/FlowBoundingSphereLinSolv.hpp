@@ -62,6 +62,7 @@ public:
 	using FlowType::getCHOLMODPerfTimings;
 	using FlowType::saveMesh;
 	using FlowType::ompThreads;
+	using FlowType::reuseOrdering;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
@@ -89,7 +90,10 @@ public:
 	#endif
 	#ifdef SUITESPARSE_VERSION_4
 	// cholmod direct solver (useSolver=4)
-	cholmod_factor* L;
+
+	cholmod_factor* L; 
+	cholmod_factor* M; 
+	cholmod_factor* N;
 	cholmod_sparse* Achol;
 	cholmod_common com;
 	bool factorExists;

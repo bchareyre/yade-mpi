@@ -47,6 +47,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		int errorCode;
 		bool factorizeOnly;
 		bool getCHOLMODPerfTimings;
+		bool reuseOrdering;
 
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;

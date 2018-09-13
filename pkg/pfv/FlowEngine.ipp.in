@@ -85,8 +85,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	}
 
         ///compute flow and and forces here
+
 	if (pressureForce){
-		if (fixTriUpdatePermInt>0) permUpdateIters++;
+		permUpdateIters++;
 		if (fixTriUpdatePermInt>0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
 		solver->gaussSeidel(scene->dt);
 		timingDeltas->checkpoint ( "Factorize + Solve" );
@@ -262,6 +263,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.meanKStat = meanKStat;
         flow.permeabilityMap = permeabilityMap;
         flow.fluidBulkModulus = fluidBulkModulus;
+
 	flow.multithread = multithread;
 	flow.getCHOLMODPerfTimings=getCHOLMODPerfTimings;
 //         flow.tesselation().Clear();
@@ -807,6 +809,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	trickPermeability(&flow);
         flow.isLinearSystemSet = false;
 	flow.factorizedEigenSolver = false;
+	if (!first) flow.reuseOrdering = true;
 	meshUpdateInterval = -1;
 	defTolerance = -1; 
 	permUpdateIters = 0;

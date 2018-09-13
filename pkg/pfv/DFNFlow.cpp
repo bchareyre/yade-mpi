@@ -141,7 +141,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 	void interpolateCrack(Tesselation& Tes,Tesselation& NewTes);
 	void trickPermeability(RTriangulation::Facet_circulator& facet,Real aperture,RTriangulation::Finite_edges_iterator& edge);
 	void trickPermeability(RTriangulation::Finite_edges_iterator& edge,Real aperture);
-	void setPositionsBuffer(bool current);
+//	void setPositionsBuffer(bool current);
 	Real leakOffRate;
     	Real averageAperture;
 	Real averageFracturePermeability;
@@ -228,7 +228,7 @@ void DFNFlowEngine::interpolateCrack(Tesselation& Tes,Tesselation& NewTes){
 				if (!oldCell->neighbor(k)->info().crack){
 					facetFlowRate = oldCell->info().kNorm()[k]*(oldCell->info().shiftedP()-oldCell->neighbor(k)->info().shiftedP());
 					leakOffRate += facetFlowRate;
-				}
+				}up the schemes described in this document.
 			}
 		}
 	}

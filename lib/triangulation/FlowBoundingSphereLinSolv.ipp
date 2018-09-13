@@ -109,6 +109,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 		#endif
 	com.supernodal = CHOLMOD_AUTO; //CHOLMOD_SUPERNODAL;
 	#endif
+	reuseOrdering=false;
 }
 
 
@@ -170,13 +171,15 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 	if (!multithread && factorExists && useSolver==4){
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);	
 		cholmod_l_free_sparse(&Achol, &com);
-		cholmod_l_free_factor(&L, &com);
-		cholmod_l_finish(&com);
-		if (getCHOLMODPerfTimings){
-			gettimeofday (&end, NULL);
-			cout << "CHOLMOD Time to finalize singlethreaded com " << ((end.tv_sec *1000000   + end.tv_usec ) - (start.tv_sec * 1000000 + start.tv_usec )) << endl;
+		if (!reuseOrdering) {
+			cholmod_l_free_factor(&L, &com);
+			cholmod_l_finish(&com);
+			if (getCHOLMODPerfTimings){
+				gettimeofday (&end, NULL);
+				cout << "CHOLMOD Time to finalize singlethreaded com " << ((end.tv_sec *1000000   + end.tv_usec ) - (start.tv_sec * 1000000 + start.tv_usec )) << endl;
+			}
+			cholmod_l_start(&com);
 		}
-		cholmod_l_start(&com);
 		com.nmethods= 1; // nOrderingMethods; //1;
 		com.method[0].ordering = CHOLMOD_METIS; // orderingMethod; //CHOLMOD_METIS;
 		factorExists=false;	
@@ -362,7 +365,7 @@ template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=T_x[ii-1];}
 
 template<class _Tesselation, class FlowType>
-void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
+void FlowBoundingSphereLinSolv<up the schemes described in this document._Tesselation,FlowType>::copyCellsToLin (Real dt)
 {
 	for (int ii=1; ii<=ncols; ii++) {
 		T_bv[ii-1]=T_b[ii-1]-T_cells[ii]->info().dv();
@@ -616,13 +619,23 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	if (!factorizedEigenSolver) {
 		openblas_set_num_threads(numFactorizeThreads);
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);	
-		L = cholmod_l_analyze(Achol, &com);
+		if (!reuseOrdering) {
+			L = cholmod_l_analyze(Achol, &com);
+			M = cholmod_l_copy_factor(L, &com);
+		} else { 
+			N = cholmod_l_copy_factor(M, &com);
+		}
 		if (getCHOLMODPerfTimings){		
 			gettimeofday(&end,NULL);
-			cout << "CHOLMOD Time to Analyze " << ((end.tv_sec * 1000000  + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec   )) << endl;
+			cout << "Reusing reordering? " << reuseOrdering << ". CHOLMOD Time to Analyze " << ((end.tv_sec * 1000000  + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec   )) << endl;
 		}
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);
-		cholmod_l_factorize(Achol, L, &com);
+		if (!reuseOrdering) {
+			cholmod_l_factorize(Achol, L, &com);
+		} else {
+			cholmod_l_factorize(Achol, N, &com);
+		}
+
 		if (getCHOLMODPerfTimings){		
 			gettimeofday(&end,NULL);
 			cout << "CHOLMOD Time to factorize " << ((end.tv_sec * 1000000  + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec   )) << endl;

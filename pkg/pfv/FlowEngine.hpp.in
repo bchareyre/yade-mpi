@@ -331,7 +331,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		normal[wall_ymax].y()=normal[wall_xmax].x()=normal[wall_zmax].z()=-1;
 		solver = shared_ptr<FlowSolver> (new FlowSolver);
 		first=true;
-		epsVolMax=epsVolCumulative=retriangulationLastIter=0;
+		epsVolMax=epsVolCumulative=retriangulationLastIter=permUpdateIters=0;
 		ReTrg=1;
 		backgroundCompleted=true;
 		ellapsedIter=0;
