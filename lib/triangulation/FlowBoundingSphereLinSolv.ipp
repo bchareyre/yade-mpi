@@ -365,7 +365,7 @@ template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=T_x[ii-1];}
 
 template<class _Tesselation, class FlowType>
-void FlowBoundingSphereLinSolv<up the schemes described in this document._Tesselation,FlowType>::copyCellsToLin (Real dt)
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
 {
 	for (int ii=1; ii<=ncols; ii++) {
 		T_bv[ii-1]=T_b[ii-1]-T_cells[ii]->info().dv();
