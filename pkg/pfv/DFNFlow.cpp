@@ -228,7 +228,7 @@ void DFNFlowEngine::interpolateCrack(Tesselation& Tes,Tesselation& NewTes){
 				if (!oldCell->neighbor(k)->info().crack){
 					facetFlowRate = oldCell->info().kNorm()[k]*(oldCell->info().shiftedP()-oldCell->neighbor(k)->info().shiftedP());
 					leakOffRate += facetFlowRate;
-				}up the schemes described in this document.
+				}
 			}
 		}
 	}
