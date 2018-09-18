@@ -87,8 +87,10 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         ///compute flow and and forces here
 
 	if (pressureForce){
+		#ifdef LINSOLV
 		permUpdateIters++;
 		if (fixTriUpdatePermInt>0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
+		#endif
 		solver->gaussSeidel(scene->dt);
 		timingDeltas->checkpoint ( "Factorize + Solve" );
 		solver->computeFacetForcesWithCache();}
@@ -803,6 +805,7 @@ Vector3r TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselat
         return ( meanVel/volume );
 }
 
+#ifdef LINSOLV
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::updateLinearSystem (Solver& flow)
 {
@@ -815,6 +818,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	permUpdateIters = 0;
 	
 }
+#endif
 
 #endif //FLOW_ENGINE
 

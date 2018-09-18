@@ -84,6 +84,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		#ifdef LINSOLV
 		void setForceMetis (bool force);
 		bool getForceMetis ();
+		void updateLinearSystem (Solver& flow);
 		#endif
 		void triangulate (Solver& flow);
 		void addBoundary (Solver& flow);
@@ -92,7 +93,6 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		void updateVolumes (Solver& flow);
 		void initializeVolumes (Solver& flow);
 		void boundaryConditions(Solver& flow);
-		void updateLinearSystem (Solver& flow);
 		void pyInitializeVolumes () {if (solver) initializeVolumes(*solver); else LOG_WARN("Solver not initialized");}
 		void pyUpdateVolumes () {if (solver) updateVolumes(*solver); else LOG_WARN("Solver not initialized");}
 		
