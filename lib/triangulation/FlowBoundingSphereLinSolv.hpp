@@ -63,6 +63,9 @@ public:
 	using FlowType::saveMesh;
 	using FlowType::ompThreads;
 	using FlowType::reuseOrdering;
+	using FlowType::fluidRho;
+	using FlowType::fluidCp;
+	using FlowType::thermalEngine;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
@@ -75,6 +78,11 @@ public:
 	#ifdef CHOLMOD_LIBS
 	//Eigen's sparse matrix and solver
 	Eigen::SparseMatrix<double> A;
+	Eigen::SparseMatrix<double> Ga;
+	Eigen::VectorXd P;
+	Eigen::VectorXd cellInternalEnergy;
+	Eigen::VectorXd U;
+	//Eigen::SparseMatrix<std::complex<double>,RowMajor> Ga; for row major stuff?
 	typedef Eigen::Triplet<double> ETriplet;
 	std::vector<ETriplet> tripletList;//The list of non-zero components in Eigen sparse matrix
 	Eigen::CholmodDecomposition<Eigen::SparseMatrix<double>, Eigen::Lower > eSolver;
@@ -91,6 +99,7 @@ public:
 	#ifdef SUITESPARSE_VERSION_4
 	// cholmod direct solver (useSolver=4)
 
+	cholmod_triplet* cholT;
 	cholmod_factor* L; 
 	cholmod_factor* M; 
 	cholmod_factor* N;
@@ -132,7 +141,7 @@ public:
 
 	vector<double> T_b;
 	vector<double> T_bv;
-	vector <double> T_x, P_x;
+	vector <double> T_x, P_x, cellTemps; 
 	vector <double> bodv;
 	vector <double> xodv;
 	int*         perm;
@@ -176,6 +185,9 @@ public:
 	virtual int setLinearSystem(Real dt);
 	void vectorizedGaussSeidel(Real dt);
 	virtual int setLinearSystemFullGS(Real dt);
+	void augmentConductivityMatrix(Real dt);
+	void setNewCellTemps();
+	void initializeInternalEnergy();
 	
 	int taucsSolveTest();
 	int taucsSolve(Real dt);

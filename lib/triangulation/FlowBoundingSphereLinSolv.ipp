@@ -171,6 +171,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 	if (!multithread && factorExists && useSolver==4){
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);	
 		cholmod_l_free_sparse(&Achol, &com);
+		cholmod_l_free_triplet(&cholT, &com);
 		if (!reuseOrdering) {
 			cholmod_l_free_factor(&L, &com);
 			cholmod_l_finish(&com);
@@ -223,7 +224,11 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		T_bv.resize(ncols);
 		bodv.resize(ncols);
 		xodv.resize(ncols);
-// 		gsB.resize(ncols+1);
+		if (thermalEngine) {
+			cellTemps.resize(ncols);
+			cellInternalEnergy.resize(ncols);
+		}		
+		//gsB.resize(ncols+1);
 		T_cells.resize(ncols+1);
 		T_nnz=0;}
 	for (int kk=0; kk<ncols;kk++) T_b[kk]=0;
@@ -329,13 +334,13 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		#ifdef SUITESPARSE_VERSION_4
 		}else if (useSolver==4){
 			if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);
-			cholmod_triplet* T = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &com);		
+			cholT = cholmod_l_allocate_triplet(ncols,ncols, T_nnz, 1, CHOLMOD_REAL, &com);		
 			// set all the values for the cholmod triplet matrix
 			for(int k=0;k<T_nnz;k++){
-				add_T_entry(T,is[k]-1, js[k]-1, vs[k]);
+				add_T_entry(cholT,is[k]-1, js[k]-1, vs[k]);
 			}
-			Achol = cholmod_l_triplet_to_sparse(T, T->nnz, &com);
-			cholmod_l_free_triplet(&T, &com);
+			Achol = cholmod_l_triplet_to_sparse(cholT, cholT->nnz, &com);
+			//cholmod_l_free_triplet(&T, &com);
 			if (getCHOLMODPerfTimings){
 				cholmod_l_print_sparse(Achol, "Achol", &com);
 				gettimeofday (&end, NULL);
@@ -362,11 +367,18 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToGs (Real dt)
 }
 
 template<class _Tesselation, class FlowType>
-void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {for (int ii=1; ii<=ncols; ii++) T_cells[ii]->info().p()=T_x[ii-1];}
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {
+	cellInternalEnergy.resize(ncols);
+	for (int ii=1; ii<=ncols; ii++){ 
+		T_cells[ii]->info().p()=T_x[ii-1];
+	}
+
+}
 
 template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
 {
+		
 	for (int ii=1; ii<=ncols; ii++) {
 		T_bv[ii-1]=T_b[ii-1]-T_cells[ii]->info().dv();
 		if (fluidBulkModulus>0) T_bv[ii-1] += T_cells[ii]->info().p()/(fluidBulkModulus*dt*T_cells[ii]->info().invVoidVolume());}
@@ -648,8 +660,18 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 		openblas_set_num_threads(numSolveThreads);
 		cholmod_dense* ex = cholmod_l_solve(CHOLMOD_A, L, B, &com);
 		double* e_x =(double *) ex->x;
-		for (int k=0; k<ncols; k++) T_x[k] = e_x[k];	
+		for (int k=0; k<ncols; k++) {
+			T_x[k] = e_x[k];
+		//	if (thermalEngine) P[k]=e_x[k];	
+		}
 		copyLinToCells();
+		
+		//cout << "thermal engine active? "<< thermalEngine <<endl;
+		if (thermalEngine) {
+			initializeInternalEnergy();
+			augmentConductivityMatrix(dt);
+			setNewCellTemps();
+		}
 		cholmod_l_free_dense(&ex, &com);
 	}
 	cholmod_l_free_dense(&B, &com);
@@ -659,6 +681,48 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 	return 0;
 }
 
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::initializeInternalEnergy() {
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++){
+		if (!cell->info().isGhost) cell->info().internalEnergy = fluidCp*fluidRho*cell->info().temp()*cell->info().volume();
+	}
+}
+
+
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::augmentConductivityMatrix(Real dt)
+{
+	Real energyFlux; Real upwindTemp; Real facetFlowRate;
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	// cycle through facets instead of cells to avoid duplicate math
+	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
+		const CellHandle& cell = f_it->first;
+		const CellHandle& neighborCell = f_it->first->neighbor(f_it->second);
+		if (cell->info().isGhost || neighborCell->info().isGhost) continue;
+		facetFlowRate = cell->info().kNorm()[f_it->second] * (cell->info().p() - cell->neighbor(f_it->second)->info().p());
+		if (facetFlowRate>0){
+			upwindTemp = cell->info().temp();
+		} else { 
+			upwindTemp = neighborCell->info().temp();
+		}
+		energyFlux = fluidCp*fluidRho*dt*upwindTemp*facetFlowRate;
+		if (!cell->info().Tcondition) cell->info().internalEnergy -= energyFlux;
+		if (!neighborCell->info().Tcondition) neighborCell->info().internalEnergy += energyFlux;
+	}	 
+}
+
+
+template<class _Tesselation, class FlowType>
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setNewCellTemps()
+{
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++){
+		if (!cell->info().Tcondition && !cell->info().isGhost) cell->info().temp()=cell->info().internalEnergy/(cell->info().volume()*fluidCp*fluidRho);
+	}
+}
 
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::taucsSolve(Real dt)

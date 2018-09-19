@@ -210,6 +210,7 @@ vector<Real> FlowBoundingSphere<Tesselation>::averageFluidVelocityOnSphere(unsig
 	for (int i=0;i<3;i++) result[i] += velocityVolumes[i]/volumes;
 	return result;
 }
+
 template <class Tesselation> 
 double FlowBoundingSphere<Tesselation>::getPorePressure (double X, double Y, double Z)
 {
@@ -217,6 +218,15 @@ double FlowBoundingSphere<Tesselation>::getPorePressure (double X, double Y, dou
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
 	return cell->info().p();
+}
+
+template <class Tesselation> 
+double FlowBoundingSphere<Tesselation>::getPoreTemperature (double X, double Y, double Z)
+{
+	if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
+	return cell->info().temp();
 }
 
 template <class Tesselation>
@@ -451,7 +461,7 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 		for (typename VectorCell::iterator cellIt=NewTes.cellHandles.begin(); cellIt!=NewTes.cellHandles.end(); cellIt++){
 			CellHandle& newCell = *cellIt;
 	#endif
-			if (newCell->info().Pcondition || newCell->info().isGhost) continue;
+			if (newCell->info().isGhost) continue;
 			CVector center ( 0,0,0 );
 			if (newCell->info().fictious()==0) for ( int k=0;k<4;k++ ) center= center + 0.25* (Tes.vertex(newCell->vertex(k)->info().id())->point().point()-CGAL::ORIGIN);
 			else {
@@ -468,8 +478,9 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 				}
 			}
         oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
-		newCell->info().getInfo(oldCell->info());
+		if (!newCell->info().Pcondition) newCell->info().getInfo(oldCell->info());
 //                 newCell->info().p() = oldCell->info().shiftedP();
+		if (!newCell->info().Tcondition && thermalEngine) newCell->info().temp() = oldCell->info().temp();
 		}
 }
 
@@ -827,6 +838,59 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
 
 }
 
+
+template <class Tesselation> 
+void FlowBoundingSphere<Tesselation>::initializeTemperatures( double tZero )
+{
+        RTriangulation& Tri = T[currentTes].Triangulation();
+        FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+
+        for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++){
+		if (!cell->info().Tcondition && !cell->info().isGhost) cell->info().temp() = tZero;
+	}
+        for (int bound=0; bound<6;bound++) {
+                int& id = *boundsIds[bound];
+		thermalBoundingCells[bound].clear();
+		if (id<0) continue;
+                ThermalBoundary& bi = thermalBoundary(id);
+                if (!bi.fluxCondition) {
+                        VectorCell tmpCells;
+                        tmpCells.resize(10000);
+                        VCellIterator cells_it = tmpCells.begin();
+                        VCellIterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+                        for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
+				(*it)->info().temp() = bi.value;(*it)->info().Tcondition=true;
+				thermalBoundingCells[bound].push_back(*it);
+			}
+                }
+        }
+ //       if (ppval && pxpos) applyUserDefinedPressure(Tri,*pxpos,*ppval);
+        
+ //       ITCells.clear();
+ //       for (unsigned int n=0; n<imposedT.size();n++) {
+//		CellHandle cell=Tri.locate(CGT::Sphere(imposedT[n].first,0));
+		//check redundancy
+//		for (unsigned int kk=0;kk<IPCells.size();kk++){
+//			if (cell==IPCells[kk]) cerr<<"Two imposed pressures fall in the same cell."<<endl;
+//			else if  (cell->info().Pcondition) cerr<<"Imposed pressure fall in a boundary condition."<<endl;}
+//		ITCells.push_back(cell);
+//		cell->info().temp()=imposedT[n].second;
+//		cell->info().Tcondition=true;}
+//	pressureChanged=false;
+
+//	IFCells.clear();
+//	for (unsigned int n=0; n<imposedF.size();n++) {
+//		CellHandle cell=Tri.locate(CGT::Sphere(imposedF[n].first,0));
+		//check redundancy
+//		for (unsigned int kk=0;kk<IPCells.size();kk++){
+//			if (cell==IPCells[kk]) cerr<<"Both flux and pressure are imposed in the same cell."<<endl;
+//			else if  (cell->info().Pcondition) cerr<<"Imposed flux fall in a pressure boundary condition."<<endl;}
+//		IFCells.push_back(cell);
+//		cell->info().Pcondition=false;}
+
+}
+
+
 template <class Tesselation> 
 bool FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 {
@@ -1144,6 +1208,12 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 		vtkWrite.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
 		for (unsigned kk=0; kk<allIds.size(); kk++) vtkWrite.write_data(tesselation().cellHandles[allIds[kk]]->info().p());
 		vtkWrite.end_data();
+
+		if (thermalEngine) {
+			vtkWrite.begin_data("Temperature",CELL_DATA,SCALARS,FLOAT);
+			for (unsigned kk=0; kk<allIds.size(); kk++) vtkWrite.write_data(tesselation().cellHandles[allIds[kk]]->info().temp());
+			vtkWrite.end_data();
+		}
 			
 		vtkWrite.begin_data("fictious",CELL_DATA,SCALARS,INT);
 		for (unsigned kk=0; kk<allIds.size(); kk++) vtkWrite.write_data(fictiousN[kk]);

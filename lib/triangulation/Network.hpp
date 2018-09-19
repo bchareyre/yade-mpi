@@ -34,6 +34,17 @@ struct Boundary
 	bool useMaxMin;// tells if this boundary was placed following the particles (using min/max of them) or with user defined position
 };
 
+struct ThermalBoundary
+{
+	Point p;//position
+	CVector normal;//orientation
+	Vector3r velocity;//motion
+	int coordinate;//the axis perpendicular to the boundary
+	bool fluxCondition;//fluxCondition=0, temperature is imposed // fluxCondition=1, flux is imposed
+	Real value;// value of imposed temperature
+	bool useMaxMin;// tells if this boundary was placed following the particles (using min/max of them) or with user defined position
+};
+
 
 template<class Tesselation>
 class Network
@@ -54,11 +65,14 @@ class Network
 		int xMinId, xMaxId, yMinId, yMaxId, zMinId, zMaxId;
 		int* boundsIds [6];
 		vector<CellHandle> boundingCells [6];
+		vector<CellHandle> thermalBoundingCells [6];
 		Point cornerMin;
 		Point cornerMax;
 		Real VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalPorosity;
 		Boundary boundaries [6];
+		ThermalBoundary thermalBoundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-idOffset];}
+		ThermalBoundary& thermalBoundary (int b) {return thermalBoundaries[b-idOffset];}
 		short idOffset;
 		int vtkInfiniteVertices, vtkInfiniteCells, num_particles;
 

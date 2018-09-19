@@ -66,31 +66,15 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
 		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0 && retriangulationLastIter>meshUpdateInterval);
 
-// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
-	if (breakControlledRemesh){
-	bool foundBreak = false;
-		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
-			if (!I || !I->phys.get()) continue;
-			if (I->isReal() && JCFpmPhys::getClassIndexStatic()==I->phys->getClassIndex()) {
-				JCFpmPhys* jcfpmphys = YADE_CAST<JCFpmPhys*>(I->phys.get());
-				if (!jcfpmphys) continue;
-				if (jcfpmphys->breakOccurred && !foundBreak){
-					updateTriangulation = true;
-					jcfpmphys->breakOccurred = false;
-					foundBreak = true;
-				}
-			else if (jcfpmphys->breakOccurred && foundBreak) jcfpmphys->breakOccurred = false;
-			}
-		}
-	}
+	// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
+	if (breakControlledRemesh) remeshForFreshlyBrokenBonds();
 
         ///compute flow and and forces here
-
 	if (pressureForce){
-		#ifdef LINSOLV
+	#ifdef LINSOLV
 		permUpdateIters++;
 		if (fixTriUpdatePermInt>0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
-		#endif
+	#endif
 		solver->gaussSeidel(scene->dt);
 		timingDeltas->checkpoint ( "Factorize + Solve" );
 		solver->computeFacetForcesWithCache();}
@@ -208,6 +192,15 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 }
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
+void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::thermalBoundaryConditions ( Solver& flow )
+{
+	for (int k=0;k<6;k++)	{
+		flow.thermalBoundary (wallIds[k]).fluxCondition=!bndCondIsTemperature[k];
+                flow.thermalBoundary (wallIds[k]).value=thermalBndCondValue[k];
+	}
+}
+
+template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::setImposedPressure ( unsigned int cond, Real p)
 {
         if ( cond>=solver->imposedP.size() ) LOG_ERROR ( "Setting p with cond higher than imposedP size." );
@@ -265,7 +258,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.meanKStat = meanKStat;
         flow.permeabilityMap = permeabilityMap;
         flow.fluidBulkModulus = fluidBulkModulus;
-
+	flow.fluidRho = fluidRho;
+	flow.fluidCp = fluidCp;
+	flow.thermalEngine = thermalEngine;
 	flow.multithread = multithread;
 	flow.getCHOLMODPerfTimings=getCHOLMODPerfTimings;
 //         flow.tesselation().Clear();
@@ -316,17 +311,21 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.displayStatistics ();
 	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
         flow.computePermeability();
-	//This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
 
 	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (https://bugs.launchpad.net/yade/+bug/1687355)
-	trickPermeability(&flow);
+	trickPermeability(&flow); //This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
         boundaryConditions ( flow );
         flow.initializePressure ( pZero );
+	if (thermalEngine) {
+		//initializeVolumes(flow);
+		thermalBoundaryConditions ( flow ); 
+		flow.initializeTemperatures ( tZero );
+	}
 
 	
-        if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate)) flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
+        if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate || thermalEngine)) flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
         if ( waveAction ) flow.applySinusoidalPressure ( flow.tesselation().Triangulation(), sineMagnitude, sineAverage, 30 );
 	else if (boundaryPressure.size()!=0) flow.applyUserDefinedPressure ( flow.tesselation().Triangulation(), boundaryXPos , boundaryPressure);
         if (normalLubrication || shearLubrication || viscousShear) flow.computeEdgesSurfaces();
@@ -405,7 +404,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
  
         //assign BCs types and values
         boundaryConditions ( flow );
-
+	if (thermalEngine) thermalBoundaryConditions ( flow );
         double center[3];
         for ( int i=0; i<6; i++ ) {
                 if ( *flow.boundsIds[i]<0 ) continue;
@@ -819,6 +818,25 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	
 }
 #endif
+
+template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
+void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::remeshForFreshlyBrokenBonds ()
+{
+bool foundBreak = false;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if (!I || !I->phys.get()) continue;
+		if (I->isReal() && JCFpmPhys::getClassIndexStatic()==I->phys->getClassIndex()) {
+			JCFpmPhys* jcfpmphys = YADE_CAST<JCFpmPhys*>(I->phys.get());
+			if (!jcfpmphys) continue;
+			if (jcfpmphys->breakOccurred && !foundBreak){
+				updateTriangulation = true;
+				jcfpmphys->breakOccurred = false;
+				foundBreak = true;
+			} else if (jcfpmphys->breakOccurred && foundBreak) jcfpmphys->breakOccurred = false;
+		}
+	}
+}
+
 
 #endif //FLOW_ENGINE
 
