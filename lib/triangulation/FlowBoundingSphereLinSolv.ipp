@@ -70,6 +70,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::~FlowBoundingSphereLinSolv()
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);
 		cholmod_l_free_sparse(&Achol, &com);
 		cholmod_l_free_factor(&L, &com);
+		cholmod_l_free_triplet(&cholT, &com);
 		cholmod_l_finish(&com);
 		if (getCHOLMODPerfTimings){
 			gettimeofday (&end, NULL);
@@ -223,11 +224,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		T_b.resize(ncols);
 		T_bv.resize(ncols);
 		bodv.resize(ncols);
-		xodv.resize(ncols);
-		if (thermalEngine) {
-			cellTemps.resize(ncols);
-			cellInternalEnergy.resize(ncols);
-		}		
+		xodv.resize(ncols);		
 		//gsB.resize(ncols+1);
 		T_cells.resize(ncols+1);
 		T_nnz=0;}
@@ -368,7 +365,6 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToGs (Real dt)
 
 template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyLinToCells() {
-	cellInternalEnergy.resize(ncols);
 	for (int ii=1; ii<=ncols; ii++){ 
 		T_cells[ii]->info().p()=T_x[ii-1];
 	}
@@ -662,11 +658,9 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 		double* e_x =(double *) ex->x;
 		for (int k=0; k<ncols; k++) {
 			T_x[k] = e_x[k];
-		//	if (thermalEngine) P[k]=e_x[k];	
 		}
 		copyLinToCells();
 		
-		//cout << "thermal engine active? "<< thermalEngine <<endl;
 		if (thermalEngine) {
 			initializeInternalEnergy();
 			augmentConductivityMatrix(dt);

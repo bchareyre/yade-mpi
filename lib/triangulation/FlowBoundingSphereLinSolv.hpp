@@ -78,10 +78,6 @@ public:
 	#ifdef CHOLMOD_LIBS
 	//Eigen's sparse matrix and solver
 	Eigen::SparseMatrix<double> A;
-	Eigen::SparseMatrix<double> Ga;
-	Eigen::VectorXd P;
-	Eigen::VectorXd cellInternalEnergy;
-	Eigen::VectorXd U;
 	//Eigen::SparseMatrix<std::complex<double>,RowMajor> Ga; for row major stuff?
 	typedef Eigen::Triplet<double> ETriplet;
 	std::vector<ETriplet> tripletList;//The list of non-zero components in Eigen sparse matrix
@@ -141,7 +137,7 @@ public:
 
 	vector<double> T_b;
 	vector<double> T_bv;
-	vector <double> T_x, P_x, cellTemps; 
+	vector <double> T_x, P_x;
 	vector <double> bodv;
 	vector <double> xodv;
 	int*         perm;
