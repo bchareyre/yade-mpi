@@ -148,6 +148,8 @@ need root privileges.
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
 		
+* For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``
+		
 
 Some of the packages (for example, cmake, eigen3) are mandatory, some of them
 are optional. Watch for notes and warnings/errors, which are shown
@@ -158,8 +160,8 @@ Additional packages, which can become mandatory later::
 
 		sudo apt-get install python-gts
 		
-For effective usage of direct solvers in the PFV-type fluid coupling, the following libraries are recommended, together with eigen>=3.1: blas, lapack, suitesparse, and metis.
-All four of them are available in many different versions. Different combinations are possible and not all of them will work. The following was found to be effective on recent deb-based systems. On ubuntu 12.04, better compile openblas with USE_OPENMP=1, else yade will run on a single core::
+For effective usage of direct solvers in the PFV-type fluid coupling, the following libraries are recommended: ``openblas``, ``suitesparse``, and ``metis``.
+All three of them are available in many different versions in each distribution. Different combinations are possible and not all of them will work. The following was found to be effective on recent debian-based systems. ::
 
 		sudo apt-get install libopenblas-dev libsuitesparse-dev libmetis-dev
 
