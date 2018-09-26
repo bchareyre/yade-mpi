@@ -2,10 +2,11 @@
 Installation
 ###############
 
-Yade can be installed from packages (pre-compiled binaries) or source code. 
-The choice depends on what you need: if you don't plan to modify Yade itself, 
-package installation is easier. In the contrary case, you must download and 
-install the source code.
+* Linux systems
+  Yade can be installed from packages (pre-compiled binaries) or source code. The choice depends on what you need: if you don't plan to modify Yade itself, package installation is easier. In the contrary case, you must download and   install the source code.
+
+* Other Operating Systems
+  Jump to the `last section <https://yade-dem.org/doc/installation.html#yubuntu>`_ of this page.
 
 Packages
 ----------
@@ -326,14 +327,6 @@ The two tools can be combined very simply, adding to the above exports::
 
 	export CCACHE_PREFIX="distcc"
 
-Yubuntu
-------------
-
-If you are not running Ubuntu nor Debian, there is a way to create a Yubuntu `live-usb <http://en.wikipedia.org/wiki/Live_USB>`_ on any usb mass-storage device (minimum recommended size is 5GB). It is a way to make a bootable usb-key with a preinstalled minimalist operating system (Xubuntu), including Yadedaily and Paraview.
-
-More informations about this alternative are available `here <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_ (see the README file first).
-
-
 Cloud Computing
 ----------------
 
@@ -343,3 +336,10 @@ GPU Acceleration
 ----------------
 
 The FlowEngine can be accelerated with CHOLMOD's GPU accelerated solver. The specific hardware and software requirements are outlined in the section :ref:`GPUacceleration`.
+
+Yubuntu
+------------
+
+If you are not running a Linux system there is a way to create an Ubuntu `live-usb <http://en.wikipedia.org/wiki/Live_USB>`_ on any usb mass-storage device (minimum size 10GB). It is a way to boot the computer on a linux system with Yadedaily pre-installed without affecting the original system. More informations about this alternative are available `here <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_ (see the README file first).
+
+Alternatively, images of a linux virtual machine can be downloaded, `here again <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_, and they should run on any system with a virtualization software (tested with VirtualBox and VMWare).
