@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 /* This engine is under active development. Experimental only */
-
-//#define THERMAL 
+//#define THERMAL
 #ifdef THERMAL
 #include<pkg/pfv/Thermal.hpp>
 #include<core/Scene.hpp>
@@ -26,10 +25,17 @@ ThermalEngine::~ThermalEngine(){}
 void ThermalEngine::action()
 {
 	scene = Omega::instance().getScene().get();
-	if (setInternalEnergy) initializeInternalEnergy();
-	computeSolidSolidFluxes();
-	computeSolidFluidFluxes();
-	computeNewTemperatures();
+	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
+		if (e->getClassName() == "FlowEngine") {
+			flow = dynamic_cast<FlowEngineT*>(e.get());
+		}
+	}
+	flow->solver->initializeInternalEnergy(); // internal energy of cells
+	flow->solver->augmentConductivityMatrix(scene->dt);
+	if (setInternalEnergy) initializeInternalEnergy();  // internal energy of particles
+	computeSolidSolidFluxes(); 
+	computeSolidFluidFluxes(flow);
+	computeNewTemperatures(flow); // new temps for particles and pores
 }
 
 void ThermalEngine::makeThermalState() {
@@ -49,30 +55,25 @@ void ThermalEngine::initializeInternalEnergy() {
 	setInternalEnergy = false;
 }
 
-void ThermalEngine::computeSolidFluidFluxes() {
-	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
-		if (e->getClassName() == "FlowEngine") {
-			FlowEngineT* flow = dynamic_cast<FlowEngineT*>(e.get());		
-			fluidK = flow->fluidK;
-			if (!flow->solver->sphericalVertexAreaCalculated) computeVertexSphericalArea(flow);
-			shared_ptr<BodyContainer>& bodies = scene->bodies;
-			Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
-//			#ifdef YADE_OPENMP
-			const long size = Tes.cellHandles.size();
-//			#pragma omp parallel for num_threads(ompThreads>0 ? ompThreads : 1)
-    			for (long i=0; i<size; i++){
-				CellHandle& cell = Tes.cellHandles[i];
-//			#else	
-				if (cell->info().isGhost) continue; // Do we need special cases for fictious cells?
-				for (int v=0;v<4;v++){
-					//if (cell->vertex(v)->info().isFictious) continue;
-					const long int id = cell->vertex(v)->info().id();
-					const shared_ptr<Body>& b =(*bodies)[id];
-					if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic() || !b) continue;
-					const double surfaceArea = cell->info().sphericalVertexSurface[v];
-					computeFlux(cell,b,surfaceArea);
-				}
-			}
+void ThermalEngine::computeSolidFluidFluxes(FlowEngineT* flow) {		
+	fluidK = flow->fluidK;
+	if (!flow->solver->sphericalVertexAreaCalculated) computeVertexSphericalArea(flow);
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
+	Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
+//	#ifdef YADE_OPENMP
+	const long size = Tes.cellHandles.size();
+//	#pragma omp parallel for num_threads(ompThreads>0 ? ompThreads : 1)
+    	for (long i=0; i<size; i++){
+		CellHandle& cell = Tes.cellHandles[i];
+//	#else	
+		if (cell->info().isGhost) continue; // Do we need special cases for fictious cells?
+		for (int v=0;v<4;v++){
+			//if (cell->vertex(v)->info().isFictious) continue;
+			const long int id = cell->vertex(v)->info().id();
+			const shared_ptr<Body>& b =(*bodies)[id];
+			if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic() || !b) continue;
+			const double surfaceArea = cell->info().sphericalVertexSurface[v];
+			computeFlux(cell,b,surfaceArea);
 		}
 	}
 }
@@ -81,14 +82,14 @@ void ThermalEngine::computeSolidFluidFluxes() {
 void ThermalEngine::computeVertexSphericalArea(FlowEngineT* flow){
 	Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
 //	#ifdef YADE_OPENMP
-		const long size = Tes.cellHandles.size();
+	const long size = Tes.cellHandles.size();
 //	#pragma omp parallel for num_threads(ompThreads>0 ? ompThreads : 1)
-    		for (long i=0; i<size; i++){
-			CellHandle& cell = Tes.cellHandles[i];
+    	for (long i=0; i<size; i++){
+		CellHandle& cell = Tes.cellHandles[i];
 //	#else		
-			if (cell->info().isFictious) continue;
-			VertexHandle W[4];
-			for (int k=0;k<4;k++) W[k] = cell->vertex(k);
+		if (cell->info().isFictious) continue;
+		VertexHandle W[4];
+		for (int k=0;k<4;k++) W[k] = cell->vertex(k);
 			cell->info().sphericalVertexSurface[0]=flow->solver->fastSphericalTriangleArea(W[0]->point(),W[1]->point().point(),W[2]->point().point(),W[3]->point().point());
 			cell->info().sphericalVertexSurface[1]=flow->solver->fastSphericalTriangleArea(W[1]->point(),W[0]->point().point(),W[2]->point().point(),W[3]->point().point());
 			cell->info().sphericalVertexSurface[2]=flow->solver->fastSphericalTriangleArea(W[2]->point(),W[1]->point().point(),W[0]->point().point(),W[3]->point().point());
@@ -144,17 +145,11 @@ void ThermalEngine::computeSolidSolidFluxes() {
 		const double T2 = thState2->temp;
 		const double d = r1 + r2 - pd;
 		if (d==0) continue;
-
 		double R = 0;
 		double r = 0;
 		// for equation: 
-		if (r1 >= r2) {
-			R = r1;
-			r = r2;
-		} else if (r1 < r2) {
-			R = r2;
-			r = r1;
-		} 
+		if (r1 >= r2) {R = r1;r = r2;}
+		else if (r1 < r2) {R = r2;r = r1;} 
 		// The radius of the intersection found by: Kern, W. F. and Bland, J. R. Solid Mensuration with Proofs, 2nd ed. New York: Wiley, p. 97, 1948.	http://mathworld.wolfram.com/Sphere-SphereIntersection.html	
 		const double numerator = pow((-d+r-R)*(-d-r+R)*(-d+r+R)*(d+r+R),0.5);	
 		const double rc = numerator / (2.*d);
@@ -167,7 +162,7 @@ void ThermalEngine::computeSolidSolidFluxes() {
 	}
 }
 
-void ThermalEngine::computeNewTemperatures() {
+void ThermalEngine::computeNewTemperatures(FlowEngineT* flow) {
 	const shared_ptr<BodyContainer>& bodies=scene->bodies;
 	const long size=bodies->size();
 //	#pragma omp parallel for
@@ -177,12 +172,7 @@ void ThermalEngine::computeNewTemperatures() {
 		ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get()); 
 		thState->temp = thState->U/(thState->Cp*thState->mass); // + thState->temp;
 	}
-	FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
-		if (e->getClassName() == "FlowEngine") {
-			FlowEngineT* flow = dynamic_cast<FlowEngineT*>(e.get());
-			flow->solver->setNewCellTemps();
-		}
-	}
+	flow->solver->setNewCellTemps();
 }
 
 

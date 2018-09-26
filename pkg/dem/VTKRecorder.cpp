@@ -604,10 +604,12 @@ void VTKRecorder::action(){
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
+			#ifdef THERMAL
 				if (recActive[REC_TEMP]) {
 					ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
 					spheresTemp->InsertNextValue(thState->temp);
 				}
+			#endif
 				if (recActive[REC_CLUMPID]) clumpId->InsertNextValue(b->clumpId);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = sphere->color;

@@ -7,6 +7,8 @@
 *************************************************************************/
 /* This engine is under active development. Experimental only */
 
+//#define THERMAL
+#ifdef THERMAL
 #pragma once 
 #include<core/PartialEngine.hpp>
 #include<core/State.hpp>
@@ -62,11 +64,10 @@ class ThermalState: public State {
 
 REGISTER_SERIALIZABLE(ThermalState);
 
-typedef TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT> FlowEngineT;
-
 class ThermalEngine : public PartialEngine
 {
 	public:
+		typedef TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT> FlowEngineT;
 		typedef FlowEngineT::Tesselation					Tesselation;
 		typedef FlowEngineT::RTriangulation					RTriangulation;
 		typedef FlowEngineT::FiniteCellsIterator				FiniteCellsIterator;
@@ -79,15 +80,15 @@ class ThermalEngine : public PartialEngine
 		double fluidK;
 		Scene* scene;
 		bool setInternalEnergy; //initialize the internal energy of the particles
+		FlowEngineT* flow;
 
 		virtual ~ThermalEngine();
 		virtual void action();
 		void makeThermalState();
 		void initializeInternalEnergy();
-		void computeSolidFluidFluxes();
-		void computeNewTemperatures();
-		void computeVertexSphericalArea(
-	TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT>* flow);
+		void computeSolidFluidFluxes(FlowEngineT* flow);
+		void computeNewTemperatures(FlowEngineT* flow);
+		void computeVertexSphericalArea(FlowEngineT* flow);
 		void computeFlux(CellHandle& cell, const shared_ptr<Body>& b, const double surfaceArea);
 		void computeSolidSolidFluxes();
 
@@ -106,5 +107,7 @@ class ThermalEngine : public PartialEngine
 	
 };
 REGISTER_SERIALIZABLE(ThermalEngine);
-//
+
+
+#endif//THERMAL
 	
