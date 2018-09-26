@@ -271,6 +271,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((double, fluidRho, 1000.,,"Density of fluid (for thermalEngine)."))
 		((double, fluidCp, 4181.3,,"Heat capacity of fluid (for thermalEngine)."))
 		((Real, dt, 0,,"timestep [s]"))
+		((double, fluidK, 0.650,,"Thermal conductivity of the fluid (for thermalEngine)."))
 		((bool,permeabilityMap,false,,"Enable/disable stocking of average permeability scalar in cell infos."))
 		((bool, slipBoundary, true,, "Controls friction condition on lateral walls"))
 		((bool,waveAction, false,, "Allow sinusoidal pressure condition to simulate ocean waves"))
@@ -440,6 +441,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	std::vector<CVector> cellForce;
 	std::vector<double> rayHydr;
 	std::vector<double> modulePermeability;
+	std::vector<double> sphericalVertexSurface;
 	// Partial surfaces of spheres in the double-tetrahedron linking two voronoi centers. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.doInterpolate
 	double solidSurfaces [4][4];
 	double temperature;
@@ -457,6 +459,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 		facetSphereCrossSections.resize(4,CGAL::NULL_VECTOR);
 		unitForceVectors.resize(4,CGAL::NULL_VECTOR);
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
+		sphericalVertexSurface.resize(4,0);
 		rayHydr.resize(4, 0);
 		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=temperature=0;
 		isFictious=false; Pcondition = false; isGhost = false; Tcondition= false;

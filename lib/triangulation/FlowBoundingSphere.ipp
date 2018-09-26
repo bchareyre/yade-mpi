@@ -477,10 +477,9 @@ void FlowBoundingSphere<Tesselation>::interpolate(Tesselation& Tes, Tesselation&
 					}
 				}
 			}
-        oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
-		if (!newCell->info().Pcondition) newCell->info().getInfo(oldCell->info());
-//                 newCell->info().p() = oldCell->info().shiftedP();
-		if (!newCell->info().Tcondition && thermalEngine) newCell->info().temp() = oldCell->info().temp();
+			oldCell = Tri.locate(CGT::Sphere(center[0],center[1],center[2]));
+			if (!newCell->info().Pcondition) newCell->info().getInfo(oldCell->info());
+			if (!newCell->info().Tcondition && thermalEngine) newCell->info().temp() = oldCell->info().temp();
 		}
 }
 
@@ -1211,7 +1210,17 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 
 		if (thermalEngine) {
 			vtkWrite.begin_data("Temperature",CELL_DATA,SCALARS,FLOAT);
-			for (unsigned kk=0; kk<allIds.size(); kk++) vtkWrite.write_data(tesselation().cellHandles[allIds[kk]]->info().temp());
+			for (unsigned kk=0; kk<allIds.size(); kk++){
+				bool isDrawable = tesselation().cellHandles[allIds[kk]]->info().isReal() && tesselation().cellHandles[allIds[kk]]->vertex(0)->info().isReal() && tesselation().cellHandles[allIds[kk]]->vertex(1)->info().isReal() && tesselation().cellHandles[allIds[kk]]->vertex(2)->info().isReal() && tesselation().cellHandles[allIds[kk]]->vertex(3)->info().isReal();
+				 if(isDrawable) vtkWrite.write_data(tesselation().cellHandles[allIds[kk]]->info().temp());
+			vtkWrite.end_data();
+			}
+			
+			vtkWrite.begin_data("Tcondition",CELL_DATA,SCALARS,FLOAT);
+			for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+				bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal() && cell->vertex(3)->info().isReal();
+				if (isDrawable){vtkWrite.write_data(cell->info().Tcondition);}
+			}
 			vtkWrite.end_data();
 		}
 			

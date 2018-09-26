@@ -266,6 +266,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 //         flow.tesselation().Clear();
         flow.tesselation().maxId=-1;
 	flow.blockedCells.clear();
+	flow.sphericalVertexAreaCalculated=false;
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
 }
 
@@ -322,6 +323,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		//initializeVolumes(flow);
 		thermalBoundaryConditions ( flow ); 
 		flow.initializeTemperatures ( tZero );
+		flow.sphericalVertexAreaCalculated=false;
 	}
 
 	
@@ -398,6 +400,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.boundsIds[5]= &flow.zMaxId;
 
 	for (int k=0;k<6;k++) flow.boundary ( *flow.boundsIds[k] ).useMaxMin = boundaryUseMaxMin[k];
+	//for (int k=0;k<6;k++) flow.thermalBoundary ( *flow.boundsIds[k] ).useMaxMin = boundaryUseMaxMin[k];
 
         flow.cornerMin = CGT::Point ( flow.xMin, flow.yMin, flow.zMin );
         flow.cornerMax = CGT::Point ( flow.xMax, flow.yMax, flow.zMax );

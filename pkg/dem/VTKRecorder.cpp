@@ -23,6 +23,7 @@
 #endif
 
 #include<core/Scene.hpp>
+#include<pkg/pfv/Thermal.hpp>
 #include<pkg/common/Sphere.hpp>
 #include<pkg/common/Facet.hpp>
 #include<pkg/common/Box.hpp>
@@ -72,6 +73,7 @@ void VTKRecorder::action(){
 		else if(rec=="facets") recActive[REC_FACETS]=true;
 		else if(rec=="boxes") recActive[REC_BOXES]=true;
 		else if(rec=="mass") recActive[REC_MASS]=true;
+		else if(rec=="thermal") recActive[REC_TEMP]=true;
 		else if((rec=="colors") || (rec=="color"))recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else if(rec=="wpm") recActive[REC_WPM]=true;
@@ -142,6 +144,10 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> spheresId = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresId->SetNumberOfComponents(1);
 	spheresId->SetName("id");
+
+	vtkSmartPointer<vtkDoubleArray> spheresTemp = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresTemp->SetNumberOfComponents(1);
+	spheresTemp->SetName("temp");
 
 #ifdef YADE_SPH
 	vtkSmartPointer<vtkDoubleArray> spheresRhoSPH = vtkSmartPointer<vtkDoubleArray>::New();
@@ -407,6 +413,7 @@ void VTKRecorder::action(){
 	momentNumInts->SetNumberOfComponents(1);
 	momentNumInts->SetName("momentNumInts");
 	
+	
 #ifdef YADE_LIQMIGRATION
 	vtkSmartPointer<vtkDoubleArray> liqVol = vtkSmartPointer<vtkDoubleArray>::New();
 	liqVol->SetNumberOfComponents(1);
@@ -597,6 +604,10 @@ void VTKRecorder::action(){
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
+				if (recActive[REC_TEMP]) {
+					ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
+					spheresTemp->InsertNextValue(thState->temp);
+				}
 				if (recActive[REC_CLUMPID]) clumpId->InsertNextValue(b->clumpId);
 				if (recActive[REC_COLORS]){
 					const Vector3r& color = sphere->color;
@@ -893,6 +904,7 @@ void VTKRecorder::action(){
 		if (recActive[REC_ID]) spheresUg->GetPointData()->AddArray(spheresId);
 		if (recActive[REC_MASK]) spheresUg->GetPointData()->AddArray(spheresMask);
 		if (recActive[REC_MASS]) spheresUg->GetPointData()->AddArray(spheresMass);
+		if (recActive[REC_TEMP]) spheresUg->GetPointData()->AddArray(spheresTemp);
 		if (recActive[REC_CLUMPID]) spheresUg->GetPointData()->AddArray(clumpId);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
 		if (recActive[REC_VELOCITY]){

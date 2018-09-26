@@ -664,7 +664,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::cholmodSolve(Real dt)
 		if (thermalEngine) {
 			initializeInternalEnergy();
 			augmentConductivityMatrix(dt);
-			setNewCellTemps();
+			//setNewCellTemps();
 		}
 		cholmod_l_free_dense(&ex, &com);
 	}
