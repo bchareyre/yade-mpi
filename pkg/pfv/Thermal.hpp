@@ -49,9 +49,11 @@ class ThermalState: public State {
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ThermalState,State,"preliminary",
 		/*attributes*/
 		((Real,temp,0,,"temperature of the body"))
+		((Real,oldTemp,0,,"change of temp (for thermal expansion)"))
 		((Real,U,0,,"internal energy of the body"))
 		((Real,Cp,0,,"internal energy of the body"))
 		((Real,k,0,,"thermal conductivity of the body"))
+		((Real,alpha,0,,"coefficient of thermal expansion"))
 		,
 		/* extra initializers */
 		,
@@ -81,10 +83,11 @@ class ThermalEngine : public PartialEngine
 		Scene* scene;
 		bool setInternalEnergy; //initialize the internal energy of the particles
 		FlowEngineT* flow;
-
+		
 		virtual ~ThermalEngine();
 		virtual void action();
 		void makeThermalState();
+		void thermalExpansion();
 		void initializeInternalEnergy();
 		void computeSolidFluidFluxes(FlowEngineT* flow);
 		void computeNewTemperatures(FlowEngineT* flow);
@@ -94,6 +97,9 @@ class ThermalEngine : public PartialEngine
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ThermalEngine,PartialEngine,"preliminary",
 		/*attributes*/
+		((bool,advection,true,,"Activates advection"))
+		((bool,conduction,true,,"Activates conduction"))
+		((bool,thermoMech,true,,"Activates thermoMech"))
 		,
 		/* extra initializers */
 		,

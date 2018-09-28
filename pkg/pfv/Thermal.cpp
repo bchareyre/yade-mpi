@@ -30,12 +30,18 @@ void ThermalEngine::action()
 			flow = dynamic_cast<FlowEngineT*>(e.get());
 		}
 	}
-	flow->solver->initializeInternalEnergy(); // internal energy of cells
-	flow->solver->augmentConductivityMatrix(scene->dt);
-	if (setInternalEnergy) initializeInternalEnergy();  // internal energy of particles
-	computeSolidSolidFluxes(); 
-	computeSolidFluidFluxes(flow);
+	if (!conduction) thermoMech = false; //don't allow thermoMech if conduction is not activated
+	if (advection) {
+		flow->solver->initializeInternalEnergy(); // internal energy of cells
+		flow->solver->augmentConductivityMatrix(scene->dt);
+	}
+	if (conduction) {
+		if (setInternalEnergy) initializeInternalEnergy();  // internal energy of particles
+		computeSolidSolidFluxes(); 
+		if (advection) computeSolidFluidFluxes(flow);
+	}
 	computeNewTemperatures(flow); // new temps for particles and pores
+	if (thermoMech) thermalExpansion();
 }
 
 void ThermalEngine::makeThermalState() {
@@ -163,17 +169,41 @@ void ThermalEngine::computeSolidSolidFluxes() {
 }
 
 void ThermalEngine::computeNewTemperatures(FlowEngineT* flow) {
+	if (conduction){
+		const shared_ptr<BodyContainer>& bodies=scene->bodies;
+		const long size=bodies->size();
+//		#pragma omp parallel for
+		for (long i=0; i<size; i++){
+			const shared_ptr<Body>& b=(*bodies)[i];
+			if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic() || !b) continue;
+			ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
+			thState->oldTemp = thState->temp; 
+			thState->temp = thState->U/(thState->Cp*thState->mass); // + thState->temp;
+		}
+	}
+	if (advection) flow->solver->setNewCellTemps();
+}
+
+
+void ThermalEngine::thermalExpansion() {
 	const shared_ptr<BodyContainer>& bodies=scene->bodies;
 	const long size=bodies->size();
-//	#pragma omp parallel for
+
 	for (long i=0; i<size; i++){
-		const shared_ptr<Body>& b=(*bodies)[i];
+		const shared_ptr<Body> b=(*bodies)[i];
 		if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic() || !b) continue;
-		ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get()); 
-		thState->temp = thState->U/(thState->Cp*thState->mass); // + thState->temp;
+		Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());		
+		ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
+		sphere->radius +=  thState->alpha * sphere->radius * (thState->temp - thState->oldTemp);
 	}
-	flow->solver->setNewCellTemps();
 }
+
+
+
+
+
+
+
 
 
 #endif//THERMAL
