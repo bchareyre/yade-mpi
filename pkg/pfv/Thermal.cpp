@@ -30,13 +30,14 @@ void ThermalEngine::action()
 			flow = dynamic_cast<FlowEngineT*>(e.get());
 		}
 	}
+	if (!boundarySet) setConductionBoundary(flow);
 	if (!conduction) thermoMech = false; //don't allow thermoMech if conduction is not activated
 	if (advection) {
 		flow->solver->initializeInternalEnergy(); // internal energy of cells
 		flow->solver->augmentConductivityMatrix(scene->dt);
 	}
 	if (conduction) {
-		if (setInternalEnergy) initializeInternalEnergy();  // internal energy of particles
+		if (!energySet) initializeInternalEnergy();  // internal energy of particles
 		computeSolidSolidFluxes(); 
 		if (advection) computeSolidFluidFluxes(flow);
 	}
@@ -46,6 +47,47 @@ void ThermalEngine::action()
 
 void ThermalEngine::makeThermalState() {
 	// loop through bodies and copy information over to new state
+}
+
+void ThermalEngine::setConductionBoundary(FlowEngineT* flow) {
+
+	for (int k=0;k<6;k++)	{
+		flow->solver->conductionBoundary(flow->wallIds[k]).fluxCondition=!bndCondIsTemperature[k];
+                flow->solver->conductionBoundary(flow->wallIds[k]).value=thermalBndCondValue[k];
+	}
+
+        RTriangulation& Tri = flow->solver->T[flow->solver->currentTes].Triangulation();
+        FiniteCellsIterator cellEnd = Tri.finite_cells_end();
+	const shared_ptr<BodyContainer>& bodies=scene->bodies;
+        for (int bound=0; bound<6;bound++) {
+                int& id = *flow->solver->boundsIds[bound];
+		flow->solver->conductionBoundingCells[bound].clear();
+		if (id<0) continue;
+                CGT::ThermalBoundary& bi = flow->solver->conductionBoundary(id);
+	
+                if (!bi.fluxCondition) {
+                        VectorCell tmpCells;
+                        tmpCells.resize(10000);
+                        VCellIterator cells_it = tmpCells.begin();
+                        VCellIterator cells_end = Tri.incident_cells(flow->solver->T[flow->solver->currentTes].vertexHandles[id],cells_it);
+			
+                        for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
+				CellHandle& cell = *it;
+				for (int v=0;v<4;v++) {
+					if (!cell->vertex(v)->info().isFictious){
+						const long int id = cell->vertex(v)->info().id();
+						const shared_ptr<Body>& b =(*bodies)[id];
+						if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic() || !b) continue;
+						ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
+						thState->Tcondition=true;
+						thState->temp=bi.value;
+					}
+				}
+				flow->solver->conductionBoundingCells[bound].push_back(cell);
+			}
+                }
+        }
+	boundarySet = true;
 }
 
 void ThermalEngine::initializeInternalEnergy() {
@@ -58,7 +100,7 @@ void ThermalEngine::initializeInternalEnergy() {
 		ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
 		thState->U = thState->Cp*thState->mass*thState->temp;
 	}
-	setInternalEnergy = false;
+	energySet = true;
 }
 
 void ThermalEngine::computeSolidFluidFluxes(FlowEngineT* flow) {		
@@ -112,7 +154,7 @@ void ThermalEngine::computeFlux(CellHandle& cell,const shared_ptr<Body>& b, cons
 	//const double areaRatio = surfaceArea/(4.*M_PI*sphere->radius*sphere->radius);
 	const double flux = h*surfaceArea*(cell->info().temp() - thState->temp); // Total surface accounted for through pores, but we also account for conduction area? Unphysical? 
 	if (!cell->info().Tcondition) cell->info().internalEnergy -= flux*scene->dt;
-	thState->U += flux*scene->dt;
+	if (!thState->Tcondition) thState->U += flux*scene->dt;
 }
 
 
@@ -162,8 +204,8 @@ void ThermalEngine::computeSolidSolidFluxes() {
 		const double dt = scene->dt;		
 		const double fluxij = 4.*rc*(T1-T2) / (1./k1 + 1./k2);
 		
-		U1 -= fluxij*dt;
-		U2 += fluxij*dt;
+		if (!thState1->Tcondition) U1 -= fluxij*dt;
+		if (!thState2->Tcondition) U2 += fluxij*dt;
 		}
 	}
 }
@@ -177,6 +219,7 @@ void ThermalEngine::computeNewTemperatures(FlowEngineT* flow) {
 			const shared_ptr<Body>& b=(*bodies)[i];
 			if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic() || !b) continue;
 			ThermalState* thState = YADE_CAST<ThermalState*>(b->state.get());
+			if (thState->Tcondition) continue;
 			thState->oldTemp = thState->temp; 
 			thState->temp = thState->U/(thState->Cp*thState->mass); // + thState->temp;
 		}

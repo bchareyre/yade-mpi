@@ -10,6 +10,7 @@
 //#define THERMAL
 #ifdef THERMAL
 #pragma once 
+
 #include<core/PartialEngine.hpp>
 #include<core/State.hpp>
 #include<pkg/dem/ScGeom.hpp>
@@ -21,6 +22,7 @@
 #include<lib/triangulation/FlowBoundingSphere.hpp>
 #include "FlowEngine_FlowEngineT.hpp"
 #include<pkg/dem/TesselationWrapper.hpp>
+#include<lib/triangulation/Network.hpp>
 #endif
 
 // This is how to turn a body thermal without data loss. Should be done in a loop by a single function, ofc.
@@ -38,7 +40,6 @@
 // Yade [21]: s.state=ThermalState().__setstate__( s.state.__getstate__())
 
 
-
 class ThermalState: public State {
 	public:
 		virtual ~ThermalState();
@@ -54,6 +55,7 @@ class ThermalState: public State {
 		((Real,Cp,0,,"internal energy of the body"))
 		((Real,k,0,,"thermal conductivity of the body"))
 		((Real,alpha,0,,"coefficient of thermal expansion"))
+		((bool,Tcondition,false,,"indicates if particle is assigned dirichlet (constant temp) condition"))
 		,
 		/* extra initializers */
 		,
@@ -74,19 +76,21 @@ class ThermalEngine : public PartialEngine
 		typedef FlowEngineT::RTriangulation					RTriangulation;
 		typedef FlowEngineT::FiniteCellsIterator				FiniteCellsIterator;
 		typedef FlowEngineT::CellHandle						CellHandle;
-		typedef FlowEngineT::VertexHandle                    			VertexHandle;
-
-
+		typedef FlowEngineT::VertexHandle	VertexHandle;
+		typedef std::vector<CellHandle>		VectorCell;
+		typedef typename VectorCell::iterator		VCellIterator;
 
 	public:
 		double fluidK;
 		Scene* scene;
-		bool setInternalEnergy; //initialize the internal energy of the particles
+		bool energySet; //initialize the internal energy of the particles
 		FlowEngineT* flow;
+		bool boundarySet;
 		
 		virtual ~ThermalEngine();
 		virtual void action();
 		void makeThermalState();
+		void setConductionBoundary(FlowEngineT* flow);
 		void thermalExpansion();
 		void initializeInternalEnergy();
 		void computeSolidFluidFluxes(FlowEngineT* flow);
@@ -100,11 +104,13 @@ class ThermalEngine : public PartialEngine
 		((bool,advection,true,,"Activates advection"))
 		((bool,conduction,true,,"Activates conduction"))
 		((bool,thermoMech,true,,"Activates thermoMech"))
+		((vector<bool>, bndCondIsTemperature, vector<bool>(6,false),,"defines the type of boundary condition for each side. True if temperature is imposed, False for no heat-flux. Indices can be retrieved with :yref:`FlowEngine::xmin` and friends."))
+		((vector<double>, thermalBndCondValue, vector<double>(6,0),,"Imposed value of a boundary condition."))
 		,
 		/* extra initializers */
 		,
 		/* ctor */
-		setInternalEnergy=true;
+		energySet=false;boundarySet=false;
 		,
 		/* py */
 	)

@@ -66,13 +66,16 @@ class Network
 		int* boundsIds [6];
 		vector<CellHandle> boundingCells [6];
 		vector<CellHandle> thermalBoundingCells [6];
+		vector<CellHandle> conductionBoundingCells [6];
 		Point cornerMin;
 		Point cornerMax;
 		Real VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalPorosity;
 		Boundary boundaries [6];
 		ThermalBoundary thermalBoundaries [6];
+		ThermalBoundary conductionBoundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-idOffset];}
 		ThermalBoundary& thermalBoundary (int b) {return thermalBoundaries[b-idOffset];}
+		ThermalBoundary& conductionBoundary (int b) {return conductionBoundaries[b-idOffset];}
 		short idOffset;
 		int vtkInfiniteVertices, vtkInfiniteCells, num_particles;
 
