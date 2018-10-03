@@ -117,6 +117,7 @@ print "Qin=",Qin," Qout=",Qout," permeability=",permeability
 #C. now the oedometer test, drained at the top, impermeable at the bottom plate
 flow.bndCondIsPressure=[0,0,0,1,0,0]
 flow.bndCondValue=[0,0,0,0,0,0]
+flow.updateTriangulation=True #force remeshing to reflect new BC immediately
 newton.damping=0
 
 #we want the theoretical value from Terzaghi's solution
