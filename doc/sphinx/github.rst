@@ -86,7 +86,7 @@ Then you proceed to commit through terminal::
  git commit path/to/new_or_modified/file.cpp -m'Commit message'``  #Validate a change. It can be done several times after every sufficient change. No equivalent in bzr, it's like commiting to your own local repository
  git push  #Push your changes into GitHub. Equivalent of "bzr commit", except that your are commiting to your own remote branch
 
-Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" [5] or create a patch from your commit via::
+Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" (see github website for help) or create a patch from your commit via::
 
  git format-patch origin  #create patch file in current folder)
 
