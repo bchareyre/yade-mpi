@@ -310,7 +310,7 @@ feature will be disabled.
 Speed-up compilation
 ^^^^^^^^^^^^^^^^^^^^^
 
-When spliting the compilation on many cores (``make -jN``), ``N`` is limited by the available cores and memory. It is possible to use more cores if remote computers are available, ditributing the compilation with `ditscc <https://wiki.archlinux.org/index.php/Distcc>`_  (see distcc documentation for configuring slaves and master)::
+When spliting the compilation on many cores (``make -jN``), ``N`` is limited by the available cores and memory. It is possible to use more cores if remote computers are available, distributing the compilation with `distcc <https://wiki.archlinux.org/index.php/Distcc>`_  (see distcc documentation for configuring slaves and master)::
 
 	export CC=distcc gcc
 	export CXX=distcc g++
