@@ -445,7 +445,7 @@ Instead of typing everything into the command-line, one can describe simulation 
 		ForceResetter(),
 		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
 		InteractionLoop(           # dtto for the parenthesis here
-			 [Ig2_Sphere_Sphere_ScGeom_Inc(),Ig2_Wall_Sphere_ScGeom_Inc()],
+			 [Ig2_Sphere_Sphere_ScGeom(),Ig2_Wall_Sphere_ScGeom()],
 			 [Ip2_FrictMat_FrictMat_FrictPhys()],
 			 [Law2_ScGeom_FrictPhys_CundallStrack()]
 		),
