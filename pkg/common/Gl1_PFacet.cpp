@@ -5,7 +5,7 @@
 
 // bool Gl1_PFacet::normals=false;
 bool Gl1_PFacet::wire=true;
-void Gl1_PFacet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2,const GLViewInfo&)
+void Gl1_PFacet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& st,bool wire2,const GLViewInfo&)
 {   
 	PFacet* Pfacet = static_cast<PFacet*>(cm.get());
 	vector<Vector3r> vertices;
@@ -14,6 +14,8 @@ void Gl1_PFacet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool 
 	vertices.push_back(Pfacet->node3->state->pos);
 	
 	Vector3r pos=Pfacet->node1->state->pos;
+	
+	st->ori = Quaternionr::Identity();// Otherwise clumped connexions get rotated by the clump motion and the view is messed up (note that orientation is never used in mechanical calculations in the case of connexions and pfacets).
 
 	vertices[0]=vertices[0]-pos;
 	vertices[1]=vertices[1]-pos;

@@ -37,6 +37,9 @@ void Gl1_GridConnection::go(const shared_ptr<Shape>& cm, const shared_ptr<State>
 // 	glPushMatrix();
 	Quaternionr shift;
 	shift.setFromTwoVectors(Vector3r::UnitZ(),segt);
+	
+	st->ori = Quaternionr::Identity();// Otherwise clumped connexions get rotated by the clump motion and the view is messed up (note that orientation is never used in mechanical calculations in the case of connexions and pfacets).
+	
 	if(intr){drawCylinder(wire || wire2, r,length,shift);}
 // 	if (intr && scene->isPeriodic) { glTranslatef(-segt[0],-segt[1],-segt[2]); drawCylinder(wire || wire2, r,length,-shift);}
 	if(glutNormalize) glPopAttrib();
