@@ -144,19 +144,20 @@ To avoid confusing logs after each commit/pull/push cycle, it is better to setup
 
  git config --global branch.autosetuprebase always
 
-Now your file ~/.gitconfig should include:
+Now your file ~/.gitconfig should include::
 
- [branch]
-   autosetuprebase = always
+	  [branch]
+	    autosetuprebase = always
 
-Check also .git/config file in your local trunk folder (rebase = true):
+Check also .git/config file in your local trunk folder (rebase = true)::
 
- [branch "master"]
-   remote = origin
-
-   merge = refs/heads/master
-
-   rebase = true
+	  [remote "origin"]
+	    url = git@github.com:yade/trunk.git
+	    fetch = +refs/heads/*:refs/remotes/origin/*
+	  [branch "master"]
+	    remote = origin
+	    merge = refs/heads/master
+	    rebase = true
 
 Auto-rebase may have unpleasant side effects by blocking "pull" if you have uncommited changes. In this case you can use "git stash"::
 
