@@ -31,6 +31,7 @@ postprocessing and debugging.
 
 - General users: https://launchpad.net/~yade-users
 - Developers and advanced users: https://launchpad.net/~yade-dev
+- Developers for distributed memory parallelization of Yade: https://launchpad.net/~yade-mpi
 - Infrastructure maintainers: https://launchpad.net/~yade-pkg
 
 **Miscellaneous:**
