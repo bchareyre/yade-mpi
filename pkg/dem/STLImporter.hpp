@@ -121,7 +121,18 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
   vector<Vrtx> vcs;
   set<pair<int,int> > egs;
 
-  /* Read a single facet from an ASCII .STL file */
+  /* Read a single facet from an ASCII .STL file 
+   * ASCII file looks like:
+   *   solid name
+   *    facet normal n1 n2 n3
+   *     outer loop
+   *     vertex p1x p1y p1z
+   *     vertex p2x p2y p2z
+   *     vertex p3x p3y p3z
+   *     endloop
+   *    endfacet
+   *   endsolid name
+   */
   int r=0; //just to escape "warning: ignoring return value of 'int fscanf(FILE*, const char*, ...)',"
   while(!feof(fp))
   {
@@ -134,7 +145,11 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
     r+=fscanf(fp, "%*s %f %f %f\n", &v[2][0],  &v[2][1],  &v[2][2]);
     r+=fscanf(fp, "%*s"); // end loop
     r+=fscanf(fp, "%*s"); // end facet
-    if(feof(fp)) break;
+    if (feof(fp))
+    {
+      r=1; // last time reading procedures from above are called, the end-of-file was reached so r got negative; assigning some value > 0 let's succed this function
+      break;
+    }
   
     int vid[3];
     for(int i=0;i<3;++i)
