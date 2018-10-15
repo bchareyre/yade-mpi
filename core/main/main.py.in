@@ -164,30 +164,7 @@ def userSession(gui='none',qapp=None):
 	import sys
 	if __name__ != "__main__": # for importing as python module
 		return
-	# start non-blocking qt4 app here; need to ask on the mailing list on how to make it functional
-	## with ipython 0.11, start the even loop early (impossible with 0.10, which is thread-based)
-	#if qt4 and yade.runtime.ipython_version==11:
-	#	import IPython
-	#	IPython.appstart_qt4(qapp)
-	if len(sys.argv)>0:
-		arg0=sys.argv[0]
-		if (gui<>'none'): yade.qt.Controller();
-		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
-			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
-			sys.stderr.write("Running simulation "+arg0+'\n')
-		if arg0.endswith('.py'):
-			def runScript(script):
-				sys.stderr.write("Running script "+arg0+'\n')
-				try:
-					execfile(script,globals())
-				except SystemExit: raise
-				except: # all other exceptions
-					import traceback
-					traceback.print_exc()
-					if yade.runtime.opts.exitAfter: sys.exit(1)
-				if yade.runtime.opts.exitAfter: sys.exit(0)
-			runScript(arg0)
-	if yade.runtime.opts.exitAfter: sys.exit(0)
+	
 	# common ipython configuration
 	banner='[[ ^L clears screen, ^U kills line. '+', '.join((['F12 controller','F11 3d view (use h-key for showing help)','F10 both','F9 generator'] if (gui<>'none') else [])+['F8 plot'])+'. ]]'
 	ipconfig=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py
@@ -207,11 +184,10 @@ def userSession(gui='none',qapp=None):
 	)
 
 	# show python console
-	# handle both ipython 0.10 and 0.11 (incompatible API)
+	# handle ipython version (version 10 nost tested after some changes here)
 	if yade.runtime.ipython_version==10:
 		from IPython.Shell import IPShellEmbed
 		ipshell=IPShellEmbed(banner=banner,rc_override=ipconfig)
-		ipshell()
 		# save history -- a workaround for atexit handlers not being run (why?)
 		# http://lists.ipython.scipy.org/pipermail/ipython-user/2008-September/005839.html
 		import IPython.ipapi
@@ -222,7 +198,6 @@ def userSession(gui='none',qapp=None):
 		for k in ipconfig: setattr(InteractiveShellEmbed,k,ipconfig[k])
 		InteractiveShellEmbed.banner1=banner+'\n'  # called banner1 here, not banner anymore
 		ipshell=InteractiveShellEmbed()
-		ipshell()
 	elif yade.runtime.ipython_version>=12:
 		if yade.runtime.ipython_version>=100:
 			from IPython.terminal.embed import InteractiveShellEmbed
@@ -247,7 +222,33 @@ def userSession(gui='none',qapp=None):
 		# If IPython > 5 one need to initialize graphic gui
 		if ((gui == "qt5" or gui == "qt4")and yade.runtime.ipython_version>=500):
 			ipshell.enable_gui(gui)
-		ipshell()
+		
+	# start non-blocking qt4 app here; need to ask on the mailing list on how to make it functional
+	## with ipython 0.11, start the even loop early (impossible with 0.10, which is thread-based)
+	#if qt4 and yade.runtime.ipython_version==11:
+	#	import IPython
+	#	IPython.appstart_qt4(qapp)
+	if len(sys.argv)>0:
+		arg0=sys.argv[0]
+		if (gui<>'none'): yade.qt.Controller();
+		if sum(bool(arg0.endswith(ext)) for ext in ('.xml','.xml.bz2','.xml.gz','.yade','.yade.gz','.yade.bz2','.bin','.bin.gz','.bin.bz2'))>0:
+			if len(sys.argv)>1: raise RuntimeError('Extra arguments to saved simulation to run: '+' '.join(sys.argv[1:]))
+			sys.stderr.write("Running simulation "+arg0+'\n')
+		if arg0.endswith('.py'):
+			def runScript(script):
+				sys.stderr.write("Running script "+arg0+'\n')
+				try:
+					execfile(script,globals())
+				except SystemExit: raise
+				except: # all other exceptions
+					import traceback
+					traceback.print_exc()
+					if yade.runtime.opts.exitAfter: sys.exit(1)
+				if yade.runtime.opts.exitAfter: sys.exit(0)
+			runScript(arg0)
+		if yade.runtime.opts.exitAfter: sys.exit(0)
+	## start interpreter
+	ipshell()
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
