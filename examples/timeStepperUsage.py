@@ -77,43 +77,44 @@ print "dt dynamicaly set with GlobalStiffness timesteper + density scaling:"
 print "--------------------------------------------------------------------"
 timing.stats()
 
-#_____ TYPICAL RESULTS (n=1000)____
+
+#_____ TYPICAL RESULTS (N=1000, single core)____
 #--------------------------------
 #Fixed dt = 0.8 * PWave timestep:
 #--------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#ForceResetter                                     58166             455809us                0.82%
-#InsertionSortCollider                             23641           17777093us               31.92%
-#InteractionLoop                                   58166           21812997us               39.17%
-#"ts"                                                  0                  0us                0.00%
-#"triax"                                           58166            4329739us                7.77%
-#"newton"                                          58166           11314162us               20.32%
-#TOTAL                                                             55689802us              100.00%
+#ForceResetter                                     60126             466162us                0.94%      
+#InsertionSortCollider                             23643           10263455us               20.65%      
+#InteractionLoop                                   60126           22821530us               45.92%      
+#"ts"                                                  0                  0us                0.00%      
+#"triax"                                           60126            4447870us                8.95%      
+#"newton"                                          60126           11704656us               23.55%      
+#TOTAL                                                             49703674us              100.00%      
 
 #--------------------------------------------------
 #dt dynamicaly set with GlobalStiffness timesteper:
 #--------------------------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#ForceResetter                                     37471             296255us                0.82%
-#InsertionSortCollider                              6589            5608966us               15.57%
-#InteractionLoop                                   37471           18167532us               50.44%
-#"ts"                                               3785             477777us                1.33%
-#"triax"                                           37471            3801429us               10.55%
-#"newton"                                          37471            7664305us               21.28%
-#TOTAL                                                             36016267us              100.00%
+#ForceResetter                                     29396             234443us                0.88%      
+#InsertionSortCollider                              7271            3634797us               13.66%      
+#InteractionLoop                                   29396           13682597us               51.43%      
+#"ts"                                               2977             342164us                1.29%      
+#"triax"                                           29396            2754907us               10.36%      
+#"newton"                                          29396            5955196us               22.38%      
+#TOTAL                                                             26604106us              100.00%      
 
-#WARN  /home/3S-LAB/bchareyre/yade/yade-git/trunk/pkg/dem/NewtonIntegrator.cpp:282 set_densityScaling: GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the timestepper if you don't want the scaling adjusted automatically.
+#WARN  /home/3S-LAB/bchareyre/yade/yade-fresh/trunk/pkg/dem/NewtonIntegrator.cpp:283 set_densityScaling: GlobalStiffnessTimeStepper found in O.engines and adjusted to match this setting. Revert in the timestepper if you don't want the scaling adjusted automatically.
 #--------------------------------------------------------------------
 #dt dynamicaly set with GlobalStiffness timesteper + density scaling:
 #--------------------------------------------------------------------
 #Name                                                    Count                 Time            Rel. time
 #-------------------------------------------------------------------------------------------------------
-#ForceResetter                                     31666             251568us                1.55%
-#InsertionSortCollider                               429             429116us                2.64%
-#InteractionLoop                                   31666            8135458us               50.06%
-#"ts"                                               3168             244340us                1.50%
-#"triax"                                           31666            1282567us                7.89%
-#"newton"                                          31666            5909985us               36.36%
-#TOTAL                                                             16253037us              100.00%
+#ForceResetter                                     27071             217134us                1.83%      
+#InsertionSortCollider                               341             205483us                1.73%      
+#InteractionLoop                                   27071            5238977us               44.24%      
+#"ts"                                               2709             858071us                7.25%      
+#"triax"                                           27071             619294us                5.23%      
+#"newton"                                          27071            4704522us               39.72%      
+#TOTAL                                                             11843484us              100.00%      

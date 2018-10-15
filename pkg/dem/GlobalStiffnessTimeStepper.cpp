@@ -13,6 +13,7 @@
 #include<core/Interaction.hpp>
 #include<core/Scene.hpp>
 #include<core/Clump.hpp>
+#include<pkg/common/Sphere.hpp>
 #include<pkg/dem/Shop.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 
@@ -38,37 +39,42 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 			}
 		}
 	}
-	
+	Real dt; 
 	if(!sdec || stiffness==Vector3r::Zero()){
+		// No interaction on this body, return. If using density scaline fallback to PWaveTimestep-like equation for dt.
 		if (densityScaling) {
-			if (sdec->densityScaling<=0)  sdec->densityScaling = timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0);
-			else sdec->densityScaling = max(0.99*sdec->densityScaling, timestepSafetyCoefficient*pow(defaultDt/targetDt,2.0));}
-		return; // not possible to compute!
+			if (body->material and body->shape) {
+				shared_ptr<ElastMat> ebp=YADE_PTR_DYN_CAST<ElastMat>(body->material);
+				shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(body->shape);
+				if(!ebp || !s) dt=defaultDt;
+				Real density=body->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
+				dt=s->radius/sqrt(ebp->young/density);
+// 				dt=defaultDt;
+			} else {
+				dt=defaultDt;
+			}
+			if (sdec->densityScaling<=0)  sdec->densityScaling = timestepSafetyCoefficient*pow(dt/targetDt,2.0);
+			else sdec->densityScaling = min(1.01*sdec->densityScaling, timestepSafetyCoefficient*pow(dt/targetDt,2.0));}
+		if (not viscEl) return; // not possible to compute!
+	} else {
+		//Normal case: determine the elastic minimum eigenperiod (and if required determine also the viscous one separately and take the minimum of the two)
+		Real dtx, dty, dtz;
+		dt = max( max (stiffness.x(), stiffness.y()), stiffness.z() );
+		if (dt!=0) {dt = sdec->mass/dt;  computedSomething = true;}//dt = squared eigenperiod of translational motion 
+		else dt = Mathr::MAX_REAL;
+		if (Rstiffness.x()!=0) {dtx = sdec->inertia.x()/Rstiffness.x();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
+		else dtx = Mathr::MAX_REAL;
+		if (Rstiffness.y()!=0) {dty = sdec->inertia.y()/Rstiffness.y();  computedSomething = true;}
+		else dty = Mathr::MAX_REAL;
+		if (Rstiffness.z()!=0) {dtz = sdec->inertia.z()/Rstiffness.z();  computedSomething = true;}
+		else dtz = Mathr::MAX_REAL;
+		
+		Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for elastic rotational motions
+		dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
 	}
-
-	//Determine the elastic minimum eigenperiod (and if required determine also the viscous one separately and take the minimum of the two)
-
-	//Elastic
-	Real dtx, dty, dtz;
-	Real dt = max( max (stiffness.x(), stiffness.y()), stiffness.z() );
-	if (dt!=0) {
-		dt = sdec->mass/dt;  computedSomething = true;}//dt = squared eigenperiod of translational motion 
-	else dt = Mathr::MAX_REAL;
-	if (Rstiffness.x()!=0) {
-		dtx = sdec->inertia.x()/Rstiffness.x();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
-	else dtx = Mathr::MAX_REAL;	
-	if (Rstiffness.y()!=0) {
-		dty = sdec->inertia.y()/Rstiffness.y();  computedSomething = true;}
-	else dty = Mathr::MAX_REAL;
-	if (Rstiffness.z()!=0) {
-		dtz = sdec->inertia.z()/Rstiffness.z();  computedSomething = true;}
-	else dtz = Mathr::MAX_REAL;
-	
-	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for elastic rotational motions
-	dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
 	
 	//Viscous 
-	if (viscEl == true){		
+	if (viscEl == true){
 		Vector3r&  viscosity = viscosities[body->getId()];
 		Vector3r& Rviscosity = Rviscosities[body->getId()];
 		Real dtx_visc, dty_visc, dtz_visc;
@@ -96,7 +102,8 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 
 	//if there is a target dt, then we apply density scaling on the body, the inertia used in Newton will be mass/scaling, the weight is unmodified
 	if (densityScaling) {
-		sdec->densityScaling = min(sdec->densityScaling*1.01, pow(dt /targetDt,2.0));
+		if (sdec->densityScaling>0)  sdec->densityScaling = min(sdec->densityScaling*1.05, pow(dt /targetDt,2.0));
+		else sdec->densityScaling = pow(dt /targetDt,2.0);
 		newDt=targetDt;
 	}
 	//else we update dt normaly
