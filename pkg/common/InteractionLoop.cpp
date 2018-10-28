@@ -29,6 +29,8 @@ void InteractionLoop::action(){
 	geomDispatcher->updateScenePtr();
 	physDispatcher->updateScenePtr();
 	lawDispatcher->updateScenePtr();
+	
+	const Body::id_t& subDIdx = scene->subdomain;
 
 	/*
 		initialize callbacks; they return pointer (used only in this timestep) to the function to be called
@@ -64,15 +66,17 @@ void InteractionLoop::action(){
 		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
-		}
-
+		}		
 		const shared_ptr<Body>& b1_=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
-
+		
 		if(!b1_ || !b2_){
-			LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!");
 			scene->interactions->requestErase(I);
 			continue;
+		}
+		//FIXME: can be removed if scene splitting takes care of it
+		if (subDIdx!=b1_->subdomain and subDIdx!=b2_->subdomain) {
+			scene->interactions->requestErase(I); continue;
 		}
     
 		// Skip interaction with clumps
