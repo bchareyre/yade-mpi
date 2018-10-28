@@ -3,6 +3,7 @@
 #pragma once
 #include<pkg/common/Collider.hpp>
 #include<core/Scene.hpp>
+#include<pkg/dem/NewtonIntegrator.hpp>
 class InteractionContainer;
 
 
@@ -71,10 +72,6 @@ Possible performance improvements & bugs
 	#define ISC_CHECKPOINT(cpt)
 #endif
 
-class NewtonIntegrator;
-
-class Integrator;
-
 class GeneralIntegratorInsertionSortCollider;// Forward decleration of child to decleare it as friend
 
 class InsertionSortCollider: public Collider{
@@ -100,8 +97,7 @@ class InsertionSortCollider: public Collider{
 			return coord>b.coord;
 		}
 	};
-		// we need this to find out about current maxVelocitySq
-		shared_ptr<NewtonIntegrator> newton;
+		
 		// if False, no type of striding is used
 		// if True, then either verletDist XOR nBins is set
 		bool strideActive;
@@ -207,6 +203,7 @@ class InsertionSortCollider: public Collider{
 		((int,numAction,0,,"Cummulative number of collision detection."))
 		((Real,useless,,,"for compatibility of scripts defining the old collider's attributes - see deprecated attributes")) 
 		((bool,doSort,false,,"Do forced resorting of interactions."))
+		((shared_ptr<NewtonIntegrator>, newton,,,"reference to active :yref:`Newton integrator<NewtonIntegrator>`. |yupdate|"))
 		, /* ctor */
 			#ifdef ISC_TIMING
 				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);

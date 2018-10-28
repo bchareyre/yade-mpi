@@ -6,7 +6,6 @@
 #include<core/Interaction.hpp>
 #include<core/InteractionContainer.hpp>
 #include<pkg/common/Dispatching.hpp>
-#include<pkg/dem/NewtonIntegrator.hpp>
 #include<pkg/common/Sphere.hpp>
 
 #include<boost/static_assert.hpp>
@@ -278,6 +277,7 @@ void InsertionSortCollider::action(){
 			if(verletDist>0) strideActive=true;
 			if(strideActive){
 				assert(verletDist>0);
+				assert(YADE_PTR_DYN_CAST<NewtonIntegrator>(newton));
 				assert(strideActive); assert(newton->maxVelocitySq>=0);
 				newton->updatingDispFactor=updatingDispFactor;
 			} else boundDispatcher->sweepDist=0;
