@@ -40,7 +40,8 @@ class GridConnection: public Sphere{
 		virtual ~GridConnection();
 		Real getLength();
 		Vector3r getSegment();
-		void addPFacet(shared_ptr<Body> PF); 
+		void addPFacet(shared_ptr<Body> PF);
+		vector<shared_ptr<Body> > getPFacets() {return pfacetList;}
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GridConnection,Sphere,"GridConnection shape (see [Effeindzourou2016]_, [Bourrier2013]_). Component of a grid designed to link two :yref:`GridNodes<GridNode>`. It is highly recommended to use :yref:`yade.gridpfacet.gridConnection` to generate correct :yref:`GridConnections<GridConnection>`.",
 		((shared_ptr<Body> , node1 , ,,"First :yref:`Body` the GridConnection is connected to."))
 		((shared_ptr<Body> , node2 , ,,"Second :yref:`Body` the GridConnection is connected to."))
@@ -48,8 +49,9 @@ class GridConnection: public Sphere{
 		 ((vector<shared_ptr<Body> >,pfacetList,,Attr::hidden,"List of :yref:`PFacet<PFacet>` the GridConnection is connected to."))
 		((Vector3i , cellDist , Vector3i(0,0,0),,"Distance of bodies in cell size units, if using periodic boundary conditions. Note that periodic boundary conditions for GridConnections have not yet been fully implemented.")),
 		createIndex();, /*ctor*/
-				/*py*/			  
-		.def("addPFacet",&GridConnection::addPFacet,(boost::python::arg("Body")),"Add a PFacet to the GridConnection.") 
+		/*py*/  
+		.def("addPFacet",&GridConnection::addPFacet,(boost::python::arg("Body")),"Add a PFacet to the GridConnection.")
+		.def("getPFacets",&GridConnection::getPFacets,"get list of linked PFacets.") 
 	);
 	REGISTER_CLASS_INDEX(GridConnection,Sphere);
 };
@@ -60,7 +62,10 @@ class GridNode: public Sphere{
 	public:
 		virtual ~GridNode();
 		void addConnection(shared_ptr<Body> GC);
-		void addPFacet(shared_ptr<Body> PF); 
+		void addPFacet(shared_ptr<Body> PF);
+		vector<shared_ptr<Body> > getPFacets() {return pfacetList;}
+		vector<shared_ptr<Body> > getConnections() {return ConnList;}
+		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GridNode,Sphere,"GridNode shape, component of a grid.\nTo create a Grid, place the nodes first, they will define the spacial discretisation of it. It is highly recommended to use :yref:`yade.gridpfacet.gridNode` to generate correct :yref:`GridNodes<GridNode>`. Note that the GridNodes should only be in an Interaction with other GridNodes. The Sphere-Grid contact is only handled by the :yref:`GridConnections<GridConnection>`.",
 		((vector<shared_ptr<Body> >,pfacetList,,Attr::hidden,"List of :yref:`PFacets<PFacet>` the GridConnection is connected to."))
 		((vector<shared_ptr<Body> >,ConnList,,Attr::hidden,"List of :yref:`GridConnections<GridConnection>` the GridNode is connected to.")),
@@ -69,6 +74,8 @@ class GridNode: public Sphere{
 		/*py*/
 		.def("addConnection",&GridNode::addConnection,(boost::python::arg("Body")),"Add a GridConnection to the GridNode.")
 		.def("addPFacet",&GridNode::addPFacet,(boost::python::arg("Body")),"Add a PFacet to the GridNode.")
+		.def("getPFacets",&GridNode::getPFacets,"get list of linked :yref:`PFacet`'s.") 
+		.def("getConnections",&GridNode::getConnections,"get list of linked :yref:`GridConnection`'s.") 
 	);
 	REGISTER_CLASS_INDEX(GridNode,Sphere);
 };
