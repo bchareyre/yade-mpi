@@ -282,12 +282,9 @@ ELSE(ENABLE_GUI)
   SET(DISABLED_FEATS "${DISABLED_FEATS} GUI")
 ENDIF(ENABLE_GUI)
 #===========================================================
-# This one will automatically enable CGAL
-IF(ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW)
-  IF (NOT ENABLE_CGAL)
-    MESSAGE(STATUS "PFVFLOW and TWOPHASEFLOW depends on CGAL, attempting to turn ENABLE_CGAL ON")
-    SET(ENABLE_CGAL ON)
-  ENDIF (NOT ENABLE_CGAL)
+# This one will cry on attempts to build CGAL-based packages without cgal
+IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW))
+  MESSAGE(STATUS "PFVFLOW and TWOPHASEFLOW depends on CGAL, and ENABLE_CGAL is disabled (not found or turned OFF)")
 ENDIF(ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW)
 #===========================================================
 IF(ENABLE_CGAL)  
