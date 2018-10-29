@@ -8,7 +8,7 @@
 // #include<core/PartialEngine.hpp>
 #include <pkg/common/Aabb.hpp>
 #include <pkg/common/Dispatching.hpp>
-
+#include <mpi.h>
 
 class NewtonIntegrator;
 
@@ -22,7 +22,8 @@ class Subdomain: public Shape {
 	void intrs_set(const boost::python::list& intrs);
 	boost::python::list mIntrs_get();
 	void mIntrs_set(const boost::python::list& intrs);
-//     boost::python::dict members_get();
+//     	boost::python::dict members_get();
+	vector<MPI_Request> mpiReqs;
 	
 	// returns pos,vel,angVel,ori of bodies interacting with a given otherDomain
 	std::vector<double> getStateValuesFromIds(const vector<Body::id_t>& search) { 
@@ -40,7 +41,7 @@ class Subdomain: public Shape {
 	
 	std::vector<double> getStateValues(unsigned otherSubdomain) { 
 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
-		if (scene->subdomain==otherSubdomain) {LOG_ERROR("subdomain cannot interact with itself"); return std::vector<double>();}
+		if (scene->subdomain==int(otherSubdomain)) {LOG_ERROR("subdomain cannot interact with itself"); return std::vector<double>();}
 		if (otherSubdomain >= intersections.size()) {LOG_ERROR("otherSubdomain exceeds no. of subdomains ("<<otherSubdomain<<" vs. "<<intersections.size()); return std::vector<double>();}
 		const vector<Body::id_t>& search = intersections[otherSubdomain];
 		return getStateValuesFromIds(search);
@@ -49,7 +50,7 @@ class Subdomain: public Shape {
 	boost::python::dict getStateValuesFromIdsAsArray(int otherSubdomain);
 	
 	
-	void setStateValuesFromIds(const vector<Body::id_t>& b_ids, const std::vector<double>& input) { 
+	void setStateValuesFromIds(const vector<Body::id_t>& b_ids, const std::vector<Real>& input) { 
 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
 		unsigned int N= b_ids.size();
 		if ((N*13) != input.size()) LOG_ERROR("size mismatch"<<N*13<<" vs "<<input.size()<< " in "<<scene->subdomain);
@@ -62,7 +63,48 @@ class Subdomain: public Shape {
 			s->ori=Quaternionr(input[idx+12],input[idx+9],input[idx+10],input[idx+11]);//note q.coeffs() and q(w,x,y,z) take different oredrings
 		}
 	}
+	
+	void setStateValuesFromBuffer(unsigned otherSubdomain) {
+		if (mirrorIntersections.size() <= otherSubdomain or stateBuffer.size() <= otherSubdomain) LOG_ERROR("inconsistent size of mirrorIntersections and/or stateBuffer, "<<mirrorIntersections.size()<<" "<<otherSubdomain<<" "<<stateBuffer.size()<<" "<<Omega::instance().getScene()->subdomain);
+		setStateValuesFromIds(mirrorIntersections[otherSubdomain],stateBuffer[otherSubdomain]);
+	}
+	
+	void mpiSendStates(/*vector<double> message,*/ unsigned otherSubdomain){
+		std::vector<double> vals = getStateValues(otherSubdomain);
+		MPI_Send(&vals.front(), vals.size(), MPI_DOUBLE, otherSubdomain, 177, MPI_COMM_WORLD);
+	}
+	
+	void mpiRecvStates(unsigned otherSubdomain){
+		if (mirrorIntersections.size() <= otherSubdomain) LOG_ERROR("inconsistent size of mirrorIntersections and/or stateBuffer");
+		if (stateBuffer.size() <= otherSubdomain) stateBuffer.resize(otherSubdomain+1);
+		const vector<Body::id_t>& b_ids = mirrorIntersections[otherSubdomain];
+		unsigned nb = b_ids.size()*13;
+		vector<Real>& vals = stateBuffer[otherSubdomain];
+		vals.resize(nb);
+		int recv_count;
+		MPI_Status recv_status;
+		MPI_Recv(&vals.front(), nb, MPI_DOUBLE, otherSubdomain, 177, MPI_COMM_WORLD, &recv_status);
+		MPI_Get_count(&recv_status,MPI_DOUBLE,&recv_count);
+		if (recv_count != int(nb)) LOG_ERROR("length mismatch");
+	}
+	
+	void mpiIrecvStates(unsigned otherSubdomain){
+		if (mirrorIntersections.size() <= otherSubdomain) LOG_ERROR("inconsistent size of mirrorIntersections and/or stateBuffer");
+		if (stateBuffer.size() <= otherSubdomain) stateBuffer.resize(otherSubdomain+1);
+		if (mpiReqs.size() <= otherSubdomain) mpiReqs.resize(otherSubdomain+1);		
+		
+		const vector<Body::id_t>& b_ids = mirrorIntersections[otherSubdomain];
+		unsigned nb = b_ids.size()*13;
+		vector<Real>& vals = stateBuffer[otherSubdomain];
+		vals.resize(nb);
+		
+		MPI_Irecv(&vals.front(), nb, MPI_DOUBLE, otherSubdomain, 177, MPI_COMM_WORLD, &mpiReqs[otherSubdomain]);
+	}
+	
+	void mpiWaitReceived(unsigned otherSubdomain){ MPI_Wait(&mpiReqs[otherSubdomain],MPI_STATUS_IGNORE);}
+	
 
+	
 	//WARNING: precondition: the members bounds have been dispatched already, else we re-use old values. Carefull if subdomain is not at the end of O.bodies
 	void setMinMax();
 		
@@ -74,13 +116,19 @@ class Subdomain: public Shape {
 		((IntersectionMap,intersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
 		((IntersectionMap,mirrorIntersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
 		((vector<Body::id_t>,ids,vector<Body::id_t>(),,"Ids of owned particles.")) //FIXME
+		((vector<vector<Real> >,stateBuffer,vector<vector<Real> >(),Attr::noSave,"container storing data from other subdomains")) 
 		,/*ctor*/ createIndex();
 		,/*py*/ /*.add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")*/
 		.def("setMinMax",&Subdomain::setMinMax,"returns bounding min-max based on members bounds. precondition: the members bounds have been dispatched already, else we re-use old values. Carefull if subdomain is not at the end of O.bodies.")
 		.def("getStateValues",&Subdomain::getStateValues,(boost::python::arg("otherDomain")),"returns pos,vel,angVel,ori of bodies interacting with a given otherDomain, based on :yref:`Subdomain.intersections`.")
 		.def("getStateValuesFromId",&Subdomain::getStateValuesFromIds,(boost::python::arg("b_ids")),"returns pos,vel,angVel,ori of listed bodies.")
-		.def("setStateValuesFromIds",&Subdomain::setStateValuesFromIds,(boost::python::arg("b_ids"),boost::python::arg("input")),"set pos,vel,angVel,ori form listed body ids and data.")
+		.def("setStateValuesFromIds",&Subdomain::setStateValuesFromIds,(boost::python::arg("b_ids"),boost::python::arg("input")),"set pos,vel,angVel,ori from listed body ids and data.")
 		.def("getStateValuesFromIdsAsArray",&Subdomain::getStateValuesFromIdsAsArray,(boost::python::arg("otherDomain")),"returns 1D numpy array of pos,vel,angVel,ori of bodies interacting with a given otherDomain, based on :yref:`Subdomain.intersections`.")
+		.def("setStateValuesFromBuffer",&Subdomain::setStateValuesFromBuffer,(boost::python::arg("subdomain")),"set pos,vel,angVel,ori from state buffer.")
+		.def("mpiSendStates",&Subdomain::mpiSendStates,(boost::python::arg("otherSubdomain")),"mpi-send states from current domain to another domain (blocking)")
+		.def("mpiRecvStates",&Subdomain::mpiRecvStates,(boost::python::arg("otherSubdomain")),"mpi-recv states from another domain  (blocking)")
+		.def("mpiIrecvStates",&Subdomain::mpiIrecvStates,(boost::python::arg("otherSubdomain")),"mpi-Irecv states from another domain  (non-blocking)")
+		.def("mpiWaitReceived",&Subdomain::mpiWaitReceived,(boost::python::arg("otherSubdomain")),"mpi-Wait states from another domain (upon return the buffer is set)")		
 		.add_property("intersections",&Subdomain::intrs_get,&Subdomain::intrs_set,"lists of bodies from this subdomain intersecting other subdomains. WARNING: only assignement and concatenation allowed")
 		.add_property("mirrorIntersections",&Subdomain::mIntrs_get,&Subdomain::mIntrs_set,"lists of bodies from other subdomains intersecting this one. WARNING: only assignement and concatenation allowed")
 	);
