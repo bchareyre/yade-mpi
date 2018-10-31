@@ -43,17 +43,14 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 numThreads = comm.Get_size()
 
-
-MAX_SUBDOMAIN = 8
 NSTEPS=100 #turn it >0 to see time iterations, else only initilization
 ACCUMULATE_FORCES=True #control force summation on master's body. FIXME: if false master goes out of sync since nothing is blocking rank=0 thread
 VERBOSE_OUTPUT=False
 SEND_SHAPES=False #if false only bodies' states are communicated between threads, else shapes as well (to be implemented)
-N=300; M=100; #(columns, rows) per thread
 ERASE_REMOTE = True #erase bodies not interacting wit a given subdomain? else keep dead clones of all bodies in each scene
 OPTIMIZE_COM=True
 USE_CPP_MPI=True and OPTIMIZE_COM
-
+YADE_TIMING=True #report timing.stats()?
 
 #tags for mpi messages
 _SCENE_=11
@@ -505,12 +502,12 @@ def splitScene():
 
 
 ##### RUN MPI #########
-
-
 def mpirun(nSteps):
 	if not O.splitted: splitScene()
-	O.timingEnabled=True
+	if YADE_TIMING:
+		O.timingEnabled=True
 	for iter in range(nSteps): O.step()
-	from yade import timing
-	if rank==2 or rank==0: timing.stats() #specific numbers for -n4 and gabion.py
+	if YADE_TIMING:
+		from yade import timing
+		if rank<2: timing.stats() #print out timings for master and 1st worker
 
