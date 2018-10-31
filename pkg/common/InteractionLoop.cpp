@@ -54,15 +54,18 @@ void InteractionLoop::action(){
 	// force removal of interactions that were not encountered by the collider
 	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
 	const bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->iter);
-
-	#ifdef YADE_OPENMP
+	
 	const long size=scene->interactions->size();
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#endif
 	for(long i=0; i<size; i++){
 		const shared_ptr<Interaction>& I=(*scene->interactions)[i];
-	#else
-	for (const auto & I : *scene->interactions){
-	#endif
+// 	#else
+//	FIXME: unexplained segfaults with this one (initialy that was the non-OPENMP case) on large problems
+// 	for (const auto & I : *scene->interactions){ 
+// 	#endif
+		if (not (bool) I) cerr<<"##### found null I #####"<<endl;
 		if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->iter) {
 			eraseAfterLoop(I->getId1(),I->getId2());
 			continue;
@@ -71,6 +74,7 @@ void InteractionLoop::action(){
 		const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
 		
 		if(!b1_ || !b2_){
+// 			LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!");
 			scene->interactions->requestErase(I);
 			continue;
 		}
