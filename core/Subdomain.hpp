@@ -42,19 +42,20 @@ class Subdomain: public Shape {
 	std::vector<double> getStateValues(unsigned otherSubdomain) { 
 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
 		if (scene->subdomain==int(otherSubdomain)) {LOG_ERROR("subdomain cannot interact with itself"); return std::vector<double>();}
-		if (otherSubdomain >= intersections.size()) {LOG_ERROR("otherSubdomain exceeds no. of subdomains ("<<otherSubdomain<<" vs. "<<intersections.size()); return std::vector<double>();}
+		if (int(otherSubdomain) >= intersections.size()) {LOG_ERROR("otherSubdomain exceeds no. of subdomains ("<<otherSubdomain<<" vs. "<<intersections.size()); return std::vector<double>();}
 		const vector<Body::id_t>& search = intersections[otherSubdomain];
 		return getStateValuesFromIds(search);
 	}
 	
-	boost::python::dict getStateValuesFromIdsAsArray(int otherSubdomain);
+// 	BROKEN:
+// 	boost::python::dict getStateValuesFromIdsAsArray(int otherSubdomain);
 	
 	
 	void setStateValuesFromIds(const vector<Body::id_t>& b_ids, const std::vector<Real>& input) { 
 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
 		unsigned int N= b_ids.size();
 		if ((N*13) != input.size()) LOG_ERROR("size mismatch"<<N*13<<" vs "<<input.size()<< " in "<<scene->subdomain);
-		for (int k=0; k<N; k++) {
+		for (unsigned k=0; k<N; k++) {
 			const shared_ptr<State>& s = (*(scene->bodies))[b_ids[k]]->state;
 			unsigned int idx=k*13;
 			s->pos=Vector3r(input[idx],input[idx+1],input[idx+2]);
@@ -123,7 +124,7 @@ class Subdomain: public Shape {
 		.def("getStateValues",&Subdomain::getStateValues,(boost::python::arg("otherDomain")),"returns pos,vel,angVel,ori of bodies interacting with a given otherDomain, based on :yref:`Subdomain.intersections`.")
 		.def("getStateValuesFromId",&Subdomain::getStateValuesFromIds,(boost::python::arg("b_ids")),"returns pos,vel,angVel,ori of listed bodies.")
 		.def("setStateValuesFromIds",&Subdomain::setStateValuesFromIds,(boost::python::arg("b_ids"),boost::python::arg("input")),"set pos,vel,angVel,ori from listed body ids and data.")
-		.def("getStateValuesFromIdsAsArray",&Subdomain::getStateValuesFromIdsAsArray,(boost::python::arg("otherDomain")),"returns 1D numpy array of pos,vel,angVel,ori of bodies interacting with a given otherDomain, based on :yref:`Subdomain.intersections`.")
+// 		.def("getStateValuesFromIdsAsArray",&Subdomain::getStateValuesFromIdsAsArray,(boost::python::arg("otherDomain")),"returns 1D numpy array of pos,vel,angVel,ori of bodies interacting with a given otherDomain, based on :yref:`Subdomain.intersections`.")
 		.def("setStateValuesFromBuffer",&Subdomain::setStateValuesFromBuffer,(boost::python::arg("subdomain")),"set pos,vel,angVel,ori from state buffer.")
 		.def("mpiSendStates",&Subdomain::mpiSendStates,(boost::python::arg("otherSubdomain")),"mpi-send states from current domain to another domain (blocking)")
 		.def("mpiRecvStates",&Subdomain::mpiRecvStates,(boost::python::arg("otherSubdomain")),"mpi-recv states from another domain  (blocking)")

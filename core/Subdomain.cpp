@@ -8,7 +8,7 @@
 #include<core/BodyContainer.hpp>
 #include<core/State.hpp>
 #include<pkg/common/Sphere.hpp>
-#include <lib/pyutil/numpy_boost.hpp>
+// #include <lib/pyutil/numpy_boost.hpp>
 
 YADE_PLUGIN((Subdomain));
 CREATE_LOGGER(Subdomain);
@@ -102,27 +102,27 @@ void Bo1_Subdomain_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, 
 }
 
 
-boost::python::dict Subdomain::getStateValuesFromIdsAsArray(int otherSubdomain){
-	Py_Initialize();
-		const shared_ptr<Scene>& scene= Omega::instance().getScene();
-		const vector<Body::id_t>& search = intersections[otherSubdomain];
-		/// This is the code that needs numpy_boost include
-		unsigned int N=search.size();
-		unsigned dim[]={N*13};
-		cerr << "======== getStateValuesFromIdsAsArray 0=============" <<endl;
-		numpy_boost<double,1> res(dim);
-		cerr << "======== getStateValuesFromIdsAsArray 1=============" <<endl;
-		for (unsigned k=0; k<N; k++) {
-			cerr << "======== getStateValuesFromIdsAsArray "<< k<<"===" <<endl;
-			const shared_ptr<State>& s = (*(scene->bodies))[search[k]]->state;
-			for (unsigned i=0; i<3; i++) res[N*13+i]=s->pos[i];
-			for (unsigned i=0; i<3; i++) res[N*13+i+3]=s->vel[i];
-			for (unsigned i=0; i<3; i++) res[N*13+i+6]=s->angVel[i];
-			for (unsigned i=0; i<4; i++) res[N*13+i+9]=s->ori.coeffs()[i];}
-		boost::python::dict ret;
-		ret["dat"]=res;
-		return ret;
-	}
+// boost::python::dict Subdomain::getStateValuesFromIdsAsArray(int otherSubdomain){
+// 	Py_Initialize();
+// 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
+// 		const vector<Body::id_t>& search = intersections[otherSubdomain];
+// 		/// This is the code that needs numpy_boost include
+// 		unsigned int N=search.size();
+// 		unsigned dim[]={N*13};
+// 		cerr << "======== getStateValuesFromIdsAsArray 0=============" <<endl;
+// 		numpy_boost<double,1> res(dim);
+// 		cerr << "======== getStateValuesFromIdsAsArray 1=============" <<endl;
+// 		for (unsigned k=0; k<N; k++) {
+// 			cerr << "======== getStateValuesFromIdsAsArray "<< k<<"===" <<endl;
+// 			const shared_ptr<State>& s = (*(scene->bodies))[search[k]]->state;
+// 			for (unsigned i=0; i<3; i++) res[N*13+i]=s->pos[i];
+// 			for (unsigned i=0; i<3; i++) res[N*13+i+3]=s->vel[i];
+// 			for (unsigned i=0; i<3; i++) res[N*13+i+6]=s->angVel[i];
+// 			for (unsigned i=0; i<4; i++) res[N*13+i+9]=s->ori.coeffs()[i];}
+// 		boost::python::dict ret;
+// 		ret["dat"]=res;
+// 		return ret;
+// 	}
 
 
 
