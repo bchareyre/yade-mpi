@@ -522,12 +522,9 @@ def mpirun(nSteps):
 	if not O.splitted: splitScene()
 	if YADE_TIMING:
 		O.timingEnabled=True
-	for iter in range(nSteps):
-		O.step()
-		#mprint("done step "+str(iter))
-	#O.run(nSteps,True)
+	O.run(nSteps,True)
 	if YADE_TIMING:
-	from yade import timing
+		from yade import timing
 		time.sleep(rank*0.2) #avoid mixing the final output, timing.stats() is independent of the sleep
 		mprint( "#####  Worker "+str(rank)+"  ######")
 		timing.stats() #specific numbers for -n4 and gabion.py
