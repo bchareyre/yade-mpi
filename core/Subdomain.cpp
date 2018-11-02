@@ -82,49 +82,9 @@ void Bo1_Subdomain_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, 
 	if(!scene->isPeriodic){
 		aabb->min=domain->boundsMin; aabb->max=domain->boundsMax;
 		return;
-	}
+	} else {LOG_ERROR("to be implemented")}
 	LOG_WARN("Bo1_Subdomain_Aabb::go not implemented for periodic boundaries");
-	// adjust box size along axes so that sphere doesn't stick out of the box even if sheared (i.e. parallelepiped)
-// 	if(scene->cell->hasShear()) {
-// // 		Vector3r halfSize = (aabbEnlargeFactor>0?aabbEnlargeFactor:1.)*Vector3r(sphere->radius,sphere->radius,sphere->radius);
-// 		Vector3r refHalfSize(halfSize);
-// 		const Vector3r& cos=scene->cell->getCos();
-// 		for(int i=0; i<3; i++){
-// 			//cerr<<"cos["<<i<<"]"<<cos[i]<<" ";
-// 			int i1=(i+1)%3,i2=(i+2)%3;
-// 			halfSize[i1]+=.5*refHalfSize[i1]*(1/cos[i]-1);
-// 			halfSize[i2]+=.5*refHalfSize[i2]*(1/cos[i]-1);
-// 		}
-// 	}
-// 	//cerr<<" || "<<halfSize<<endl;
-// 	aabb->min = scene->cell->unshearPt(se3.position)-halfSize;
-// 	aabb->max = scene->cell->unshearPt(se3.position)+halfSize;	
 }
-
-
-// boost::python::dict Subdomain::getStateValuesFromIdsAsArray(int otherSubdomain){
-// 	Py_Initialize();
-// 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
-// 		const vector<Body::id_t>& search = intersections[otherSubdomain];
-// 		/// This is the code that needs numpy_boost include
-// 		unsigned int N=search.size();
-// 		unsigned dim[]={N*13};
-// 		cerr << "======== getStateValuesFromIdsAsArray 0=============" <<endl;
-// 		numpy_boost<double,1> res(dim);
-// 		cerr << "======== getStateValuesFromIdsAsArray 1=============" <<endl;
-// 		for (unsigned k=0; k<N; k++) {
-// 			cerr << "======== getStateValuesFromIdsAsArray "<< k<<"===" <<endl;
-// 			const shared_ptr<State>& s = (*(scene->bodies))[search[k]]->state;
-// 			for (unsigned i=0; i<3; i++) res[N*13+i]=s->pos[i];
-// 			for (unsigned i=0; i<3; i++) res[N*13+i+3]=s->vel[i];
-// 			for (unsigned i=0; i<3; i++) res[N*13+i+6]=s->angVel[i];
-// 			for (unsigned i=0; i<4; i++) res[N*13+i+9]=s->ori.coeffs()[i];}
-// 		boost::python::dict ret;
-// 		ret["dat"]=res;
-// 		return ret;
-// 	}
-
-
 
 #endif
 
