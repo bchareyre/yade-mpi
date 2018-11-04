@@ -97,7 +97,7 @@ from yadeimport import yade,sphere,box,Sphere,Body,Subdomain,Bo1_Subdomain_Aabb,
 
 def receiveForces(subdomains):
 	'''
-	Accumulate forces from subdomains (only executed by master process), should happen after ForceResetter but before Newton and before any other force-dependent engine (e.g. StressController), could be inserted via yade's pyRunner
+	Accumulate forces from subdomains (only executed by master process), should happen after ForceResetter but before Newton and before any other force-dependent engine (e.g. StressController), could be inserted via yade's pyRunner.
 	'''
 	if 0: #non-blocking:
 		reqForces=[]
@@ -341,14 +341,13 @@ def isendRecvForces():
 	Communicate forces from subdomain to master
 	Warning: the sending sides (everyone but master) must wait() the returned list of requests
 	'''	
-	O.freqs=[]
+	O.freqs=[] #keep that one defined even if empty, it is accessed in other functions
 	if ACCUMULATE_FORCES:
 		if rank!=0:
-			forces0=[[id,O.forces.f(id),O.forces.t(id)] for id in  O.subD.intersections[0]]
+			forces0=[[id,O.forces.f(id),O.forces.t(id)] for id in  O.subD.mirrorIntersections[0]]
 			#wprint ("worker "+str(rank)+": sending "+str(len(forces0))+" "+str("forces to 0 "))
 			#O.freqs.append(comm.isend(forces0, dest=0, tag=_FORCES_))
 			comm.send(forces0, dest=0, tag=_FORCES_)
-			#mprint("broadcast forces: "+str(time.time()-start)); start=time.time()
 		else: #master
 			receiveForces(O.subD.intersections[0])
 
@@ -493,13 +492,13 @@ def splitScene():
 	moduleName = "mp"
 	
 	# append states communicator after Newton
-	O.engines=O.engines[:idx+1]+[PyRunner(iterPeriod=1,command="sys.modules['yade.mpy'].sendRecvStates()",label="sendRecvStatesRunner")]+O.engines[idx+1:]
+	O.engines=O.engines[:idx+1]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy'].sendRecvStates()",label="sendRecvStatesRunner")]+O.engines[idx+1:]
 	
 	# append force communicator before Newton
-	O.engines=O.engines[:idx]+[PyRunner(iterPeriod=1,command="sys.modules['yade.mpy'].isendRecvForces()",label="isendRecvForcesRunner")]+O.engines[idx:]
+	O.engines=O.engines[:idx]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy'].isendRecvForces()",label="isendRecvForcesRunner")]+O.engines[idx:]
 	
 	# append engine waiting until forces are effectively sent to master
-	O.engines=O.engines+[PyRunner(iterPeriod=1,command="sys.modules['yade.mpy'].waitForces()",label="waitForcesRunner")]
+	O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy'].waitForces()",label="waitForcesRunner")]
 	
 	# mark scene splitted
 	O.splitted=True
@@ -515,7 +514,7 @@ def mpirun(nSteps):
 	O.run(nSteps,True)
 	if YADE_TIMING:
 		from yade import timing
-		time.sleep(rank*0.2) #avoid mixing the final output, timing.stats() is independent of the sleep
+		time.sleep((numThreads-rank)*0.1) #avoid mixing the final output, timing.stats() is independent of the sleep
 		mprint( "#####  Worker "+str(rank)+"  ######")
 		timing.stats() #specific numbers for -n4 and gabion.py
 
