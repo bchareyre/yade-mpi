@@ -1,17 +1,12 @@
-#mpiexec -n 4 python testMPIxN.py
-#mpiexec -n 4 python testMPIxN.py N M
-# get non-MPI reference time using testMonolithic.py
+
 
 
 '''
-This script simulates spheres falling on a plate using a distributed memory approach based on mpi4py
-The number of spheres assigned to one particular process (aka 'worker') is N*M, they form a regular array.
-The master process (rank=0) has no spheres assigned presently; it is in charge of getting the total force on the plate (in more advanced simulations it could handle boundary conditions).
-The number of subdomains depends on argument 'n' of mpiexec. Since rank=0 is not assigned a regular subdomain the total number of spheres is n*N*M
+This module defines mpirun(), a parallel implementation of run() using a distributed memory approach. Message passing is done with mpi4py mainly, however some messages are also handled in c++ (with openmpi).
 
 
-The logic is as follows:
-1. Instanciate a complete, ordinary, yade scene with the plate and spheres (only done by rank=0)
+The distribution logic is as follows:
+1. Instanciate a complete, ordinary, yade scene
 2. Insert subdomains as special yade bodies. This is somehow similar to adding a clump body on the top of clump members
 3. Broadcast this scene to all workers. In the initialization phase the workers will:
 	- define the bounding box of their assigned bodies and return it to other workers
@@ -25,17 +20,13 @@ The logic is as follows:
 
 Yet to be implemented is the global update of domain bounds and new collision detection. It could be simply achieved by importing all bodies back in master process and re-running an initialization/distribution but there are certainly mmore efficient techniques to find.
 
-Performance:
-The default settings of testMPIxN.py and testMonolithic.py correspond to 90k spheres and 3 subdomains, for this problem size the MPI version runs approximately as fast as monolithic (actually a bit faster), the performance is expected to increase for more threads and/or more bodies per thread
-
-#HINTS:
-- handle subD.intersections with care (same for mirrorIntersections). subD.intersections.append() will not reach the c++ object. subD.intersections can only be assigned (a list of list of int)
-
 #RULES:
 	#- intersections[0] has 0-bodies (to which we need to send force)
 	#- intersections[thisDomain] has ids of the other domains overlapping the current ones
 	#- intersections[otherDomain] has ids of bodies in _current_ domain which are overlapping with other domain (for which we need to send updated pos/vel)
 
+#HINTS:
+- handle subD.intersections with care (same for mirrorIntersections). subD.intersections.append() will not reach the c++ object. subD.intersections can only be assigned (a list of list of int)
 
 
 '''
