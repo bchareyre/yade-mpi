@@ -74,6 +74,9 @@ if opts.version:
 if opts.script:
 	args.insert(0,opts.script) # for compatibility with userSession(), could be modified in the future
 
+## Check if this script is exec'd or imported as part of a mpi process
+opts.mpi_mode = os.getenv('OMPI_COMM_WORLD_RANK')!=None
+
 
 ## remove later
 ## python2.5 relative module imports workaround
@@ -122,7 +125,7 @@ if opts.cores:
 elif opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 else: os.environ['OMP_NUM_THREADS']='1'
 
-if __name__ == "__main__": # do not print this while importing yade in other python application
+if __name__ == "__main__" and not opts.mpi_mode: # do not print this while importing yade in other python application
 	sys.stdout.write('Welcome to Yade '+version+debugbuild+'\n')
 
 # initialization and c++ plugins import
@@ -248,14 +251,15 @@ def userSession(gui='none',qapp=None):
 			runScript(arg0)
 		if yade.runtime.opts.exitAfter: sys.exit(0)
 	## start interpreter
-	ipshell()
+	if not opts.mpi_mode: ipshell()
+	
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
 yade.runtime.hasDisplay=False # this is the default initialized in the module, anyway
 if 'GUI' in features: gui='qt4'
 if 'GUI-Qt5' in features: gui='qt5'
-if opts.nogui: gui=None
+if opts.nogui or opts.mpi_mode: gui=None
 if gui:
 	import Xlib.display
 	# PyQt4's QApplication does exit(1) if it is unable to connect to the display
@@ -272,12 +276,13 @@ if gui:
 		print 'Warning: no X rendering available (see https://bbs.archlinux.org/viewtopic.php?id=13189)'
 
 # run remote access things, before actually starting the user session (not while imported by other python application)
-if __name__ == "__main__":
+if __name__ == "__main__" and not opts.mpi_mode:
 	from yade import remote
 	if (gui=='qt4' or gui=='qt5'):
 		yade.remote.useQThread=True
 		yade.remote.gui=gui
 	yade.remote.runServers()
+
 
 if gui==None:
 	userSession()
