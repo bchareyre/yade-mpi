@@ -1,7 +1,7 @@
 # Possible executions
 # Parallel:
 # mpiexec -n 4 yade-mpi testMPIxNxM.py
-# mpiexec -n 4 yade-mpi testMPIxN.py N M
+# mpiexec -n 4 yade-mpi testMPIxN.py N M # (n-1) subdomains with NxM spheres each
 # Monolithic:
 # yade-mpi testMPIxN.py
 # yade-mpi testMPIxN.py N M
@@ -25,14 +25,12 @@ N=100; M=100; #(columns, rows) per thread
 import os
 rank = os.getenv('OMPI_COMM_WORLD_RANK')
 if rank is not None: #mpiexec was used
+	rank=int(rank)
 	numThreads=int(os.getenv('OMPI_COMM_WORLD_SIZE'))
 else: #non-mpi execution, numThreads will still be used as multiplier for the problem size
-	print sys.argv, len(sys.argv)
 	numThreads=2 if len(sys.argv)<4 else (int(sys.argv[3]))
 	print "numThreads",numThreads
 	
-print "###########  numThreads:",numThreads
-
 if len(sys.argv)>1: #we then assume N,M are provided as 1st and 2nd cmd line arguments
 	N=int(sys.argv[1]); M=int(sys.argv[2])
 
@@ -47,7 +45,7 @@ import colorsys
 colorScale = (Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads))
 
 #add spheres
-for sd in range(0,numThreads):
+for sd in range(0,numThreads-1):
 	col = next(colorScale)
 	ids=[]
 	for i in range(N):#(numThreads-1) x N x M spheres, one thread is for master and will keep only the wall, others handle spheres
@@ -68,7 +66,8 @@ if rank is None: #######  Single-core  ######
 	#print "num bodies:",len(O.bodies)
 	from yade import timing
 	timing.stats()
-	print "total force on floor=",O.forces.f(WALL_ID)[1]
+	print "num. bodies:",len([b for b in O.bodies]),len(O.bodies)
+	print "Total force on floor=",O.forces.f(WALL_ID)[1]
 else: #######  MPI  ######
 	#import yade's mpi module
 	from yade import mpy as mp
@@ -80,6 +79,8 @@ else: #######  MPI  ######
 	mp.USE_CPP_MPI=True and mp.OPTIMIZE_COM #L2-optimization: workaround python by passing a vector<double> at the c++ level
 
 	mp.mpirun(NSTEPS)
-	if rank==0: print "total force on floor=",O.forces.f(WALL_ID)[1]
+	print "num. bodies:",len([b for b in O.bodies]),len(O.bodies)
+	if rank==0: mp.mprint( "Total force on floor="+str(O.forces.f(WALL_ID)[1]))
+	else: mp.mprint( "Partial force on floor="+str(O.forces.f(WALL_ID)[1]))
 	mp.MPI.Finalize()
 	exit()
