@@ -25,6 +25,12 @@ def reset():
 _statCols={'label':40,'count':20,'time':20,'relTime':20}
 _maxLev=3
 
+def runtime():
+	'''
+	Return total running time, i.e. sum of all deltas (same as last line in the output of stats())
+	'''
+	return sum([e.execTime for e in O.engines])
+
 def _formatLine(label,time,count,totalTime,level):
 	sp,negSp=' '*level*2,' '*(_maxLev-level)*2
 	raw=[]
@@ -67,18 +73,10 @@ def _engines_stats(engines,totalTime,level):
 		elif isinstance(e,ParallelEngine):
 			for slave in e.slaves:
 				print "\\"
-#<<<<<<< Updated upstream
-				#if not isinstance(slave,list): lines+=_engines_stats([slave],slave.execTime,level+1)
-				#else:
-					#for se in slave:
-						#lines+=_engines_stats([se],se.execTime,level+1)
-				
-#=======
 				if not isinstance(slave,list): lines+=_engines_stats([slave],e.execTime,level+1)
 				else:
 					for el in slave: _engines_stats([el],e.execTime,level+1)
 			print "/"
-#>>>>>>> Stashed changes
 	if hereLines>1 and not isinstance(e,Functor):
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1
 	return lines

@@ -27,7 +27,7 @@ rank = os.getenv('OMPI_COMM_WORLD_RANK')
 if rank is not None: #mpiexec was used
 	rank=int(rank)
 	numThreads=int(os.getenv('OMPI_COMM_WORLD_SIZE'))
-else: #non-mpi execution, numThreads will still be used as multiplier for the problem size
+else: #non-mpi execution, numThreads will still be used as multiplier for the problem size (2 => multiplier is 1)
 	numThreads=2 if len(sys.argv)<4 else (int(sys.argv[3]))
 	print "numThreads",numThreads
 	
@@ -59,6 +59,14 @@ WALL_ID=O.bodies.append(box(center=(numThreads*N*0.5,-0.5,0),extents=(2*numThrea
 
 
 #########  RUN  ##########
+def collectTiming():
+	created = os.path.isfile("collect.dat")
+	f=open('collect.dat','a')
+	if not created: f.write("numThreads mpi omp Nspheres N M runtime \n")
+	from yade import timing
+	f.write(str(numThreads)+" "+str(os.getenv('OMPI_COMM_WORLD_SIZE'))+" "+os.getenv('OMP_NUM_THREADS')+" "+str(N*M*(numThreads-1))+" "+str(N)+" "+str(M)+" "+str(timing.runtime())+"\n")
+	f.close()
+
 
 if rank is None: #######  Single-core  ######
 	O.timingEnabled=True
@@ -66,6 +74,7 @@ if rank is None: #######  Single-core  ######
 	#print "num bodies:",len(O.bodies)
 	from yade import timing
 	timing.stats()
+	collectTiming()
 	print "num. bodies:",len([b for b in O.bodies]),len(O.bodies)
 	print "Total force on floor=",O.forces.f(WALL_ID)[1]
 else: #######  MPI  ######
@@ -80,7 +89,10 @@ else: #######  MPI  ######
 
 	mp.mpirun(NSTEPS)
 	print "num. bodies:",len([b for b in O.bodies]),len(O.bodies)
-	if rank==0: mp.mprint( "Total force on floor="+str(O.forces.f(WALL_ID)[1]))
+	if rank==0:
+		mp.mprint( "Total force on floor="+str(O.forces.f(WALL_ID)[1]))
+		collectTiming()
 	else: mp.mprint( "Partial force on floor="+str(O.forces.f(WALL_ID)[1]))
+
 	mp.MPI.Finalize()
-	exit()
+exit()
