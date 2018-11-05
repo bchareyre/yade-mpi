@@ -1,13 +1,19 @@
-# Possible executions
-# Parallel:
-# mpiexec -n 4 yade-mpi testMPIxNxM.py
-# mpiexec -n 4 yade-mpi testMPIxN.py N M # (n-1) subdomains with NxM spheres each
-# Monolithic:
-# yade-mpi testMPIxN.py
-# yade-mpi testMPIxN.py N M
-# yade-mpi testMPIxN.py N M n
+# In order for mpy module to work, don't forget to make a symlink to yade executable named "yadeimport.py":
+# ln -s path/to/yade/yade-version path/to/yade/yadeimport.py
+#
+# Possible executions of this script
+### Parallel:
+# mpiexec -n 4 yade-mpi -n -x testMPIxNxM.py
+# mpiexec -n 4 yade-mpi  -n -x testMPIxN.py N M # (n-1) subdomains with NxM spheres each
+### Monolithic:
+# yade-mpi -n -x testMPIxN.py 
+# yade-mpi -n -x testMPIxN.py N M
+# yade-mpi -n -x testMPIxN.py N M n
 # in last line the optional argument 'n' has the same meaning as with mpiexec, i.e. total number of bodies will be (n-1)*N*M but on single core
-
+### Openmp:
+# yade-mpi -j4 -n -x testMPIxN.py N M n
+### Nexted MPI * OpenMP
+# needs testing...
 '''
 This script simulates spheres falling on a plate using a distributed memory approach based on mpy module
 The number of spheres assigned to one particular process (aka 'worker') is N*M, they form a regular patern.
