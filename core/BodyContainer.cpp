@@ -27,6 +27,16 @@ Body::id_t BodyContainer::insert(shared_ptr<Body> b){
 	return b->id;
 }
 
+Body::id_t BodyContainer::insertAtId(shared_ptr<Body> b, Body::id_t candidate){
+	if(body[candidate] or candidate>=size()) {LOG_ERROR("invalid candidate id"); return -1;}
+	const shared_ptr<Scene>& scene=Omega::instance().getScene(); 
+	b->iterBorn=scene->iter;
+	b->timeBorn=scene->time;
+	b->id=candidate;
+	scene->doSort = true;
+	return b->id;
+}
+
 bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is false (as before)
 	if(!body[id]) return false;
 	const shared_ptr<Body>& b=Body::byId(id);

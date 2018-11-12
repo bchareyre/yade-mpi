@@ -53,7 +53,9 @@ class BodyContainer: public Serializable{
 
 // 		BodyContainer() {};
 		virtual ~BodyContainer() {};
-		Body::id_t insert(shared_ptr<Body>);
+		Body::id_t insert(shared_ptr<Body>); // => body.push_back()
+		Body::id_t insertAtId(shared_ptr<Body> b, Body::id_t candidate);  // => body[candidate]=...
+			
 		void clear();
 		iterator begin() {
 			iterator temp(body.begin());
