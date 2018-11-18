@@ -174,13 +174,13 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 	bool InsertionSortCollider::isActivated(){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
-		if(!strideActive) { scene->doSort=false; return true; }
-		if(!newton) { scene->doSort=false; return true; }
+		if(!strideActive) { return true; }
+		if(!newton) { return true; }
 		fastestBodyMaxDist=newton->maxVelocitySq;
-		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) { scene->doSort=false; return true; }
-		if((size_t)BB[0].size!=2*scene->bodies->size()) { scene->doSort=false; return true; }
-		if(scene->interactions->dirty) { scene->doSort=false; return true; }
-		if(scene->doSort) { scene->doSort=false; return true; }
+		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) {  return true; }
+		if((size_t)BB[0].size!=2*scene->bodies->size()) {  return true; }
+		if(scene->interactions->dirty) {  return true; }
+		if(scene->doSort) { return true; }
 		return false;
 	}
 
@@ -192,6 +192,7 @@ void InsertionSortCollider::action(){
 	long nBodies=(long)scene->bodies->size();
 	InteractionContainer* interactions=scene->interactions.get();
 	scene->interactions->iterColliderLastRun=-1;
+	scene->doSort = false;
 	#ifdef YADE_OPENMP
 	if (ompThreads<=0) ompThreads = omp_get_max_threads();
 	#endif
