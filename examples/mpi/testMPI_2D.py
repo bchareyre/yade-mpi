@@ -41,10 +41,6 @@ if len(sys.argv)>1: #we then assume N,M are provided as 1st and 2nd cmd line arg
 	N=int(sys.argv[1]); M=int(sys.argv[2])
 
 ############  Build a scene (we use Yade's pre-filled scene)  ############
-newton.gravity=(0,-10,0) #else nothing would move
-tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper
-O.engines=O.engines[0:tsIdx]+O.engines[tsIdx+1:]
-O.dt=0.00002 #very important, we don't want subdomains to use many different timesteps...
 
 # sequential grain colors
 import colorsys
@@ -62,6 +58,13 @@ for sd in range(0,numThreads-1):
 		for id in ids: O.bodies[id].subdomain = sd+1
 
 WALL_ID=O.bodies.append(box(center=(numThreads*N*0.5,-0.5,0),extents=(2*numThreads*N,0,2),fixed=True))
+
+collider.verletDist = 0.01
+newton.gravity=(0,-10,0) #else nothing would move
+tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper. Very important: we don't want subdomains to use many different timesteps...
+O.engines=O.engines[0:tsIdx]+O.engines[tsIdx+1:]
+O.dt=0.00002 #this very small timestep will make it possible to run 2000 iter without merging
+#O.dt=0.3*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
 
 
 #########  RUN  ##########
@@ -99,6 +102,7 @@ else: #######  MPI  ######
 		mp.mprint( "Total force on floor="+str(O.forces.f(WALL_ID)[1]))
 		collectTiming()
 	else: mp.mprint( "Partial force on floor="+str(O.forces.f(WALL_ID)[1]))
-
+	#mp.mergeScene()
+	#if rank==0: O.save('mergedScene.yade')
 	mp.MPI.Finalize()
 exit()
