@@ -65,7 +65,7 @@ newton.gravity=(0,-10,0) #else nothing would move
 tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper. Very important: we don't want subdomains to use many different timesteps...
 O.engines=O.engines[0:tsIdx]+O.engines[tsIdx+1:]
 #O.dt=0.00002 #this very small timestep will make it possible to run 2000 iter without merging
-O.dt=0.3*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
+O.dt=0.1*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
 
 
 #########  RUN  ##########
@@ -104,6 +104,6 @@ else: #######  MPI  ######
 		collectTiming()
 	else: mp.mprint( "Partial force on floor="+str(O.forces.f(WALL_ID)[1]))
 	mp.mergeScene()
-	if rank==0: O.save('mergedScene.yade')
+	#if rank==0: O.save('mergedScene.yade')
 	mp.MPI.Finalize()
 exit()
