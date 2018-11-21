@@ -89,6 +89,9 @@ class pyBodyContainer{
 		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+boost::lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); py::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
+	Body::id_t insertAtId(shared_ptr<Body> b, Body::id_t pos){
+		return proxee->insertAtId(b,pos);
+	}
 	vector<Body::id_t> appendList(vector<shared_ptr<Body> > bb){
 		boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
 		vector<Body::id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
