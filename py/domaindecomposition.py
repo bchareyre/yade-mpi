@@ -32,7 +32,7 @@ class GlobaldomainCloud(object):
 #		By default, the domain is automatically decomposed based on finding the furthest nearest neighbor in a group of random sample points
 #		User can pass realiziations to increase the random point sample size
 #		'''
-	def __init__(self,upperBound,lowerBound,numThreads=1,realizations=int(1e3)):
+	def __init__(self,lowerBound,upperBound,numThreads=1,realizations=int(1e3)):
 		self.mx = upperBound
 		self.mn = lowerBound	
 		self.realizations=realizations
@@ -132,7 +132,7 @@ class Globaldomain(object):
 #		User can pass xDecomp,yDecomp,zDecomp arguments to manually control the decomposition
 #		Subdomains are split into halves to accommodate random numbers of MPI threads
 #		'''
-	def __init__(self,upperBound,lowerBound,numThreads=1,xDecomp=0,yDecomp=0,zDecomp=0):
+	def __init__(self,lowerBound,upperBound,numThreads=1,xDecomp=0,yDecomp=0,zDecomp=0):
 		self.subdomains = []
 		self.mx = upperBound
 		self.mn = lowerBound
