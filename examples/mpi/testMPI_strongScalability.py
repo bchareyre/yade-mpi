@@ -85,7 +85,7 @@ def collectTimingMPI():
 	if not created: f.write("numThreads mpi omp Nspheres force TotalRuntime isendRecvForces sendRecvStates waitForces collisionChecker collider\n")
 	from yade import timing
 	#f.write(str(globalDomain.numThreads)+" "+str(os.getenv('OMPI_COMM_WORLD_SIZE'))+" "+os.getenv('OMP_NUM_THREADS')+" "+str(len(O.bodies))++" "+str(O.forces.f(WALL_ID)[1])+" "+str(timing.runtime())+" ""\n")
-	f.write("%s %s %s %g %g %g %g %g %g %g\n" % (numThreads, str(os.getenv('OMPI_COMM_WORLD_SIZE')), os.getenv('OMP_NUM_THREADS'), len(O.bodies), O.forces.f(WALL_ID)[1], timing.runtime()/1e6, isendRecvForcesRunner.execTime/1e6, sendRecvStatesRunner.execTime/1e6,waitForcesRunner.execTime/1e6, collisionChecker.execTime/1e6, collider.execTime/1e6))
+	f.write("%s %s %s %g %g %g %g %g %g %g %g\n" % (numThreads, str(os.getenv('OMPI_COMM_WORLD_SIZE')), os.getenv('OMP_NUM_THREADS'), len(O.bodies), O.forces.f(WALL_ID)[1], timing.runtime()/1e6, isendRecvForcesRunner.execTime/1e6, sendRecvStatesRunner.execTime/1e6,waitForcesRunner.execTime/1e6, collisionChecker.execTime/1e6, collider.execTime/1e6))
 	f.close()
 
 def collectTiming():

@@ -31,6 +31,8 @@ NSTEPS=2000 #turn it >0 to see time iterations, else only initilization
 # Check MPI world
 # This is to know if it was run with or without mpiexec (see preamble of this script)
 import os
+import time
+timeStr = time.strftime('%m-%d-%Y')
 rank = os.getenv('OMPI_COMM_WORLD_RANK')
 if rank is not None: #mpiexec was used
 	rank=int(rank)
@@ -77,7 +79,7 @@ def collectTimingMPI():
 	if not created: f.write("numThreads mpi omp Nspheres force TotalRuntime isendRecvForces sendRecvStates waitForces collisionChecker collider\n")
 	from yade import timing
 	#f.write(str(globalDomain.numThreads)+" "+str(os.getenv('OMPI_COMM_WORLD_SIZE'))+" "+os.getenv('OMP_NUM_THREADS')+" "+str(len(O.bodies))++" "+str(O.forces.f(WALL_ID)[1])+" "+str(timing.runtime())+" ""\n")
-	f.write("%s %s %s %g %g %g %g %g %g %g\n" % (numThreads, str(os.getenv('OMPI_COMM_WORLD_SIZE')), os.getenv('OMP_NUM_THREADS'), len(O.bodies), O.forces.f(WALL_ID)[1], timing.runtime()/1e6, isendRecvForcesRunner.execTime/1e6, sendRecvStatesRunner.execTime/1e6,waitForcesRunner.execTime/1e6, collisionChecker.execTime/1e6, collider.execTime/1e6))
+	f.write("%s %s %s %g %g %g %g %g %g %g %g\n" % (numThreads, str(os.getenv('OMPI_COMM_WORLD_SIZE')), os.getenv('OMP_NUM_THREADS'), len(O.bodies), O.forces.f(WALL_ID)[1], timing.runtime()/1e6, isendRecvForcesRunner.execTime/1e6, sendRecvStatesRunner.execTime/1e6,waitForcesRunner.execTime/1e6, collisionChecker.execTime/1e6, collider.execTime/1e6))
 	f.close()
 
 #########  RUN  ##########
