@@ -1,0 +1,10 @@
+Hackathon TODO:
+
+-get baseline performance
+-look through python syntax and object usage for improvement
+-are we sending data that we really need? Find balance between processing data and data comm
+-look further at the comm types iRecv iSend
+-is it possible to run collider while iRecv iSend are active??
+-use mpy4py timers?
+-time the collider check (null bodies), if bottlenceck, use map or new list of body pointers
+-change optimization flags?
