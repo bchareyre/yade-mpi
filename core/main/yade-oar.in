@@ -43,12 +43,11 @@ try:
 except ImportError: # argparse not present, print error message
 	raise RuntimeError("\n\nPlease install 'python-argparse' package.\n")
 
-
 class JobInfo():
-	def __init__(self,num,id,command,log,nCores,script,table,lineNo,affinity,oarprop):
+	def __init__(self,num,id,command,log,nCores,nCpu,script,table,lineNo,oarprop):
 		self.started,self.finished,self.duration,self.durationSec,self.exitStatus=None,None,None,None,None # duration is a string, durationSec is a number
-		self.command=command; self.num=num; self.log=log; self.id=id; self.nCores=nCores; self.cores=set(); self.infoSocket=None
-		self.script=script; self.table=table; self.lineNo=lineNo; self.affinity=affinity
+		self.command=command; self.num=num; self.log=log; self.id=id; self.nCores=nCores; self.nCpu=nCpu; self.cores=set(); self.infoSocket=None
+		self.script=script; self.table=table; self.lineNo=lineNo;
 		self.hasXmlrpc=False
 		self.status='PENDING'
 		self.threadNum=None
@@ -60,15 +59,12 @@ features,version='${CONFIGURED_FEATS}'.split(','),'${realVersion}'
 if (features[0]==''): features=features[1:]
 
 prog = os.path.basename(sys.argv[0])
-parser=argparse.ArgumentParser(usage='%s --oar-script=[SCRIPT] [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]'%prog,description='%s runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !THREADS column in the parameter table), e.g. sim.py/3.'%prog)
+parser=argparse.ArgumentParser(usage='%s --oar-script=[SCRIPT] [options] [ TABLE [SIMULATION.py] | SIMULATION.py[/nCores] [...] ]'%prog,description='%s runs yade simulation multiple times with different parameters.\n\nSee https://yade-dem.org/sphinx/user.html#batch-queuing-and-execution-yade-batch for details.\n\nBatch can be specified either with parameter table TABLE (must not end in .py), which is either followed by exactly one SIMULATION.py (must end in .py), or contains !SCRIPT column specifying the simulation to be run. The second option is to specify multiple scripts, which can optionally have /nCores suffix to specify number of cores for that particular simulation (corresponds to !CORES column in the parameter table), e.g. sim.py/3.'%prog)
 parser.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
-parser.add_argument('--job-threads',dest='defaultThreads',type=int,help="Default number of threads for one job; can be overridden by per-job with !THREADS (or !OMP_NUM_THREADS) column. Defaults to 1.",metavar='NUM',default=1)
-parser.add_argument('--force-threads',action='store_true',dest='forceThreads',help='Force jobs to not use more cores than the maximum (see \-j), even if !THREADS colums specifies more.')
 parser.add_argument('--log',dest='logFormat',help='Format of job log files: must contain a $, %% or @, which will be replaced by script name, line number or by description column respectively (default: $.%%.log)',metavar='FORMAT',default='$.%.log')
 parser.add_argument('--global-log',dest='globalLog',help='Filename where to redirect output of yade-batch itself (as opposed to \-\-log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_argument('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_argument('--nice',dest='nice',type=int,help='Nice value of spawned jobs (default: 10)',default=10)
-parser.add_argument('--cpu-affinity',dest='affinity',action='store_true',help='Bind each job to specific CPU cores; cores are assigned in a quasi-random order, depending on availability at the moment the jobs is started. Each job can override this setting by setting AFFINE column.')
 parser.add_argument('--executable',dest='executable',help='Name of the program to run (default: %s). Jobs can override with !EXEC column.'%executable,default=executable,metavar='FILE')
 parser.add_argument('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_argument('--timing',type=int,dest='timing',default=0,metavar='COUNT',help='Repeat each job COUNT times, and output a simple table with average/variance/minimum/maximum job duration; used for measuring how various parameters affect execution time. Jobs can override the global value with the !COUNT column.')
@@ -156,26 +152,26 @@ else:
 		m=re.match('(.*)(/[0-9]+)$',s)
 		if m:
 			params[fakeLineNo]['!SCRIPT']=m.group(1)
-			params[fakeLineNo]['!THREADS']=int(m.group(2)[1:])
+			params[fakeLineNo]['!CORES']=int(m.group(2)[1:])
 jobs=[]
 executables=set()
 logFiles=[]
 for i,l in enumerate(useLines):
 	script=scripts[0] if len(scripts)>0 else None
 	envVars=[]
-	nCores=opts.defaultThreads
+	nCores=1
+	nCpu=-1
 	jobExecutable=executable
-	jobAffinity=opts.affinity
 	jobCount=opts.timing
 	walltime = opts.oar_t
 	oarprops = opts.oar_prop
 	for col in params[l].keys():
 		if col[0]!='!': continue
 		val=params[l][col]
-		if col=='!OMP_NUM_THREADS' or col=='!THREADS': nCores=int(val)
+		if col=='!CORES': nCores=int(val)
+		elif col=='!CPU': nCpu=int(val)
 		elif col=='!EXEC': jobExecutable=val
 		elif col=='!SCRIPT': script=val
-		elif col=='!AFFINITY': jobAffinity=eval(val)
 		elif col=='!COUNT': jobCount=eval(val)
 		elif col=='!WALLTIME' : walltime=val
 		elif col=='!OARPROPERTIES' : oarprops=val
@@ -200,11 +196,13 @@ for i,l in enumerate(useLines):
 		logFiles.append(logFile2)
 		env='YADE_WALLTIME=%s YADE_BATCH='%walltime
 		if table: env+='%s:%d'%(os.path.abspath(table),l) # keep YADE_BATCH empty (but still defined) if running a single simulation
-		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,os.path.abspath(script))
+		nThread = nCores
+		if(nCpu == -1) : nThread = nCpu * nCores
+		cmd=' mpiexec -n %i %s%s -n -x %s 2>&1'%(nThread, jobExecutable,' --nice=%s'%nice if nice!=None else '',os.path.abspath(script))
 		desc=params[l]['description']
 		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
-		jobs.append(JobInfo(jobNum,desc,env+cmd,os.path.abspath('tmp/'+str(os.getpid())+'/'+logFile2),nCores,script=os.path.abspath(script),table=table,lineNo=l,affinity=jobAffinity,oarprop=oarprops))
+		jobs.append(JobInfo(jobNum,desc,env+cmd,os.path.abspath('tmp/'+str(os.getpid())+'/'+logFile2),nCores,nCpu,script=os.path.abspath(script),table=table,lineNo=l,oarprop=oarprops))
 
 if not os.path.exists('tmp/'+str(os.getpid())):
     os.makedirs('tmp/'+str(os.getpid()));
@@ -237,8 +235,14 @@ for job in jobs:
 
 
 		os.chmod(scriptname,0744);
+		
+		resources = 'core=%i'%(job.nCores);
+		
+		if job.nCpu != -1:
+			resources = 'cpu=%i/core=%i'%(job.nCpu,job.nCores);
+			
 		#os.system('%s'%(scriptname));
-		os.system('oarsub --project=%s %s -l/cpu=1/core=%i,walltime=%s -O %s -E %s.err %s\n'%(project, prop, job.nCores, walltime, job.log,job.log,scriptname));
+		os.system('oarsub --project=%s %s -l/%s,walltime=%s -O %s -E %s.err %s\n'%(project, prop, resources, walltime, job.log,job.log,scriptname));
 
                 
                 
