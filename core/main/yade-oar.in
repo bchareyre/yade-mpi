@@ -196,9 +196,7 @@ for i,l in enumerate(useLines):
 		logFiles.append(logFile2)
 		env='YADE_WALLTIME=%s YADE_BATCH='%walltime
 		if table: env+='%s:%d'%(os.path.abspath(table),l) # keep YADE_BATCH empty (but still defined) if running a single simulation
-		nThread = nCores
-		if(nCpu == -1) : nThread = nCpu * nCores
-		cmd=' mpiexec -n %i %s%s -n -x %s 2>&1'%(nThread, jobExecutable,' --nice=%s'%nice if nice!=None else '',os.path.abspath(script))
+		cmd=' mpiexec -np `cat $OAR_FILE_NODES|wc -l` -x LD_LIBRARY_PATH --machinefile $OAR_NODE_FILE -mca plm_rsh_agent "oarsh" %s%s -n -x %s 2>&1'%( jobExecutable,' --nice=%s'%nice if nice!=None else '',os.path.abspath(script))
 		desc=params[l]['description']
 		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
@@ -225,10 +223,10 @@ for job in jobs:
 				line = line.replace("__YADE_JOBID__", str(job.id))
 				outfile.write(line)
 
-		prop='';
+		prop='-t frag_ok';
 
 		if job.oarprop != '':
-			prop='-p '+job.oarprop;
+			prop=' -p '+job.oarprop;
 			
 		if opts.oar_best:
 			prop+=' -t besteffort'
