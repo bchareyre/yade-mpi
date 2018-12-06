@@ -24,8 +24,6 @@ The number of subdomains depends on argument 'n' of mpiexec. Since rank=0 is not
 readParamsFromTable(noTableOk=True,N=100,M=10)
 from yade.params.table import *
 
-M=table.M
-N=table.N
 
 NSTEPS=2000 #turn it >0 to see time iterations, else only initilization
 #N=100; M=100; #(columns, rows) per thread
@@ -58,7 +56,7 @@ def SaveAndQuit():
 	O.stopAtIter = O.iter + 1;
 
 #time.sleep(5)
-O.engines=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
+O.engines+=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
 
 if m_hasWalltime:
     O.engines += [PyRunner(command='SaveAndQuit()',realPeriod=m_Walltime*m_WalltimeStopAt)];

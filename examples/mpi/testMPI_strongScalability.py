@@ -19,8 +19,6 @@ The master process (rank=0) has no spheres assigned; it is in charge of getting 
 readParamsFromTable(noTableOk=True,zLength=10000)
 from yade.params.table import *
 
-zLength=table.zLength
-
 NSTEPS=2000#turn it >0 to see time iterations, else only initilization
 #identifier = os.environ["IDENTIFIER"]
 #################
@@ -51,7 +49,7 @@ def SaveAndQuit():
 	O.stopAtIter = O.iter + 1;
 
 #time.sleep(5)
-O.engines=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
+O.engines+=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
 
 if m_hasWalltime:
     O.engines += [PyRunner(command='SaveAndQuit()',realPeriod=m_Walltime*m_WalltimeStopAt)];
