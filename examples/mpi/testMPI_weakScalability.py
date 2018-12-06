@@ -32,6 +32,34 @@ NSTEPS=2000 #turn it >0 to see time iterations, else only initilization
 # This is to know if it was run with or without mpiexec (see preamble of this script)
 import os
 import time
+import re
+
+# Stop script before walltime ends
+m_hasWalltime       = 'YADE_WALLTIME' in os.environ;
+m_Walltime          = 0;
+m_WalltimeStopAt    = 0.95;
+
+if m_hasWalltime :
+    walltime = os.environ['YADE_WALLTIME'];
+    if re.search("^([0-9]+):([0-9]{2}):([0-9]{2})$",walltime) :
+        w = re.match("^([0-9]+):([0-9]{2}):([0-9]{2})$",walltime);
+        g = w.groups();
+        m_Walltime = 3600*float(g[0]) + 60*float(g[1]) + float(g[2]);
+        print "Will run for %i seconds"%m_Walltime;
+    else:
+        print "Wrong walltime format."
+        m_hasWalltime = False;
+        
+def SaveAndQuit():
+	print "Quit due to walltime expiration";
+	O.stopAtIter = O.iter + 1;
+
+#time.sleep(5)
+O.engines=[PyRunner(command='time.sleep(.005)',iterPeriod=1)]
+
+if m_hasWalltime:
+    O.engines += [PyRunner(command='SaveAndQuit()',realPeriod=m_Walltime*m_WalltimeStopAt)];
+
 timeStr = time.strftime('%m-%d-%Y')
 rank = os.getenv('OMPI_COMM_WORLD_RANK')
 if rank is not None: #mpiexec was used
@@ -120,4 +148,4 @@ else: #######  MPI  ######
 	mp.mergeScene()
 	#if rank==0: O.save('mergedScene.yade')
 	mp.MPI.Finalize()
-exit()
+waitIfBatch()
