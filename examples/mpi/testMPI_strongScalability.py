@@ -19,6 +19,8 @@ The master process (rank=0) has no spheres assigned; it is in charge of getting 
 readParamsFromTable(noTableOk=True,zLength=10000)
 from yade.params.table import *
 
+zLength=table.zLength
+
 NSTEPS=2000#turn it >0 to see time iterations, else only initilization
 #identifier = os.environ["IDENTIFIER"]
 #################
