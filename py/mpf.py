@@ -469,47 +469,18 @@ def mergeScene():
 				#bounds = comm.recv(source=worker,tag=_BOUNDS_) #optional
 				# generate corresponding ids (order is the same for both master and worker)
 				ids = [b.id for b in O.bodies if b.subdomain==worker_id]
-				# worler_id = [1, 2, 3]
-				# sizes = [0, 7619, 7619, 7619]
-				# dspl = [0, 0, 7619, 15878]
-				#FIXME HACK
 				shift = dspl[worker_id];
 				if (worker_id != numThreads-1):
-					shift_plus_un = dspl[worker_id+1];
+					shift_plus_one = dspl[worker_id+1];
 				else:		
-					shift_plus_un = len(dat);
-				print "Shift:", shift, shift_plus_un
-				O.subD.setStateBoundsValuesFromIds(ids,dat[shift: shift_plus_un]);
-				#for k in range(len(ids)):
-					#O.bodies[ids[k]].bound = bounds[k]
+					shift_plus_one = len(dat);
+				O.subD.setStateBoundsValuesFromIds(ids,dat[shift: shift_plus_one]);
 				reboundRemoteBodies(ids)
 		# turn mpi engines off
 		sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = True
 		O.splitted=False
 		collider.doSort = True
 		#O.save('mergedScene.yade')
-
-#def mergeScene():
-	#if O.splitted:
-		#if rank>0:
-			#send("mergeScene_1",O.subD.getStateValuesFromIds([b.id for b in O.bodies if b.subdomain==rank]), dest=0, tag=_POS_VEL_)
-			#send("mergeScene_2",[b.bound for b in O.bodies if b.subdomain==rank], dest=0, tag=_BOUNDS_) #optional, for collider.targetInter>0
-		#else: #master
-			#for worker in range(1,numThreads):
-				## get pos/vel
-				#dat = comm.recv(source=worker,tag=_POS_VEL_)
-				#bounds = comm.recv(source=worker,tag=_BOUNDS_) #optional
-				## generate corresponding ids (order is the same for both master and worker)
-				#ids = [b.id for b in O.bodies if b.subdomain==worker]
-				#O.subD.setStateValuesFromIds(ids,dat)
-				#for k in range(len(ids)):
-					#O.bodies[ids[k]].bound = bounds[k]
-				#reboundRemoteBodies(ids)
-		## turn mpi engines off
-		#sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = True
-		#O.splitted=False
-		#collider.doSort = True
-		##O.save('mergedScene.yade')
 
 def splitScene():
 	'''
