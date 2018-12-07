@@ -524,7 +524,7 @@ def splitScene():
 					for c in O.bodies[id].shape.getConnections():
 						if c.bounded: connected = True
 				if not connected: O.bodies.erase(id)
-	#collider.doSort = True
+	collider.doSort = True
 	collider.__call__()
 				
 	idx = O.engines.index(utils.typedEngine("NewtonIntegrator"))
