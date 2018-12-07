@@ -54,6 +54,7 @@ class Subdomain: public Shape {
 			for (unsigned i=0; i<3; i++) res.push_back(s->vel[i]);
 			for (unsigned i=0; i<3; i++) res.push_back(s->angVel[i]);
 			for (unsigned i=0; i<4; i++) res.push_back(s->ori.coeffs()[i]);
+			//HACK
 			if  (b->bound){
 				for (unsigned i=0; i<3; i++) res.push_back(b->bound->min[i]);
 				for (unsigned i=0; i<3; i++) res.push_back(b->bound->max[i]);
@@ -93,6 +94,7 @@ class Subdomain: public Shape {
 	}
 	
 	void setStateBoundsValuesFromIds(const vector<Body::id_t>& b_ids, const std::vector<Real>& input) { 
+		//HACK
 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
 		unsigned int N= b_ids.size();
 		if ((N*19) != input.size()) LOG_ERROR("size mismatch"<<N*19<<" vs "<<input.size()<< " in "<<scene->subdomain);
@@ -104,8 +106,16 @@ class Subdomain: public Shape {
 			s->vel=Vector3r(input[idx+3],input[idx+4],input[idx+5]);
 			s->angVel=Vector3r(input[idx+6],input[idx+7],input[idx+8]);
 			s->ori=Quaternionr(input[idx+12],input[idx+9],input[idx+10],input[idx+11]);//note q.coeffs() and q(w,x,y,z) take different oredrings
-			b->bound->min=Vector3r(input[idx+12],input[idx+13],input[idx+14]);
-			b->bound->max=Vector3r(input[idx+15],input[idx+16],input[idx+17]);
+
+			if (!b->bound){
+				b->bound = shared_ptr<Bound>(new Bound);
+			} else {
+				//std::cout << k << " " << input[idx] << " " << input[idx+1] << " " << input[idx+2] << endl;
+				std::cout << "set::Hello b<-bound==True" << endl;
+			}
+
+			b->bound->min = Vector3r(input[idx+13],input[idx+14],input[idx+15]);
+			b->bound->max = Vector3r(input[idx+16],input[idx+17],input[idx+18]);
 		}
 	}
 	

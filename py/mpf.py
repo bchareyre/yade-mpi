@@ -36,7 +36,7 @@ import time
 from mpi4py import MPI
 import pickle #just for measuring size of message before comm.irecv
 import numpy as np
-import yappi
+#import yappi
 
 this = sys.modules[__name__]
 
@@ -420,21 +420,40 @@ O.splittedOnce=False #after the first split we have additional bodies (Subdomain
 def mergeScene():
 	if O.splitted:
 		if rank>0:
+			# Workers
 			send_buff=np.asarray(O.subD.getStateBoundsValuesFromIds([b.id for b in O.bodies if b.subdomain==rank]))
 			size=np.array(len(send_buff),dtype=int)
 		else:
-			send_buff=np.array([])
+			#Master
+			send_buff=np.array([0])
 			size=np.array(0,dtype=int)
+
 		sizes=np.empty(numThreads,dtype=int)
-		
+		# Master get sizes from all workers
 		comm.Gather(size,sizes,root=0)
 		
+		
 		if(rank==0):
-			print sizes
-			dat=np.empty(sizes.sum()+1,dtype=np.float64)
+			# MASTER
+			print "Size:", sizes
+
+			# Alloc sizes for workers 
+			dat=np.ones(sizes.sum(),dtype=np.float64)
+
+			# Displacement indexes where data should be stored/received in targeted array
+			# dspl should be visible by everyone
+			dspl=np.empty(numThreads, dtype=int)
+			dspl[0] = 0
+			for i in range(1, len(sizes)):
+				dspl[i] = dspl[i-1] + sizes[i-1];
+			print dspl
 		else:
+			dspl=None
 			dat=None
-		comm.Gatherv([send_buff,size],[dat,sizes],root=0)			
+
+		# data sent = [data, size of data] (for each worker)
+		# data recv = [allocated target_array, array of different sizes, displacement, data type]
+		comm.Gatherv([send_buff, size], [dat, sizes, dspl, MPI.DOUBLE], root=0)
 		
 			#comm.send(len(send_buff), dest=0, tag=_SCENE_SIZE_)
 			
@@ -442,7 +461,7 @@ def mergeScene():
 			#comm.Send(send_buff,dest=0,tag=_POS_VEL_)
 			#send("mergeScene_2",[b.bound for b in O.bodies if b.subdomain==rank], dest=0, tag=_BOUNDS_) #optional, for collider.targetInter>0
 		if(rank==0): #master
-			for worker_id in range(1,len(sizes)):
+			for worker_id in range(1, numThreads):
 				# get pos/vel
 				#size=comm.recv(source=worker,tag=_SCENE_SIZE_)
 				#dat=np.empty(size,dtype=np.float64)
@@ -450,7 +469,17 @@ def mergeScene():
 				#bounds = comm.recv(source=worker,tag=_BOUNDS_) #optional
 				# generate corresponding ids (order is the same for both master and worker)
 				ids = [b.id for b in O.bodies if b.subdomain==worker_id]
-				O.subD.setStateBoundsValuesFromIds(ids,dat.tolist())
+				# worler_id = [1, 2, 3]
+				# sizes = [0, 7619, 7619, 7619]
+				# dspl = [0, 0, 7619, 15878]
+				#FIXME HACK
+				shift = dspl[worker_id];
+				if (worker_id != numThreads-1):
+					shift_plus_un = dspl[worker_id+1];
+				else:		
+					shift_plus_un = len(dat);
+				print "Shift:", shift, shift_plus_un
+				O.subD.setStateBoundsValuesFromIds(ids,dat[shift: shift_plus_un]);
 				#for k in range(len(ids)):
 					#O.bodies[ids[k]].bound = bounds[k]
 				reboundRemoteBodies(ids)
@@ -634,8 +663,8 @@ def splitScene():
 
 ##### RUN MPI #########
 def mpirun(nSteps,mergeSplit=False):
-	if(rank==1):
-		yappi.start(builtins=True)
+	#if(rank==1):
+		#yappi.start(builtins=True)
 	initStep = O.iter
 	if not O.splitted: splitScene()
 	if YADE_TIMING:
@@ -649,9 +678,9 @@ def mpirun(nSteps,mergeSplit=False):
 			if checkColliderActivated() and (O.iter-initStep)<nSteps:
 				mergeScene()
 				splitScene()
-	if(rank==1):
-		yappi.stop()
-		yappi.get_func_stats().print_all()
+	#if(rank==1):
+		#yappi.stop()
+		#yappi.get_func_stats().print_all()
 	comm.barrier()
 	time.sleep((numThreads-rank)*0.1)
 	for k,v in timings.items():

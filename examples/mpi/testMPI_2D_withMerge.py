@@ -22,7 +22,8 @@ The number of subdomains depends on argument 'n' of mpiexec. Since rank=0 is not
 
 '''
 
-NSTEPS=1000 #turn it >0 to see time iterations, else only initilization
+NSTEPS=2000 #turn it >0 to see time iterations, else only initilization TODO!HACK
+#NSTEPS=50 #turn it >0 to see time iterations, else only initilization
 N=100; M=100; #(columns, rows) per thread
 
 #################
@@ -59,7 +60,8 @@ for sd in range(0,numThreads-1):
 
 WALL_ID=O.bodies.append(box(center=(numThreads*N*0.5,-0.5,0),extents=(2*numThreads*N,0,2),fixed=True))
 
-collider.verletDist = 0.7
+#collider.verletDist = 0.7 TODO!HACK
+collider.verletDist = 0.5
 collider.targetInterv=200
 newton.gravity=(0,-10,0) #else nothing would move
 tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper. Very important: we don't want subdomains to use many different timesteps...
@@ -89,7 +91,8 @@ if rank is None: #######  Single-core  ######
 	print "Total force on floor=",O.forces.f(WALL_ID)[1]
 else: #######  MPI  ######
 	#import yade's mpi module
-	from yade import mpy as mp
+	#from yade import mpy as mp TODO!HACK
+	from yade import mpf as mp
 	# customize
 	mp.ACCUMULATE_FORCES=True #trigger force summation on master's body (here WALL_ID)
 	mp.VERBOSE_OUTPUT=False
@@ -104,6 +107,6 @@ else: #######  MPI  ######
 		collectTiming()
 	else: mp.mprint( "Partial force on floor="+str(O.forces.f(WALL_ID)[1]))
 	mp.mergeScene()
-	#if rank==0: O.save('mergedScene.yade')
+	if rank==0: O.save('mergedScene.yade')
 	mp.MPI.Finalize()
 exit()
