@@ -561,8 +561,8 @@ def splitScene():
                     
                     for sdId in O.subD.subdomains: 
                         O.bodies[sdId].shape.ids = [b.id for b in O.bodies if b.subdomain==O.bodies[sdId].subdomain]
-                    #for b in O.bodies:
-                        #b.shape.color = color_val[b.subdomain-1] #color
+                    for b in O.bodies:
+                        b.shape.color = color_val[b.subdomain-1] #color for testing reassignment
                     
                 
                         
