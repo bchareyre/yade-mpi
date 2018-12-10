@@ -167,7 +167,7 @@ class Subdomain: public Shape {
 		((Vector3r,boundsMax,Vector3r(NaN,NaN,NaN),,"max corner of all bboxes of members; differs from effective domain bounds by the extra length (sweepLength)"))
 		((IntersectionMap,intersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
 		((IntersectionMap,mirrorIntersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
-		((vector<Body::id_t>,ids,vector<Body::id_t>(),Attr::hidden,"Ids of owned particles.")) //FIXME
+		((vector<Body::id_t>,ids,vector<Body::id_t>(),,"Ids of owned particles.")) //FIXME
 		((vector<vector<Real> >,stateBuffer,vector<vector<Real> >(),(Attr::noSave | Attr::hidden),"container storing data from other subdomains")) 
 		,/*ctor*/ createIndex();
 		,/*py*/ /*.add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")*/
