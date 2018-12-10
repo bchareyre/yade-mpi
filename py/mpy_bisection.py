@@ -593,14 +593,14 @@ def splitScene():
 	moduleName = "mp"
 	if not O.splittedOnce: 
 		# append states communicator after Newton
-		O.engines=O.engines[:idx+1]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpyx'].sendRecvStates()",label="sendRecvStatesRunner")]+O.engines[idx+1:]
+		O.engines=O.engines[:idx+1]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy_bisection'].sendRecvStates()",label="sendRecvStatesRunner")]+O.engines[idx+1:]
 		
 		# append force communicator before Newton
-		O.engines=O.engines[:idx]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpyx'].isendRecvForces()",label="isendRecvForcesRunner")]+O.engines[idx:]
+		O.engines=O.engines[:idx]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy_bisection'].isendRecvForces()",label="isendRecvForcesRunner")]+O.engines[idx:]
 		
 		# append engine waiting until forces are effectively sent to master
-		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpyx'].waitForces()",label="waitForcesRunner")]
-		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="if sys.modules['yade.mpyx'].checkColliderActivated(): O.pause()",label="collisionChecker")]
+		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy_bisection'].waitForces()",label="waitForcesRunner")]
+		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="if sys.modules['yade.mpy_bisection'].checkColliderActivated(): O.pause()",label="collisionChecker")]
 	else:
 		sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = False
 	
