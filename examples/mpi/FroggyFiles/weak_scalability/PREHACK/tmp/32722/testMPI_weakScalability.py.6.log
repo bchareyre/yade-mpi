@@ -1,0 +1,59 @@
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.[frog53:04318] Warning: could not find environment variable "LD_LIBRARY_PATH"
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed./applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed./bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.[95mmaster:rank 1 triggers collider at iter 837: paused[0m
+-------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+-------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec noticed that process rank 8 with PID 96705 on node frog54 exited on signal 9 (Killed).
+--------------------------------------------------------------------------

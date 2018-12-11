@@ -1,0 +1,46 @@
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.[frog69:74633] Warning: could not find environment variable "LD_LIBRARY_PATH"
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.[95mmaster:rank 1 triggers collider at iter 837: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1165: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1435: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1662: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1861: paused[0m
+[93mworker1: #####  Worker 1  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139             101452us                1.41%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            5538533us               77.11%      
+"isendRecvForcesRunner"                             139              21586us                0.30%      
+"newton"                                            139            1503596us               20.93%      
+"sendRecvStatesRunner"                              139              15022us                0.21%      
+"waitForcesRunner"                                  139               2841us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                              7183033us              100.00%      
+
+num. bodies: 40002 40002
+[93mworker1: Partial force on floor=-33273112.68[0m
+[95mmaster:#####  Worker 0  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                      2000            1568056us                1.80%      
+"collider"                                            1              14037us                0.02%      
+"interactionLoop"                                  2000              22672us                0.03%      
+"isendRecvForcesRunner"                            2000           81763433us               94.05%      
+"newton"                                           2000            3345249us                3.85%      
+"sendRecvStatesRunner"                             2000             186341us                0.21%      
+"waitForcesRunner"                                 2000              38074us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             86937865us              100.00%      
+
+num. bodies: 40002 40002
+[95mmaster:Total force on floor=-33273112.68[0m

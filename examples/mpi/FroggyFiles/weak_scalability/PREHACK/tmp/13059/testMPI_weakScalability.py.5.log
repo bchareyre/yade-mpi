@@ -1,0 +1,166 @@
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.[frog112:90712] Warning: could not find environment variable "LD_LIBRARY_PATH"
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+/applis/ciment/v2/stow/noarch/irods_2.5/irods_completion.bash: line 69: complete: command not found
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+/bin/sh: error importing function definition for `BASH_FUNC_module%%'
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.Running script /home/robertcaulk/hackathon2018/weak_scalability/PREHACK/testMPI_weakScalability.py
+libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.libibverbs: Warning: getrlimit(RLIMIT_MEMLOCK) failed.[95mmaster:rank 1 triggers collider at iter 837: paused[0m
+[95mmaster:rank 7 triggers collider at iter 1165: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1435: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1662: paused[0m
+[95mmaster:rank 1 triggers collider at iter 1861: paused[0m
+[94mworker7: #####  Worker 7  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2978910us               18.78%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8913428us               56.20%      
+"isendRecvForcesRunner"                             139              72293us                0.46%      
+"newton"                                            139            3745804us               23.62%      
+"sendRecvStatesRunner"                              139             141488us                0.89%      
+"waitForcesRunner"                                  139               7030us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             15858955us              100.00%      
+
+num. bodies: 41264 280008
+[94mworker7: Partial force on floor=-32241666.9449[0m
+[94mworker6: #####  Worker 6  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2984884us               18.76%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8803721us               55.33%      
+"isendRecvForcesRunner"                             139              59303us                0.37%      
+"newton"                                            139            3828961us               24.06%      
+"sendRecvStatesRunner"                              139             227928us                1.43%      
+"waitForcesRunner"                                  139               6233us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             15911033us              100.00%      
+
+num. bodies: 42434 280008
+[94mworker6: Partial force on floor=-32088424.276[0m
+[94mworker5: #####  Worker 5  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2978315us               18.69%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8765426us               55.02%      
+"isendRecvForcesRunner"                             139              62852us                0.39%      
+"newton"                                            139            3784260us               23.75%      
+"sendRecvStatesRunner"                              139             334226us                2.10%      
+"waitForcesRunner"                                  139               6415us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             15931497us              100.00%      
+
+num. bodies: 42434 280008
+[94mworker5: Partial force on floor=-32088416.7509[0m
+[94mworker4: #####  Worker 4  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2976952us               18.67%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8844079us               55.47%      
+"isendRecvForcesRunner"                             139              70654us                0.44%      
+"newton"                                            139            3784642us               23.74%      
+"sendRecvStatesRunner"                              139             262615us                1.65%      
+"waitForcesRunner"                                  139               6090us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             15945034us              100.00%      
+
+num. bodies: 42434 280008
+[94mworker4: Partial force on floor=-32088418.4899[0m
+[94mworker3: #####  Worker 3  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2977245us               18.15%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8821720us               53.78%      
+"isendRecvForcesRunner"                             139              62020us                0.38%      
+"newton"                                            139            3786722us               23.09%      
+"sendRecvStatesRunner"                              139             748581us                4.56%      
+"waitForcesRunner"                                  139               6457us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             16402747us              100.00%      
+
+num. bodies: 42434 280008
+[94mworker3: Partial force on floor=-32088421.6239[0m
+[94mworker2: #####  Worker 2  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2985117us               18.16%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8875194us               54.00%      
+"isendRecvForcesRunner"                             139             103327us                0.63%      
+"newton"                                            139            3761388us               22.89%      
+"sendRecvStatesRunner"                              139             704316us                4.29%      
+"waitForcesRunner"                                  139               6001us                0.04%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             16435345us              100.00%      
+
+num. bodies: 42434 280008
+[94mworker2: Partial force on floor=-32088419.1134[0m
+[93mworker1: #####  Worker 1  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                       139            2983205us               18.26%      
+"collider"                                            0                  0us                0.00%      
+"interactionLoop"                                   139            8746282us               53.54%      
+"isendRecvForcesRunner"                             139              47924us                0.29%      
+"newton"                                            139            4447996us               27.23%      
+"sendRecvStatesRunner"                              139             107516us                0.66%      
+"waitForcesRunner"                                  139               3707us                0.02%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                             16336632us              100.00%      
+
+num. bodies: 41178 280008
+[93mworker1: Partial force on floor=-33119861.7798[0m
+[95mmaster:#####  Worker 0  ######[0m
+Name                                                    Count                 Time            Rel. time
+-------------------------------------------------------------------------------------------------------
+ForceResetter                                      2000           42953060us               19.07%      
+"collider"                                            1             128374us                0.06%      
+"interactionLoop"                                  2000              72852us                0.03%      
+"isendRecvForcesRunner"                            2000          132048864us               58.63%      
+"newton"                                           2000           49726866us               22.08%      
+"sendRecvStatesRunner"                             2000             244888us                0.11%      
+"waitForcesRunner"                                 2000              46265us                0.02%      
+"collisionChecker"                                    0                  0us                0.00%      
+TOTAL                                                            225221173us              100.00%      
+
+num. bodies: 280008 280008
+[95mmaster:Total force on floor=-225803628.979[0m

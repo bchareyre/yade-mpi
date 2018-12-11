@@ -1,0 +1,2 @@
+numThreads mpi omp Nspheres wallTime merge
+4 4 1 120004 168.362 1

@@ -1,0 +1,4 @@
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+## OAR [2018-12-10 13:42:16] Job 15106417 KILLED ##

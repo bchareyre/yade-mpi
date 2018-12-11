@@ -1,0 +1,3 @@
+numThreads mpi omp Nspheres force TotalRuntime isendRecvForces sendRecvStates waitForces collisionChecker collider Merge
+4 4 1 270004 -1.73552e+08 352.648 292.868 0.305631 0.0423401 0 0.11208 1
+8 8 1 630008 -3.99895e+08 686.768 473.372 0.257686 0.0435596 0 0.297852 1

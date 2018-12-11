@@ -1,0 +1,4 @@
+ls: cannot access /home/robertcaulk/.nix-profile: Stale file handle
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
+GC Warning: pthread_getattr_np or pthread_attr_getstack failed for main thread
