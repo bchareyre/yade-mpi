@@ -914,6 +914,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
 		.def("erase", &pyBodyContainer::erase,(py::arg("eraseClumpMembers")=0),"Erase body with the given id; all interaction will be deleted by InteractionLoop in the next step. If a clump is erased use *O.bodies.erase(clumpId,True)* to erase the clump AND its members.")
 		.def("replace",&pyBodyContainer::replace)
+	  .def("insertAtId",&pyBodyContainer::insertAtId,(py::arg("insertatid")),"Insert a body at theid, (no body should exist in this id)")
 		.add_property("rawBodies",&pyBodyContainer::raw_bodies_get,&pyBodyContainer::raw_bodies_set,"Bodies in the current simulation in the form of pickle-friendly raw container. In typical situations it is better to access bodies as 'O.bodies', which offers better python support. This one may be used for debugging or advanced manipulations.");
 	py::class_<pyBodyIterator>("BodyIterator",py::init<pyBodyIterator&>())
 		.def("__iter__",&pyBodyIterator::pyIter)
