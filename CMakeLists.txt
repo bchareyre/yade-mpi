@@ -148,7 +148,7 @@ OPTION(ENABLE_MASK_ARBITRARY "Enable arbitrary precision of bitmask variables (o
 OPTION(ENABLE_PROFILING "Enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)" OFF)
 OPTION(ENABLE_POTENTIAL_PARTICLES "Enable potential particles" OFF)
 OPTION(ENABLE_OAR "Generate script for oar-based task scheduler" OFF)
-OPTION(USE_QT5 "USE Qt5 for GUI" ON)
+OPTION(USE_QT5 "USE Qt5 for GUI" OFF)
 OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" OFF)
 OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver (experimental)" OFF)
