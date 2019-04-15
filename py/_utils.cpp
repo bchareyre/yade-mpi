@@ -27,6 +27,23 @@ py::tuple coordsAndDisplacements(int axis,py::tuple Aabb){
 	return py::make_tuple(retCoord,retDispl);
 }
 
+string serializeMPIBodyContainer(shared_ptr<MPIBodyContainer>& container) {
+  ostringstream oss;
+  yade::ObjectIO::save<decltype(container),boost::archive::binary_oarchive>(oss,"bodycontainer",container);
+  oss.flush() ;
+  return oss.str();
+}
+
+shared_ptr<MPIBodyContainer> deSerializeMPIBodyContainer(const string& containerString) {
+	
+	shared_ptr<MPIBodyContainer> container(shared_ptr<MPIBodyContainer> (new MPIBodyContainer()));
+  istringstream iss(containerString);
+  yade::ObjectIO::load<decltype(container),boost::archive::binary_iarchive>(iss,"bodycontainer",container);
+  return container;
+}
+
+
+
 void setRefSe3(){
 	Scene* scene=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
@@ -75,11 +92,11 @@ py::tuple bodyNumInteractionsHistogram(py::tuple aabb){
 		if(!i->isReal()) continue;
 		const Body::id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) {
-			if (b1->isClumpMember()) bodyNumIntr[b1->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			if (b1->isClumpMember()) bodyNumIntr[b1->clumpId]+=1; //count bodyNumIntr for the clump, not for the member
 			else bodyNumIntr[id1]+=1;
 		}
 		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) {
-			if (b2->isClumpMember()) bodyNumIntr[b2->clumpId]+=1; //count bodyNumIntr for the clump, not for the member 
+			if (b2->isClumpMember()) bodyNumIntr[b2->clumpId]+=1; //count bodyNumIntr for the clump, not for the member
 			else bodyNumIntr[id2]+=1;
 		}
 		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
@@ -222,7 +239,7 @@ void wireNoSpheres(){wireSome("noSpheres");}
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
  *   2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided with the distribution.
- *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission. 
+ *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission.
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * http://numpy.scipy.org/numpydoc/numpy-13.html told me how to use Numeric.array from c
@@ -275,7 +292,7 @@ Real approxSectionArea(Real coord, int axis){
 }
 /* Find all interactions deriving from NormShearPhys that cross plane given by a point and normal
 	(the normal may not be normalized in this case, though) and sum forces (both normal and shear) on them.
-	
+
 	Returns a 3-tuple with the components along global x,y,z axes, which can be viewed as "action from lower part, towards
 	upper part" (lower and upper parts with respect to the plane's normal).
 
@@ -455,7 +472,8 @@ void setBodyColor(int id, Vector3r newColor){
 
 BOOST_PYTHON_MODULE(_utils){
 	YADE_SET_DOCSTRING_OPTS;
-
+  py::def("serializeMPIBodyContainer",serializeMPIBodyContainer, (py::arg("container")), "test serializing . ");
+	py::def("deSerializeMPIBodyContainer",deSerializeMPIBodyContainer,(py::arg("containerString")),  "test deserializing");
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
 	py::def("RayleighWaveTimeStep",RayleighWaveTimeStep,"Determination of time step according to Rayleigh wave speed of force propagation.");
 	py::def("getSpheresVolume",Shop__getSpheresVolume,(py::arg("mask")=-1),"Compute the total volume of spheres in the simulation, mask parameter is considered");

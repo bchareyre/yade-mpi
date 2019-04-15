@@ -10,7 +10,11 @@
 #include<lib/computational-geometry/Hull2d.hpp>
 #include<lib/pyutil/doc_opts.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
-
+#include<pkg/mpi/MPIBodyContainer.hpp>
+#include <boost/archive/codecvt_null.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <lib/serialization/ObjectIO.hpp>
 namespace py = boost::python;
 
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax);
@@ -23,6 +27,10 @@ void setRefSe3();
 
 Real PWaveTimeStep();
 Real RayleighWaveTimeStep();
+
+
+string serializeMPIBodyContainer(shared_ptr<MPIBodyContainer>& ) ;
+shared_ptr<MPIBodyContainer> deSerializeMPIBodyContainer(const string& ); 
 
 py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::tuple aabb=py::tuple(), bool sphSph=0, Real minProjLen=1e-6);
 
@@ -79,7 +87,7 @@ void wireNoSpheres();
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
  *   2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided with the distribution.
- *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission. 
+ *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission.
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * http://numpy.scipy.org/numpydoc/numpy-13.html told me how to use Numeric.array from c
@@ -97,7 +105,7 @@ Real approxSectionArea(Real coord, int axis);
 
 /* Find all interactions deriving from NormShearPhys that cross plane given by a point and normal
 	(the normal may not be normalized in this case, though) and sum forces (both normal and shear) on them.
-	
+
 	Returns a 3-tuple with the components along global x,y,z axes, which can be viewed as "action from lower part, towards
 	upper part" (lower and upper parts with respect to the plane's normal).
 
