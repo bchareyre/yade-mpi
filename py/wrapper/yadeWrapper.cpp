@@ -703,15 +703,7 @@ class pyOmega{
 		OMEGA.sceneFile=":memory:"+mark;
 		load(OMEGA.sceneFile,true);
 	}
-	
-	string bodyContainertoString(){ 
-	  // get the scene. 
-	  ostringstream oss; 
-	  const shared_ptr<Scene>& scene  = Omega::instance().getScene();
-	  const shared_ptr<BodyContainer>& b = scene->bodies; 
-	  yade::ObjectIO::save<decltype(#here#),boost::archive::binary_oarchive>(oss,"scene",#here#); 
-	}
-	
+
 	int thisScene(){return OMEGA.currentSceneNb;}
 
 	void save(std::string fileName,bool quiet=false){
